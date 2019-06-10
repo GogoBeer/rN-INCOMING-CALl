@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\common.init.vcxproj" />
+  <Import Project="..\common.qt.init.vcxproj" />
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{51201D5E-D939-4854-AE9D-008F03FF518E}</ProjectGuid>
+    <ConfigurationType>Application</ConfigurationType>
+    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
+  </PropertyGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\src\init\bitcoin-qt.cpp" />
+    <ClCompile Include="..\..\src\test\util\setup_common.cpp" />
+    <ClCompile Include="..\..\src\qt\test\addressbooktests.cpp" />
+    <ClCompile Include="..\..\src\qt\test\apptests.cpp" />
+    <ClCompile Include="..\..\src\qt\test\rpcnestedtests.cpp" />
+    <ClCompile Include="..\..\src\qt\test\test_main.cpp" />
+    <ClCompile Include="..\..\src\qt\test\uritests.cpp" />
+    <ClCompile Include="..\..\src\qt\test\util.cpp" />
+    <ClCompile Include="..\..\src\qt\test\wallettests.cpp" />
+    <ClCompile Include="..\..\src\wallet\test\wallet_test_fixture.cpp" />
