@@ -73,4 +73,51 @@ Test functionality:
 
 Limit retries:
 
-`retry -t 4 '
+`retry -t 4 'echo "y u no work"; false'`
+
+    y u no work
+    Before retry #1: sleeping 0.3 seconds
+    y u no work
+    Before retry #2: sleeping 0.6 seconds
+    y u no work
+    Before retry #3: sleeping 1.2 seconds
+    y u no work
+    Before retry #4: sleeping 2.4 seconds
+    y u no work
+    Retries exhausted
+
+Bad command:
+
+`retry poop`
+
+    bash: poop: command not found
+
+Fail command:
+
+`retry -t 3 -f 'echo "oh poopsickles"' 'echo "y u no work"; false'`
+
+    y u no work
+    Before retry #1: sleeping 0.3 seconds
+    y u no work
+    Before retry #2: sleeping 0.6 seconds
+    y u no work
+    Before retry #3: sleeping 1.2 seconds
+    y u no work
+    Retries exhausted, running fail script
+    oh poopsickles
+
+Last attempt passed:
+
+`retry -t 3 -- 'if [ $RETRY_ATTEMPT -eq 3 ]; then echo Passed at attempt $RETRY_ATTEMPT; true; else echo Failed at attempt $RETRY_ATTEMPT; false; fi;'`
+
+    Failed at attempt 0
+    Before retry #1: sleeping 0.3 seconds
+    Failed at attempt 1
+    Before retry #2: sleeping 0.6 seconds
+    Failed at attempt 2
+    Before retry #3: sleeping 1.2 seconds
+    Passed at attempt 3
+
+### License
+
+Apache 2.0 - go nuts
