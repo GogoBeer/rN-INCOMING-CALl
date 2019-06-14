@@ -38,4 +38,25 @@ fi
 
 if [[ ${USE_MEMORY_SANITIZER} == "true" ]]; then
   # Use BDB compiled using install_db4.sh script to work around linking issue when using BDB
-  # from depends. See https://github.
+  # from depends. See https://github.com/bitcoin/bitcoin/pull/18288#discussion_r433189350 for
+  # details.
+  DOCKER_EXEC "contrib/install_db4.sh \$(pwd) --enable-umrw CC=clang CXX=clang++ CFLAGS='${MSAN_FLAGS}' CXXFLAGS='${MSAN_AND_LIBCXX_FLAGS}'"
+fi
+
+if [[ $HOST = *-mingw32 ]]; then
+  DOCKER_EXEC update-alternatives --set "${HOST}-g++" \$\(which "${HOST}-g++-posix"\)
+fi
+if [ -z "$NO_DEPENDS" ]; then
+  if [[ $DOCKER_NAME_TAG == centos* ]]; then
+    # CentOS has problems building the depends if the config shell is not explicitly set
+    # (i.e. for libevent a Makefile with an empty SHELL variable is generated, leading to
+    #  an error as the first command is executed)
+    SHELL_OPTS="LC_ALL=en_US.UTF-8 CONFIG_SHELL=/bin/bash"
+  else
+    SHELL_OPTS="CONFIG_SHELL="
+  fi
+  DOCKER_EXEC "$SHELL_OPTS" make "$MAKEJOBS" -C depends HOST="$HOST" "$DEP_OPTS"
+fi
+if [ -n "$PREVIOUS_RELEASES_TO_DOWNLOAD" ]; then
+  DOCKER_EXEC test/get_previous_releases.py -b -t "$PREVIOUS_RELEASES_DIR" "${PREVIOUS_RELEASES_TO_DOWNLOAD}"
+fi
