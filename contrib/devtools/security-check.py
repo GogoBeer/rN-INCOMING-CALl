@@ -157,4 +157,104 @@ def check_MACHO_Canary(binary) -> bool:
     '''
     Check for use of stack canary
     '''
-    return binary.has_symbol('
+    return binary.has_symbol('___stack_chk_fail')
+
+def check_PIE(binary) -> bool:
+    '''
+    Check for position independent executable (PIE),
+    allowing for address space randomization.
+    '''
+    return binary.is_pie
+
+def check_NX(binary) -> bool:
+    '''
+    Check for no stack execution
+    '''
+    return binary.has_nx
+
+def check_control_flow(binary) -> bool:
+    '''
+    Check for control flow instrumentation
+    '''
+    content = binary.get_content_from_virtual_address(binary.entrypoint, 4, lief.Binary.VA_TYPES.AUTO)
+
+    if content == [243, 15, 30, 250]: # endbr64
+        return True
+    return False
+
+BASE_ELF = [
+    ('PIE', check_PIE),
+    ('NX', check_NX),
+    ('RELRO', check_ELF_RELRO),
+    ('Canary', check_ELF_Canary),
+    ('separate_code', check_ELF_separate_code),
+]
+
+BASE_PE = [
+    ('PIE', check_PIE),
+    ('DYNAMIC_BASE', check_PE_DYNAMIC_BASE),
+    ('HIGH_ENTROPY_VA', check_PE_HIGH_ENTROPY_VA),
+    ('NX', check_NX),
+    ('RELOC_SECTION', check_PE_RELOC_SECTION),
+    ('CONTROL_FLOW', check_PE_control_flow),
+]
+
+BASE_MACHO = [
+    ('PIE', check_PIE),
+    ('NOUNDEFS', check_MACHO_NOUNDEFS),
+    ('NX', check_NX),
+    ('LAZY_BINDINGS', check_MACHO_LAZY_BINDINGS),
+    ('Canary', check_MACHO_Canary),
+    ('CONTROL_FLOW', check_control_flow),
+]
+
+CHECKS = {
+    lief.EXE_FORMATS.ELF: {
+        lief.ARCHITECTURES.X86: BASE_ELF,
+        lief.ARCHITECTURES.ARM: BASE_ELF,
+        lief.ARCHITECTURES.ARM64: BASE_ELF,
+        lief.ARCHITECTURES.PPC: BASE_ELF,
+        LIEF_ELF_ARCH_RISCV: BASE_ELF,
+    },
+    lief.EXE_FORMATS.PE: {
+        lief.ARCHITECTURES.X86: BASE_PE,
+    },
+    lief.EXE_FORMATS.MACHO: {
+        lief.ARCHITECTURES.X86: BASE_MACHO,
+    }
+}
+
+if __name__ == '__main__':
+    retval: int = 0
+    for filename in sys.argv[1:]:
+        try:
+            binary = lief.parse(filename)
+            etype = binary.format
+            arch = binary.abstract.header.architecture
+            binary.concrete
+
+            if etype == lief.EXE_FORMATS.UNKNOWN:
+                print(f'{filename}: unknown executable format')
+                retval = 1
+                continue
+
+            if arch == lief.ARCHITECTURES.NONE:
+                if binary.header.machine_type == LIEF_ELF_ARCH_RISCV:
+                    arch = LIEF_ELF_ARCH_RISCV
+                else:
+                    print(f'{filename}: unknown architecture')
+                    retval = 1
+                    continue
+
+            failed: List[str] = []
+            for (name, func) in CHECKS[etype][arch]:
+                if not func(binary):
+                    failed.append(name)
+            if failed:
+                print(f'{filename}: failed {" ".join(failed)}')
+                retval = 1
+        except IOError:
+            print(f'{filename}: cannot open')
+            retval = 1
+    sys.exit(retval)
+
