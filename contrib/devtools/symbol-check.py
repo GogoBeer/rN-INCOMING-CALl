@@ -134,4 +134,164 @@ MACHO_ALLOWED_LIBRARIES = {
 'CoreServices', # operating system services
 'CoreText', # interface for laying out text and handling fonts.
 'CoreVideo', # video processing
-'Foundation', # base layer functionality for a
+'Foundation', # base layer functionality for apps/frameworks
+'ImageIO', # read and write image file formats.
+'IOKit', # user-space access to hardware devices and drivers.
+'IOSurface', # cross process image/drawing buffers
+'libobjc.A.dylib', # Objective-C runtime library
+'Metal', # 3D graphics
+'Security', # access control and authentication
+'QuartzCore', # animation
+}
+
+PE_ALLOWED_LIBRARIES = {
+'ADVAPI32.dll', # security & registry
+'IPHLPAPI.DLL', # IP helper API
+'KERNEL32.dll', # win32 base APIs
+'msvcrt.dll', # C standard library for MSVC
+'SHELL32.dll', # shell API
+'USER32.dll', # user interface
+'WS2_32.dll', # sockets
+# bitcoin-qt only
+'dwmapi.dll', # desktop window manager
+'GDI32.dll', # graphics device interface
+'IMM32.dll', # input method editor
+'NETAPI32.dll',
+'ole32.dll', # component object model
+'OLEAUT32.dll', # OLE Automation API
+'SHLWAPI.dll', # light weight shell API
+'USERENV.dll',
+'UxTheme.dll',
+'VERSION.dll', # version checking
+'WINMM.dll', # WinMM audio API
+'WTSAPI32.dll',
+'d3d11.dll',
+'dxgi.dll',
+}
+
+def check_version(max_versions, version, arch) -> bool:
+    (lib, _, ver) = version.rpartition('_')
+    ver = tuple([int(x) for x in ver.split('.')])
+    if not lib in max_versions:
+        return False
+    if isinstance(max_versions[lib], tuple):
+        return ver <= max_versions[lib]
+    else:
+        return ver <= max_versions[lib][arch]
+
+def check_imported_symbols(binary) -> bool:
+    ok: bool = True
+
+    for symbol in binary.imported_symbols:
+        if not symbol.imported:
+            continue
+
+        version = symbol.symbol_version if symbol.has_version else None
+
+        if version:
+            aux_version = version.symbol_version_auxiliary.name if version.has_auxiliary_version else None
+            if aux_version and not check_version(MAX_VERSIONS, aux_version, binary.header.machine_type):
+                print(f'{filename}: symbol {symbol.name} from unsupported version {version}')
+                ok = False
+    return ok
+
+def check_exported_symbols(binary) -> bool:
+    ok: bool = True
+
+    for symbol in binary.dynamic_symbols:
+        if not symbol.exported:
+            continue
+        name = symbol.name
+        if binary.header.machine_type == LIEF_ELF_ARCH_RISCV or name in IGNORE_EXPORTS:
+            continue
+        print(f'{binary.name}: export of symbol {name} not allowed!')
+        ok = False
+    return ok
+
+def check_ELF_libraries(binary) -> bool:
+    ok: bool = True
+    for library in binary.libraries:
+        if library not in ELF_ALLOWED_LIBRARIES:
+            print(f'{filename}: {library} is not in ALLOWED_LIBRARIES!')
+            ok = False
+    return ok
+
+def check_MACHO_libraries(binary) -> bool:
+    ok: bool = True
+    for dylib in binary.libraries:
+        split = dylib.name.split('/')
+        if split[-1] not in MACHO_ALLOWED_LIBRARIES:
+            print(f'{split[-1]} is not in ALLOWED_LIBRARIES!')
+            ok = False
+    return ok
+
+def check_MACHO_min_os(binary) -> bool:
+    if binary.build_version.minos == [10,15,0]:
+        return True
+    return False
+
+def check_MACHO_sdk(binary) -> bool:
+    if binary.build_version.sdk == [10, 15, 6]:
+        return True
+    return False
+
+def check_PE_libraries(binary) -> bool:
+    ok: bool = True
+    for dylib in binary.libraries:
+        if dylib not in PE_ALLOWED_LIBRARIES:
+            print(f'{dylib} is not in ALLOWED_LIBRARIES!')
+            ok = False
+    return ok
+
+def check_PE_subsystem_version(binary) -> bool:
+    major: int = binary.optional_header.major_subsystem_version
+    minor: int = binary.optional_header.minor_subsystem_version
+    if major == 6 and minor == 1:
+        return True
+    return False
+
+def check_ELF_interpreter(binary) -> bool:
+    expected_interpreter = ELF_INTERPRETER_NAMES[binary.header.machine_type][binary.abstract.header.endianness]
+
+    return binary.concrete.interpreter == expected_interpreter
+
+CHECKS = {
+lief.EXE_FORMATS.ELF: [
+    ('IMPORTED_SYMBOLS', check_imported_symbols),
+    ('EXPORTED_SYMBOLS', check_exported_symbols),
+    ('LIBRARY_DEPENDENCIES', check_ELF_libraries),
+    ('INTERPRETER_NAME', check_ELF_interpreter),
+],
+lief.EXE_FORMATS.MACHO: [
+    ('DYNAMIC_LIBRARIES', check_MACHO_libraries),
+    ('MIN_OS', check_MACHO_min_os),
+    ('SDK', check_MACHO_sdk),
+],
+lief.EXE_FORMATS.PE: [
+    ('DYNAMIC_LIBRARIES', check_PE_libraries),
+    ('SUBSYSTEM_VERSION', check_PE_subsystem_version),
+]
+}
+
+if __name__ == '__main__':
+    retval: int = 0
+    for filename in sys.argv[1:]:
+        try:
+            binary = lief.parse(filename)
+            etype = binary.format
+            if etype == lief.EXE_FORMATS.UNKNOWN:
+                print(f'{filename}: unknown executable format')
+                retval = 1
+                continue
+
+            failed: List[str] = []
+            for (name, func) in CHECKS[etype]:
+                if not func(binary):
+                    failed.append(name)
+            if failed:
+                print(f'{filename}: failed {" ".join(failed)}')
+                retval = 1
+        except IOError:
+            print(f'{filename}: cannot open')
+            retval = 1
+    sys.exit(retval)
