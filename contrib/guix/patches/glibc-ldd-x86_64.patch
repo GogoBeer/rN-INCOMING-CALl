@@ -1,0 +1,2 @@
+By default, 'RTDLLIST' in 'ldd' refers to 'lib64/ld-linux-x86-64.so', whereas
+it's in 'lib/' for us.  T

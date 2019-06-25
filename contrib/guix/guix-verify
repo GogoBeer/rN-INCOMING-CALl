@@ -149,4 +149,26 @@ if (( ${#all_all[@]} )); then
     # noncodesigned.SHA256SUMS that doesn't exist in all.SHA256SUMS
     if [[ "$(comm -23 <(sort "$compare_noncodesigned") <(sort "$compare_all") | wc -c)" -ne 0 ]]; then
         echo "ERR: There are unique lines in noncodesigned.SHA256SUMS which"
-        echo "     do not exist in all.SHA256SUMS, som
+        echo "     do not exist in all.SHA256SUMS, something went very wrong."
+        exit 1
+    fi
+
+    echo "DONE: Checking output signatures for all.SHA256SUMS"
+    echo ""
+else
+    echo "WARN: No signature directories with all.SHA256SUMS found"
+    echo ""
+fi
+
+echo "===================="
+echo ""
+if (( ${#all_noncodesigned[@]} + ${#all_all[@]} == 0 )); then
+    echo "ERR: Unable to perform any verifications as no signature directories"
+    echo "     were found"
+    echo ""
+    exit 1
+fi
+
+if [ -n "$failure" ]; then
+    exit 1
+fi
