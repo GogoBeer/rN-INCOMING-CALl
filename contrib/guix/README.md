@@ -479,4 +479,6 @@ start over.
 
 [debian/guix-bullseye]: https://packages.debian.org/bullseye/guix
 [ubuntu/guix-hirsute]: https://packages.ubuntu.com/hirsute/guix
-[fanquake/guix-docker]: https://github.com/fanquake/core-review/tree/master/g
+[fanquake/guix-docker]: https://github.com/fanquake/core-review/tree/master/guix
+
+[env-vars-list]: #recognized-environment-variables
