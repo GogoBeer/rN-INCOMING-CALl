@@ -230,4 +230,11 @@ index bb62a31..d276a35 100644
 +   and ENOMEN if memory cannot be allocated.  */
 +extern error_t __argz_suffix_entries (char **__restrict __argz,
 +				      size_t *__restrict __argz_len,
-+				
++				      const char *__restrict __suffix);
++extern error_t argz_suffix_entries (char **__restrict __argz,
++				    size_t *__restrict __argz_len,
++				    const char *__restrict __suffix);
++
+ 
+ /* Returns the next entry in ARGZ & ARGZ_LEN after ENTRY, or NULL if there
+    are no more.  If entry is NULL, then the first entry is returned.  This
