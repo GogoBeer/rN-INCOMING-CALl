@@ -146,4 +146,115 @@ index 5fdee5a..0b75f57 100644
  		MUTEX_LOCK(env, alloc_bhp->mtx_buf);
  		alloc_bhp->priority = bhp->priority;
  		alloc_bhp->pgno = bhp->pgno;
-diff
+diff --git a/mp/mp_mvcc.c b/mp/mp_mvcc.c
+index 34467d2..f05aa0c 100644
+--- a/mp/mp_mvcc.c
++++ b/mp/mp_mvcc.c
+@@ -276,7 +276,7 @@ __memp_bh_freeze(dbmp, infop, hp, bhp, need_frozenp)
+ #else
+ 	memcpy(frozen_bhp, bhp, SSZA(BH, buf));
+ #endif
+-	atomic_init(&frozen_bhp->ref, 0);
++	atomic_init_db(&frozen_bhp->ref, 0);
+ 	if (mutex != MUTEX_INVALID)
+ 		frozen_bhp->mtx_buf = mutex;
+ 	else if ((ret = __mutex_alloc(env, MTX_MPOOL_BH,
+@@ -428,7 +428,7 @@ __memp_bh_thaw(dbmp, infop, hp, frozen_bhp, alloc_bhp)
+ #endif
+ 		alloc_bhp->mtx_buf = mutex;
+ 		MUTEX_LOCK(env, alloc_bhp->mtx_buf);
+-		atomic_init(&alloc_bhp->ref, 1);
++		atomic_init_db(&alloc_bhp->ref, 1);
+ 		F_CLR(alloc_bhp, BH_FROZEN);
+ 	}
+
+diff --git a/mp/mp_region.c b/mp/mp_region.c
+index e6cece9..ddbe906 100644
+--- a/mp/mp_region.c
++++ b/mp/mp_region.c
+@@ -224,7 +224,7 @@ __memp_init(env, dbmp, reginfo_off, htab_buckets, max_nreg)
+ 			     MTX_MPOOL_FILE_BUCKET, 0, &htab[i].mtx_hash)) != 0)
+ 				return (ret);
+ 			SH_TAILQ_INIT(&htab[i].hash_bucket);
+-			atomic_init(&htab[i].hash_page_dirty, 0);
++			atomic_init_db(&htab[i].hash_page_dirty, 0);
+ 		}
+
+ 		/*
+@@ -269,7 +269,7 @@ __memp_init(env, dbmp, reginfo_off, htab_buckets, max_nreg)
+ 		hp->mtx_hash = (mtx_base == MUTEX_INVALID) ? MUTEX_INVALID :
+ 		    mtx_base + i;
+ 		SH_TAILQ_INIT(&hp->hash_bucket);
+-		atomic_init(&hp->hash_page_dirty, 0);
++		atomic_init_db(&hp->hash_page_dirty, 0);
+ #ifdef HAVE_STATISTICS
+ 		hp->hash_io_wait = 0;
+ 		hp->hash_frozen = hp->hash_thawed = hp->hash_frozen_freed = 0;
+diff --git a/mutex/mut_method.c b/mutex/mut_method.c
+index 2588763..5c6d516 100644
+--- a/mutex/mut_method.c
++++ b/mutex/mut_method.c
+@@ -426,7 +426,7 @@ atomic_compare_exchange(env, v, oldval, newval)
+ 	MUTEX_LOCK(env, mtx);
+ 	ret = atomic_read(v) == oldval;
+ 	if (ret)
+-		atomic_init(v, newval);
++		atomic_init_db(v, newval);
+ 	MUTEX_UNLOCK(env, mtx);
+
+ 	return (ret);
+diff --git a/mutex/mut_tas.c b/mutex/mut_tas.c
+index f3922e0..e40fcdf 100644
+--- a/mutex/mut_tas.c
++++ b/mutex/mut_tas.c
+@@ -46,7 +46,7 @@ __db_tas_mutex_init(env, mutex, flags)
+
+ #ifdef HAVE_SHARED_LATCHES
+ 	if (F_ISSET(mutexp, DB_MUTEX_SHARED))
+-		atomic_init(&mutexp->sharecount, 0);
++		atomic_init_db(&mutexp->sharecount, 0);
+ 	else
+ #endif
+ 	if (MUTEX_INIT(&mutexp->tas)) {
+@@ -486,7 +486,7 @@ __db_tas_mutex_unlock(env, mutex)
+ 			F_CLR(mutexp, DB_MUTEX_LOCKED);
+ 			/* Flush flag update before zeroing count */
+ 			MEMBAR_EXIT();
+-			atomic_init(&mutexp->sharecount, 0);
++			atomic_init_db(&mutexp->sharecount, 0);
+ 		} else {
+ 			DB_ASSERT(env, sharecount > 0);
+ 			MEMBAR_EXIT();
+EOF
+
+# The packaged config.guess and config.sub are ancient (2009) and can cause build issues.
+# Replace them with modern versions.
+# See https://github.com/bitcoin/bitcoin/issues/16064
+CONFIG_GUESS_URL='https://git.savannah.gnu.org/gitweb/?p=config.git;a=blob_plain;f=config.guess;hb=4550d2f15b3a7ce2451c1f29500b9339430c877f'
+CONFIG_GUESS_HASH='c8f530e01840719871748a8071113435bdfdf75b74c57e78e47898edea8754ae'
+CONFIG_SUB_URL='https://git.savannah.gnu.org/gitweb/?p=config.git;a=blob_plain;f=config.sub;hb=4550d2f15b3a7ce2451c1f29500b9339430c877f'
+CONFIG_SUB_HASH='3969f7d5f6967ccc6f792401b8ef3916a1d1b1d0f0de5a4e354c95addb8b800e'
+
+rm -f "dist/config.guess"
+rm -f "dist/config.sub"
+
+http_get "${CONFIG_GUESS_URL}" dist/config.guess "${CONFIG_GUESS_HASH}"
+http_get "${CONFIG_SUB_URL}" dist/config.sub "${CONFIG_SUB_HASH}"
+
+cd build_unix/
+
+"${BDB_PREFIX}/${BDB_VERSION}/dist/configure" \
+  --enable-cxx --disable-shared --disable-replication --with-pic --prefix="${BDB_PREFIX}" \
+  "${@}"
+
+make install
+
+echo
+echo "db4 build complete."
+echo
+# shellcheck disable=SC2016
+echo 'When compiling bitcoind, run `./configure` in the following way:'
+echo
+echo "  export BDB_PREFIX='${BDB_PREFIX}'"
+# shellcheck disable=SC2016
+echo '  ./configure BDB_LIBS="-L${BDB_PREFIX}/lib -ldb_cxx-4.8" BDB_CFLAGS="-I${BDB_PREFIX}/include" ...'
