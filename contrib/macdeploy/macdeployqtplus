@@ -1,0 +1,69 @@
+#!/usr/bin/env python3
+#
+# Copyright (C) 2011  Patrick "p2k" Schneider <me@p2k-network.org>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+
+import sys, re, os, shutil, stat, os.path
+from argparse import ArgumentParser
+from ds_store import DSStore
+from mac_alias import Alias
+from pathlib import Path
+from subprocess import PIPE, run
+from typing import List, Optional
+
+# This is ported from the original macdeployqt with modifications
+
+class FrameworkInfo(object):
+    def __init__(self):
+        self.frameworkDirectory = ""
+        self.frameworkName = ""
+        self.frameworkPath = ""
+        self.binaryDirectory = ""
+        self.binaryName = ""
+        self.binaryPath = ""
+        self.version = ""
+        self.installName = ""
+        self.deployedInstallName = ""
+        self.sourceFilePath = ""
+        self.destinationDirectory = ""
+        self.sourceResourcesDirectory = ""
+        self.sourceVersionContentsDirectory = ""
+        self.sourceContentsDirectory = ""
+        self.destinationResourcesDirectory = ""
+        self.destinationVersionContentsDirectory = ""
+    
+    def __eq__(self, other):
+        if self.__class__ == other.__class__:
+            return self.__dict__ == other.__dict__
+        else:
+            return False
+    
+    def __str__(self):
+        return f""" Framework name: {self.frameworkName}
+ Framework directory: {self.frameworkDirectory}
+ Framework path: {self.frameworkPath}
+ Binary name: {self.binaryName}
+ Binary directory: {self.binaryDirectory}
+ Binary path: {self.binaryPath}
+ Version: {self.version}
+ Install name: {self.installName}
+ Deployed install name: {self.deployedInstallName}
+ Source file Path: {self.sourceFilePath}
+ Deployed Directory (relative to bundle): {self.destinationDirectory}
+"""
+    
+    def isDylib(self):
+        return self.frameworkName.endswith(".dyl
