@@ -216,3 +216,39 @@ def render(screen, peers, cur_list_pos, scroll, ROWS_AVALIABLE_FOR_LIST, info_pa
     screen.addstr(3, 0,
                   header_format % ("PEER", "OUTBOUND", "INBOUND", "TYPE", "ADDR"), curses.A_BOLD | curses.A_UNDERLINE)
     peer_list = sorted(peers.keys())[scroll:ROWS_AVALIABLE_FOR_LIST+scroll]
+    for i, peer_id in enumerate(peer_list):
+        peer = peers[peer_id]
+        screen.addstr(i + 4, 0,
+                      row_format % (peer.id, peer.total_outbound_msgs, peer.total_outbound_bytes,
+                                    peer.total_inbound_msgs, peer.total_inbound_bytes,
+                                    peer.connection_type, peer.address),
+                      curses.A_REVERSE if i + scroll == cur_list_pos else curses.A_NORMAL)
+        if i + scroll == cur_list_pos:
+            info_window = info_panel.window()
+            info_window.erase()
+            info_window.border(
+                ord("|"), ord("|"), ord("-"), ord("-"),
+                ord("-"), ord("-"), ord("-"), ord("-"))
+
+            info_window.addstr(
+                1, 1, f"PEER {peer.id} ({peer.address})".center(68), curses.A_REVERSE | curses.A_BOLD)
+            info_window.addstr(
+                2, 1, f" OUR NODE{peer.connection_type:^54}PEER ",
+                curses.A_BOLD)
+            for i, msg in enumerate(peer.last_messages):
+                if msg.inbound:
+                    info_window.addstr(
+                        i + 3, 1, "%68s" %
+                        (f"<--- {msg.msg_type} ({msg.size} bytes) "), curses.A_NORMAL)
+                else:
+                    info_window.addstr(
+                        i + 3, 1, " %s (%d byte) --->" %
+                        (msg.msg_type, msg.size), curses.A_NORMAL)
+
+
+if __name__ == "__main__":
+    if len(sys.argv) < 2:
+        print("USAGE:", sys.argv[0], "path/to/bitcoind")
+        exit()
+    path = sys.argv[1]
+    main(path)
