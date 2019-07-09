@@ -204,4 +204,25 @@ def main():
         'onion': 10,
     }
     ips = [ip for ip in ips if ip['uptime'] > req_uptime[ip['net']]]
-    print('%s Require minimum uptime' % (ip_stats
+    print('%s Require minimum uptime' % (ip_stats(ips)), file=sys.stderr)
+    # Require a known and recent user agent.
+    ips = [ip for ip in ips if PATTERN_AGENT.match(ip['agent'])]
+    print('%s Require a known and recent user agent' % (ip_stats(ips)), file=sys.stderr)
+    # Sort by availability (and use last success as tie breaker)
+    ips.sort(key=lambda x: (x['uptime'], x['lastsuccess'], x['ip']), reverse=True)
+    # Filter out hosts with multiple bitcoin ports, these are likely abusive
+    ips = filtermultiport(ips)
+    print('%s Filter out hosts with multiple bitcoin ports' % (ip_stats(ips)), file=sys.stderr)
+    # Look up ASNs and limit results, both per ASN and globally.
+    ips = filterbyasn(ips, MAX_SEEDS_PER_ASN, NSEEDS)
+    print('%s Look up ASNs and limit results per ASN and per net' % (ip_stats(ips)), file=sys.stderr)
+    # Sort the results by IP address (for deterministic output).
+    ips.sort(key=lambda x: (x['net'], x['sortkey']))
+    for ip in ips:
+        if ip['net'] == 'ipv6':
+            print('[%s]:%i' % (ip['ip'], ip['port']))
+        else:
+            print('%s:%i' % (ip['ip'], ip['port']))
+
+if __name__ == '__main__':
+    main()
