@@ -226,3 +226,59 @@ $($(1)_staged): | $($(1)_built)
 $($(1)_postprocessed): | $($(1)_staged)
 	echo Postprocessing $(1)...
 	cd $($(1)_staging_prefix_dir); $(call $(1)_postprocess_cmds)
+	touch $$@
+$($(1)_cached): | $($(1)_dependencies) $($(1)_postprocessed)
+	echo Caching $(1)...
+	cd $$($(1)_staging_dir)/$(host_prefix); find . | sort | tar --no-recursion -czf $$($(1)_staging_dir)/$$(@F) -T -
+	mkdir -p $$(@D)
+	rm -rf $$(@D) && mkdir -p $$(@D)
+	mv $$($(1)_staging_dir)/$$(@F) $$(@)
+	rm -rf $($(1)_staging_dir)
+$($(1)_cached_checksum): $($(1)_cached)
+	cd $$(@D); $(build_SHA256SUM) $$(<F) > $$(@)
+
+.PHONY: $(1)
+$(1): | $($(1)_cached_checksum)
+.SECONDARY: $($(1)_cached) $($(1)_postprocessed) $($(1)_staged) $($(1)_built) $($(1)_configured) $($(1)_preprocessed) $($(1)_extracted) $($(1)_fetched)
+
+endef
+
+stages = fetched extracted preprocessed configured built staged postprocessed cached cached_checksum
+
+define ext_add_stages
+$(foreach stage,$(stages),
+          $(1)_$(stage): $($(1)_$(stage))
+          .PHONY: $(1)_$(stage))
+endef
+
+# These functions create the build targets for each package. They must be
+# broken down into small steps so that each part is done for all packages
+# before moving on to the next step. Otherwise, a package's info
+# (build-id for example) would only be available to another package if it
+# happened to be computed already.
+
+#set the type for host/build packages.
+$(foreach native_package,$(native_packages),$(eval $(native_package)_type=build))
+$(foreach package,$(packages),$(eval $(package)_type=$(host_arch)_$(host_os)))
+
+#set overridable defaults
+$(foreach package,$(all_packages),$(eval $(call int_vars,$(package))))
+
+#include package files
+$(foreach native_package,$(native_packages),$(eval include packages/$(native_package).mk))
+$(foreach package,$(packages),$(eval include packages/$(package).mk))
+
+#compute a hash of all files that comprise this package's build recipe
+$(foreach package,$(all_packages),$(eval $(call int_get_build_recipe_hash,$(package))))
+
+#generate a unique id for this package, incorporating its dependencies as well
+$(foreach package,$(all_packages),$(eval $(call int_get_build_id,$(package))))
+
+#compute final vars after reading package vars
+$(foreach package,$(all_packages),$(eval $(call int_config_attach_build_config,$(package))))
+
+#create build targets
+$(foreach package,$(all_packages),$(eval $(call int_add_cmds,$(package))))
+
+#special exception: if a toolchain package exists, all non-native packages depend on it
+$(foreach package,$(packages),$(eval $($(package)_extracted): |$($($(host_arch)_$(host_os)_native_toolchain)_cached) $($($(host_arch)_$(host_os)_native_binutils)_cached) ))
