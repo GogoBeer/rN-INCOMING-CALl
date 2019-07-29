@@ -612,4 +612,180 @@ Common misconceptions are clarified in those sections:
 - Passing (non-)fundamental types in the [C++ Core
   Guideline](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#Rf-conventional).
 
-- Assertions should not have side-
+- Assertions should not have side-effects.
+
+  - *Rationale*: Even though the source code is set to refuse to compile
+    with assertions disabled, having side-effects in assertions is unexpected and
+    makes the code harder to understand.
+
+- If you use the `.h`, you must link the `.cpp`.
+
+  - *Rationale*: Include files define the interface for the code in implementation files. Including one but
+      not linking the other is confusing. Please avoid that. Moving functions from
+      the `.h` to the `.cpp` should not result in build errors.
+
+- Use the RAII (Resource Acquisition Is Initialization) paradigm where possible. For example, by using
+  `unique_ptr` for allocations in a function.
+
+  - *Rationale*: This avoids memory and resource leaks, and ensures exception safety.
+
+C++ data structures
+--------------------
+
+- Never use the `std::map []` syntax when reading from a map, but instead use `.find()`.
+
+  - *Rationale*: `[]` does an insert (of the default element) if the item doesn't
+    exist in the map yet. This has resulted in memory leaks in the past, as well as
+    race conditions (expecting read-read behavior). Using `[]` is fine for *writing* to a map.
+
+- Do not compare an iterator from one data structure with an iterator of
+  another data structure (even if of the same type).
+
+  - *Rationale*: Behavior is undefined. In C++ parlor this means "may reformat
+    the universe", in practice this has resulted in at least one hard-to-debug crash bug.
+
+- Watch out for out-of-bounds vector access. `&vch[vch.size()]` is illegal,
+  including `&vch[0]` for an empty vector. Use `vch.data()` and `vch.data() +
+  vch.size()` instead.
+
+- Vector bounds checking is only enabled in debug mode. Do not rely on it.
+
+- Initialize all non-static class members where they are defined.
+  If this is skipped for a good reason (i.e., optimization on the critical
+  path), add an explicit comment about this.
+
+  - *Rationale*: Ensure determinism by avoiding accidental use of uninitialized
+    values. Also, static analyzers balk about this.
+    Initializing the members in the declaration makes it easy to
+    spot uninitialized ones.
+
+```cpp
+class A
+{
+    uint32_t m_count{0};
+}
+```
+
+- By default, declare constructors `explicit`.
+
+  - *Rationale*: This is a precaution to avoid unintended
+    [conversions](https://en.cppreference.com/w/cpp/language/converting_constructor).
+
+- Use explicitly signed or unsigned `char`s, or even better `uint8_t` and
+  `int8_t`. Do not use bare `char` unless it is to pass to a third-party API.
+  This type can be signed or unsigned depending on the architecture, which can
+  lead to interoperability problems or dangerous conditions such as
+  out-of-bounds array accesses.
+
+- Prefer explicit constructions over implicit ones that rely on 'magical' C++ behavior.
+
+  - *Rationale*: Easier to understand what is happening, thus easier to spot mistakes, even for those
+  that are not language lawyers.
+
+- Use `Span` as function argument when it can operate on any range-like container.
+
+  - *Rationale*: Compared to `Foo(const vector<int>&)` this avoids the need for a (potentially expensive)
+    conversion to vector if the caller happens to have the input stored in another type of container.
+    However, be aware of the pitfalls documented in [span.h](../src/span.h).
+
+```cpp
+void Foo(Span<const int> data);
+
+std::vector<int> vec{1,2,3};
+Foo(vec);
+```
+
+- Prefer `enum class` (scoped enumerations) over `enum` (traditional enumerations) where possible.
+
+  - *Rationale*: Scoped enumerations avoid two potential pitfalls/problems with traditional C++ enumerations: implicit conversions to `int`, and name clashes due to enumerators being exported to the surrounding scope.
+
+- `switch` statement on an enumeration example:
+
+```cpp
+enum class Tabs {
+    info,
+    console,
+    network_graph,
+    peers
+};
+
+int GetInt(Tabs tab)
+{
+    switch (tab) {
+    case Tabs::info: return 0;
+    case Tabs::console: return 1;
+    case Tabs::network_graph: return 2;
+    case Tabs::peers: return 3;
+    } // no default case, so the compiler can warn about missing cases
+    assert(false);
+}
+```
+
+*Rationale*: The comment documents skipping `default:` label, and it complies with `clang-format` rules. The assertion prevents firing of `-Wreturn-type` warning on some compilers.
+
+Strings and formatting
+------------------------
+
+- Be careful of `LogPrint` versus `LogPrintf`. `LogPrint` takes a `category` argument, `LogPrintf` does not.
+
+  - *Rationale*: Confusion of these can result in runtime exceptions due to
+    formatting mismatch, and it is easy to get wrong because of subtly similar naming.
+
+- Use `std::string`, avoid C string manipulation functions.
+
+  - *Rationale*: C++ string handling is marginally safer, less scope for
+    buffer overflows, and surprises with `\0` characters. Also, some C string manipulations
+    tend to act differently depending on platform, or even the user locale.
+
+- Use `ParseInt32`, `ParseInt64`, `ParseUInt32`, `ParseUInt64`, `ParseDouble` from `utilstrencodings.h` for number parsing.
+
+  - *Rationale*: These functions do overflow checking and avoid pesky locale issues.
+
+- Avoid using locale dependent functions if possible. You can use the provided
+  [`lint-locale-dependence.sh`](/test/lint/lint-locale-dependence.sh)
+  to check for accidental use of locale dependent functions.
+
+  - *Rationale*: Unnecessary locale dependence can cause bugs that are very tricky to isolate and fix.
+
+  - These functions are known to be locale dependent:
+    `alphasort`, `asctime`, `asprintf`, `atof`, `atoi`, `atol`, `atoll`, `atoq`,
+    `btowc`, `ctime`, `dprintf`, `fgetwc`, `fgetws`, `fprintf`, `fputwc`,
+    `fputws`, `fscanf`, `fwprintf`, `getdate`, `getwc`, `getwchar`, `isalnum`,
+    `isalpha`, `isblank`, `iscntrl`, `isdigit`, `isgraph`, `islower`, `isprint`,
+    `ispunct`, `isspace`, `isupper`, `iswalnum`, `iswalpha`, `iswblank`,
+    `iswcntrl`, `iswctype`, `iswdigit`, `iswgraph`, `iswlower`, `iswprint`,
+    `iswpunct`, `iswspace`, `iswupper`, `iswxdigit`, `isxdigit`, `mblen`,
+    `mbrlen`, `mbrtowc`, `mbsinit`, `mbsnrtowcs`, `mbsrtowcs`, `mbstowcs`,
+    `mbtowc`, `mktime`, `putwc`, `putwchar`, `scanf`, `snprintf`, `sprintf`,
+    `sscanf`, `stoi`, `stol`, `stoll`, `strcasecmp`, `strcasestr`, `strcoll`,
+    `strfmon`, `strftime`, `strncasecmp`, `strptime`, `strtod`, `strtof`,
+    `strtoimax`, `strtol`, `strtold`, `strtoll`, `strtoq`, `strtoul`,
+    `strtoull`, `strtoumax`, `strtouq`, `strxfrm`, `swprintf`, `tolower`,
+    `toupper`, `towctrans`, `towlower`, `towupper`, `ungetwc`, `vasprintf`,
+    `vdprintf`, `versionsort`, `vfprintf`, `vfscanf`, `vfwprintf`, `vprintf`,
+    `vscanf`, `vsnprintf`, `vsprintf`, `vsscanf`, `vswprintf`, `vwprintf`,
+    `wcrtomb`, `wcscasecmp`, `wcscoll`, `wcsftime`, `wcsncasecmp`, `wcsnrtombs`,
+    `wcsrtombs`, `wcstod`, `wcstof`, `wcstoimax`, `wcstol`, `wcstold`,
+    `wcstoll`, `wcstombs`, `wcstoul`, `wcstoull`, `wcstoumax`, `wcswidth`,
+    `wcsxfrm`, `wctob`, `wctomb`, `wctrans`, `wctype`, `wcwidth`, `wprintf`
+
+- For `strprintf`, `LogPrint`, `LogPrintf` formatting characters don't need size specifiers.
+
+  - *Rationale*: Bitcoin Core uses tinyformat, which is type safe. Leave them out to avoid confusion.
+
+- Use `.c_str()` sparingly. Its only valid use is to pass C++ strings to C functions that take NULL-terminated
+  strings.
+
+  - Do not use it when passing a sized array (so along with `.size()`). Use `.data()` instead to get a pointer
+    to the raw data.
+
+    - *Rationale*: Although this is guaranteed to be safe starting with C++11, `.data()` communicates the intent better.
+
+  - Do not use it when passing strings to `tfm::format`, `strprintf`, `LogPrint[f]`.
+
+    - *Rationale*: This is redundant. Tinyformat handles strings.
+
+  - Do not use it to convert to `QString`. Use `QString::fromStdString()`.
+
+    - *Rationale*: Qt has built-in functionality for converting their string
+      type from/to C++. No need to roll y
