@@ -439,4 +439,177 @@ Some examples:
 ./configure --with-sanitizers=thread
 ```
 
-If you are compiling with G
+If you are compiling with GCC you will typically need to install corresponding
+"san" libraries to actually compile with these flags, e.g. libasan for the
+address sanitizer, libtsan for the thread sanitizer, and libubsan for the
+undefined sanitizer. If you are missing required libraries, the configure script
+will fail with a linker error when testing the sanitizer flags.
+
+The test suite should pass cleanly with the `thread` and `undefined` sanitizers,
+but there are a number of known problems when using the `address` sanitizer. The
+address sanitizer is known to fail in
+[sha256_sse4::Transform](/src/crypto/sha256_sse4.cpp) which makes it unusable
+unless you also use `--disable-asm` when running configure. We would like to fix
+sanitizer issues, so please send pull requests if you can fix any errors found
+by the address sanitizer (or any other sanitizer).
+
+Not all sanitizer options can be enabled at the same time, e.g. trying to build
+with `--with-sanitizers=address,thread` will fail in the configure script as
+these sanitizers are mutually incompatible. Refer to your compiler manual to
+learn more about these options and which sanitizers are supported by your
+compiler.
+
+Additional resources:
+
+ * [AddressSanitizer](https://clang.llvm.org/docs/AddressSanitizer.html)
+ * [LeakSanitizer](https://clang.llvm.org/docs/LeakSanitizer.html)
+ * [MemorySanitizer](https://clang.llvm.org/docs/MemorySanitizer.html)
+ * [ThreadSanitizer](https://clang.llvm.org/docs/ThreadSanitizer.html)
+ * [UndefinedBehaviorSanitizer](https://clang.llvm.org/docs/UndefinedBehaviorSanitizer.html)
+ * [GCC Instrumentation Options](https://gcc.gnu.org/onlinedocs/gcc/Instrumentation-Options.html)
+ * [Google Sanitizers Wiki](https://github.com/google/sanitizers/wiki)
+ * [Issue #12691: Enable -fsanitize flags in Travis](https://github.com/bitcoin/bitcoin/issues/12691)
+
+Locking/mutex usage notes
+-------------------------
+
+The code is multi-threaded and uses mutexes and the
+`LOCK` and `TRY_LOCK` macros to protect data structures.
+
+Deadlocks due to inconsistent lock ordering (thread 1 locks `cs_main` and then
+`cs_wallet`, while thread 2 locks them in the opposite order: result, deadlock
+as each waits for the other to release its lock) are a problem. Compile with
+`-DDEBUG_LOCKORDER` (or use `--enable-debug`) to get lock order inconsistencies
+reported in the `debug.log` file.
+
+Re-architecting the core code so there are better-defined interfaces
+between the various components is a goal, with any necessary locking
+done by the components (e.g. see the self-contained `FillableSigningProvider` class
+and its `cs_KeyStore` lock for example).
+
+Threads
+-------
+
+- [Main thread (`bitcoind`)](https://doxygen.bitcoincore.org/bitcoind_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97)
+  : Started from `main()` in `bitcoind.cpp`. Responsible for starting up and
+  shutting down the application.
+
+- [ThreadImport (`b-loadblk`)](https://doxygen.bitcoincore.org/init_8cpp.html#ae9e290a0e829ec0198518de2eda579d1)
+  : Loads blocks from `blk*.dat` files or `-loadblock=<file>` on startup.
+
+- [ThreadScriptCheck (`b-scriptch.x`)](https://doxygen.bitcoincore.org/validation_8cpp.html#a925a33e7952a157922b0bbb8dab29a20)
+  : Parallel script validation threads for transactions in blocks.
+
+- [ThreadHTTP (`b-http`)](https://doxygen.bitcoincore.org/httpserver_8cpp.html#abb9f6ea8819672bd9a62d3695070709c)
+  : Libevent thread to listen for RPC and REST connections.
+
+- [HTTP worker threads(`b-httpworker.x`)](https://doxygen.bitcoincore.org/httpserver_8cpp.html#aa6a7bc27265043bc0193220c5ae3a55f)
+  : Threads to service RPC and REST requests.
+
+- [Indexer threads (`b-txindex`, etc)](https://doxygen.bitcoincore.org/class_base_index.html#a96a7407421fbf877509248bbe64f8d87)
+  : One thread per indexer.
+
+- [SchedulerThread (`b-scheduler`)](https://doxygen.bitcoincore.org/class_c_scheduler.html#a14d2800815da93577858ea078aed1fba)
+  : Does asynchronous background tasks like dumping wallet contents, dumping
+  addrman and running asynchronous validationinterface callbacks.
+
+- [TorControlThread (`b-torcontrol`)](https://doxygen.bitcoincore.org/torcontrol_8cpp.html#a4faed3692d57a0d7bdbecf3b37f72de0)
+  : Libevent thread for tor connections.
+
+- Net threads:
+
+  - [ThreadMessageHandler (`b-msghand`)](https://doxygen.bitcoincore.org/class_c_connman.html#aacdbb7148575a31bb33bc345e2bf22a9)
+    : Application level message handling (sending and receiving). Almost
+    all net_processing and validation logic runs on this thread.
+
+  - [ThreadDNSAddressSeed (`b-dnsseed`)](https://doxygen.bitcoincore.org/class_c_connman.html#aa7c6970ed98a4a7bafbc071d24897d13)
+    : Loads addresses of peers from the DNS.
+
+  - [ThreadMapPort (`b-upnp`)](https://doxygen.bitcoincore.org/net_8cpp.html#a63f82a71c4169290c2db1651a9bbe249)
+    : Universal plug-and-play startup/shutdown.
+
+  - [ThreadSocketHandler (`b-net`)](https://doxygen.bitcoincore.org/class_c_connman.html#a765597cbfe99c083d8fa3d61bb464e34)
+    : Sends/Receives data from peers on port 8333.
+
+  - [ThreadOpenAddedConnections (`b-addcon`)](https://doxygen.bitcoincore.org/class_c_connman.html#a0b787caf95e52a346a2b31a580d60a62)
+    : Opens network connections to added nodes.
+
+  - [ThreadOpenConnections (`b-opencon`)](https://doxygen.bitcoincore.org/class_c_connman.html#a55e9feafc3bab78e5c9d408c207faa45)
+    : Initiates new connections to peers.
+
+Ignoring IDE/editor files
+--------------------------
+
+In closed-source environments in which everyone uses the same IDE, it is common
+to add temporary files it produces to the project-wide `.gitignore` file.
+
+However, in open source software such as Bitcoin Core, where everyone uses
+their own editors/IDE/tools, it is less common. Only you know what files your
+editor produces and this may change from version to version. The canonical way
+to do this is thus to create your local gitignore. Add this to `~/.gitconfig`:
+
+```
+[core]
+        excludesfile = /home/.../.gitignore_global
+```
+
+(alternatively, type the command `git config --global core.excludesfile ~/.gitignore_global`
+on a terminal)
+
+Then put your favourite tool's temporary filenames in that file, e.g.
+```
+# NetBeans
+nbproject/
+```
+
+Another option is to create a per-repository excludes file `.git/info/exclude`.
+These are not committed but apply only to one repository.
+
+If a set of tools is used by the build system or scripts the repository (for
+example, lcov) it is perfectly acceptable to add its files to `.gitignore`
+and commit them.
+
+Development guidelines
+============================
+
+A few non-style-related recommendations for developers, as well as points to
+pay attention to for reviewers of Bitcoin Core code.
+
+General Bitcoin Core
+----------------------
+
+- New features should be exposed on RPC first, then can be made available in the GUI.
+
+  - *Rationale*: RPC allows for better automatic testing. The test suite for
+    the GUI is very limited.
+
+- Make sure pull requests pass CI before merging.
+
+  - *Rationale*: Makes sure that they pass thorough testing, and that the tester will keep passing
+     on the master branch. Otherwise, all new pull requests will start failing the tests, resulting in
+     confusion and mayhem.
+
+  - *Explanation*: If the test suite is to be updated for a change, this has to
+    be done first.
+
+Wallet
+-------
+
+- Make sure that no crashes happen with run-time option `-disablewallet`.
+
+- Include `db_cxx.h` (BerkeleyDB header) only when `ENABLE_WALLET` is set.
+
+  - *Rationale*: Otherwise compilation of the disable-wallet build will fail in environments without BerkeleyDB.
+
+General C++
+-------------
+
+For general C++ guidelines, you may refer to the [C++ Core
+Guidelines](https://isocpp.github.io/CppCoreGuidelines/).
+
+Common misconceptions are clarified in those sections:
+
+- Passing (non-)fundamental types in the [C++ Core
+  Guideline](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#Rf-conventional).
+
+- Assertions should not have side-
