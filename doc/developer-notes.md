@@ -1017,4 +1017,168 @@ Current subtrees include:
 - src/crc32c
   - Used by leveldb for hardware acceleration of CRC32C checksums for data integrity.
   - Subtree at https://github.com/bitcoin-core/crc32c-subtree ; maintained by Core contributors.
-  - Upstream at https://github.com/google/cr
+  - Upstream at https://github.com/google/crc32c ; maintained by Google.
+
+- src/secp256k1
+  - Upstream at https://github.com/bitcoin-core/secp256k1/ ; maintained by Core contributors.
+
+- src/crypto/ctaes
+  - Upstream at https://github.com/bitcoin-core/ctaes ; maintained by Core contributors.
+
+- src/univalue
+  - Subtree at https://github.com/bitcoin-core/univalue-subtree ; maintained by Core contributors.
+  - Deviates from upstream https://github.com/jgarzik/univalue.
+
+- src/minisketch
+  - Upstream at https://github.com/sipa/minisketch ; maintained by Core contributors.
+
+Upgrading LevelDB
+---------------------
+
+Extra care must be taken when upgrading LevelDB. This section explains issues
+you must be aware of.
+
+### File Descriptor Counts
+
+In most configurations, we use the default LevelDB value for `max_open_files`,
+which is 1000 at the time of this writing. If LevelDB actually uses this many
+file descriptors, it will cause problems with Bitcoin's `select()` loop, because
+it may cause new sockets to be created where the fd value is >= 1024. For this
+reason, on 64-bit Unix systems, we rely on an internal LevelDB optimization that
+uses `mmap()` + `close()` to open table files without actually retaining
+references to the table file descriptors. If you are upgrading LevelDB, you must
+sanity check the changes to make sure that this assumption remains valid.
+
+In addition to reviewing the upstream changes in `env_posix.cc`, you can use `lsof` to
+check this. For example, on Linux this command will show open `.ldb` file counts:
+
+```bash
+$ lsof -p $(pidof bitcoind) |\
+    awk 'BEGIN { fd=0; mem=0; } /ldb$/ { if ($4 == "mem") mem++; else fd++ } END { printf "mem = %s, fd = %s\n", mem, fd}'
+mem = 119, fd = 0
+```
+
+The `mem` value shows how many files are mmap'ed, and the `fd` value shows you
+many file descriptors these files are using. You should check that `fd` is a
+small number (usually 0 on 64-bit hosts).
+
+See the notes in the `SetMaxOpenFiles()` function in `dbwrapper.cc` for more
+details.
+
+### Consensus Compatibility
+
+It is possible for LevelDB changes to inadvertently change consensus
+compatibility between nodes. This happened in Bitcoin 0.8 (when LevelDB was
+first introduced). When upgrading LevelDB, you should review the upstream changes
+to check for issues affecting consensus compatibility.
+
+For example, if LevelDB had a bug that accidentally prevented a key from being
+returned in an edge case, and that bug was fixed upstream, the bug "fix" would
+be an incompatible consensus change. In this situation, the correct behavior
+would be to revert the upstream fix before applying the updates to Bitcoin's
+copy of LevelDB. In general, you should be wary of any upstream changes affecting
+what data is returned from LevelDB queries.
+
+Scripted diffs
+--------------
+
+For reformatting and refactoring commits where the changes can be easily automated using a bash script, we use
+scripted-diff commits. The bash script is included in the commit message and our CI job checks that
+the result of the script is identical to the commit. This aids reviewers since they can verify that the script
+does exactly what it is supposed to do. It is also helpful for rebasing (since the same script can just be re-run
+on the new master commit).
+
+To create a scripted-diff:
+
+- start the commit message with `scripted-diff:` (and then a description of the diff on the same line)
+- in the commit message include the bash script between lines containing just the following text:
+    - `-BEGIN VERIFY SCRIPT-`
+    - `-END VERIFY SCRIPT-`
+
+The scripted-diff is verified by the tool `test/lint/commit-script-check.sh`. The tool's default behavior, when supplied
+with a commit is to verify all scripted-diffs from the beginning of time up to said commit. Internally, the tool passes
+the first supplied argument to `git rev-list --reverse` to determine which commits to verify script-diffs for, ignoring
+commits that don't conform to the commit message format described above.
+
+For development, it might be more convenient to verify all scripted-diffs in a range `A..B`, for example:
+
+```bash
+test/lint/commit-script-check.sh origin/master..HEAD
+```
+
+### Suggestions and examples
+
+If you need to replace in multiple files, prefer `git ls-files` to `find` or globbing, and `git grep` to `grep`, to
+avoid changing files that are not under version control.
+
+For efficient replacement scripts, reduce the selection to the files that potentially need to be modified, so for
+example, instead of a blanket `git ls-files src | xargs sed -i s/apple/orange/`, use
+`git grep -l apple src | xargs sed -i s/apple/orange/`.
+
+Also, it is good to keep the selection of files as specific as possible — for example, replace only in directories where
+you expect replacements — because it reduces the risk that a rebase of your commit by re-running the script will
+introduce accidental changes.
+
+Some good examples of scripted-diff:
+
+- [scripted-diff: Rename InitInterfaces to NodeContext](https://github.com/bitcoin/bitcoin/commit/301bd41a2e6765b185bd55f4c541f9e27aeea29d)
+uses an elegant script to replace occurrences of multiple terms in all source files.
+
+- [scripted-diff: Remove g_connman, g_banman globals](https://github.com/bitcoin/bitcoin/commit/8922d7f6b751a3e6b3b9f6fb7961c442877fb65a)
+replaces specific terms in a list of specific source files.
+
+- [scripted-diff: Replace fprintf with tfm::format](https://github.com/bitcoin/bitcoin/commit/fac03ec43a15ad547161e37e53ea82482cc508f9)
+does a global replacement but excludes certain directories.
+
+To find all previous uses of scripted diffs in the repository, do:
+
+```
+git log --grep="-BEGIN VERIFY SCRIPT-"
+```
+
+Release notes
+-------------
+
+Release notes should be written for any PR that:
+
+- introduces a notable new feature
+- fixes a significant bug
+- changes an API or configuration model
+- makes any other visible change to the end-user experience.
+
+Release notes should be added to a PR-specific release note file at
+`/doc/release-notes-<PR number>.md` to avoid conflicts between multiple PRs.
+All `release-notes*` files are merged into a single
+[/doc/release-notes.md](/doc/release-notes.md) file prior to the release.
+
+RPC interface guidelines
+--------------------------
+
+A few guidelines for introducing and reviewing new RPC interfaces:
+
+- Method naming: use consecutive lower-case names such as `getrawtransaction` and `submitblock`.
+
+  - *Rationale*: Consistency with the existing interface.
+
+- Argument naming: use snake case `fee_delta` (and not, e.g. camel case `feeDelta`)
+
+  - *Rationale*: Consistency with the existing interface.
+
+- Use the JSON parser for parsing, don't manually parse integers or strings from
+  arguments unless absolutely necessary.
+
+  - *Rationale*: Introduces hand-rolled string manipulation code at both the caller and callee sites,
+    which is error-prone, and it is easy to get things such as escaping wrong.
+    JSON already supports nested data structures, no need to re-invent the wheel.
+
+  - *Exception*: AmountFromValue can parse amounts as string. This was introduced because many JSON
+    parsers and formatters hard-code handling decimal numbers as floating-point
+    values, resulting in potential loss of precision. This is unacceptable for
+    monetary values. **Always** use `AmountFromValue` and `ValueFromAmount` when
+    inputting or outputting monetary values. The only exceptions to this are
+    `prioritisetransaction` and `getblocktemplate` because their interface
+    is specified as-is in BIP22.
+
+- Missing arguments and 'null' should be treated the same: as default values. If there is no
+  default value, both cases should fail in the same way. The easiest way to follow this
+  guideline is to detect unspecified arguments wit
