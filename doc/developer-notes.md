@@ -1355,4 +1355,28 @@ communication:
   virtual bool disconnect(NodeId id) = 0;
   ```
 
-- For consistency and friendliness to code generation tools, i
+- For consistency and friendliness to code generation tools, interface method
+  names should be `lowerCamelCase` and standalone function names should be
+  `UpperCamelCase`.
+
+  Examples:
+
+  ```c++
+  // Good: lowerCamelCase method name
+  virtual void blockConnected(const CBlock& block, int height) = 0;
+
+  // Bad: uppercase class method
+  virtual void BlockConnected(const CBlock& block, int height) = 0;
+  ```
+
+  ```c++
+  // Good: UpperCamelCase standalone function name
+  std::unique_ptr<Node> MakeNode(LocalInit& init);
+
+  // Bad: lowercase standalone function
+  std::unique_ptr<Node> makeNode(LocalInit& init);
+  ```
+
+  Note: This last convention isn't generally followed outside of
+  [`src/interfaces/`](../src/interfaces/), though it did come up for discussion
+  before in [#14635](https://github.com/bitcoin/bitcoin/pull/14635).
