@@ -97,4 +97,25 @@ There are several ways to see your I2P address in Bitcoin Core:
 To see which I2P peers your node is connected to, use `bitcoin-cli -netinfo 4`
 or the `getpeerinfo` RPC (e.g. `bitcoin-cli getpeerinfo`).
 
-To see which I2P addresses your node knows, use the `getnodeaddress
+To see which I2P addresses your node knows, use the `getnodeaddresses 0 i2p`
+RPC.
+
+## Compatibility
+
+Bitcoin Core uses the [SAM v3.1](https://geti2p.net/en/docs/api/samv3) protocol
+to connect to the I2P network. Any I2P router that supports it can be used.
+
+## Ports in I2P and Bitcoin Core
+
+Bitcoin Core uses the [SAM v3.1](https://geti2p.net/en/docs/api/samv3)
+protocol. One particularity of SAM v3.1 is that it does not support ports,
+unlike newer versions of SAM (v3.2 and up) that do support them and default the
+port numbers to 0. From the point of view of peers that use newer versions of
+SAM or other protocols that support ports, a SAM v3.1 peer is connecting to them
+on port 0, from source port 0.
+
+To allow future upgrades to newer versions of SAM, Bitcoin Core sets its
+listening port to 0 when listening for incoming I2P connections and advertises
+its own I2P address with port 0. Furthermore, it will not attempt to connect to
+I2P addresses with a non-zero port number because with SAM v3.1 the destination
+port (`TO_PORT`) is always set to 0 and is not in the control of Bitcoin Core.
