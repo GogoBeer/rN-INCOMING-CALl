@@ -233,4 +233,9 @@ After that, the rest of the process is the same: the PSBT is finalized and trans
 ```bash
 psbt_1=$(./src/bitcoin-cli -signet -rpcwallet="participant_1" walletprocesspsbt $funded_psbt | jq -r '.psbt')
 
-psbt_2=$(./src/bitcoin-cli -signet -rpcwallet="participant_2" wall
+psbt_2=$(./src/bitcoin-cli -signet -rpcwallet="participant_2" walletprocesspsbt $psbt_1 | jq -r '.psbt')
+
+finalized_psbt_hex=$(./src/bitcoin-cli -signet finalizepsbt $psbt_2 | jq -r '.hex')
+
+./src/bitcoin-cli -signet sendrawtransaction $finalized_psbt_hex
+```
