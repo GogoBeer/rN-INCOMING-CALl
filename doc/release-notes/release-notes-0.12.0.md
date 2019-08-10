@@ -354,4 +354,162 @@ Option parsing behavior
 -----------------------
 
 Command line options are now parsed strictly in the order in which they are
-specified. It used to be the ca
+specified. It used to be the case that `-X -noX` ends up, unintuitively, with X
+set, as `-X` had precedence over `-noX`. This is no longer the case. Like for
+other software, the last specified value for an option will hold.
+
+RPC: Low-level API changes
+--------------------------
+
+- Monetary amounts can be provided as strings. This means that for example the
+  argument to sendtoaddress can be "0.0001" instead of 0.0001. This can be an
+  advantage if a JSON library insists on using a lossy floating point type for
+  numbers, which would be dangerous for monetary amounts.
+
+* The `asm` property of each scriptSig now contains the decoded signature hash
+  type for each signature that provides a valid defined hash type.
+
+* OP_NOP2 has been renamed to OP_CHECKLOCKTIMEVERIFY by [BIP 65](https://github.com/bitcoin/bips/blob/master/bip-0065.mediawiki)
+
+The following items contain assembly representations of scriptSig signatures
+and are affected by this change:
+
+- RPC `getrawtransaction`
+- RPC `decoderawtransaction`
+- RPC `decodescript`
+- REST `/rest/tx/` (JSON format)
+- REST `/rest/block/` (JSON format when including extended tx details)
+- `bitcoin-tx -json`
+
+For example, the `scriptSig.asm` property of a transaction input that
+previously showed an assembly representation of:
+
+    304502207fa7a6d1e0ee81132a269ad84e68d695483745cde8b541e3bf630749894e342a022100c1f7ab20e13e22fb95281a870f3dcf38d782e53023ee313d741ad0cfbc0c509001 400000 OP_NOP2
+
+now shows as:
+
+    304502207fa7a6d1e0ee81132a269ad84e68d695483745cde8b541e3bf630749894e342a022100c1f7ab20e13e22fb95281a870f3dcf38d782e53023ee313d741ad0cfbc0c5090[ALL] 400000 OP_CHECKLOCKTIMEVERIFY
+
+Note that the output of the RPC `decodescript` did not change because it is
+configured specifically to process scriptPubKey and not scriptSig scripts.
+
+RPC: SSL support dropped
+------------------------
+
+SSL support for RPC, previously enabled by the option `rpcssl` has been dropped
+from both the client and the server. This was done in preparation for removing
+the dependency on OpenSSL for the daemon completely.
+
+Trying to use `rpcssl` will result in an error:
+
+    Error: SSL mode for RPC (-rpcssl) is no longer supported.
+
+If you are one of the few people that relies on this feature, a flexible
+migration path is to use `stunnel`. This is an utility that can tunnel
+arbitrary TCP connections inside SSL. On e.g. Ubuntu it can be installed with:
+
+    sudo apt-get install stunnel4
+
+Then, to tunnel a SSL connection on 28332 to a RPC server bound on localhost on port 18332 do:
+
+    stunnel -d 28332 -r 127.0.0.1:18332 -p stunnel.pem -P ''
+
+It can also be set up system-wide in inetd style.
+
+Another way to re-attain SSL would be to setup a httpd reverse proxy. This solution
+would allow the use of different authentication, loadbalancing, on-the-fly compression and
+caching. A sample config for apache2 could look like:
+
+    Listen 443
+
+    NameVirtualHost *:443
+    <VirtualHost *:443>
+
+    SSLEngine On
+    SSLCertificateFile /etc/apache2/ssl/server.crt
+    SSLCertificateKeyFile /etc/apache2/ssl/server.key
+
+    <Location /bitcoinrpc>
+        ProxyPass http://127.0.0.1:8332/
+        ProxyPassReverse http://127.0.0.1:8332/
+        # optional enable digest auth
+        # AuthType Digest
+        # ...
+
+        # optional bypass bitcoind rpc basic auth
+        # RequestHeader set Authorization "Basic <hash>"
+        # get the <hash> from the shell with: base64 <<< bitcoinrpc:<password>
+    </Location>
+
+    # Or, balance the load:
+    # ProxyPass / balancer://balancer_cluster_name
+
+    </VirtualHost>
+
+Mining Code Changes
+-------------------
+
+The mining code in 0.12 has been optimized to be significantly faster and use less
+memory. As part of these changes, consensus critical calculations are cached on a
+transaction's acceptance into the mempool and the mining code now relies on the
+consistency of the mempool to assemble blocks. However all blocks are still tested
+for validity after assembly.
+
+Other P2P Changes
+-----------------
+
+The list of banned peers is now stored on disk rather than in memory.
+Restarting bitcoind will no longer clear out the list of banned peers; instead
+a new RPC call (`clearbanned`) can be used to manually clear the list.  The new
+`setban` RPC call can also be used to manually ban or unban a peer.
+
+0.12.0 Change log
+=================
+
+Detailed release notes follow. This overview includes changes that affect
+behavior, not code moves, refactors and string updates. For convenience in locating
+the code changes and accompanying discussion, both the pull request and
+git merge commit are mentioned.
+
+### RPC and REST
+
+- #6121 `466f0ea` Convert entire source tree from json_spirit to UniValue (Jonas Schnelli)
+- #6234 `d38cd47` fix rpcmining/getblocktemplate univalue transition logic error (Jonas Schnelli)
+- #6239 `643114f` Don't go through double in AmountFromValue and ValueFromAmount (Wladimir J. van der Laan)
+- #6266 `ebab5d3` Fix univalue handling of \u0000 characters. (Daniel Kraft)
+- #6276 `f3d4dbb` Fix getbalance * 0 (Tom Harding)
+- #6257 `5ebe7db` Add `paytxfee` and `errors` JSON fields where appropriate (Stephen)
+- #6271 `754aae5` New RPC command disconnectnode (Alex van der Peet)
+- #6158 `0abfa8a` Add setban/listbanned RPC commands (Jonas Schnelli)
+- #6307 `7ecdcd9` rpcban fixes (Jonas Schnelli)
+- #6290 `5753988` rpc: make `gettxoutsettinfo` run lock-free (Wladimir J. van der Laan)
+- #6262 `247b914` Return all available information via RPC call "validateaddress" (dexX7)
+- #6339 `c3f0490` UniValue: don't escape solidus, keep espacing of reverse solidus (Jonas Schnelli)
+- #6353 `6bcb0a2` Show softfork status in getblockchaininfo (Wladimir J. van der Laan)
+- #6247 `726e286` Add getblockheader RPC call (Peter Todd)
+- #6362 `d6db115` Fix null id in RPC response during startup (Forrest Voight)
+- #5486 `943b322` [REST] JSON support for /rest/headers (Jonas Schnelli)
+- #6379 `c52e8b3` rpc: Accept scientific notation for monetary amounts in JSON (Wladimir J. van der Laan)
+- #6388 `fd5dfda` rpc: Implement random-cookie based authentication (Wladimir J. van der Laan)
+- #6457 `3c923e8` Include pruned state in chaininfo.json (Simon Males)
+- #6456 `bfd807f` rpc: Avoid unnecessary parsing roundtrip in number formatting, fix locale issue (Wladimir J. van der Laan)
+- #6380 `240b30e` rpc: Accept strings in AmountFromValue (Wladimir J. van der Laan)
+- #6346 `6bb2805` Add OP_RETURN support in createrawtransaction RPC call, add tests. (paveljanik)
+- #6013 `6feeec1` [REST] Add memory pool API (paveljanik)
+- #6576 `da9beb2` Stop parsing JSON after first finished construct. (Daniel Kraft)
+- #5677 `9aa9099` libevent-based http server (Wladimir J. van der Laan)
+- #6633 `bbc2b39` Report minimum ping time in getpeerinfo (Matt Corallo)
+- #6648 `cd381d7` Simplify logic of REST request suffix parsing. (Daniel Kraft)
+- #6695 `5e21388` libevent http fixes (Wladimir J. van der Laan)
+- #5264 `48efbdb` show scriptSig signature hash types in transaction decodes. fixes #3166 (mruddy)
+- #6719 `1a9f19a` Make HTTP server shutdown more graceful (Wladimir J. van der Laan)
+- #6859 `0fbfc51` http: Restrict maximum size of http + headers (Wladimir J. van der Laan)
+- #5936 `bf7c195` [RPC] Add optional locktime to createrawtransaction (Tom Harding)
+- #6877 `26f5b34` rpc: Add maxmempool and effective min fee to getmempoolinfo (Wladimir J. van der Laan)
+- #6970 `92701b3` Fix crash in validateaddress with -disablewallet (Wladimir J. van der Laan)
+- #5574 `755b4ba` Expose GUI labels in RPC as comments (Luke-Jr)
+- #6990 `dbd2c13` http: speed up shutdown (Wladimir J. van der Laan)
+- #7013 `36baa9f` Remove LOCK(cs_main) from decodescript (Peter Todd)
+- #6999 `972bf9c` add (max)uploadtarget infos to getnettotals RPC help (Jonas Schnelli)
+- #7011 `31de241` Add mediantime to getblockchaininfo (Peter Todd)
+- #7065 `f91e29f` http: add Boost 1.49 compatibility (Wl
