@@ -188,4 +188,170 @@ three bytes overhead)
 Relay: New and only new blocks relayed when pruning
 ---------------------------------------------------
 
-When running in pruned mode, the 
+When running in pruned mode, the client will now relay new blocks. When
+responding to the `getblocks` message, only hashes of blocks that are on disk
+and are likely to remain there for some reasonable time window (1 hour) will be
+returned (previously all relevant hashes were returned).
+
+Relay and Mining: Priority transactions
+---------------------------------------
+
+Bitcoin Core has a heuristic 'priority' based on coin value and age. This
+calculation is used for relaying of transactions which do not pay the
+minimum relay fee, and can be used as an alternative way of sorting
+transactions for mined blocks. Bitcoin Core will relay transactions with
+insufficient fees depending on the setting of `-limitfreerelay=<r>` (default:
+`r=15` kB per minute) and `-blockprioritysize=<s>`.
+
+In Bitcoin Core 0.12, when mempool limit has been reached a higher minimum
+relay fee takes effect to limit memory usage. Transactions which do not meet
+this higher effective minimum relay fee will not be relayed or mined even if
+they rank highly according to the priority heuristic.
+
+The mining of transactions based on their priority is also now disabled by
+default. To re-enable it, simply set `-blockprioritysize=<n>` where is the size
+in bytes of your blocks to reserve for these transactions. The old default was
+50k, so to retain approximately the same policy, you would set
+`-blockprioritysize=50000`.
+
+Additionally, as a result of computational simplifications, the priority value
+used for transactions received with unconfirmed inputs is lower than in prior
+versions due to avoiding recomputing the amounts as input transactions confirm.
+
+External miner policy set via the `prioritisetransaction` RPC to rank
+transactions already in the mempool continues to work as it has previously.
+Note, however, that if mining priority transactions is left disabled, the
+priority delta will be ignored and only the fee metric will be effective.
+
+This internal automatic prioritization handling is being considered for removal
+entirely in Bitcoin Core 0.13, and it is at this time undecided whether the
+more accurate priority calculation for chained unconfirmed transactions will be
+restored. Community direction on this topic is particularly requested to help
+set project priorities.
+
+Automatically use Tor hidden services
+-------------------------------------
+
+Starting with Tor version 0.2.7.1 it is possible, through Tor's control socket
+API, to create and destroy 'ephemeral' hidden services programmatically.
+Bitcoin Core has been updated to make use of this.
+
+This means that if Tor is running (and proper authorization is available),
+Bitcoin Core automatically creates a hidden service to listen on, without
+manual configuration. Bitcoin Core will also use Tor automatically to connect
+to other .onion nodes if the control socket can be successfully opened. This
+will positively affect the number of available .onion nodes and their usage.
+
+This new feature is enabled by default if Bitcoin Core is listening, and
+a connection to Tor can be made. It can be configured with the `-listenonion`,
+`-torcontrol` and `-torpassword` settings. To show verbose debugging
+information, pass `-debug=tor`.
+
+Notifications through ZMQ
+-------------------------
+
+Bitcoind can now (optionally) asynchronously notify clients through a
+ZMQ-based PUB socket of the arrival of new transactions and blocks.
+This feature requires installation of the ZMQ C API library 4.x and
+configuring its use through the command line or configuration file.
+Please see [docs/zmq.md](/doc/zmq.md) for details of operation.
+
+Wallet: Transaction fees
+------------------------
+
+Various improvements have been made to how the wallet calculates
+transaction fees.
+
+Users can decide to pay a predefined fee rate by setting `-paytxfee=<n>`
+(or `settxfee <n>` rpc during runtime). A value of `n=0` signals Bitcoin
+Core to use floating fees. By default, Bitcoin Core will use floating
+fees.
+
+Based on past transaction data, floating fees approximate the fees
+required to get into the `m`th block from now. This is configurable
+with `-txconfirmtarget=<m>` (default: `2`).
+
+Sometimes, it is not possible to give good estimates, or an estimate
+at all. Therefore, a fallback value can be set with `-fallbackfee=<f>`
+(default: `0.0002` BTC/kB).
+
+At all times, Bitcoin Core will cap fees at `-maxtxfee=<x>` (default:
+0.10) BTC.
+Furthermore, Bitcoin Core will never create transactions paying less than
+the current minimum relay fee.
+Finally, a user can set the minimum fee rate for all transactions with
+`-mintxfee=<i>`, which defaults to 1000 satoshis per kB.
+
+Wallet: Negative confirmations and conflict detection
+-----------------------------------------------------
+
+The wallet will now report a negative number for confirmations that indicates
+how deep in the block chain the conflict is found. For example, if a transaction
+A has 5 confirmations and spends the same input as a wallet transaction B, B
+will be reported as having -5 confirmations. If another wallet transaction C
+spends an output from B, it will also be reported as having -5 confirmations.
+To detect conflicts with historical transactions in the chain a one-time
+`-rescan` may be needed.
+
+Unlike earlier versions, unconfirmed but non-conflicting transactions will never
+get a negative confirmation count. They are not treated as spendable unless
+they're coming from ourself (change) and accepted into our local mempool,
+however. The new "trusted" field in the `listtransactions` RPC output
+indicates whether outputs of an unconfirmed transaction are considered
+spendable.
+
+Wallet: Merkle branches removed
+-------------------------------
+
+Previously, every wallet transaction stored a Merkle branch to prove its
+presence in blocks. This wasn't being used for more than an expensive
+sanity check. Since 0.12, these are no longer stored. When loading a
+0.12 wallet into an older version, it will automatically rescan to avoid
+failed checks.
+
+Wallet: Pruning
+---------------
+
+With 0.12 it is possible to use wallet functionality in pruned mode.
+This can reduce the disk usage from currently around 60 GB to
+around 2 GB.
+
+However, rescans as well as the RPCs `importwallet`, `importaddress`,
+`importprivkey` are disabled.
+
+To enable block pruning set `prune=<N>` on the command line or in
+`bitcoin.conf`, where `N` is the number of MiB to allot for
+raw block & undo data.
+
+A value of 0 disables pruning. The minimal value above 0 is 550. Your
+wallet is as secure with high values as it is with low ones. Higher
+values merely ensure that your node will not shut down upon blockchain
+reorganizations of more than 2 days - which are unlikely to happen in
+practice. In future releases, a higher value may also help the network
+as a whole: stored blocks could be served to other nodes.
+
+For further information about pruning, you may also consult the [release
+notes of v0.11.0](https://github.com/bitcoin/bitcoin/blob/v0.11.0/doc/release-notes.md#block-file-pruning).
+
+`NODE_BLOOM` service bit
+------------------------
+
+Support for the `NODE_BLOOM` service bit, as described in [BIP
+111](https://github.com/bitcoin/bips/blob/master/bip-0111.mediawiki), has been
+added to the P2P protocol code.
+
+BIP 111 defines a service bit to allow peers to advertise that they support
+bloom filters (such as used by SPV clients) explicitly. It also bumps the protocol
+version to allow peers to identify old nodes which allow bloom filtering of the
+connection despite lacking the new service bit.
+
+In this version, it is only enforced for peers that send protocol versions
+`>=70011`. For the next major version it is planned that this restriction will be
+removed. It is recommended to update SPV clients to check for the `NODE_BLOOM`
+service bit for nodes that report versions newer than 70011.
+
+Option parsing behavior
+-----------------------
+
+Command line options are now parsed strictly in the order in which they are
+specified. It used to be the ca
