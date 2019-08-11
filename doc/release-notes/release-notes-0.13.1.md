@@ -139,4 +139,157 @@ covered by the txid. This provides several immediate benefits:
   Script language when those users receive new transactions.  Features
   currently being researched by Bitcoin Core contributors that may use this
   capability include support for Schnorr signatures, which can improve the
-  privacy and 
+  privacy and efficiency of multisig transactions (or transactions with
+  multiple inputs), and Merklized Abstract Syntax Trees (MAST), which can
+  improve the privacy and efficiency of scripts with two or more conditions.
+  Other Bitcoin community members are studying several other improvements
+  that can be made using script versioning.
+
+Activation for the segwit soft fork is being managed using BIP9
+versionbits.  Segwit's version bit is bit 1, and nodes will begin
+tracking which blocks signal support for segwit at the beginning of the
+first retarget period after segwit's start date of 15 November 2016.  If
+95% of blocks within a 2,016-block retarget period (about two weeks)
+signal support for segwit, the soft fork will be locked in.  After
+another 2,016 blocks, segwit will activate.
+
+For more information about segwit, please see the [segwit FAQ][], the
+[segwit wallet developers guide][] or BIPs [141][BIP141], [143][BIP143],
+[144][BIP144], and [145][BIP145].  If you're a miner or mining pool
+operator, please see the [versionbits FAQ][] for information about
+signaling support for a soft fork.
+
+[Segwit FAQ]: https://bitcoincore.org/en/2016/01/26/segwit-benefits/
+[segwit wallet developers guide]: https://bitcoincore.org/en/segwit_wallet_dev/
+[BIP141]: https://github.com/bitcoin/bips/blob/master/bip-0141.mediawiki
+[BIP143]: https://github.com/bitcoin/bips/blob/master/bip-0143.mediawiki
+[BIP144]: https://github.com/bitcoin/bips/blob/master/bip-0144.mediawiki
+[BIP145]: https://github.com/bitcoin/bips/blob/master/bip-0145.mediawiki
+[versionbits FAQ]: https://bitcoincore.org/en/2016/06/08/version-bits-miners-faq/
+
+
+Null dummy soft fork
+-------------------
+
+Combined with the segwit soft fork is an additional change that turns a
+long-existing network relay policy into a consensus rule. The
+`OP_CHECKMULTISIG` and `OP_CHECKMULTISIGVERIFY` opcodes consume an extra
+stack element ("dummy element") after signature validation. The dummy
+element is not inspected in any manner, and could be replaced by any
+value without invalidating the script.
+
+Because any value can be used for this dummy element, it's possible for
+a third-party to insert data into other people's transactions, changing
+the transaction's txid (called transaction malleability) and possibly
+causing other problems.
+
+Since Bitcoin Core 0.10.0, nodes have defaulted to only relaying and
+mining transactions whose dummy element was a null value (0x00, also
+called OP_0).  The null dummy soft fork turns this relay rule into a
+consensus rule both for non-segwit transactions and segwit transactions,
+so that this method of mutating transactions is permanently eliminated
+from the network.
+
+Signaling for the null dummy soft fork is done by signaling support
+for segwit, and the null dummy soft fork will activate at the same time
+as segwit.
+
+For more information, please see [BIP147][].
+
+[BIP147]: https://github.com/bitcoin/bips/blob/master/bip-0147.mediawiki
+
+Low-level RPC changes
+---------------------
+
+- `importprunedfunds` only accepts two required arguments. Some versions accept
+  an optional third arg, which was always ignored. Make sure to never pass more
+  than two arguments.
+
+
+Linux ARM builds
+----------------
+
+With the 0.13.0 release, pre-built Linux ARM binaries were added to the set of
+uploaded executables. Additional detail on the ARM architecture targeted by each
+is provided below.
+
+The following extra files can be found in the download directory or torrent:
+
+- `bitcoin-${VERSION}-arm-linux-gnueabihf.tar.gz`: Linux binaries targeting
+  the 32-bit ARMv7-A architecture.
+- `bitcoin-${VERSION}-aarch64-linux-gnu.tar.gz`: Linux binaries targeting
+  the 64-bit ARMv8-A architecture.
+
+ARM builds are still experimental. If you have problems on a certain device or
+Linux distribution combination please report them on the bug tracker, it may be
+possible to resolve them. Note that the device you use must be (backward)
+compatible with the architecture targeted by the binary that you use.
+For example, a Raspberry Pi 2 Model B or Raspberry Pi 3 Model B (in its 32-bit
+execution state) device, can run the 32-bit ARMv7-A targeted binary. However,
+no model of Raspberry Pi 1 device can run either binary because they are all
+ARMv6 architecture devices that are not compatible with ARMv7-A or ARMv8-A.
+
+Note that Android is not considered ARM Linux in this context. The executables
+are not expected to work out of the box on Android.
+
+
+0.13.1 Change log
+=================
+
+Detailed release notes follow. This overview includes changes that affect
+behavior, not code moves, refactors and string updates. For convenience in locating
+the code changes and accompanying discussion, both the pull request and
+git merge commit are mentioned.
+
+### Consensus
+- #8636 `9dfa0c8` Implement NULLDUMMY softfork (BIP147) (jl2012)
+- #8848 `7a34a46` Add NULLDUMMY verify flag in bitcoinconsensus.h (jl2012)
+- #8937 `8b66659` Define start and end time for segwit deployment (sipa)
+
+### RPC and other APIs
+- #8581 `526d2b0` Drop misleading option in importprunedfunds (MarcoFalke)
+- #8699 `a5ec248` Remove createwitnessaddress RPC command (jl2012)
+- #8780 `794b007` Deprecate getinfo (MarcoFalke)
+- #8832 `83ad563` Throw JSONRPCError when utxo set can not be read (MarcoFalke)
+- #8884 `b987348` getblockchaininfo help: pruneheight is the lowest, not highest, block (luke-jr)
+- #8858 `3f508ed` rpc: Generate auth cookie in hex instead of base64 (laanwj)
+- #8951 `7c2bf4b` RPC/Mining: getblocktemplate: Update and fix formatting of help (luke-jr)
+
+### Block and transaction handling
+- #8611 `a9429ca` Reduce default number of blocks to check at startup (sipa)
+- #8634 `3e80ab7` Add policy: null signature for failed CHECK(MULTI)SIG (jl2012)
+- #8525 `1672225` Do not store witness txn in rejection cache (sipa)
+- #8499 `9777fe1` Add several policy limits and disable uncompressed keys for segwit scripts (jl2012)
+- #8526 `0027672` Make non-minimal OP_IF/NOTIF argument non-standard for P2WSH (jl2012)
+- #8524 `b8c79a0` Precompute sighashes (sipa)
+- #8651 `b8c79a0` Predeclare PrecomputedTransactionData as struct (sipa)
+
+### P2P protocol and network code
+- #8740 `42ea51a` No longer send local address in addrMe (laanwj)
+- #8427 `69d1cd2` Ignore `notfound` P2P messages (laanwj)
+- #8573 `4f84082` Set jonasschnellis dns-seeder filter flag (jonasschnelli)
+- #8712 `23feab1` Remove maxuploadtargets recommended minimum (jonasschnelli)
+- #8862 `7ae6242` Fix a few cases where messages were sent after requested disconnect (theuni)
+- #8393 `fe1975a` Support for compact blocks together with segwit (sipa)
+- #8282 `2611ad7` Feeler connections to increase online addrs in the tried table (EthanHeilman)
+- #8612 `2215c22` Check for compatibility with download in FindNextBlocksToDownload (sipa)
+- #8606 `bbf379b` Fix some locks (sipa)
+- #8594 `ab295bb` Do not add random inbound peers to addrman (gmaxwell)
+- #8940 `5b4192b` Add x9 service bit support to dnsseed.bluematt.me, seed.bitcoinstats.com (TheBlueMatt, cdecker)
+- #8944 `685e4c7` Remove bogus assert on number of oubound connections. (TheBlueMatt)
+- #8949 `0dbc48a` Be more agressive in getting connections to peers with relevant services (gmaxwell)
+
+### Build system
+- #8293 `fa5b249` Allow building libbitcoinconsensus without any univalue (luke-jr)
+- #8492 `8b0bdd3` Allow building bench_bitcoin by itself (luke-jr)
+- #8563 `147003c` Add configure check for -latomic (ajtowns)
+- #8626 `ea51b0f` Berkeley DB v6 compatibility fix (netsafe)
+- #8520 `75f2065` Remove check for `openssl/ec.h` (laanwj)
+
+### GUI
+- #8481 `d9f0d4e` Fix minimize and close bugs (adlawren)
+- #8487 `a37cec5` Persist the datadir after option reset (achow101)
+- #8697 `41fd852` Fix op order to append first alert (rodasmith)
+- #8678 `8e03382` Fix UI bug that could result in paying unexpected fee (jonasschnelli)
+- #8911 `7634d8e` Translate all files, even if wallet disabled (laanwj)
+- #8540 `1db3352` Fix
