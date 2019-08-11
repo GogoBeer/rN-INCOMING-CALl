@@ -725,4 +725,170 @@ git merge commit are mentioned.
 - #6417 `44fa82d` [QA] fix possible reorg issue in (fund)rawtransaction(s).py RPC test (Jonas Schnelli)
 - #6398 `3d9362d` rpc: Remove chain-specific RequireRPCPassword (Wladimir J. van der Laan)
 - #6428 `bb59e78` tests: Remove old sh-based test framework (Wladimir J. van der Laan)
-- #5515 `d946e9a` RFC: Assert on probable deadlocks if the second lock isnt try_lock (Matt Coral
+- #5515 `d946e9a` RFC: Assert on probable deadlocks if the second lock isnt try_lock (Matt Corallo)
+- #6287 `d2464df` Clang lock debug (Cory Fields)
+- #6465 `410fd74` Don't share objects between TestInstances (Casey Rodarmor)
+- #6534 `6c1c7fd` Fix test locking issues and un-revert the probable-deadlines assertions commit (Cory Fields)
+- #6509 `bb4faee` Fix race condition on test node shutdown (Casey Rodarmor)
+- #6523 `561f8af` Add p2p-fullblocktest.py (Casey Rodarmor)
+- #6590 `981fd92` Fix stale socket rebinding and re-enable python tests for Windows (Cory Fields)
+- #6730 `cb4d6d0` build: Remove dependency of bitcoin-cli on secp256k1 (Wladimir J. van der Laan)
+- #6616 `5ab5dca` Regression Tests: Migrated rpc-tests.sh to all Python rpc-tests.py (Peter Tschipper)
+- #6720 `d479311` Creates unittests for addrman, makes addrman more testable. (Ethan Heilman)
+- #6853 `c834f56` Added fPowNoRetargeting field to Consensus::Params (Eric Lombrozo)
+- #6827 `87e5539` [rpc-tests] Check return code (MarcoFalke)
+- #6848 `f2c869a` Add DERSIG transaction test cases (Ross Nicoll)
+- #6813 `5242bb3` Support gathering code coverage data for RPC tests with lcov (dexX7)
+- #6888 `c8322ff` Clear strMiscWarning before running PartitionAlert (Eric Lombrozo)
+- #6894 `2675276` [Tests] Fix BIP65 p2p test (Suhas Daftuar)
+- #6863 `725539e` [Test Suite] Fix test for null tx input (Daniel Kraft)
+- #6926 `a6d0d62` tests: Initialize networking on windows (Wladimir J. van der Laan)
+- #6822 `9fa54a1` [tests] Be more strict checking dust (MarcoFalke)
+- #6804 `5fcc14e` [tests] Add basic coverage reporting for RPC tests (James O'Beirne)
+- #7045 `72dccfc` Bugfix: Use unique autostart filenames on Linux for testnet/regtest (Luke-Jr)
+- #7095 `d8368a0` Replace scriptnum_test's normative ScriptNum implementation (Wladimir J. van der Laan)
+- #7063 `6abf6eb` [Tests] Add prioritisetransaction RPC test (Suhas Daftuar)
+- #7137 `16f4a6e` Tests: Explicitly set chain limits in replace-by-fee test (Suhas Daftuar)
+- #7216 `9572e49` Removed offline testnet DNSSeed 'alexykot.me'. (tnull)
+- #7209 `f3ad812` test: don't override BITCOIND and BITCOINCLI if they're set (Wladimir J. van der Laan)
+- #7226 `301f16a` Tests: Add more tests to p2p-fullblocktest (Suhas Daftuar)
+- #7153 `9ef7c54` [Tests] Add mempool_limit.py test (Jonas Schnelli)
+- #7170 `453c567` tests: Disable Tor interaction (Wladimir J. van der Laan)
+- #7229 `1ed938b` [qa] wallet: Check if maintenance changes the balance (MarcoFalke)
+- #7308 `d513405` [Tests] Eliminate intermittent failures in sendheaders.py (Suhas Daftuar)
+- #7468 `947c4ff` [rpc-tests] Change solve() to use rehash (Brad Andrews)
+
+### Miscellaneous
+
+- #6213 `e54ff2f` [init] add -blockversion help and extend -upnp help (Diapolo)
+- #5975 `1fea667` Consensus: Decouple ContextualCheckBlockHeader from checkpoints (Jorge Timón)
+- #6061 `eba2f06` Separate Consensus::CheckTxInputs and GetSpendHeight in CheckInputs (Jorge Timón)
+- #5994 `786ed11` detach wallet from miner (Jonas Schnelli)
+- #6387 `11576a5` [bitcoin-cli] improve error output (Jonas Schnelli)
+- #6401 `6db53b4` Add BITCOIND_SIGTERM_TIMEOUT to OpenRC init scripts (Florian Schmaus)
+- #6430 `b01981e` doc: add documentation for shared library libbitcoinconsensus (Braydon Fuller)
+- #6372 `dcc495e` Update Linearize tool to support Windows paths; fix variable scope; update README and example configuration (Paul Georgiou)
+- #6453 `8fe5cce` Separate core memory usage computation in core_memusage.h (Pieter Wuille)
+- #6149 `633fe10` Buffer log messages and explicitly open logs (Adam Weiss)
+- #6488 `7cbed7f` Avoid leaking file descriptors in RegisterLoad (Casey Rodarmor)
+- #6497 `a2bf40d` Make sure LogPrintf strings are line-terminated (Wladimir J. van der Laan)
+- #6504 `b6fee6b` Rationalize currency unit to "BTC" (Ross Nicoll)
+- #6507 `9bb4dd8` Removed contrib/bitrpc (Casey Rodarmor)
+- #6527 `41d650f` Use unique name for AlertNotify tempfile (Casey Rodarmor)
+- #6561 `e08a7d9` limitedmap fixes and tests (Casey Rodarmor)
+- #6565 `a6f2aff` Make sure we re-acquire lock if a task throws (Casey Rodarmor)
+- #6599 `f4d88c4` Make sure LogPrint strings are line-terminated (Ross Nicoll)
+- #6630 `195942d` Replace boost::reverse_lock with our own (Casey Rodarmor)
+- #6103 `13b8282` Add ZeroMQ notifications (João Barbosa)
+- #6692 `d5d1d2e` devtools: don't push if signing fails in github-merge (Wladimir J. van der Laan)
+- #6728 `2b0567b` timedata: Prevent warning overkill (Wladimir J. van der Laan)
+- #6713 `f6ce59c` SanitizeString: Allow hypen char (MarcoFalke)
+- #5987 `4899a04` Bugfix: Fix testnet-in-a-box use case (Luke-Jr)
+- #6733 `b7d78fd` Simple benchmarking framework (Gavin Andresen)
+- #6854 `a092970` devtools: Add security-check.py (Wladimir J. van der Laan)
+- #6790 `fa1d252` devtools: add clang-format.py (MarcoFalke)
+- #7114 `f3d0fdd` util: Don't set strMiscWarning on every exception (Wladimir J. van der Laan)
+- #7078 `93e0514` uint256::GetCheapHash bigendian compatibility (arowser)
+- #7094 `34e02e0` Assert now > 0 in GetTime GetTimeMillis GetTimeMicros (Patrick Strateman)
+
+Credits
+=======
+
+Thanks to everyone who directly contributed to this release:
+
+- accraze
+- Adam Weiss
+- Alex Morcos
+- Alex van der Peet
+- AlSzacrel
+- Altoidnerd
+- Andriy Voskoboinyk
+- antonio-fr
+- Arne Brutschy
+- Ashley Holman
+- Bob McElrath
+- Braydon Fuller
+- BtcDrak
+- Casey Rodarmor
+- centaur1
+- Chris Kleeschulte
+- Christian Decker
+- Cory Fields
+- crowning-
+- daniel
+- Daniel Cousens
+- Daniel Kraft
+- David Hill
+- dexX7
+- Diego Viola
+- Elias Rohrer
+- Eric Lombrozo
+- Erik Mossberg
+- Esteban Ordano
+- EthanHeilman
+- Florian Schmaus
+- Forrest Voight
+- Gavin Andresen
+- Gregory Maxwell
+- Gregory Sanders / instagibbs
+- Ian T
+- Irving Ruan
+- Jacob Welsh
+- James O'Beirne
+- Jeff Garzik
+- Johnathan Corgan
+- Jonas Schnelli
+- Jonathan Cross
+- João Barbosa
+- Jorge Timón
+- Josh Lehan
+- J Ross Nicoll
+- kazcw
+- Kevin Cooper
+- lpescher
+- Luke Dashjr
+- MarcoFalke
+- Mark Friedenbach
+- Matt
+- Matt Bogosian
+- Matt Corallo
+- Matt Quinn
+- Micha
+- Michael
+- Michael Ford / fanquake
+- Midnight Magic
+- Mitchell Cash
+- mrbandrews
+- mruddy
+- Nick
+- Patrick Strateman
+- Paul Georgiou
+- Paul Rabahy
+- Pavel Janík / paveljanik
+- Pavel Vasin
+- Pavol Rusnak
+- Peter Josling
+- Peter Todd
+- Philip Kaufmann
+- Pieter Wuille
+- ptschip
+- randy-waterhouse
+- rion
+- Ross Nicoll
+- Ryan Havar
+- Shaul Kfir
+- Simon Males
+- Stephen
+- Suhas Daftuar
+- tailsjoin
+- Thomas Kerin
+- Tom Harding
+- tulip
+- unsystemizer
+- Veres Lajos
+- Wladimir J. van der Laan
+- xor-freenet
+- Zak Wilcox
+- zathras-crypto
+
+As well as everyone that helped translating on [Transifex](https://www.transifex.com/projects/p/bitcoin/).
