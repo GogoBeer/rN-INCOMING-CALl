@@ -110,4 +110,68 @@ Initial Block Download, startup, transaction and block validation much faster:
   on architectures supporting SSE 4.2. As a result, synchronization and block validation are now faster.
 - SHA256 hashing has been optimized for architectures supporting SSE 4 (See [PR 10821](https://github.com/bitcoin/bitcoin/pull/10821)). SHA256 is around
   50% faster on supported hardware, which results in around 5% faster IBD and block
-  v
+  validation. In version 0.15, SHA256 hardware optimization is disabled in release builds by
+  default, but can be enabled by using `--enable-experimental-asm` when building.
+- Refill of the keypool no longer flushes the wallet between each key which resulted in a ~20x speedup in creating a new wallet. Part of this speedup was used to increase the default keypool to 1000 keys to make recovery more robust. (See [PR 10831](https://github.com/bitcoin/bitcoin/pull/10831)).
+
+Fee Estimation Improvements
+---------------------------
+
+Fee estimation has been significantly improved in version 0.15, with more accurate fee estimates used by the wallet and a wider range of options for advanced users of the `estimatesmartfee` and `estimaterawfee` RPCs (See [PR 10199](https://github.com/bitcoin/bitcoin/pull/10199)).
+
+### Changes to internal logic and wallet behavior
+
+- Internally, estimates are now tracked on 3 different time horizons. This allows for longer targets and means estimates adjust more quickly to changes in conditions.
+- Estimates can now be *conservative* or *economical*. *Conservative* estimates use longer time horizons to produce an estimate which is less susceptible to rapid changes in fee conditions. *Economical* estimates use shorter time horizons and will be more affected by short-term changes in fee conditions. Economical estimates may be considerably lower during periods of low transaction activity (for example over weekends), but may result in transactions being unconfirmed if prevailing fees increase rapidly.
+- By default, the wallet will use conservative fee estimates to increase the reliability of transactions being confirmed within the desired target. For transactions that are marked as replaceable, the wallet will use an economical estimate by default, since the fee can be 'bumped' if the fee conditions change rapidly (See [PR 10589](https://github.com/bitcoin/bitcoin/pull/10589)).
+- Estimates can now be made for confirmation targets up to 1008 blocks (one week).
+- More data on historical fee rates is stored, leading to more precise fee estimates.
+- Transactions which leave the mempool due to eviction or other non-confirmed reasons are now taken into account by the fee estimation logic, leading to more accurate fee estimates.
+- The fee estimation logic will make sure enough data has been gathered to return a meaningful estimate. If there is insufficient data, a fallback default fee is used.
+
+### Changes to fee estimate RPCs
+
+- The `estimatefee` RPC is now deprecated in favor of using only `estimatesmartfee` (which is the implementation used by the GUI)
+- The `estimatesmartfee` RPC interface has been changed (See [PR 10707](https://github.com/bitcoin/bitcoin/pull/10707)):
+    - The `nblocks` argument has been renamed to `conf_target` (to be consistent with other RPC methods).
+    - An `estimate_mode` argument has been added. This argument takes one of the following strings: `CONSERVATIVE`, `ECONOMICAL` or `UNSET` (which defaults to `CONSERVATIVE`).
+    - The RPC return object now contains an `errors` member, which returns errors encountered during processing.
+    - If Bitcoin Core has not been running for long enough and has not seen enough blocks or transactions to produce an accurate fee estimation, an error will be returned (previously a value of -1 was used to indicate an error, which could be confused for a feerate).
+- A new `estimaterawfee` RPC is added to provide raw fee data. External clients can query and use this data in their own fee estimation logic.
+
+Multi-wallet support
+--------------------
+
+Bitcoin Core now supports loading multiple, separate wallets (See [PR 8694](https://github.com/bitcoin/bitcoin/pull/8694), [PR 10849](https://github.com/bitcoin/bitcoin/pull/10849)). The wallets are completely separated, with individual balances, keys and received transactions.
+
+Multi-wallet is enabled by using more than one `-wallet` argument when starting Bitcoin, either on the command line or in the Bitcoin config file.
+
+**In Bitcoin-Qt, only the first wallet will be displayed and accessible for creating and signing transactions.** GUI selectable multiple wallets will be supported in a future version. However, even in 0.15 other loaded wallets will remain synchronized to the node's current tip in the background. This can be useful if running a pruned node, since loading a wallet where the most recent sync is beyond the pruned height results in having to download and revalidate the whole blockchain. Continuing to synchronize all wallets in the background avoids this problem.
+
+Bitcoin Core 0.15.0 contains the following changes to the RPC interface and `bitcoin-cli` for multi-wallet:
+
+* When running Bitcoin Core with a single wallet, there are **no** changes to the RPC interface or `bitcoin-cli`. All RPC calls and `bitcoin-cli` commands continue to work as before.
+* When running Bitcoin Core with multi-wallet, all *node-level* RPC methods continue to work as before. HTTP RPC requests should be send to the normal `<RPC IP address>:<RPC port>` endpoint, and `bitcoin-cli` commands should be run as before. A *node-level* RPC method is any method which does not require access to the wallet.
+* When running Bitcoin Core with multi-wallet, *wallet-level* RPC methods must specify the wallet for which they're intended in every request. HTTP RPC requests should be send to the `<RPC IP address>:<RPC port>/wallet/<wallet name>` endpoint, for example `127.0.0.1:8332/wallet/wallet1.dat`. `bitcoin-cli` commands should be run with a `-rpcwallet` option, for example `bitcoin-cli -rpcwallet=wallet1.dat getbalance`.
+* A new *node-level* `listwallets` RPC method is added to display which wallets are currently loaded. The names returned by this method are the same as those used in the HTTP endpoint and for the `rpcwallet` argument.
+
+Note that while multi-wallet is now fully supported, the RPC multi-wallet interface should be considered unstable for version 0.15.0, and there may backwards-incompatible changes in future versions.
+
+Replace-by-fee control in the GUI
+---------------------------------
+
+Bitcoin Core has supported creating opt-in replace-by-fee (RBF) transactions
+since version 0.12.0, and since version 0.14.0 has included a `bumpfee` RPC method to
+replace unconfirmed opt-in RBF transactions with a new transaction that pays
+a higher fee.
+
+In version 0.15, creating an opt-in RBF transaction and replacing the unconfirmed
+transaction with a higher-fee transaction are both supported in the GUI (See [PR 9592](https://github.com/bitcoin/bitcoin/pull/9592)).
+
+Removal of Coin Age Priority
+----------------------------
+
+In previous versions of Bitcoin Core, a portion of each block could be reserved for transactions based on the age and value of UTXOs they spent. This concept (Coin Age Priority) is a policy choice by miners, and there are no consensus rules around the inclusion of Coin Age Priority transactions in blocks. In practice, only a few miners continue to use Coin Age Priority for transaction selection in blocks. Bitcoin Core 0.15 removes all remaining support for Coin Age Priority (See [PR 9602](https://github.com/bitcoin/bitcoin/pull/9602)). This has the following implications:
+
+- The concept of *free transactions* has been removed. High Coin Age Priority transactions would previously be allowed to be relayed even if they didn't attach a miner fee. This is no longer possible since there is no concept of Coin Age Priority. The `-limitfreerelay` and `-relaypriority` options which controlled relay of free transactions have therefore been removed.
+- The `-sendfreetransactions` option has been removed, since almost all miners do not include transactions which do not atta
