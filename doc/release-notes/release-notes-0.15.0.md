@@ -253,4 +253,109 @@ Low-level RPC changes
 - The second argument in the `submitblock` RPC argument has been renamed from `parameters` to `dummy`. This argument never had any effect, and the renaming is simply to communicate this fact to the user (See [PR 10191](https://github.com/bitcoin/bitcoin/pull/10191))
   (Clients should, however, use positional arguments for `submitblock` in order to be compatible with BIP 22.)
 
-- The `verbose` argument of `getblock` has been renamed to `verbosity` and now takes an integer from 0 to 2. Verbose level 0 is equivalent to `verbose=false`. Verbose level 1 is equivalent to `verbose=true`. Verbose level 2 will give the full transaction details of each transaction in the output as given by `getrawtransaction`. The old b
+- The `verbose` argument of `getblock` has been renamed to `verbosity` and now takes an integer from 0 to 2. Verbose level 0 is equivalent to `verbose=false`. Verbose level 1 is equivalent to `verbose=true`. Verbose level 2 will give the full transaction details of each transaction in the output as given by `getrawtransaction`. The old behavior of using the `verbose` named argument and a boolean value is still maintained for compatibility.
+
+- Error codes have been updated to be more accurate for the following error cases (See [PR 9853](https://github.com/bitcoin/bitcoin/pull/9853)):
+  - `getblock` now returns RPC_MISC_ERROR if the block can't be found on disk (for
+  example if the block has been pruned). Previously returned RPC_INTERNAL_ERROR.
+  - `pruneblockchain` now returns RPC_MISC_ERROR if the blocks cannot be pruned
+  because the node is not in pruned mode. Previously returned RPC_METHOD_NOT_FOUND.
+  - `pruneblockchain` now returns RPC_INVALID_PARAMETER if the blocks cannot be pruned
+  because the supplied timestamp is too late. Previously returned RPC_INTERNAL_ERROR.
+  - `pruneblockchain` now returns RPC_MISC_ERROR if the blocks cannot be pruned
+  because the blockchain is too short. Previously returned RPC_INTERNAL_ERROR.
+  - `setban` now returns RPC_CLIENT_INVALID_IP_OR_SUBNET if the supplied IP address
+  or subnet is invalid. Previously returned RPC_CLIENT_NODE_ALREADY_ADDED.
+  - `setban` now returns RPC_CLIENT_INVALID_IP_OR_SUBNET if the user tries to unban
+  a node that has not previously been banned. Previously returned RPC_MISC_ERROR.
+  - `removeprunedfunds` now returns RPC_WALLET_ERROR if `bitcoind` is unable to remove
+  the transaction. Previously returned RPC_INTERNAL_ERROR.
+  - `removeprunedfunds` now returns RPC_INVALID_PARAMETER if the transaction does not
+  exist in the wallet. Previously returned RPC_INTERNAL_ERROR.
+  - `fundrawtransaction` now returns RPC_INVALID_ADDRESS_OR_KEY if an invalid change
+  address is provided. Previously returned RPC_INVALID_PARAMETER.
+  - `fundrawtransaction` now returns RPC_WALLET_ERROR if `bitcoind` is unable to create
+  the transaction. The error message provides further details. Previously returned
+  RPC_INTERNAL_ERROR.
+  - `bumpfee` now returns RPC_INVALID_PARAMETER if the provided transaction has
+  descendants in the wallet. Previously returned RPC_MISC_ERROR.
+  - `bumpfee` now returns RPC_INVALID_PARAMETER if the provided transaction has
+  descendants in the mempool. Previously returned RPC_MISC_ERROR.
+  - `bumpfee` now returns RPC_WALLET_ERROR if the provided transaction has
+  has been mined or conflicts with a mined transaction. Previously returned
+  RPC_INVALID_ADDRESS_OR_KEY.
+  - `bumpfee` now returns RPC_WALLET_ERROR if the provided transaction is not
+  BIP 125 replaceable. Previously returned RPC_INVALID_ADDRESS_OR_KEY.
+  - `bumpfee` now returns RPC_WALLET_ERROR if the provided transaction has already
+  been bumped by a different transaction. Previously returned RPC_INVALID_REQUEST.
+  - `bumpfee` now returns RPC_WALLET_ERROR if the provided transaction contains
+  inputs which don't belong to this wallet. Previously returned RPC_INVALID_ADDRESS_OR_KEY.
+  - `bumpfee` now returns RPC_WALLET_ERROR if the provided transaction has multiple change
+  outputs. Previously returned RPC_MISC_ERROR.
+  - `bumpfee` now returns RPC_WALLET_ERROR if the provided transaction has no change
+  output. Previously returned RPC_MISC_ERROR.
+  - `bumpfee` now returns RPC_WALLET_ERROR if the fee is too high. Previously returned
+  RPC_MISC_ERROR.
+  - `bumpfee` now returns RPC_WALLET_ERROR if the fee is too low. Previously returned
+  RPC_MISC_ERROR.
+  - `bumpfee` now returns RPC_WALLET_ERROR if the change output is too small to bump the
+  fee. Previously returned RPC_MISC_ERROR.
+
+0.15.0 Change log
+=================
+
+### RPC and other APIs
+- #9485 `61a640e` ZMQ example using python3 and asyncio (mcelrath)
+- #9894 `0496e15` remove 'label' filter for rpc command help (instagibbs)
+- #9853 `02bd6e9` Fix error codes from various RPCs (jnewbery)
+- #9842 `598ef9c` Fix RPC failure testing (continuation of #9707) (jnewbery)
+- #10038 `d34995a` Add mallocinfo mode to `getmemoryinfo` RPC (laanwj)
+- #9500 `3568b30` [Qt][RPC] Autocomplete commands for 'help' command in debug console (achow101)
+- #10056 `e6156a0` [zmq] Call va_end() on va_start()ed args (kallewoof)
+- #10086 `7438cea` Trivial: move rpcserialversion into RPC option group (jlopp)
+- #10150 `350b224` [rpc] Add logging rpc (jnewbery)
+- #10208 `393160c` [wallet] Rescan abortability (kallewoof)
+- #10143 `a987def` [net] Allow disconnectnode RPC to be called with node id (jnewbery)
+- #10281 `0e8499c` doc: Add RPC interface guidelines (laanwj)
+- #9733 `d4732f3` Add getchaintxstats RPC (sipa)
+- #10310 `f4b15e2` [doc] Add hint about getmempoolentry to getrawmempool help (kallewoof)
+- #8704 `96c850c` [RPC] Transaction details in getblock (achow101)
+- #8952 `9390845` Add query options to listunspent RPC call (pedrobranco)
+- #10413 `08ac35a` Fix docs (there's no rpc command setpaytxfee) (RHavar)
+- #8384 `e317c0d` Add witness data output to TxInError messages (instagibbs)
+- #9571 `4677151` RPC: getblockchaininfo returns BIP signaling statistics  (pinheadmz)
+- #10450 `ef2d062` Fix bumpfee rpc "errors" return value (ryanofsky)
+- #10475 `39039b1` [RPC] getmempoolinfo mempoolminfee is a BTC/KB feerate (instagibbs)
+- #10478 `296928e` rpc: Add listen address to incoming connections in `getpeerinfo` (laanwj)
+- #10403 `08d0390` Fix importmulti failure to return rescan errors (ryanofsky)
+- #9740 `9fec4da` Add friendly output to dumpwallet (aideca)
+- #10426 `16f6c98` Replace bytes_serialized with bogosize (sipa)
+- #10252 `980deaf` RPC/Mining: Restore API compatibility for prioritisetransaction (luke-jr)
+- #9672 `46311e7` Opt-into-RBF for RPC & bitcoin-tx (luke-jr)
+- #10481 `9c248e3` Decodehextx scripts sanity check  (achow101)
+- #10488 `fa1f106` Note that the prioritizetransaction dummy value is deprecated, and has no meaning (TheBlueMatt)
+- #9738 `c94b89e` gettxoutproof() should return consistent result (jnewbery)
+- #10191 `00350bd` [trivial] Rename unused RPC arguments 'dummy' (jnewbery)
+- #10627 `b62b4c8` fixed listunspent rpc convert parameter (tnakagawa)
+- #10412 `bef02fb` Improve wallet rescan API (ryanofsky)
+- #10400 `1680ee0` [RPC] Add an uptime command that displays the amount of time (in seconds) bitcoind has been running (rvelhote)
+- #10683 `d81bec7` rpc: Move the `generate` RPC call to rpcwallet (laanwj)
+- #10710 `30bc0f6` REST/RPC example update (Mirobit)
+- #10747 `9edda0c` [rpc] fix verbose argument for getblock in bitcoin-cli (jnewbery)
+- #10589 `104f5f2` More economical fee estimates for RBF and RPC options to control (morcos)
+- #10543 `b27b004` Change API to estimaterawfee (morcos)
+- #10807 `afd2fca` getbalance example covers at least 6 confirms (instagibbs)
+- #10707 `75b5643` Better API for estimatesmartfee RPC  (morcos)
+- #10784 `9e8d6a3` Do not allow users to get keys from keypool without reserving them (TheBlueMatt)
+- #10857 `d445a2c` [RPC] Add a deprecation warning to getinfo's output (achow101)
+- #10571 `adf170d` [RPC]Move transaction combining from signrawtransaction to new RPC (achow101)
+- #10783 `041dad9` [RPC] Various rpc argument fixes (instagibbs)
+- #9622 `6ef3c7e` [rpc] listsinceblock should include lost transactions when parameter is a reorg'd block (kallewoof)
+- #10799 `8537187` Prevent user from specifying conflicting parameters to fundrawtx (TheBlueMatt)
+- #10931 `0b11a07` Fix misleading "Method not found" multiwallet errors (ryanofsky)
+- #10788 `f66c596` [RPC] Fix addwitnessaddress by replacing ismine with producesignature (achow101)
+- #10999 `627c3c0` Fix amounts formatting in `decoderawtransaction` (laanwj)
+- #11002 `4268426` [wallet] return correct error code from resendwallettransaction (jnewbery)
+- #11029 `96a63a3` [RPC] trivial: gettxout no longer shows version of tx (FelixWeis)
+- #11083 `6c2b008` Fix combinerawtransaction RPC help result section (jonasnick)
+- #11027 
