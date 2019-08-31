@@ -769,4 +769,110 @@ Low-level RPC changes
 - #10614 `cafe24f` random: fix crash on some 64bit platforms (theuni)
 - #10714 `2a09a38` Avoid printing incorrect block indexing time due to uninitialized variable (practicalswift)
 - #10837 `8bc6d1f` Fix resource leak on error in GetDevURandom (corebob)
-- #10832 `89bb036` init: 
+- #10832 `89bb036` init: Factor out AppInitLockDataDirectory and fix startup core dump issue (laanwj)
+- #10914 `b995a37` Add missing lock in CScheduler::AreThreadsServicingQueue() (TheBlueMatt)
+- #10958 `659c096` Update to latest Bitcoin patches for LevelDB (sipa)
+- #10919 `c1c671f` Fix more init bugs (TheBlueMatt)
+
+Credits
+=======
+
+Thanks to everyone who directly contributed to this release:
+
+- ロハン ダル
+- Ahmad Kazi
+- aideca
+- Akio Nakamura
+- Alex Morcos
+- Allan Doensen
+- Andres G. Aragoneses
+- Andrew Chow
+- Angel Leon
+- Awemany
+- Bob McElrath
+- Brian McMichael
+- BtcDrak
+- Charlie Lee
+- Chris Gavin
+- Chris Stewart
+- Cory Fields
+- CryptAxe
+- Dag Robole
+- Daniel Aleksandersen
+- Daniel Cousens
+- darksh1ne
+- Dimitris Tsapakidis
+- Eric Shaw
+- Evan Klitzke
+- fanquake
+- Felix Weis
+- flack
+- Guido Vranken
+- Greg Griffith
+- Gregory Maxwell
+- Gregory Sanders
+- Ian Kelling
+- Jack Grigg
+- James Evans
+- James Hilliard
+- Jameson Lopp
+- Jeremy Rubin
+- Jimmy Song
+- João Barbosa
+- Johnathan Corgan
+- John Newbery
+- Jonas Schnelli
+- Jorge Timón
+- Karl-Johan Alm
+- kewde
+- KibbledJiveElkZoo
+- Kirit Thadaka
+- kobake
+- Kyle Honeycutt
+- Lawrence Nahum
+- Luke Dashjr
+- Marco Falke
+- Marcos Mayorga
+- Marijn Stollenga
+- Mario Dian
+- Mark Friedenbach
+- Marko Bencun
+- Masahiko Hyuga
+- Matt Corallo
+- Matthew Zipkin
+- Matthias Grundmann
+- Michael Goldstein
+- Michael Rotarius
+- Mikerah
+- Mike van Rossum
+- Mitchell Cash
+- Nicolas Dorier
+- Patrick Strateman
+- Pavel Janík
+- Pavlos Antoniou
+- Pavol Rusnak
+- Pedro Branco
+- Peter Todd
+- Pieter Wuille
+- practicalswift
+- René Nyffenegger
+- Ricardo Velhote
+- romanornr
+- Russell Yanofsky
+- Rusty Russell
+- Ryan Havar
+- shaolinfry
+- Shigeya Suzuki
+- Simone Madeo
+- Spencer Lievens
+- Steven D. Lander
+- Suhas Daftuar
+- Takashi Mitsuta
+- Thomas Snider
+- Timothy Redaelli
+- tintinweb
+- tnaka
+- Warren Togami
+- Wladimir J. van der Laan
+
+As well as everyone that helped translating on [Transifex](https://www.transifex.com/projects/p/bitcoin/).
