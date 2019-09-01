@@ -235,4 +235,167 @@ P2P changes
   flag, accepting BIP37 bloom filters, or serving merkle blocks or
   transactions matching a bloom filter.  Users who still want to provide
   bloom filter support may either set the configuration option to true
-  to re-enable both BIP111 and BIP37 support or ena
+  to re-enable both BIP111 and BIP37 support or enable just BIP37
+  support for specific peers using the updated `-whitelist` and
+  `-whitebind` configuration options described elsewhere in these
+  release notes.  For the near future, lightweight clients using public
+  BIP111/BIP37 nodes should still be able to connect to older versions
+  of Bitcoin Core and nodes that have manually enabled BIP37 support,
+  but developers of such software should consider migrating to either
+  using specific BIP37 nodes or an alternative transaction filtering
+  system. (#16152)
+
+- By default, Bitcoin Core will now make two additional outbound connections that are exclusively used for block-relay.  No transactions or addr messages will be processed on these connections. These connections are designed to add little additional memory or bandwidth resource requirements but should make some partitioning attacks more difficult to carry out. (#15759)
+
+Miscellaneous CLI Changes
+-------------------------
+
+- The `testnet` field in `bitcoin-cli -getinfo` has been renamed to
+  `chain` and now returns the current network name as defined in BIP70
+  (main, test, regtest). (#15566)
+
+Low-level changes
+=================
+
+RPC
+---
+
+- `getblockchaininfo` no longer returns a `bip9_softforks` object.
+  Instead, information has been moved into the `softforks` object and
+  an additional `type` field describes how Bitcoin Core determines
+  whether that soft fork is active (e.g. BIP9 or BIP90).  See the RPC
+  help for details. (#16060)
+
+- `getblocktemplate` no longer returns a `rules` array containing `CSV`
+  and `segwit` (the BIP9 deployments that are currently in active
+  state). (#16060)
+
+- `getrpcinfo` now returns a `logpath` field with the path to
+  `debug.log`. (#15483)
+
+Tests
+-----
+
+- The regression test chain enabled by the `-regtest` command line flag
+  now requires transactions to not violate standard policy by default.
+  This is the same default used for mainnet and makes it easier to test
+  mainnet behavior on regtest. Note that the testnet still allows
+  non-standard txs by default and that the policy can be locally
+  adjusted with the `-acceptnonstdtxn` command line flag for both test
+  chains. (#15891)
+
+Configuration
+------------
+
+- A setting specified in the default section but not also specified in a
+  network-specific section (e.g. testnet) will now produce an error
+  preventing startup instead of just a warning unless the network is
+  mainnet.  This prevents settings intended for mainnet from being
+  applied to testnet or regtest. (#15629)
+
+- On platforms supporting `thread_local`, log lines can be prefixed with
+  the name of the thread that caused the log. To enable this behavior,
+  use `-logthreadnames=1`. (#15849)
+
+Network
+-------
+
+- When fetching a transaction announced by multiple peers, previous versions of
+  Bitcoin Core would sequentially attempt to download the transaction from each
+  announcing peer until the transaction is received, in the order that those
+  peers' announcements were received.  In this release, the download logic has
+  changed to randomize the fetch order across peers and to prefer sending
+  download requests to outbound peers over inbound peers. This fixes an issue
+  where inbound peers could prevent a node from getting a transaction.
+  (#14897, #15834)
+
+- If a Tor hidden service is being used, Bitcoin Core will be bound to
+  the standard port 8333 even if a different port is configured for
+  clearnet connections.  This prevents leaking node identity through use
+  of identical non-default port numbers. (#15651)
+
+Mempool and transaction relay
+-----------------------------
+
+- Allows one extra single-ancestor transaction per package.  Previously,
+  if a transaction in the mempool had 25 descendants, or it and all of
+  its descendants were over 101,000 vbytes, any newly-received
+  transaction that was also a descendant would be ignored.  Now, one
+  extra descendant will be allowed provided it is an immediate
+  descendant (child) and the child's size is 10,000 vbytes or less.
+  This makes it possible for two-party contract protocols such as
+  Lightning Network to give each participant an output they can spend
+  immediately for Child-Pays-For-Parent (CPFP) fee bumping without
+  allowing one malicious participant to fill the entire package and thus
+  prevent the other participant from spending their output. (#15681)
+
+- Transactions with outputs paying v1 to v16 witness versions (future
+  segwit versions) are now accepted into the mempool, relayed, and
+  mined.  Attempting to spend those outputs remains forbidden by policy
+  ("non-standard").  When this change has been widely deployed, wallets
+  and services can accept any valid bech32 Bitcoin address without
+  concern that transactions paying future segwit versions will become
+  stuck in an unconfirmed state. (#15846)
+
+- Legacy transactions (transactions with no segwit inputs) must now be
+  sent using the legacy encoding format, enforcing the rule specified in
+  BIP144.  (#14039)
+
+Wallet
+------
+
+- When in pruned mode, a rescan that was triggered by an `importwallet`,
+  `importpubkey`, `importaddress`, or `importprivkey` RPC will only fail
+  when blocks have been pruned. Previously it would fail when `-prune`
+  has been set.  This change allows setting `-prune` to a high value
+  (e.g. the disk size) without the calls to any of the import RPCs
+  failing until the first block is pruned. (#15870)
+
+- When creating a transaction with a fee above `-maxtxfee` (default 0.1
+  BTC), the RPC commands `walletcreatefundedpsbt` and
+  `fundrawtransaction` will now fail instead of rounding down the fee.
+  Be aware that the `feeRate` argument is specified in BTC per 1,000
+  vbytes, not satoshi per vbyte. (#16257)
+
+- A new wallet flag `avoid_reuse` has been added (default off). When
+  enabled, a wallet will distinguish between used and unused addresses,
+  and default to not use the former in coin selection.  When setting
+  this flag on an existing wallet, rescanning the blockchain is required
+  to correctly mark previously used destinations.  Together with "avoid
+  partial spends" (added in Bitcoin Core v0.17.0), this can eliminate a
+  serious privacy issue where a malicious user can track spends by
+  sending small payments to a previously-paid address that would then
+  be included with unrelated inputs in future payments. (#13756)
+
+Build system changes
+--------------------
+
+- Python >=3.5 is now required by all aspects of the project. This
+  includes the build systems, test framework and linters. The previously
+  supported minimum (3.4), was EOL in March 2019. (#14954)
+
+- The minimum supported miniUPnPc API version is set to 10. This keeps
+  compatibility with Ubuntu 16.04 LTS and Debian 8 `libminiupnpc-dev`
+  packages. Please note, on Debian this package is still vulnerable to
+  [CVE-2017-8798](https://security-tracker.debian.org/tracker/CVE-2017-8798)
+  (in jessie only) and
+  [CVE-2017-1000494](https://security-tracker.debian.org/tracker/CVE-2017-1000494)
+  (both in jessie and in stretch). (#15993)
+
+0.19.0 change log
+=================
+
+### Consensus
+- #16128 Delete error-prone CScript constructor only used with FindAndDelete (instagibbs)
+- #16060 Bury bip9 deployments (jnewbery)
+
+### Policy
+- #15557 Enhance `bumpfee` to include inputs when targeting a feerate (instagibbs)
+- #15846 Make sending to future native witness outputs standard (sipa)
+
+### Block and transaction handling
+- #15632 Remove ResendWalletTransactions from the Validation Interface (jnewbery)
+- #14121 Index for BIP 157 block filters (jimpo)
+- #15141 Rewrite DoS interface between validation and net_processing (sdaftuar)
+- #15880 utils and libraries: Replace deprecated Boost Filesystem functions (hebasto)
+- #15971 validation: Add compile-time checking for negative locking requirement in LimitValidationInterfaceQueue (practicalswi
