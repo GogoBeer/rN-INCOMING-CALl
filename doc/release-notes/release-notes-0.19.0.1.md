@@ -891,4 +891,199 @@ Build system changes
 - #15777 Add doxygen comments for keypool classes (jnewbery)
 - #15820 Add productivity notes for dummy rebases (dongcarl)
 - #15922 Explain how to pass in non-fundamental types into functions (MarcoFalke)
-- #16080 build/doc:
+- #16080 build/doc: update bitcoin_config.h packages, release process (jonatack)
+- #16047 analyzepsbt description in doc/psbt.md (jonatack)
+- #16039 add release note for 14954 (fanquake)
+- #16139 Add riscv64 to outputs list in release-process.md (JeremyRand)
+- #16140 create security policy (narula)
+- #16164 update release process for SECURITY.md (jonatack)
+- #16213 Remove explicit mention of versions from SECURITY.md (MarcoFalke)
+- #16186 doc/lint: Fix spelling errors identified by codespell 1.15.0 (Empact)
+- #16149 Rework section on ACK in CONTRIBUTING.md (MarcoFalke)
+- #16196 Add release notes for 14897 & 15834 (MarcoFalke)
+- #16241 add rapidcheck to vcpkg install list (fanquake)
+- #16243 Remove travis badge from readme (MarcoFalke)
+- #16256 remove orphaned header in developer notes (jonatack)
+- #15964 Improve build-osx document formatting (giulio92)
+- #16313 Fix broken link in doc/build-osx.md (jonatack)
+- #16330 Use placeholder instead of key expiration date (hebasto)
+- #16339 add reduce-memory.md (fanquake)
+- #16347 Include static members in Doxygen (dongcarl)
+- #15824 Improve netbase comments (dongcarl)
+- #16430 Update bips 35, 37 and 111 status (MarcoFalke)
+- #16455 Remove downgrading warning in release notes, per 0.18 branch (MarcoFalke)
+- #16484 update labels in CONTRIBUTING.md (MarcoFalke)
+- #16483 update Python command in msvc readme (sipsorcery)
+- #16504 Add release note for the deprecated totalFee option of bumpfee (promag)
+- #16448 add note on precedence of options in bitcoin.conf (fanquake)
+- #16536 Update and extend benchmarking.md (ariard)
+- #16530 Fix grammar and punctuation in developer notes (Tech1k)
+- #16574 Add historical release notes for 0.18.1 (laanwj)
+- #16585 Update Markdown syntax for bdb packages (emilengler)
+- #16586 Mention other ways to conserve memory on compilation (MarcoFalke)
+- #16605 Add missing contributor to 0.18.1 release notes (meshcollider)
+- #16615 Fix typos in COPYRIGHT (gapeman)
+- #16626 Fix spelling error chache -> cache (nilswloewen)
+- #16587 Improve versionbits.h documentation (ariard)
+- #16643 Add ZMQ dependencies to the Fedora build instructions (hebasto)
+- #16634 Refer in rpcbind doc to the manpage (MarcoFalke)
+- #16555 mention whitelist is inbound, and applies to blocksonly (Sjors)
+- #16645 initial RapidCheck property-based testing documentation (jonatack)
+- #16691 improve depends prefix documentation (fanquake)
+- #16629 Add documentation for the new whitelist permissions (NicolasDorier)
+- #16723 Update labels in CONTRIBUTING.md (hebasto)
+- #16461 Tidy up shadowing section (promag)
+- #16621 add default bitcoin.conf locations (GChuf)
+- #16752 Delete stale URL in test README (michaelfolkson)
+- #14862 Declare BLOCK_VALID_HEADER reserved (MarcoFalke)
+- #16806 Add issue templates for bug and feature request (MarcoFalke)
+- #16857 Elaborate need to re-login on Debian-based after usermod for Tor group (clashicly)
+- #16863 Add a missing closing parenthesis in the bitcoin-wallet's help (darosior)
+- #16757 CChainState return values (MarcoFalke)
+- #16847 add comments clarifying how local services are advertised (jamesob)
+- #16812 Fix whitespace errs in .md files, bitcoin.conf, and Info.plist.in (ch4ot1c)
+- #16885 Update tx-size-small comment with relevant CVE disclosure (instagibbs)
+- #16900 Fix doxygen comment for SignTransaction in rpc/rawtransaction_util (MarcoFalke)
+- #16914 Update homebrew instruction for doxygen (Sjors)
+- #16912 Remove Doxygen intro from src/bitcoind.cpp (ch4ot1c)
+- #16960 replace outdated OpenSSL comment in test README (fanquake)
+- #16968 Remove MSVC update step from translation process (laanwj)
+- #16953 Improve test READMEs (fjahr)
+- #16962 Put PR template in comments (laanwj)
+- #16397 Clarify includeWatching for fundrawtransaction (stevenroose)
+- #15459 add how to calculate blockchain and chainstate size variables to release process (marcoagner)
+- #16997 Update bips.md for 0.19 (laanwj)
+- #17001 Remove mention of renamed mapBlocksUnlinked (MarcoFalke)
+- #17014 Consolidate release notes before 0.19.0 (move-only) (MarcoFalke)
+- #17111 update bips.md with buried BIP9 deployments (MarcoFalke)
+
+Credits
+=======
+
+Thanks to everyone who directly contributed to this release:
+
+- 251
+- Aaron Clauson
+- Akio Nakamura
+- Alistair Mann
+- Amiti Uttarwar
+- Andrew Chow
+- andrewtoth
+- Anthony Towns
+- Antoine Riard
+- Aseem Sood
+- Ben Carman
+- Ben Woosley
+- bpay
+- Carl Dong
+- Carnhof Daki
+- Chris Capobianco
+- Chris Moore
+- Chuf
+- clashic
+- clashicly
+- Cory Fields
+- Daki Carnhof
+- Dan Gershony
+- Daniel Edgecumbe
+- Daniel Kraft
+- Daniel McNally
+- darosior
+- David A. Harding
+- David Reikher
+- Douglas Roark
+- Elichai Turkel
+- Emil
+- Emil Engler
+- ezegom
+- Fabian Jahr
+- fanquake
+- Felix Weis
+- Ferdinando M. Ametrano
+- fridokus
+- gapeman
+- GChuf
+- Gert-Jaap Glasbergen
+- Giulio Lombardo
+- Glenn Willen
+- Graham Krizek
+- Gregory Sanders
+- grim-trigger
+- gwillen
+- Hennadii Stepanov
+- Jack Mallers
+- James Hilliard
+- James O'Beirne
+- Jan Beich
+- Jeremy Rubin
+- JeremyRand
+- Jim Posen
+- John Bampton
+- John Newbery
+- Jon Atack
+- Jon Layton
+- Jonas Schnelli
+- Jonathan "Duke" Leto
+- João Barbosa
+- Joonmo Yang
+- Jordan Baczuk
+- Jorge Timón
+- Josu Goñi
+- Julian Fleischer
+- Karl-Johan Alm
+- Kaz Wesley
+- keepkeyjon
+- Kirill Fomichev
+- Kristaps Kaupe
+- Kristian Kramer
+- Larry Ruane
+- Lenny Maiorani
+- LongShao007
+- Luca Venturini
+- lucash-dev
+- Luke Dashjr
+- marcoagner
+- MarcoFalke
+- marcuswin
+- Martin Ankerl
+- Martin Zumsande
+- Matt Corallo
+- MeshCollider
+- Michael Folkson
+- Miguel Herranz
+- Nathan Marley
+- Neha Narula
+- nicolas.dorier
+- Nils Loewen
+- nkostoulas
+- NullFunctor
+- orient
+- Patrick Strateman
+- Peter Bushnell
+- Peter Wagner
+- Pieter Wuille
+- practicalswift
+- qmma
+- r8921039
+- RJ Rybarczyk
+- Russell Yanofsky
+- Samuel Dobson
+- Sebastian Falbesoner
+- setpill
+- shannon1916
+- Sjors Provoost
+- soroosh-sdi
+- Steven Roose
+- Suhas Daftuar
+- tecnovert
+- THETCR
+- Tim Ruffing
+- Tobias Kaderle
+- Torkel Rogstad
+- Ulrich Kempken
+- whythat
+- William Casarin
+- Wladimir J. van der Laan
+- zenosage
+
+As well as everyone that helped translating on [Transifex](https://www.transifex.com/bitcoin/bitcoin/).
