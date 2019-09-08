@@ -134,4 +134,165 @@ Updated RPCs
 - `getnetworkinfo` now returns two new fields, `connections_in` and
   `connections_out`, that provide the number of inbound and outbound peer
   connections. These new fields are in addition to the existing `connections`
-  field, which returns the total number of peer connections. (#1
+  field, which returns the total number of peer connections. (#19405)
+
+- Exposed transaction version numbers are now treated as unsigned 32-bit
+  integers instead of signed 32-bit integers. This matches their treatment in
+  consensus logic. Versions greater than 2 continue to be non-standard
+  (matching previous behavior of smaller than 1 or greater than 2 being
+  non-standard). Note that this includes the `joinpsbt` command, which combines
+  partially-signed transactions by selecting the highest version number.
+  (#16525)
+
+- `getmempoolinfo` now returns an additional `unbroadcastcount` field. The
+  mempool tracks locally submitted transactions until their initial broadcast
+  is acknowledged by a peer. This field returns the count of transactions
+  waiting for acknowledgement.
+
+- Mempool RPCs such as `getmempoolentry` and `getrawmempool` with
+  `verbose=true` now return an additional `unbroadcast` field. This indicates
+  whether initial broadcast of the transaction has been acknowledged by a
+  peer. `getmempoolancestors` and `getmempooldescendants` are also updated.
+
+- The `getpeerinfo` RPC no longer returns the `banscore` field unless the configuration
+  option `-deprecatedrpc=banscore` is used. The `banscore` field will be fully
+  removed in the next major release. (#19469)
+
+- The `testmempoolaccept` RPC returns `vsize` and a `fees` object with the `base` fee
+  if the transaction would pass validation. (#19940)
+
+- The `getpeerinfo` RPC now returns a `connection_type` field. This indicates
+  the type of connection established with the peer. It will return one of six
+  options. For more information, see the `getpeerinfo` help documentation.
+  (#19725)
+
+- The `getpeerinfo` RPC no longer returns the `addnode` field by default. This
+  field will be fully removed in the next major release.  It can be accessed
+  with the configuration option `-deprecatedrpc=getpeerinfo_addnode`. However,
+  it is recommended to instead use the `connection_type` field (it will return
+  `manual` when addnode is true). (#19725)
+
+- The `getpeerinfo` RPC no longer returns the `whitelisted` field by default. 
+  This field will be fully removed in the next major release. It can be accessed 
+  with the configuration option `-deprecatedrpc=getpeerinfo_whitelisted`. However, 
+  it is recommended to instead use the `permissions` field to understand if specific 
+  privileges have been granted to the peer. (#19770)
+
+- The `walletcreatefundedpsbt` RPC call will now fail with
+  `Insufficient funds` when inputs are manually selected but are not enough to cover
+  the outputs and fee. Additional inputs can automatically be added through the
+  new `add_inputs` option. (#16377)
+
+- The `fundrawtransaction` RPC now supports `add_inputs` option that when `false`
+  prevents adding more inputs if necessary and consequently the RPC fails.
+
+Changes to Wallet or GUI related RPCs can be found in the GUI or Wallet section below.
+
+New RPCs
+--------
+
+- The `getindexinfo` RPC returns the actively running indices of the node,
+  including their current sync status and height. It also accepts an `index_name`
+  to specify returning the status of that index only. (#19550)
+
+Build System
+------------
+
+Updated settings
+----------------
+
+- The same ZeroMQ notification (e.g. `-zmqpubhashtx=address`) can now be
+  specified multiple times to publish the same notification to different ZeroMQ
+  sockets. (#18309)
+
+- The `-banscore` configuration option, which modified the default threshold for
+  disconnecting and discouraging misbehaving peers, has been removed as part of
+  changes in 0.20.1 and in this release to the handling of misbehaving peers.
+  Refer to "Changes regarding misbehaving peers" in the 0.20.1 release notes for
+  details. (#19464)
+
+- The `-debug=db` logging category, which was deprecated in 0.20 and replaced by
+  `-debug=walletdb` to distinguish it from `coindb`, has been removed. (#19202)
+
+- A `download` permission has been extracted from the `noban` permission. For
+  compatibility, `noban` implies the `download` permission, but this may change
+  in future releases. Refer to the help of the affected settings `-whitebind`
+  and `-whitelist` for more details. (#19191)
+
+- Netmasks that contain 1-bits after 0-bits (the 1-bits are not contiguous on
+  the left side, e.g. 255.0.255.255) are no longer accepted. They are invalid
+  according to RFC 4632. Netmasks are used in the `-rpcallowip` and `-whitelist`
+  configuration options and in the `setban` RPC. (#19628)
+
+- The `-blocksonly` setting now completely disables fee estimation. (#18766)
+
+Changes to Wallet or GUI related settings can be found in the GUI or Wallet section below.
+
+Tools and Utilities
+-------------------
+
+- A new `bitcoin-cli -netinfo` command provides a network peer connections
+  dashboard that displays data from the `getpeerinfo` and `getnetworkinfo` RPCs
+  in a human-readable format. An optional integer argument from `0` to `4` may
+  be passed to see increasing levels of detail. (#19643)
+
+- A new `bitcoin-cli -generate` command, equivalent to RPC `generatenewaddress`
+  followed by `generatetoaddress`, can generate blocks for command line testing
+  purposes. This is a client-side version of the former `generate` RPC. See the
+  help for details. (#19133)
+
+- The `bitcoin-cli -getinfo` command now displays the wallet name and balance for
+  each of the loaded wallets when more than one is loaded (e.g. in multiwallet
+  mode) and a wallet is not specified with `-rpcwallet`. (#18594)
+
+- The `connections` field of `bitcoin-cli -getinfo` is now expanded to return a JSON
+  object with `in`, `out` and `total` numbers of peer connections. It previously
+  returned a single integer value for the total number of peer connections. (#19405)
+
+New settings
+------------
+
+- The `startupnotify` option is used to specify a command to
+  execute when Bitcoin Core has finished with its startup
+  sequence. (#15367)
+
+Wallet
+------
+
+- Backwards compatibility has been dropped for two `getaddressinfo` RPC
+  deprecations, as notified in the 0.20 release notes. The deprecated `label`
+  field has been removed as well as the deprecated `labels` behavior of
+  returning a JSON object containing `name` and `purpose` key-value pairs. Since
+  0.20, the `labels` field returns a JSON array of label names. (#19200)
+
+- To improve wallet privacy, the frequency of wallet rebroadcast attempts is
+  reduced from approximately once every 15 minutes to once every 12-36 hours.
+  To maintain a similar level of guarantee for initial broadcast of wallet
+  transactions, the mempool tracks these transactions as a part of the newly
+  introduced unbroadcast set. See the "P2P and network changes" section for
+  more information on the unbroadcast set. (#18038)
+
+- The `sendtoaddress` and `sendmany` RPCs accept an optional `verbose=True`
+  argument to also return the fee reason about the sent tx. (#19501)
+
+- The wallet can create a transaction without change even when the keypool is
+  empty. Previously it failed. (#17219)
+
+- The `-salvagewallet` startup option has been removed. A new `salvage` command
+  has been added to the `bitcoin-wallet` tool which performs the salvage
+  operations that `-salvagewallet` did. (#18918)
+
+- A new configuration flag `-maxapsfee` has been added, which sets the max
+  allowed avoid partial spends (APS) fee. It defaults to 0 (i.e. fee is the
+  same with and without APS). Setting it to -1 will disable APS, unless
+  `-avoidpartialspends` is set. (#14582)
+
+- The wallet will now avoid partial spends (APS) by default, if this does not
+  result in a difference in fees compared to the non-APS variant. The allowed
+  fee threshold can be adjusted using the new `-maxapsfee` configuration
+  option. (#14582)
+
+- The `createwallet`, `loadwallet`, and `unloadwallet` RPCs now accept
+  `load_on_startup` options to modify the settings list. Unless these options
+  are explicitly set to true or false, the list is not modified, so the RPC
+  me
