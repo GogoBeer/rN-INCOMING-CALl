@@ -436,4 +436,158 @@ This change does have a caveat. If a Descriptor Wallet with private keys *enable
 a multiple key descriptor without all of the private keys (e.g. `multi(...)` with only one private key),
 then the wallet will fail to sign and broadcast transactions. Such wallets would need to use the PSBT
 workflow but the typical GUI Send, `sendtoaddress`, etc. workflows would still be available, just
-no
+non-functional.
+
+This issue is worsened if the wallet contains both single key (e.g. `wpkh(...)`) descriptors and such
+multiple key descriptors as some transactions could be signed and broadcast and others not. This is
+due to some transactions containing only single key inputs, while others would contain both single
+key and multiple key inputs, depending on which are available and how the coin selection algorithm
+selects inputs. However this is not considered to be a supported use case; multisigs
+should be in their own wallets which do not already have descriptors. Although users cannot export
+descriptors with private keys for now as explained earlier.
+
+#### BIP 44/49/84 Support
+
+The change to using descriptors changes the default derivation paths used by Bitcoin Core
+to adhere to BIP 44/49/84. Descriptors with different derivation paths can be imported without
+issue.
+
+#### SQLite Database Backend
+
+Descriptor wallets use SQLite for the wallet file instead of the Berkeley DB used in legacy wallets.
+This will break compatibility with any existing tooling that operates on wallets, however compatibility
+was already being broken by the move to descriptors.
+
+### Wallet RPC changes
+
+- The `upgradewallet` RPC replaces the `-upgradewallet` command line option.
+  (#15761)
+
+- The `settxfee` RPC will fail if the fee was set higher than the `-maxtxfee`
+  command line setting. The wallet will already fail to create transactions
+  with fees higher than `-maxtxfee`. (#18467)
+
+- A new `fee_rate` parameter/option denominated in satoshis per vbyte (sat/vB)
+  is introduced to the `sendtoaddress`, `sendmany`, `fundrawtransaction` and
+  `walletcreatefundedpsbt` RPCs as well as to the experimental new `send`
+  RPC. The legacy `feeRate` option in `fundrawtransaction` and
+  `walletcreatefundedpsbt` still exists for setting a fee rate in BTC per 1,000
+  vbytes (BTC/kvB), but it is expected to be deprecated soon to avoid
+  confusion. For these RPCs, the fee rate error message is updated from BTC/kB
+  to sat/vB and the help documentation in BTC/kB is updated to BTC/kvB. The
+  `send` and `sendtoaddress` RPC examples are updated to aid users in creating
+  transactions with explicit fee rates. (#20305, #11413)
+
+- The `bumpfee` RPC `fee_rate` option is changed from BTC/kvB to sat/vB and the
+  help documentation is updated. Users are warned that this is a breaking API
+  change, but it should be relatively benign: the large (100,000 times)
+  difference between BTC/kvB and sat/vB units means that a transaction with a
+  fee rate mistakenly calculated in BTC/kvB rather than sat/vB should raise an
+  error due to the fee rate being set too low. In the worst case, the
+  transaction may send at 1 sat/vB, but as Replace-by-Fee (BIP125 RBF) is active
+  by default when an explicit fee rate is used, the transaction fee can be
+  bumped. (#20305)
+
+GUI changes
+-----------
+
+- Wallets created or loaded in the GUI will now be automatically loaded on
+  startup, so they don't need to be manually reloaded next time Bitcoin Core is
+  started. The list of wallets to load on startup is stored in
+  `\<datadir\>/settings.json` and augments any command line or `bitcoin.conf`
+  `-wallet=` settings that specify more wallets to load. Wallets that are
+  unloaded in the GUI get removed from the settings list so they won't load
+  again automatically next startup. (#19754)
+
+- The GUI Peers window no longer displays a "Ban Score" field. This is part of
+  changes in 0.20.1 and in this release to the handling of misbehaving
+  peers. Refer to "Changes regarding misbehaving peers" in the 0.20.1 release
+  notes for details. (#19512)
+
+Low-level changes
+=================
+
+RPC
+---
+
+- To make RPC `sendtoaddress` more consistent with `sendmany` the following error
+    `sendtoaddress` codes were changed from `-4` to `-6`:
+  - Insufficient funds
+  - Fee estimation failed
+  - Transaction has too long of a mempool chain
+
+- The `sendrawtransaction` error code for exceeding `maxfeerate` has been changed from
+  `-26` to `-25`. The error string has been changed from "absurdly-high-fee" to
+  "Fee exceeds maximum configured by user (e.g. -maxtxfee, maxfeerate)." The
+  `testmempoolaccept` RPC returns `max-fee-exceeded` rather than `absurdly-high-fee`
+  as the `reject-reason`. (#19339)
+
+- To make wallet and rawtransaction RPCs more consistent, the error message for
+  exceeding maximum feerate has been changed to "Fee exceeds maximum configured by user
+  (e.g. -maxtxfee, maxfeerate)." (#19339)
+
+Tests
+-----
+
+- The BIP 325 default signet can be enabled by the `-chain=signet` or `-signet`
+  setting. The settings `-signetchallenge` and `-signetseednode` allow
+  enabling a custom signet.
+
+- The `generateblock` RPC allows testers using regtest mode to
+  generate blocks that consist of a custom set of transactions. (#17693)
+
+0.21.0 change log
+=================
+
+### Consensus
+- #18267 BIP-325: Signet (kallewoof)
+- #20016 uint256: 1 is a constant (ajtowns)
+- #20006 Fix misleading error message: Clean stack rule (sanket1729)
+- #19953 Implement BIP 340-342 validation (Schnorr/taproot/tapscript) (sipa)
+- #20169 Taproot follow-up: Make ComputeEntrySchnorr and ComputeEntryECDSA const to clarify contract (practicalswift)
+
+### Policy
+- #18766 Disable fee estimation in blocksonly mode (darosior)
+- #19630 Cleanup fee estimation code (darosior)
+- #20165 Only relay Taproot spends if next block has it active (sipa)
+
+### Mining
+- #17946 Fix GBT: Restore "!segwit" and "csv" to "rules" key (luke-jr)
+
+### Privacy
+- #16432 Add privacy to the Overview page (hebasto)
+- #18861 Do not answer GETDATA for to-be-announced tx (sipa)
+- #18038 Mempool tracks locally submitted transactions to improve wallet privacy (amitiuttarwar)
+- #19109 Only allow getdata of recently announced invs (sipa)
+
+### Block and transaction handling
+- #17737 Add ChainstateManager, remove BlockManager global (jamesob)
+- #18960 indexes: Add compact block filter headers cache (jnewbery)
+- #13204 Faster sigcache nonce (JeremyRubin)
+- #19088 Use std::chrono throughout some validation functions (fanquake)
+- #19142 Make VerifyDB level 4 interruptible (MarcoFalke)
+- #17994 Flush undo files after last block write (kallewoof)
+- #18990 log: Properly log txs rejected from mempool (MarcoFalke)
+- #18984 Remove unnecessary input blockfile SetPos (dgenr8)
+- #19526 log: Avoid treating remote misbehvior as local system error (MarcoFalke)
+- #18044 Use wtxid for transaction relay (sdaftuar)
+- #18637 coins: allow cache resize after init (jamesob)
+- #19854 Avoid locking CTxMemPool::cs recursively in simple cases (hebasto)
+- #19478 Remove CTxMempool::mapLinks data structure member (JeremyRubin)
+- #19927 Reduce direct `g_chainman` usage (dongcarl)
+- #19898 log: print unexpected version warning in validation log category (n-thumann)
+- #20036 signet: Add assumed values for default signet (MarcoFalke)
+- #20048 chainparams: do not log signet startup messages for other chains (jonatack)
+- #19339 re-delegate absurd fee checking from mempool to clients (glozow)
+- #20035 signet: Fix uninitialized read in validation (MarcoFalke)
+- #20157 Bugfix: chainparams: Add missing (always enabled) Taproot deployment for Signet (luke-jr)
+- #20263 Update assumed chain params (MarcoFalke)
+- #20372 Avoid signed integer overflow when loading a mempool.dat file with a malformed time field (practicalswift)
+- #18621 script: Disallow silent bool -> cscript conversion (MarcoFalke)
+- #18612, #18732 script: Remove undocumented and unused operator+ (MarcoFalke)
+- #19317 Add a left-justified width field to `log2_work` component for a uniform debug.log output (jamesgmorgan)
+
+### P2P protocol and network code
+- #18544 Limit BIP37 filter lifespan (active between `filterload`..`filterclear`) (theStack)
+- #18806 Remove is{Empty,Full} flags from CBloomFilter, clarify CVE fix (theStack)
+- #18512 Improve asmap c
