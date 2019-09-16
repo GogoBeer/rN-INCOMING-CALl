@@ -1161,4 +1161,176 @@ Tests
 - #19765 Fix getmempoolancestors RPC result doc (MarcoFalke)
 - #19786 Remove label from good first issue template (MarcoFalke)
 - #19646 Updated outdated help command for getblocktemplate (jakeleventhal)
-- #18817 Document differences in 
+- #18817 Document differences in bitcoind and bitcoin-qt locale handling (practicalswift)
+- #19870 update PyZMQ install instructions, fix `zmq_sub.py` file permissions (jonatack)
+- #19903 Update build-openbsd.md with GUI support (grubles)
+- #19241 help: Generate checkpoint height from chainparams (luke-jr)
+- #18949 Add CODEOWNERS file to automatically nominate PR reviewers (adamjonas)
+- #20014 Mention signet in -help output (hebasto)
+- #20015 Added default signet config for linearize script (gr0kchain)
+- #19958 Better document features of feelers (naumenkogs)
+- #19871 Clarify scope of eviction protection of outbound block-relay peers (ariard)
+- #20076 Update and improve files.md (hebasto)
+- #20107 Collect release-notes snippets (MarcoFalke)
+- #20109 Release notes and followups from 19339 (glozow)
+- #20090 Tiny followups to new getpeerinfo connection type field (amitiuttarwar)
+- #20152 Update wallet files in files.md (hebasto)
+- #19124 Document `ALLOW_HOST_PACKAGES` dependency option (skmcontrib)
+- #20271 Document that wallet salvage is experimental (MarcoFalke)
+- #20281 Correct getblockstats documentation for `(sw)total_weight` (shesek)
+- #20279 release process updates/fixups (jonatack)
+- #20238 Missing comments for signet parameters (decryp2kanon)
+- #20756 Add missing field (permissions) to the getpeerinfo help (amitiuttarwar)
+- #20668 warn that incoming conns are unlikely when not using default ports (adamjonas)
+- #19961 tor.md updates (jonatack)
+- #19050 Add warning for rest interface limitation (fjahr)
+- #19390 doc/REST-interface: Remove stale info (luke-jr)
+- #19344 docs: update testgen usage example (Bushstar)
+
+Credits
+=======
+
+Thanks to everyone who directly contributed to this release:
+
+- 10xcryptodev
+- Aaron Clauson
+- Aaron Hook
+- Adam Jonas
+- Adam Soltys
+- Adam Stein
+- Akio Nakamura
+- Alex Willmer
+- Amir Ghorbanian
+- Amiti Uttarwar
+- Andrew Chow
+- Andrew Toth
+- Anthony Fieroni
+- Anthony Towns
+- Antoine Poinsot
+- Antoine Riard
+- Ben Carman
+- Ben Woosley
+- Benoit Verret
+- Brian Liotti
+- Bushstar
+- Calvin Kim
+- Carl Dong
+- Chris Abrams
+- Chris L
+- Christopher Coverdale
+- codeShark149
+- Cory Fields
+- Craig Andrews
+- Damian Mee
+- Daniel Kraft
+- Danny Lee
+- David Reikher
+- DesWurstes
+- Dhruv Mehta
+- Duncan Dean
+- Elichai Turkel
+- Elliott Jin
+- Emil Engler
+- Ethan Heilman
+- eugene
+- Fabian Jahr
+- fanquake
+- Ferdinando M. Ametrano
+- freenancial
+- furszy
+- Gillian Chu
+- Gleb Naumenko
+- Glenn Willen
+- Gloria Zhao
+- glowang
+- gr0kchain
+- Gregory Sanders
+- grubles
+- gzhao408
+- Harris
+- Hennadii Stepanov
+- Hugo Nguyen
+- Igor Cota
+- Ivan Metlushko
+- Ivan Vershigora
+- Jake Leventhal
+- James O'Beirne
+- Jeremy Rubin
+- jgmorgan
+- Jim Posen
+- “jkcd”
+- jmorgan
+- John Newbery
+- Johnson Lau
+- Jon Atack
+- Jonas Schnelli
+- Jonathan Schoeller
+- João Barbosa
+- Justin Moon
+- kanon
+- Karl-Johan Alm
+- Kiminuo
+- Kristaps Kaupe
+- lontivero
+- Luke Dashjr
+- Marcin Jachymiak
+- MarcoFalke
+- Martin Ankerl
+- Martin Zumsande
+- maskoficarus
+- Matt Corallo
+- Matthew Zipkin
+- MeshCollider
+- Miguel Herranz
+- MIZUTA Takeshi
+- mruddy
+- Nadav Ivgi
+- Neha Narula
+- Nicolas Thumann
+- Niklas Gögge
+- Nima Yazdanmehr
+- nsa
+- nthumann
+- Oliver Gugger
+- pad
+- pasta
+- Peter Bushnell
+- pierrenn
+- Pieter Wuille
+- practicalswift
+- Prayank
+- Raúl Martínez (RME)
+- RandyMcMillan
+- Rene Pickhardt
+- Riccardo Masutti
+- Robert
+- Rod Vagg
+- Roy Shao
+- Russell Yanofsky
+- Saahil Shangle
+- sachinkm77
+- saibato
+- Samuel Dobson
+- sanket1729
+- Sebastian Falbesoner
+- Seleme Topuz
+- Sishir Giri
+- Sjors Provoost
+- skmcontrib
+- Stepan Snigirev
+- Stephan Oeste
+- Suhas Daftuar
+- t-bast
+- Tom Harding
+- Torhte Butler
+- TrentZ
+- Troy Giorshev
+- tryphe
+- Tyler Chambers
+- U-Zyn Chua
+- Vasil Dimov
+- wiz
+- Wladimir J. van der Laan
+
+As well as to everyone that helped with translations on
+[Transifex](https://www.transifex.com/bitcoin/bitcoin/).
