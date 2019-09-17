@@ -14,4 +14,4 @@ If you have already downloaded version 0.3.20.1, please either add this to your 
   maxsendbuffer=10000
   maxreceivebuffer=10000
 
-... or download th
+... or download the new version.
