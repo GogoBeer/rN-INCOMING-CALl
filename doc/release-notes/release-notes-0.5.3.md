@@ -30,4 +30,13 @@ Various memory leaks and potential null pointer deferences have been fixed.
 Handle invalid Bitcoin URIs using "bitcoin://" instead of "bitcoin:".
 Several shutdown issues have been fixed.
 Revert to "global progress indication", as starting from zero every time was considered too confusing for many users.
-Check that keys stored in the wallet are
+Check that keys stored in the wallet are valid at startup, and if not, report corruption.
+Enable accessible widgets on Windows, so that people with screen readers such as NVDA can make sense of it.
+Various build fixes.
+If no password is specified to bitcoind, recommend a secure password.
+Automatically focus and scroll to new "Send coins" entries in Bitcoin-Qt.
+Show a message box for --help on Windows, for Bitcoin-Qt.
+Add missing "About Qt" menu option to show built-in Qt About dialog.
+Don't show "-daemon" as an option for Bitcoin-Qt, since it isn't available.
+Update hard-coded fallback seed nodes, choosing recent ones with long uptime and versions at least 0.4.0.
+Add checkpoint at block 168,000.
