@@ -134,4 +134,5 @@ For this release, creation and testing of multisignature
 transactions is limited to the bitcoin test network using
 the "addmultisigaddress" JSON-RPC api call.
 
-Short multisignature address
+Short multisignature address support is included in this
+release, as specified in BIP 13 and BIP 16.
