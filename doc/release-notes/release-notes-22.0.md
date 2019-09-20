@@ -214,4 +214,105 @@ RPC
     is malformed. Previously returned RPC_INVALID_ADDRESS_OR_KEY (-5).
 
 Tests
--
+-----
+
+22.0 change log
+===============
+
+A detailed list of changes in this version follows. To keep the list to a manageable length, small refactors and typo fixes are not included, and similar changes are sometimes condensed into one line.
+
+### Consensus
+- bitcoin/bitcoin#19438 Introduce deploymentstatus (ajtowns)
+- bitcoin/bitcoin#20207 Follow-up extra comments on taproot code and tests (sipa)
+- bitcoin/bitcoin#21330 Deal with missing data in signature hashes more consistently (sipa)
+
+### Policy
+- bitcoin/bitcoin#18766 Disable fee estimation in blocksonly mode (by removing the fee estimates global) (darosior)
+- bitcoin/bitcoin#20497 Add `MAX_STANDARD_SCRIPTSIG_SIZE` to policy (sanket1729)
+- bitcoin/bitcoin#20611 Move `TX_MAX_STANDARD_VERSION` to policy (MarcoFalke)
+
+### Mining
+- bitcoin/bitcoin#19937, bitcoin/bitcoin#20923 Signet mining utility (ajtowns)
+
+### Block and transaction handling
+- bitcoin/bitcoin#14501 Fix possible data race when committing block files (luke-jr)
+- bitcoin/bitcoin#15946 Allow maintaining the blockfilterindex when using prune (jonasschnelli)
+- bitcoin/bitcoin#18710 Add local thread pool to CCheckQueue (hebasto)
+- bitcoin/bitcoin#19521 Coinstats Index (fjahr)
+- bitcoin/bitcoin#19806 UTXO snapshot activation (jamesob)
+- bitcoin/bitcoin#19905 Remove dead CheckForkWarningConditionsOnNewFork (MarcoFalke)
+- bitcoin/bitcoin#19935 Move SaltedHashers to separate file and add some new ones (achow101)
+- bitcoin/bitcoin#20054 Remove confusing and useless "unexpected version" warning (MarcoFalke)
+- bitcoin/bitcoin#20519 Handle rename failure in `DumpMempool(…)` by using the `RenameOver(…)` return value (practicalswift)
+- bitcoin/bitcoin#20749, bitcoin/bitcoin#20750, bitcoin/bitcoin#21055, bitcoin/bitcoin#21270, bitcoin/bitcoin#21525, bitcoin/bitcoin#21391, bitcoin/bitcoin#21767, bitcoin/bitcoin#21866 Prune `g_chainman` usage (dongcarl)
+- bitcoin/bitcoin#20833 rpc/validation: enable packages through testmempoolaccept (glozow)
+- bitcoin/bitcoin#20834 Locks and docs in ATMP and CheckInputsFromMempoolAndCache (glozow)
+- bitcoin/bitcoin#20854 Remove unnecessary try-block (amitiuttarwar)
+- bitcoin/bitcoin#20868 Remove redundant check on pindex (jarolrod)
+- bitcoin/bitcoin#20921 Don't try to invalidate genesis block in CChainState::InvalidateBlock (theStack)
+- bitcoin/bitcoin#20972 Locks: Annotate CTxMemPool::check to require `cs_main` (dongcarl)
+- bitcoin/bitcoin#21009 Remove RewindBlockIndex logic (dhruv)
+- bitcoin/bitcoin#21025 Guard chainman chainstates with `cs_main` (dongcarl)
+- bitcoin/bitcoin#21202 Two small clang lock annotation improvements (amitiuttarwar)
+- bitcoin/bitcoin#21523 Run VerifyDB on all chainstates (jamesob)
+- bitcoin/bitcoin#21573 Update libsecp256k1 subtree to latest master (sipa)
+- bitcoin/bitcoin#21582, bitcoin/bitcoin#21584, bitcoin/bitcoin#21585 Fix assumeutxo crashes (MarcoFalke)
+- bitcoin/bitcoin#21681 Fix ActivateSnapshot to use hardcoded nChainTx (jamesob)
+- bitcoin/bitcoin#21796 index: Avoid async shutdown on init error (MarcoFalke)
+- bitcoin/bitcoin#21946 Document and test lack of inherited signaling in RBF policy (ariard)
+- bitcoin/bitcoin#22084 Package testmempoolaccept followups (glozow)
+- bitcoin/bitcoin#22102 Remove `Warning:` from warning message printed for unknown new rules (prayank23)
+- bitcoin/bitcoin#22112 Force port 0 in I2P (vasild)
+- bitcoin/bitcoin#22135 CRegTestParams: Use `args` instead of `gArgs` (kiminuo)
+- bitcoin/bitcoin#22146 Reject invalid coin height and output index when loading assumeutxo (MarcoFalke)
+- bitcoin/bitcoin#22253 Distinguish between same tx and same-nonwitness-data tx in mempool (glozow)
+- bitcoin/bitcoin#22261 Two small fixes to node broadcast logic (jnewbery)
+- bitcoin/bitcoin#22415 Make `m_mempool` optional in CChainState (jamesob)
+- bitcoin/bitcoin#22499 Update assumed chain params (sriramdvt)
+- bitcoin/bitcoin#22589 net, doc: update I2P hardcoded seeds and docs for 22.0 (jonatack)
+
+### P2P protocol and network code
+- bitcoin/bitcoin#18077 Add NAT-PMP port forwarding support (hebasto)
+- bitcoin/bitcoin#18722 addrman: improve performance by using more suitable containers (vasild)
+- bitcoin/bitcoin#18819 Replace `cs_feeFilter` with simple std::atomic (MarcoFalke)
+- bitcoin/bitcoin#19203 Add regression fuzz harness for CVE-2017-18350. Add FuzzedSocket (practicalswift)
+- bitcoin/bitcoin#19288 fuzz: Add fuzzing harness for TorController (practicalswift)
+- bitcoin/bitcoin#19415 Make DNS lookup mockable, add fuzzing harness (practicalswift)
+- bitcoin/bitcoin#19509 Per-Peer Message Capture (troygiorshev)
+- bitcoin/bitcoin#19763 Don't try to relay to the address' originator (vasild)
+- bitcoin/bitcoin#19771 Replace enum CConnMan::NumConnections with enum class ConnectionDirection (luke-jr)
+- bitcoin/bitcoin#19776 net, rpc: expose high bandwidth mode state via getpeerinfo (theStack)
+- bitcoin/bitcoin#19832 Put disconnecting logs into BCLog::NET category (hebasto)
+- bitcoin/bitcoin#19858 Periodically make block-relay connections and sync headers (sdaftuar)
+- bitcoin/bitcoin#19884 No delay in adding fixed seeds if -dnsseed=0 and peers.dat is empty (dhruv)
+- bitcoin/bitcoin#20079 Treat handshake misbehavior like unknown message (MarcoFalke)
+- bitcoin/bitcoin#20138 Assume that SetCommonVersion is called at most once per peer (MarcoFalke)
+- bitcoin/bitcoin#20162 p2p: declare Announcement::m_state as uint8_t, add getter/setter (jonatack)
+- bitcoin/bitcoin#20197 Protect onions in AttemptToEvictConnection(), add eviction protection test coverage (jonatack)
+- bitcoin/bitcoin#20210 assert `CNode::m_inbound_onion` is inbound in ctor, add getter, unit tests (jonatack)
+- bitcoin/bitcoin#20228 addrman: Make addrman a top-level component (jnewbery)
+- bitcoin/bitcoin#20234 Don't bind on 0.0.0.0 if binds are restricted to Tor (vasild)
+- bitcoin/bitcoin#20477 Add unit testing of node eviction logic (practicalswift)
+- bitcoin/bitcoin#20516 Well-defined CAddress disk serialization, and addrv2 anchors.dat (sipa)
+- bitcoin/bitcoin#20557 addrman: Fix new table bucketing during unserialization (jnewbery)
+- bitcoin/bitcoin#20561 Periodically clear `m_addr_known` (sdaftuar)
+- bitcoin/bitcoin#20599 net processing: Tolerate sendheaders and sendcmpct messages before verack (jnewbery)
+- bitcoin/bitcoin#20616 Check CJDNS address is valid (lontivero)
+- bitcoin/bitcoin#20617 Remove `m_is_manual_connection` from CNodeState (ariard)
+- bitcoin/bitcoin#20624 net processing: Remove nStartingHeight check from block relay (jnewbery)
+- bitcoin/bitcoin#20651 Make p2p recv buffer timeout 20 minutes for all peers (jnewbery)
+- bitcoin/bitcoin#20661 Only select from addrv2-capable peers for torv3 address relay (sipa)
+- bitcoin/bitcoin#20685 Add I2P support using I2P SAM (vasild)
+- bitcoin/bitcoin#20690 Clean up logging of outbound connection type (sdaftuar)
+- bitcoin/bitcoin#20721 Move ping data to `net_processing` (jnewbery)
+- bitcoin/bitcoin#20724 Cleanup of -debug=net log messages (ajtowns)
+- bitcoin/bitcoin#20747 net processing: Remove dropmessagestest (jnewbery)
+- bitcoin/bitcoin#20764 cli -netinfo peer connections dashboard updates 🎄 ✨ (jonatack)
+- bitcoin/bitcoin#20788 add RAII socket and use it instead of bare SOCKET (vasild)
+- bitcoin/bitcoin#20791 remove unused legacyWhitelisted in AcceptConnection() (jonatack)
+- bitcoin/bitcoin#20816 Move RecordBytesSent() call out of `cs_vSend` lock (jnewbery)
+- bitcoin/bitcoin#20845 Log to net debug in MaybeDiscourageAndDisconnect except for noban and manual peers (MarcoFalke)
+- bitcoin/bitcoin#20864 Move SocketSendData lock annotation to header (MarcoFalke)
+- bitcoin/bitcoin#20965 net, rpc:  return `NET_UNROUTABLE` as `not_publicly_routable`, automate helps (jonatack)
+- bitcoin/bitcoin#20966 banman: save the banlist in a JSON format on disk (vasild)
+- bitcoin/bitcoin#210
