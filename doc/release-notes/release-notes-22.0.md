@@ -976,4 +976,188 @@ A detailed list of changes in this version follows. To keep the list to a manage
 - bitcoin/bitcoin#21049 Add release notes for listdescriptors RPC (S3RK)
 - bitcoin/bitcoin#21060 More precise -debug and -debugexclude doc (wodry)
 - bitcoin/bitcoin#21077 Clarify -timeout and -peertimeout config options (glozow)
-- bitcoin/bitcoin#2
+- bitcoin/bitcoin#21105 Correctly identify script type (niftynei)
+- bitcoin/bitcoin#21163 Guix is shipped in Debian and Ubuntu (MarcoFalke)
+- bitcoin/bitcoin#21210 Rework internal and external links (MarcoFalke)
+- bitcoin/bitcoin#21246 Correction for VerifyTaprootCommitment comments (roconnor-blockstream)
+- bitcoin/bitcoin#21263 Clarify that squashing should happen before review (MarcoFalke)
+- bitcoin/bitcoin#21323 guix, doc: Update default HOSTS value (hebasto)
+- bitcoin/bitcoin#21324 Update build instructions for Fedora (hebasto)
+- bitcoin/bitcoin#21343 Revamp macOS build doc (jarolrod)
+- bitcoin/bitcoin#21346 install qt5 when building on macOS (fanquake)
+- bitcoin/bitcoin#21384 doc: add signet to bitcoin.conf documentation (jonatack)
+- bitcoin/bitcoin#21394 Improve comment about protected peers (amitiuttarwar)
+- bitcoin/bitcoin#21398 Update fuzzing docs for afl-clang-lto (MarcoFalke)
+- bitcoin/bitcoin#21444 net, doc: Doxygen updates and fixes in netbase.{h,cpp} (jonatack)
+- bitcoin/bitcoin#21481 Tell howto install clang-format on Debian/Ubuntu (wodry)
+- bitcoin/bitcoin#21567 Fix various misleading comments (glozow)
+- bitcoin/bitcoin#21661 Fix name of script guix-build (Emzy)
+- bitcoin/bitcoin#21672 Remove boostrap info from `GUIX_COMMON_FLAGS` doc (fanquake)
+- bitcoin/bitcoin#21688 Note on SDK for macOS depends cross-compile (jarolrod)
+- bitcoin/bitcoin#21709 Update reduce-memory.md and bitcoin.conf -maxconnections info (jonatack)
+- bitcoin/bitcoin#21710 update helps for addnode rpc and -addnode/-maxconnections config options (jonatack)
+- bitcoin/bitcoin#21752 Clarify that feerates are per virtual size (MarcoFalke)
+- bitcoin/bitcoin#21811 Remove Visual Studio 2017 reference from readme (sipsorcery)
+- bitcoin/bitcoin#21818 Fixup -coinstatsindex help, update bitcoin.conf and files.md (jonatack)
+- bitcoin/bitcoin#21856 add OSS-Fuzz section to fuzzing.md doc (adamjonas)
+- bitcoin/bitcoin#21912 Remove mention of priority estimation (MarcoFalke)
+- bitcoin/bitcoin#21925 Update bips.md for 0.21.1 (MarcoFalke)
+- bitcoin/bitcoin#21942 improve make with parallel jobs description (klementtan)
+- bitcoin/bitcoin#21947 Fix OSS-Fuzz links (MarcoFalke)
+- bitcoin/bitcoin#21988 note that brew installed qt is not supported (jarolrod)
+- bitcoin/bitcoin#22056 describe in fuzzing.md how to reproduce a CI crash (jonatack)
+- bitcoin/bitcoin#22080 add maxuploadtarget to bitcoin.conf example (jarolrod)
+- bitcoin/bitcoin#22088 Improve note on choosing posix mingw32 (jarolrod)
+- bitcoin/bitcoin#22109 Fix external links (IRC, …) (MarcoFalke)
+- bitcoin/bitcoin#22121 Various validation doc fixups (MarcoFalke)
+- bitcoin/bitcoin#22172 Update tor.md, release notes with removal of tor v2 support (jonatack)
+- bitcoin/bitcoin#22204 Remove obsolete `okSafeMode` RPC guideline from developer notes (theStack)
+- bitcoin/bitcoin#22208 Update `REVIEWERS` (practicalswift)
+- bitcoin/bitcoin#22250 add basic I2P documentation (vasild)
+- bitcoin/bitcoin#22296 Final merge of release notes snippets, mv to wiki (MarcoFalke)
+- bitcoin/bitcoin#22335 recommend `--disable-external-signer` in OpenBSD build guide (theStack)
+- bitcoin/bitcoin#22339 Document minimum required libc++ version (hebasto)
+- bitcoin/bitcoin#22349 Repository IRC updates (jonatack)
+- bitcoin/bitcoin#22360 Remove unused section from release process (MarcoFalke)
+- bitcoin/bitcoin#22369 Add steps for Transifex to release process (jonatack)
+- bitcoin/bitcoin#22393 Added info to bitcoin.conf doc (bliotti)
+- bitcoin/bitcoin#22402 Install Rosetta on M1-macOS for qt in depends (hebasto)
+- bitcoin/bitcoin#22432 Fix incorrect `testmempoolaccept` doc (glozow)
+- bitcoin/bitcoin#22648 doc, test: improve i2p/tor docs and i2p reachable unit tests (jonatack)
+
+Credits
+=======
+
+Thanks to everyone who directly contributed to this release:
+
+- Aaron Clauson
+- Adam Jonas
+- amadeuszpawlik
+- Amiti Uttarwar
+- Andrew Chow
+- Andrew Poelstra
+- Anthony Towns
+- Antoine Poinsot
+- Antoine Riard
+- apawlik
+- apitko
+- Ben Carman
+- Ben Woosley
+- benk10
+- Bezdrighin
+- Block Mechanic
+- Brian Liotti
+- Bruno Garcia
+- Carl Dong
+- Christian Decker
+- coinforensics
+- Cory Fields
+- Dan Benjamin
+- Daniel Kraft
+- Darius Parvin
+- Dhruv Mehta
+- Dmitry Goncharov
+- Dmitry Petukhov
+- dplusplus1024
+- dscotese
+- Duncan Dean
+- Elle Mouton
+- Elliott Jin
+- Emil Engler
+- Ethan Heilman
+- eugene
+- Evan Klitzke
+- Fabian Jahr
+- Fabrice Fontaine
+- fanquake
+- fdov
+- flack
+- Fotis Koutoupas
+- Fu Yong Quah
+- fyquah
+- glozow
+- Gregory Sanders
+- Guido Vranken
+- Gunar C. Gessner
+- h
+- HAOYUatHZ
+- Hennadii Stepanov
+- Igor Cota
+- Ikko Ashimine
+- Ivan Metlushko
+- jackielove4u
+- James O'Beirne
+- Jarol Rodriguez
+- Joel Klabo
+- John Newbery
+- Jon Atack
+- Jonas Schnelli
+- João Barbosa
+- Josiah Baker
+- Karl-Johan Alm
+- Kiminuo
+- Klement Tan
+- Kristaps Kaupe
+- Larry Ruane
+- lisa neigut
+- Lucas Ontivero
+- Luke Dashjr
+- Maayan Keshet
+- MarcoFalke
+- Martin Ankerl
+- Martin Zumsande
+- Michael Dietz
+- Michael Polzer
+- Michael Tidwell
+- Niklas Gögge
+- nthumann
+- Oliver Gugger
+- parazyd
+- Patrick Strateman
+- Pavol Rusnak
+- Peter Bushnell
+- Pierre K
+- Pieter Wuille
+- PiRK
+- pox
+- practicalswift
+- Prayank
+- R E Broadley
+- Rafael Sadowski
+- randymcmillan
+- Raul Siles
+- Riccardo Spagni
+- Russell O'Connor
+- Russell Yanofsky
+- S3RK
+- saibato
+- Samuel Dobson
+- sanket1729
+- Sawyer Billings
+- Sebastian Falbesoner
+- setpill
+- sgulls
+- sinetek
+- Sjors Provoost
+- Sriram
+- Stephan Oeste
+- Suhas Daftuar
+- Sylvain Goumy
+- t-bast
+- Troy Giorshev
+- Tushar Singla
+- Tyler Chambers
+- Uplab
+- Vasil Dimov
+- W. J. van der Laan
+- willcl-ark
+- William Bright
+- William Casarin
+- windsok
+- wodry
+- Yerzhan Mazhkenov
+- Yuval Kogman
+- Zero
+
+As well as to everyone that helped with translations on
+[Transifex](https://www.transifex.com/bitcoin/bitcoin/).
