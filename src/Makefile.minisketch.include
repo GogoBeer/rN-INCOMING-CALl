@@ -35,4 +35,9 @@ noinst_PROGRAMS += $(MINISKETCH_TEST)
 
 minisketch_test_SOURCES = $(MINISKETCH_TEST_SOURCES_INT)
 minisketch_test_CPPFLAGS = $(AM_CPPFLAGS) $(LIBMINISKETCH_CPPFLAGS)
-minisk
+minisketch_test_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
+minisketch_test_LDADD = $(MINISKETCH_LIBS)
+minisketch_test_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS) $(PTHREAD_FLAGS)
+
+endif
+endif
