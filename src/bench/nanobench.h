@@ -175,4 +175,162 @@ class BigO;
  *
  *    * `{{warmup}}` Number of iterations used before measuring starts. See Bench::warmup().
  *
- *    * `{{relative}}` True or false, depending on 
+ *    * `{{relative}}` True or false, depending on the setting you have used. See Bench::relative().
+ *
+ *    Apart from these tags, it is also possible to use some mathematical operations on the measurement data. The operations
+ *    are of the form `{{command(name)}}`.  Currently `name` can be one of `elapsed`, `iterations`. If performance counters
+ *    are available (currently only on current Linux systems), you also have `pagefaults`, `cpucycles`,
+ *    `contextswitches`, `instructions`, `branchinstructions`, and `branchmisses`. All the measuers (except `iterations`) are
+ *    provided for a single iteration (so `elapsed` is the time a single iteration took). The following tags are available:
+ *
+ *    * `{{median(<name>)}}` Calculate median of a measurement data set, e.g. `{{median(elapsed)}}`.
+ *
+ *    * `{{average(<name>)}}` Average (mean) calculation.
+ *
+ *    * `{{medianAbsolutePercentError(<name>)}}` Calculates MdAPE, the Median Absolute Percentage Error. The MdAPE is an excellent
+ *      metric for the variation of measurements. It is more robust to outliers than the
+ *      [Mean absolute percentage error (M-APE)](https://en.wikipedia.org/wiki/Mean_absolute_percentage_error).
+ *      @f[
+ *       \mathrm{MdAPE}(e) = \mathrm{med}\{| \frac{e_i - \mathrm{med}\{e\}}{e_i}| \}
+ *      @f]
+ *      E.g. for *elapsed*: First, @f$ \mathrm{med}\{e\} @f$ calculates the median by sorting and then taking the middle element
+ *      of all *elapsed* measurements. This is used to calculate the absolute percentage
+ *      error to this median for each measurement, as in  @f$ | \frac{e_i - \mathrm{med}\{e\}}{e_i}| @f$. All these results
+ *      are sorted, and the middle value is chosen as the median absolute percent error.
+ *
+ *      This measurement is a bit hard to interpret, but it is very robust against outliers. E.g. a value of 5% means that half of the
+ *      measurements deviate less than 5% from the median, and the other deviate more than 5% from the median.
+ *
+ *    * `{{sum(<name>)}}` Sums of all the measurements. E.g. `{{sum(iterations)}}` will give you the total number of iterations
+*        measured in this benchmark.
+ *
+ *    * `{{minimum(<name>)}}` Minimum of all measurements.
+ *
+ *    * `{{maximum(<name>)}}` Maximum of all measurements.
+ *
+ *    * `{{sumProduct(<first>, <second>)}}` Calculates the sum of the products of corresponding measures:
+ *      @f[
+ *          \mathrm{sumProduct}(a,b) = \sum_{i=1}^{n}a_i\cdot b_i
+ *      @f]
+ *      E.g. to calculate total runtime of the benchmark, you multiply iterations with elapsed time for each measurement, and
+ *      sum these results up:
+ *      `{{sumProduct(iterations, elapsed)}}`.
+ *
+ *    * `{{#measurement}}` To access individual measurement results, open the begin tag for measurements.
+ *
+ *       * `{{elapsed}}` Average elapsed wall clock time per iteration, in seconds.
+ *
+ *       * `{{iterations}}` Number of iterations in the measurement. The number of iterations will fluctuate due
+ *         to some applied randomness, to enhance accuracy.
+ *
+ *       * `{{pagefaults}}` Average number of pagefaults per iteration.
+ *
+ *       * `{{cpucycles}}` Average number of CPU cycles processed per iteration.
+ *
+ *       * `{{contextswitches}}` Average number of context switches per iteration.
+ *
+ *       * `{{instructions}}` Average number of retired instructions per iteration.
+ *
+ *       * `{{branchinstructions}}` Average number of branches executed per iteration.
+ *
+ *       * `{{branchmisses}}` Average number of branches that were missed per iteration.
+ *
+ *    * `{{/measurement}}` Ends the measurement tag.
+ *
+ * * `{{/result}}` Marks the end of the result layer. This is the end marker for the template part that will be instantiated
+ *   for each benchmark result.
+ *
+ *
+ *  For the layer tags *result* and *measurement* you additionally can use these special markers:
+ *
+ *  * ``{{#-first}}`` - Begin marker of a template that will be instantiated *only for the first* entry in the layer. Use is only
+ *    allowed between the begin and end marker of the layer allowed. So between ``{{#result}}`` and ``{{/result}}``, or between
+ *    ``{{#measurement}}`` and ``{{/measurement}}``. Finish the template with ``{{/-first}}``.
+ *
+ *  * ``{{^-first}}`` - Begin marker of a template that will be instantiated *for each except the first* entry in the layer. This,
+ *    this is basically the inversion of ``{{#-first}}``. Use is only allowed between the begin and end marker of the layer allowed.
+ *    So between ``{{#result}}`` and ``{{/result}}``, or between ``{{#measurement}}`` and ``{{/measurement}}``.
+ *
+ *  * ``{{/-first}}`` - End marker for either ``{{#-first}}`` or ``{{^-first}}``.
+ *
+ *  * ``{{#-last}}`` - Begin marker of a template that will be instantiated *only for the last* entry in the layer. Use is only
+ *    allowed between the begin and end marker of the layer allowed. So between ``{{#result}}`` and ``{{/result}}``, or between
+ *    ``{{#measurement}}`` and ``{{/measurement}}``. Finish the template with ``{{/-last}}``.
+ *
+ *  * ``{{^-last}}`` - Begin marker of a template that will be instantiated *for each except the last* entry in the layer. This,
+ *    this is basically the inversion of ``{{#-last}}``. Use is only allowed between the begin and end marker of the layer allowed.
+ *    So between ``{{#result}}`` and ``{{/result}}``, or between ``{{#measurement}}`` and ``{{/measurement}}``.
+ *
+ *  * ``{{/-last}}`` - End marker for either ``{{#-last}}`` or ``{{^-last}}``.
+ *
+   @verbatim embed:rst
+
+   For an overview of all the possible data you can get out of nanobench, please see the tutorial at :ref:`tutorial-template-json`.
+
+   The templates that ship with nanobench are:
+
+   * :cpp:func:`templates::csv() <ankerl::nanobench::templates::csv()>`
+   * :cpp:func:`templates::json() <ankerl::nanobench::templates::json()>`
+   * :cpp:func:`templates::htmlBoxplot() <ankerl::nanobench::templates::htmlBoxplot()>`
+   * :cpp:func:`templates::pyperf() <ankerl::nanobench::templates::pyperf()>`
+
+   @endverbatim
+ *
+ * @param mustacheTemplate The template.
+ * @param bench Benchmark, containing all the results.
+ * @param out Output for the generated output.
+ */
+void render(char const* mustacheTemplate, Bench const& bench, std::ostream& out);
+void render(std::string const& mustacheTemplate, Bench const& bench, std::ostream& out);
+
+/**
+ * Same as render(char const* mustacheTemplate, Bench const& bench, std::ostream& out), but for when
+ * you only have results available.
+ *
+ * @param mustacheTemplate The template.
+ * @param results All the results to be used for rendering.
+ * @param out Output for the generated output.
+ */
+void render(char const* mustacheTemplate, std::vector<Result> const& results, std::ostream& out);
+void render(std::string const& mustacheTemplate, std::vector<Result> const& results, std::ostream& out);
+
+// Contains mustache-like templates
+namespace templates {
+
+/*!
+  @brief CSV data for the benchmark results.
+
+  Generates a comma-separated values dataset. First line is the header, each following line is a summary of each benchmark run.
+
+  @verbatim embed:rst
+  See the tutorial at :ref:`tutorial-template-csv` for an example.
+  @endverbatim
+ */
+char const* csv() noexcept;
+
+/*!
+  @brief HTML output that uses plotly to generate an interactive boxplot chart. See the tutorial for an example output.
+
+  The output uses only the elapsed wall clock time, and displays each epoch as a single dot.
+  @verbatim embed:rst
+  See the tutorial at :ref:`tutorial-template-html` for an example.
+  @endverbatim
+
+  @see ankerl::nanobench::render()
+ */
+char const* htmlBoxplot() noexcept;
+
+/*!
+ @brief Output in pyperf  compatible JSON format, which can be used for more analyzations.
+ @verbatim embed:rst
+ See the tutorial at :ref:`tutorial-template-pyperf` for an example how to further analyze the output.
+ @endverbatim
+ */
+char const* pyperf() noexcept;
+
+/*!
+  @brief Template to generate JSON data.
+
+  The generated JSON data contains *all* data that has been generated. All times are as double values, in seconds. The output can get
+  quite large.
+ 
