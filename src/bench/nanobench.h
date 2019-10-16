@@ -333,4 +333,226 @@ char const* pyperf() noexcept;
 
   The generated JSON data contains *all* data that has been generated. All times are as double values, in seconds. The output can get
   quite large.
- 
+  @verbatim embed:rst
+  See the tutorial at :ref:`tutorial-template-json` for an example.
+  @endverbatim
+ */
+char const* json() noexcept;
+
+} // namespace templates
+
+namespace detail {
+
+template <typename T>
+struct PerfCountSet;
+
+class IterationLogic;
+class PerformanceCounters;
+
+#if ANKERL_NANOBENCH(PERF_COUNTERS)
+class LinuxPerformanceCounters;
+#endif
+
+} // namespace detail
+} // namespace nanobench
+} // namespace ankerl
+
+// definitions ////////////////////////////////////////////////////////////////////////////////////
+
+namespace ankerl {
+namespace nanobench {
+namespace detail {
+
+template <typename T>
+struct PerfCountSet {
+    T pageFaults{};
+    T cpuCycles{};
+    T contextSwitches{};
+    T instructions{};
+    T branchInstructions{};
+    T branchMisses{};
+};
+
+} // namespace detail
+
+ANKERL_NANOBENCH(IGNORE_PADDED_PUSH)
+struct Config {
+    // actual benchmark config
+    std::string mBenchmarkTitle = "benchmark";
+    std::string mBenchmarkName = "noname";
+    std::string mUnit = "op";
+    double mBatch = 1.0;
+    double mComplexityN = -1.0;
+    size_t mNumEpochs = 11;
+    size_t mClockResolutionMultiple = static_cast<size_t>(1000);
+    std::chrono::nanoseconds mMaxEpochTime = std::chrono::milliseconds(100);
+    std::chrono::nanoseconds mMinEpochTime{};
+    uint64_t mMinEpochIterations{1};
+    uint64_t mEpochIterations{0}; // If not 0, run *exactly* these number of iterations per epoch.
+    uint64_t mWarmup = 0;
+    std::ostream* mOut = nullptr;
+    std::chrono::duration<double> mTimeUnit = std::chrono::nanoseconds{1};
+    std::string mTimeUnitName = "ns";
+    bool mShowPerformanceCounters = true;
+    bool mIsRelative = false;
+
+    Config();
+    ~Config();
+    Config& operator=(Config const&);
+    Config& operator=(Config&&);
+    Config(Config const&);
+    Config(Config&&) noexcept;
+};
+ANKERL_NANOBENCH(IGNORE_PADDED_POP)
+
+// Result returned after a benchmark has finished. Can be used as a baseline for relative().
+ANKERL_NANOBENCH(IGNORE_PADDED_PUSH)
+class Result {
+public:
+    enum class Measure : size_t {
+        elapsed,
+        iterations,
+        pagefaults,
+        cpucycles,
+        contextswitches,
+        instructions,
+        branchinstructions,
+        branchmisses,
+        _size
+    };
+
+    explicit Result(Config const& benchmarkConfig);
+
+    ~Result();
+    Result& operator=(Result const&);
+    Result& operator=(Result&&);
+    Result(Result const&);
+    Result(Result&&) noexcept;
+
+    // adds new measurement results
+    // all values are scaled by iters (except iters...)
+    void add(Clock::duration totalElapsed, uint64_t iters, detail::PerformanceCounters const& pc);
+
+    ANKERL_NANOBENCH(NODISCARD) Config const& config() const noexcept;
+
+    ANKERL_NANOBENCH(NODISCARD) double median(Measure m) const;
+    ANKERL_NANOBENCH(NODISCARD) double medianAbsolutePercentError(Measure m) const;
+    ANKERL_NANOBENCH(NODISCARD) double average(Measure m) const;
+    ANKERL_NANOBENCH(NODISCARD) double sum(Measure m) const noexcept;
+    ANKERL_NANOBENCH(NODISCARD) double sumProduct(Measure m1, Measure m2) const noexcept;
+    ANKERL_NANOBENCH(NODISCARD) double minimum(Measure m) const noexcept;
+    ANKERL_NANOBENCH(NODISCARD) double maximum(Measure m) const noexcept;
+
+    ANKERL_NANOBENCH(NODISCARD) bool has(Measure m) const noexcept;
+    ANKERL_NANOBENCH(NODISCARD) double get(size_t idx, Measure m) const;
+    ANKERL_NANOBENCH(NODISCARD) bool empty() const noexcept;
+    ANKERL_NANOBENCH(NODISCARD) size_t size() const noexcept;
+
+    // Finds string, if not found, returns _size.
+    static Measure fromString(std::string const& str);
+
+private:
+    Config mConfig{};
+    std::vector<std::vector<double>> mNameToMeasurements{};
+};
+ANKERL_NANOBENCH(IGNORE_PADDED_POP)
+
+/**
+ * An extremely fast random generator. Currently, this implements *RomuDuoJr*, developed by Mark Overton. Source:
+ * http://www.romu-random.org/
+ *
+ * RomuDuoJr is extremely fast and provides reasonable good randomness. Not enough for large jobs, but definitely
+ * good enough for a benchmarking framework.
+ *
+ *  * Estimated capacity: @f$ 2^{51} @f$ bytes
+ *  * Register pressure: 4
+ *  * State size: 128 bits
+ *
+ * This random generator is a drop-in replacement for the generators supplied by ``<random>``. It is not
+ * cryptographically secure. It's intended purpose is to be very fast so that benchmarks that make use
+ * of randomness are not distorted too much by the random generator.
+ *
+ * Rng also provides a few non-standard helpers, optimized for speed.
+ */
+class Rng final {
+public:
+    /**
+     * @brief This RNG provides 64bit randomness.
+     */
+    using result_type = uint64_t;
+
+    static constexpr uint64_t(min)();
+    static constexpr uint64_t(max)();
+
+    /**
+     * As a safety precausion, we don't allow copying. Copying a PRNG would mean you would have two random generators that produce the
+     * same sequence, which is generally not what one wants. Instead create a new rng with the default constructor Rng(), which is
+     * automatically seeded from `std::random_device`. If you really need a copy, use copy().
+     */
+    Rng(Rng const&) = delete;
+
+    /**
+     * Same as Rng(Rng const&), we don't allow assignment. If you need a new Rng create one with the default constructor Rng().
+     */
+    Rng& operator=(Rng const&) = delete;
+
+    // moving is ok
+    Rng(Rng&&) noexcept = default;
+    Rng& operator=(Rng&&) noexcept = default;
+    ~Rng() noexcept = default;
+
+    /**
+     * @brief Creates a new Random generator with random seed.
+     *
+     * Instead of a default seed (as the random generators from the STD), this properly seeds the random generator from
+     * `std::random_device`. It guarantees correct seeding. Note that seeding can be relatively slow, depending on the source of
+     * randomness used. So it is best to create a Rng once and use it for all your randomness purposes.
+     */
+    Rng();
+
+    /*!
+      Creates a new Rng that is seeded with a specific seed. Each Rng created from the same seed will produce the same randomness
+      sequence. This can be useful for deterministic behavior.
+
+      @verbatim embed:rst
+      .. note::
+
+         The random algorithm might change between nanobench releases. Whenever a faster and/or better random
+         generator becomes available, I will switch the implementation.
+      @endverbatim
+
+      As per the Romu paper, this seeds the Rng with splitMix64 algorithm and performs 10 initial rounds for further mixing up of the
+      internal state.
+
+      @param seed  The 64bit seed. All values are allowed, even 0.
+     */
+    explicit Rng(uint64_t seed) noexcept;
+    Rng(uint64_t x, uint64_t y) noexcept;
+    Rng(std::vector<uint64_t> const& data);
+
+    /**
+     * Creates a copy of the Rng, thus the copy provides exactly the same random sequence as the original.
+     */
+    ANKERL_NANOBENCH(NODISCARD) Rng copy() const noexcept;
+
+    /**
+     * @brief Produces a 64bit random value. This should be very fast, thus it is marked as inline. In my benchmark, this is ~46 times
+     * faster than `std::default_random_engine` for producing 64bit random values. It seems that the fastest std contender is
+     * `std::mt19937_64`. Still, this RNG is 2-3 times as fast.
+     *
+     * @return uint64_t The next 64 bit random value.
+     */
+    inline uint64_t operator()() noexcept;
+
+    // This is slightly biased. See
+
+    /**
+     * Generates a random number between 0 and range (excluding range).
+     *
+     * The algorithm only produces 32bit numbers, and is slightly biased. The effect is quite small unless your range is close to the
+     * maximum value of an integer. It is possible to correct the bias with rejection sampling (see
+     * [here](https://lemire.me/blog/2016/06/30/fast-random-shuffling/), but this is most likely irrelevant in practices for the
+     * purposes of this Rng.
+     *
+     * See Daniel Lemire's blog post [A fast alternative to the modulo
+     * reduction](https://lemire.me/blog/2016/06/27/a-fast-alternative-to-the-m
