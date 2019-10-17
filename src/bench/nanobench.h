@@ -742,4 +742,181 @@ public:
      *
      * @param multiple Target number of times of clock resolution. Usually 1000 is a good compromise between runtime and accuracy.
      */
-    Bench& clockResolutionM
+    Bench& clockResolutionMultiple(size_t multiple) noexcept;
+    ANKERL_NANOBENCH(NODISCARD) size_t clockResolutionMultiple() const noexcept;
+
+    /**
+     * @brief Controls number of epochs, the number of measurements to perform.
+     *
+     * The reported result will be the median of evaluation of each epoch. The higher you choose this, the more
+     * deterministic the result be and outliers will be more easily removed. Also the `err%` will be more accurate the higher this
+     * number is. Note that the `err%` will not necessarily decrease when number of epochs is increased. But it will be a more accurate
+     * representation of the benchmarked code's runtime stability.
+     *
+     * Choose the value wisely. In practice, 11 has been shown to be a reasonable choice between runtime performance and accuracy.
+     * This setting goes hand in hand with minEpocIterations() (or minEpochTime()). If you are more interested in *median* runtime, you
+     * might want to increase epochs(). If you are more interested in *mean* runtime, you might want to increase minEpochIterations()
+     * instead.
+     *
+     * @param numEpochs Number of epochs.
+     */
+    Bench& epochs(size_t numEpochs) noexcept;
+    ANKERL_NANOBENCH(NODISCARD) size_t epochs() const noexcept;
+
+    /**
+     * @brief Upper limit for the runtime of each epoch.
+     *
+     * As a safety precausion if the clock is not very accurate, we can set an upper limit for the maximum evaluation time per
+     * epoch. Default is 100ms. At least a single evaluation of the benchmark is performed.
+     *
+     * @see minEpochTime(), minEpochIterations()
+     *
+     * @param t Maximum target runtime for a single epoch.
+     */
+    Bench& maxEpochTime(std::chrono::nanoseconds t) noexcept;
+    ANKERL_NANOBENCH(NODISCARD) std::chrono::nanoseconds maxEpochTime() const noexcept;
+
+    /**
+     * @brief Minimum time each epoch should take.
+     *
+     * Default is zero, so we are fully relying on clockResolutionMultiple(). In most cases this is exactly what you want. If you see
+     * that the evaluation is unreliable with a high `err%`, you can increase either minEpochTime() or minEpochIterations().
+     *
+     * @see maxEpochTime(), minEpochIterations()
+     *
+     * @param t Minimum time each epoch should take.
+     */
+    Bench& minEpochTime(std::chrono::nanoseconds t) noexcept;
+    ANKERL_NANOBENCH(NODISCARD) std::chrono::nanoseconds minEpochTime() const noexcept;
+
+    /**
+     * @brief Sets the minimum number of iterations each epoch should take.
+     *
+     * Default is 1, and we rely on clockResolutionMultiple(). If the `err%` is high and you want a more smooth result, you might want
+     * to increase the minimum number or iterations, or increase the minEpochTime().
+     *
+     * @see minEpochTime(), maxEpochTime(), minEpochIterations()
+     *
+     * @param numIters Minimum number of iterations per epoch.
+     */
+    Bench& minEpochIterations(uint64_t numIters) noexcept;
+    ANKERL_NANOBENCH(NODISCARD) uint64_t minEpochIterations() const noexcept;
+
+    /**
+     * Sets exactly the number of iterations for each epoch. Ignores all other epoch limits. This forces nanobench to use exactly
+     * the given number of iterations for each epoch, not more and not less. Default is 0 (disabled).
+     *
+     * @param numIters Exact number of iterations to use. Set to 0 to disable.
+     */
+    Bench& epochIterations(uint64_t numIters) noexcept;
+    ANKERL_NANOBENCH(NODISCARD) uint64_t epochIterations() const noexcept;
+
+    /**
+     * @brief Sets a number of iterations that are initially performed without any measurements.
+     *
+     * Some benchmarks need a few evaluations to warm up caches / database / whatever access. Normally this should not be needed, since
+     * we show the median result so initial outliers will be filtered away automatically. If the warmup effect is large though, you
+     * might want to set it. Default is 0.
+     *
+     * @param numWarmupIters Number of warmup iterations.
+     */
+    Bench& warmup(uint64_t numWarmupIters) noexcept;
+    ANKERL_NANOBENCH(NODISCARD) uint64_t warmup() const noexcept;
+
+    /**
+     * @brief Marks the next run as the baseline.
+     *
+     * Call `relative(true)` to mark the run as the baseline. Successive runs will be compared to this run. It is calculated by
+     *
+     * @f[
+     * 100\% * \frac{baseline}{runtime}
+     * @f]
+     *
+     *  * 100% means it is exactly as fast as the baseline
+     *  * >100% means it is faster than the baseline. E.g. 200% means the current run is twice as fast as the baseline.
+     *  * <100% means it is slower than the baseline. E.g. 50% means it is twice as slow as the baseline.
+     *
+     * See the tutorial section "Comparing Results" for example usage.
+     *
+     * @param isRelativeEnabled True to enable processing
+     */
+    Bench& relative(bool isRelativeEnabled) noexcept;
+    ANKERL_NANOBENCH(NODISCARD) bool relative() const noexcept;
+
+    /**
+     * @brief Enables/disables performance counters.
+     *
+     * On Linux nanobench has a powerful feature to use performance counters. This enables counting of retired instructions, count
+     * number of branches, missed branches, etc. On default this is enabled, but you can disable it if you don't need that feature.
+     *
+     * @param showPerformanceCounters True to enable, false to disable.
+     */
+    Bench& performanceCounters(bool showPerformanceCounters) noexcept;
+    ANKERL_NANOBENCH(NODISCARD) bool performanceCounters() const noexcept;
+
+    /**
+     * @brief Retrieves all benchmark results collected by the bench object so far.
+     *
+     * Each call to run() generates a Result that is stored within the Bench instance. This is mostly for advanced users who want to
+     * see all the nitty gritty detials.
+     *
+     * @return All results collected so far.
+     */
+    ANKERL_NANOBENCH(NODISCARD) std::vector<Result> const& results() const noexcept;
+
+    /*!
+      @verbatim embed:rst
+
+      Convenience shortcut to :cpp:func:`ankerl::nanobench::doNotOptimizeAway`.
+
+      @endverbatim
+     */
+    template <typename Arg>
+    Bench& doNotOptimizeAway(Arg&& arg);
+
+    /*!
+      @verbatim embed:rst
+
+      Sets N for asymptotic complexity calculation, so it becomes possible to calculate `Big O
+      <https://en.wikipedia.org/wiki/Big_O_notation>`_ from multiple benchmark evaluations.
+
+      Use :cpp:func:`ankerl::nanobench::Bench::complexityBigO` when the evaluation has finished. See the tutorial
+      :ref:`asymptotic-complexity` for details.
+
+      @endverbatim
+
+      @tparam T Any type is cast to `double`.
+      @param b Length of N for the next benchmark run, so it is possible to calculate `bigO`.
+     */
+    template <typename T>
+    Bench& complexityN(T b) noexcept;
+    ANKERL_NANOBENCH(NODISCARD) double complexityN() const noexcept;
+
+    /*!
+      Calculates [Big O](https://en.wikipedia.org/wiki/Big_O_notation>) of the results with all preconfigured complexity functions.
+      Currently these complexity functions are fitted into the benchmark results:
+
+       @f$ \mathcal{O}(1) @f$,
+       @f$ \mathcal{O}(n) @f$,
+       @f$ \mathcal{O}(\log{}n) @f$,
+       @f$ \mathcal{O}(n\log{}n) @f$,
+       @f$ \mathcal{O}(n^2) @f$,
+       @f$ \mathcal{O}(n^3) @f$.
+
+      If we e.g. evaluate the complexity of `std::sort`, this is the result of `std::cout << bench.complexityBigO()`:
+
+      ```
+      |   coefficient |   err% | complexity
+      |--------------:|-------:|------------
+      |   5.08935e-09 |   2.6% | O(n log n)
+      |   6.10608e-08 |   8.0% | O(n)
+      |   1.29307e-11 |  47.2% | O(n^2)
+      |   2.48677e-15 |  69.6% | O(n^3)
+      |   9.88133e-06 | 132.3% | O(log n)
+      |   5.98793e-05 | 162.5% | O(1)
+      ```
+
+      So in this case @f$ \mathcal{O}(n\log{}n) @f$ provides the best approximation.
+
+      @verbatim embed:rst
+      
