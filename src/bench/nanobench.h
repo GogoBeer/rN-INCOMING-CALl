@@ -919,4 +919,246 @@ public:
       So in this case @f$ \mathcal{O}(n\log{}n) @f$ provides the best approximation.
 
       @verbatim embed:rst
-      
+      See the tutorial :ref:`asymptotic-complexity` for details.
+      @endverbatim
+      @return Evaluation results, which can be printed or otherwise inspected.
+     */
+    std::vector<BigO> complexityBigO() const;
+
+    /**
+     * @brief Calculates bigO for a custom function.
+     *
+     * E.g. to calculate the mean squared error for @f$ \mathcal{O}(\log{}\log{}n) @f$, which is not part of the default set of
+     * complexityBigO(), you can do this:
+     *
+     * ```
+     * auto logLogN = bench.complexityBigO("O(log log n)", [](double n) {
+     *     return std::log2(std::log2(n));
+     * });
+     * ```
+     *
+     * The resulting mean squared error can be printed with `std::cout << logLogN`. E.g. it prints something like this:
+     *
+     * ```text
+     * 2.46985e-05 * O(log log n), rms=1.48121
+     * ```
+     *
+     * @tparam Op Type of mapping operation.
+     * @param name Name for the function, e.g. "O(log log n)"
+     * @param op Op's operator() maps a `double` with the desired complexity function, e.g. `log2(log2(n))`.
+     * @return BigO Error calculation, which is streamable to std::cout.
+     */
+    template <typename Op>
+    BigO complexityBigO(char const* name, Op op) const;
+
+    template <typename Op>
+    BigO complexityBigO(std::string const& name, Op op) const;
+
+    /*!
+      @verbatim embed:rst
+
+      Convenience shortcut to :cpp:func:`ankerl::nanobench::render`.
+
+      @endverbatim
+     */
+    Bench& render(char const* templateContent, std::ostream& os);
+    Bench& render(std::string const& templateContent, std::ostream& os);
+
+    Bench& config(Config const& benchmarkConfig);
+    ANKERL_NANOBENCH(NODISCARD) Config const& config() const noexcept;
+
+private:
+    Config mConfig{};
+    std::vector<Result> mResults{};
+};
+ANKERL_NANOBENCH(IGNORE_PADDED_POP)
+
+/**
+ * @brief Makes sure none of the given arguments are optimized away by the compiler.
+ *
+ * @tparam Arg Type of the argument that shouldn't be optimized away.
+ * @param arg The input that we mark as being used, even though we don't do anything with it.
+ */
+template <typename Arg>
+void doNotOptimizeAway(Arg&& arg);
+
+namespace detail {
+
+#if defined(_MSC_VER)
+void doNotOptimizeAwaySink(void const*);
+
+template <typename T>
+void doNotOptimizeAway(T const& val);
+
+#else
+
+// These assembly magic is directly from what Google Benchmark is doing. I have previously used what facebook's folly was doing, but
+// this seemd to have compilation problems in some cases. Google Benchmark seemed to be the most well tested anyways.
+// see https://github.com/google/benchmark/blob/master/include/benchmark/benchmark.h#L307
+template <typename T>
+void doNotOptimizeAway(T const& val) {
+    // NOLINTNEXTLINE(hicpp-no-assembler)
+    asm volatile("" : : "r,m"(val) : "memory");
+}
+
+template <typename T>
+void doNotOptimizeAway(T& val) {
+#    if defined(__clang__)
+    // NOLINTNEXTLINE(hicpp-no-assembler)
+    asm volatile("" : "+r,m"(val) : : "memory");
+#    else
+    // NOLINTNEXTLINE(hicpp-no-assembler)
+    asm volatile("" : "+m,r"(val) : : "memory");
+#    endif
+}
+#endif
+
+// internally used, but visible because run() is templated.
+// Not movable/copy-able, so we simply use a pointer instead of unique_ptr. This saves us from
+// having to include <memory>, and the template instantiation overhead of unique_ptr which is unfortunately quite significant.
+ANKERL_NANOBENCH(IGNORE_EFFCPP_PUSH)
+class IterationLogic {
+public:
+    explicit IterationLogic(Bench const& config) noexcept;
+    ~IterationLogic();
+
+    ANKERL_NANOBENCH(NODISCARD) uint64_t numIters() const noexcept;
+    void add(std::chrono::nanoseconds elapsed, PerformanceCounters const& pc) noexcept;
+    void moveResultTo(std::vector<Result>& results) noexcept;
+
+private:
+    struct Impl;
+    Impl* mPimpl;
+};
+ANKERL_NANOBENCH(IGNORE_EFFCPP_POP)
+
+ANKERL_NANOBENCH(IGNORE_PADDED_PUSH)
+class PerformanceCounters {
+public:
+    PerformanceCounters(PerformanceCounters const&) = delete;
+    PerformanceCounters& operator=(PerformanceCounters const&) = delete;
+
+    PerformanceCounters();
+    ~PerformanceCounters();
+
+    void beginMeasure();
+    void endMeasure();
+    void updateResults(uint64_t numIters);
+
+    ANKERL_NANOBENCH(NODISCARD) PerfCountSet<uint64_t> const& val() const noexcept;
+    ANKERL_NANOBENCH(NODISCARD) PerfCountSet<bool> const& has() const noexcept;
+
+private:
+#if ANKERL_NANOBENCH(PERF_COUNTERS)
+    LinuxPerformanceCounters* mPc = nullptr;
+#endif
+    PerfCountSet<uint64_t> mVal{};
+    PerfCountSet<bool> mHas{};
+};
+ANKERL_NANOBENCH(IGNORE_PADDED_POP)
+
+// Gets the singleton
+PerformanceCounters& performanceCounters();
+
+} // namespace detail
+
+class BigO {
+public:
+    using RangeMeasure = std::vector<std::pair<double, double>>;
+
+    template <typename Op>
+    static RangeMeasure mapRangeMeasure(RangeMeasure data, Op op) {
+        for (auto& rangeMeasure : data) {
+            rangeMeasure.first = op(rangeMeasure.first);
+        }
+        return data;
+    }
+
+    static RangeMeasure collectRangeMeasure(std::vector<Result> const& results);
+
+    template <typename Op>
+    BigO(char const* bigOName, RangeMeasure const& rangeMeasure, Op rangeToN)
+        : BigO(bigOName, mapRangeMeasure(rangeMeasure, rangeToN)) {}
+
+    template <typename Op>
+    BigO(std::string const& bigOName, RangeMeasure const& rangeMeasure, Op rangeToN)
+        : BigO(bigOName, mapRangeMeasure(rangeMeasure, rangeToN)) {}
+
+    BigO(char const* bigOName, RangeMeasure const& scaledRangeMeasure);
+    BigO(std::string const& bigOName, RangeMeasure const& scaledRangeMeasure);
+    ANKERL_NANOBENCH(NODISCARD) std::string const& name() const noexcept;
+    ANKERL_NANOBENCH(NODISCARD) double constant() const noexcept;
+    ANKERL_NANOBENCH(NODISCARD) double normalizedRootMeanSquare() const noexcept;
+    ANKERL_NANOBENCH(NODISCARD) bool operator<(BigO const& other) const noexcept;
+
+private:
+    std::string mName{};
+    double mConstant{};
+    double mNormalizedRootMeanSquare{};
+};
+std::ostream& operator<<(std::ostream& os, BigO const& bigO);
+std::ostream& operator<<(std::ostream& os, std::vector<ankerl::nanobench::BigO> const& bigOs);
+
+} // namespace nanobench
+} // namespace ankerl
+
+// implementation /////////////////////////////////////////////////////////////////////////////////
+
+namespace ankerl {
+namespace nanobench {
+
+constexpr uint64_t(Rng::min)() {
+    return 0;
+}
+
+constexpr uint64_t(Rng::max)() {
+    return (std::numeric_limits<uint64_t>::max)();
+}
+
+ANKERL_NANOBENCH_NO_SANITIZE("integer", "undefined")
+uint64_t Rng::operator()() noexcept {
+    auto x = mX;
+
+    mX = UINT64_C(15241094284759029579) * mY;
+    mY = rotl(mY - x, 27);
+
+    return x;
+}
+
+ANKERL_NANOBENCH_NO_SANITIZE("integer", "undefined")
+uint32_t Rng::bounded(uint32_t range) noexcept {
+    uint64_t r32 = static_cast<uint32_t>(operator()());
+    auto multiresult = r32 * range;
+    return static_cast<uint32_t>(multiresult >> 32U);
+}
+
+double Rng::uniform01() noexcept {
+    auto i = (UINT64_C(0x3ff) << 52U) | (operator()() >> 12U);
+    // can't use union in c++ here for type puning, it's undefined behavior.
+    // std::memcpy is optimized anyways.
+    double d;
+    std::memcpy(&d, &i, sizeof(double));
+    return d - 1.0;
+}
+
+template <typename Container>
+void Rng::shuffle(Container& container) noexcept {
+    auto size = static_cast<uint32_t>(container.size());
+    for (auto i = size; i > 1U; --i) {
+        using std::swap;
+        auto p = bounded(i); // number in [0, i)
+        swap(container[i - 1], container[p]);
+    }
+}
+
+ANKERL_NANOBENCH_NO_SANITIZE("integer", "undefined")
+constexpr uint64_t Rng::rotl(uint64_t x, unsigned k) noexcept {
+    return (x << k) | (x >> (64U - k));
+}
+
+template <typename Op>
+ANKERL_NANOBENCH_NO_SANITIZE("integer")
+Bench& Bench::run(Op&& op) {
+    // It is important that this method is kept short so the compiler can do better optimizations/ inlining of op()
+    detail::IterationLogic iterationLogic(*this);
+    auto& pc = detail::perfo
