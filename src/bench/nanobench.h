@@ -555,4 +555,191 @@ public:
      * purposes of this Rng.
      *
      * See Daniel Lemire's blog post [A fast alternative to the modulo
-     * reduction](https://lemire.me/blog/2016/06/27/a-fast-alternative-to-the-m
+     * reduction](https://lemire.me/blog/2016/06/27/a-fast-alternative-to-the-modulo-reduction/)
+     *
+     * @param range Upper exclusive range. E.g a value of 3 will generate random numbers 0, 1, 2.
+     * @return uint32_t Generated random values in range [0, range(.
+     */
+    inline uint32_t bounded(uint32_t range) noexcept;
+
+    // random double in range [0, 1(
+    // see http://prng.di.unimi.it/
+
+    /**
+     * Provides a random uniform double value between 0 and 1. This uses the method described in [Generating uniform doubles in the
+     * unit interval](http://prng.di.unimi.it/), and is extremely fast.
+     *
+     * @return double Uniformly distributed double value in range [0,1(, excluding 1.
+     */
+    inline double uniform01() noexcept;
+
+    /**
+     * Shuffles all entries in the given container. Although this has a slight bias due to the implementation of bounded(), this is
+     * preferable to `std::shuffle` because it is over 5 times faster. See Daniel Lemire's blog post [Fast random
+     * shuffling](https://lemire.me/blog/2016/06/30/fast-random-shuffling/).
+     *
+     * @param container The whole container will be shuffled.
+     */
+    template <typename Container>
+    void shuffle(Container& container) noexcept;
+
+    /**
+     * Extracts the full state of the generator, e.g. for serialization. For this RNG this is just 2 values, but to stay API compatible
+     * with future implementations that potentially use more state, we use a vector.
+     *
+     * @return Vector containing the full state:
+     */
+    std::vector<uint64_t> state() const;
+
+private:
+    static constexpr uint64_t rotl(uint64_t x, unsigned k) noexcept;
+
+    uint64_t mX;
+    uint64_t mY;
+};
+
+/**
+ * @brief Main entry point to nanobench's benchmarking facility.
+ *
+ * It holds configuration and results from one or more benchmark runs. Usually it is used in a single line, where the object is
+ * constructed, configured, and then a benchmark is run. E.g. like this:
+ *
+ *     ankerl::nanobench::Bench().unit("byte").batch(1000).run("random fluctuations", [&] {
+ *         // here be the benchmark code
+ *     });
+ *
+ * In that example Bench() constructs the benchmark, it is then configured with unit() and batch(), and after configuration a
+ * benchmark is executed with run(). Once run() has finished, it prints the result to `std::cout`. It would also store the results
+ * in the Bench instance, but in this case the object is immediately destroyed so it's not available any more.
+ */
+ANKERL_NANOBENCH(IGNORE_PADDED_PUSH)
+class Bench {
+public:
+    /**
+     * @brief Creates a new benchmark for configuration and running of benchmarks.
+     */
+    Bench();
+
+    Bench(Bench&& other);
+    Bench& operator=(Bench&& other);
+    Bench(Bench const& other);
+    Bench& operator=(Bench const& other);
+    ~Bench() noexcept;
+
+    /*!
+      @brief Repeatedly calls `op()` based on the configuration, and performs measurements.
+
+      This call is marked with `noinline` to prevent the compiler to optimize beyond different benchmarks. This can have quite a big
+      effect on benchmark accuracy.
+
+      @verbatim embed:rst
+      .. note::
+
+        Each call to your lambda must have a side effect that the compiler can't possibly optimize it away. E.g. add a result to an
+        externally defined number (like `x` in the above example), and finally call `doNotOptimizeAway` on the variables the compiler
+        must not remove. You can also use :cpp:func:`ankerl::nanobench::doNotOptimizeAway` directly in the lambda, but be aware that
+        this has a small overhead.
+
+      @endverbatim
+
+      @tparam Op The code to benchmark.
+     */
+    template <typename Op>
+    ANKERL_NANOBENCH(NOINLINE)
+    Bench& run(char const* benchmarkName, Op&& op);
+
+    template <typename Op>
+    ANKERL_NANOBENCH(NOINLINE)
+    Bench& run(std::string const& benchmarkName, Op&& op);
+
+    /**
+     * @brief Same as run(char const* benchmarkName, Op op), but instead uses the previously set name.
+     * @tparam Op The code to benchmark.
+     */
+    template <typename Op>
+    ANKERL_NANOBENCH(NOINLINE)
+    Bench& run(Op&& op);
+
+    /**
+     * @brief Title of the benchmark, will be shown in the table header. Changing the title will start a new markdown table.
+     *
+     * @param benchmarkTitle The title of the benchmark.
+     */
+    Bench& title(char const* benchmarkTitle);
+    Bench& title(std::string const& benchmarkTitle);
+    ANKERL_NANOBENCH(NODISCARD) std::string const& title() const noexcept;
+
+    /// Name of the benchmark, will be shown in the table row.
+    Bench& name(char const* benchmarkName);
+    Bench& name(std::string const& benchmarkName);
+    ANKERL_NANOBENCH(NODISCARD) std::string const& name() const noexcept;
+
+    /**
+     * @brief Sets the batch size.
+     *
+     * E.g. number of processed byte, or some other metric for the size of the processed data in each iteration. If you benchmark
+     * hashing of a 1000 byte long string and want byte/sec as a result, you can specify 1000 as the batch size.
+     *
+     * @tparam T Any input type is internally cast to `double`.
+     * @param b batch size
+     */
+    template <typename T>
+    Bench& batch(T b) noexcept;
+    ANKERL_NANOBENCH(NODISCARD) double batch() const noexcept;
+
+    /**
+     * @brief Sets the operation unit.
+     *
+     * Defaults to "op". Could be e.g. "byte" for string processing. This is used for the table header, e.g. to show `ns/byte`. Use
+     * singular (*byte*, not *bytes*). A change clears the currently collected results.
+     *
+     * @param unit The unit name.
+     */
+    Bench& unit(char const* unit);
+    Bench& unit(std::string const& unit);
+    ANKERL_NANOBENCH(NODISCARD) std::string const& unit() const noexcept;
+
+    /**
+     * @brief Sets the time unit to be used for the default output.
+     *
+     * Nanobench defaults to using ns (nanoseconds) as output in the markdown. For some benchmarks this is too coarse, so it is
+     * possible to configure this. E.g. use `timeUnit(1ms, "ms")` to show `ms/op` instead of `ns/op`.
+     *
+     * @param tu Time unit to display the results in, default is 1ns.
+     * @param tuName Name for the time unit, default is "ns"
+     */
+    Bench& timeUnit(std::chrono::duration<double> const& tu, std::string const& tuName);
+    ANKERL_NANOBENCH(NODISCARD) std::string const& timeUnitName() const noexcept;
+    ANKERL_NANOBENCH(NODISCARD) std::chrono::duration<double> const& timeUnit() const noexcept;
+
+    /**
+     * @brief Set the output stream where the resulting markdown table will be printed to.
+     *
+     * The default is `&std::cout`. You can disable all output by setting `nullptr`.
+     *
+     * @param outstream Pointer to output stream, can be `nullptr`.
+     */
+    Bench& output(std::ostream* outstream) noexcept;
+    ANKERL_NANOBENCH(NODISCARD) std::ostream* output() const noexcept;
+
+    /**
+     * Modern processors have a very accurate clock, being able to measure as low as 20 nanoseconds. This is the main trick nanobech to
+     * be so fast: we find out how accurate the clock is, then run the benchmark only so often that the clock's accuracy is good enough
+     * for accurate measurements.
+     *
+     * The default is to run one epoch for 1000 times the clock resolution. So for 20ns resolution and 11 epochs, this gives a total
+     * runtime of
+     *
+     * @f[
+     * 20ns * 1000 * 11 \approx 0.2ms
+     * @f]
+     *
+     * To be precise, nanobench adds a 0-20% random noise to each evaluation. This is to prevent any aliasing effects, and further
+     * improves accuracy.
+     *
+     * Total runtime will be higher though: Some initial time is needed to find out the target number of iterations for each epoch, and
+     * there is some overhead involved to start & stop timers and calculate resulting statistics and writing the output.
+     *
+     * @param multiple Target number of times of clock resolution. Usually 1000 is a good compromise between runtime and accuracy.
+     */
+    Bench& clockResolutionM
