@@ -1161,4 +1161,257 @@ ANKERL_NANOBENCH_NO_SANITIZE("integer")
 Bench& Bench::run(Op&& op) {
     // It is important that this method is kept short so the compiler can do better optimizations/ inlining of op()
     detail::IterationLogic iterationLogic(*this);
-    auto& pc = detail::perfo
+    auto& pc = detail::performanceCounters();
+
+    while (auto n = iterationLogic.numIters()) {
+        pc.beginMeasure();
+        Clock::time_point before = Clock::now();
+        while (n-- > 0) {
+            op();
+        }
+        Clock::time_point after = Clock::now();
+        pc.endMeasure();
+        pc.updateResults(iterationLogic.numIters());
+        iterationLogic.add(after - before, pc);
+    }
+    iterationLogic.moveResultTo(mResults);
+    return *this;
+}
+
+// Performs all evaluations.
+template <typename Op>
+Bench& Bench::run(char const* benchmarkName, Op&& op) {
+    name(benchmarkName);
+    return run(std::forward<Op>(op));
+}
+
+template <typename Op>
+Bench& Bench::run(std::string const& benchmarkName, Op&& op) {
+    name(benchmarkName);
+    return run(std::forward<Op>(op));
+}
+
+template <typename Op>
+BigO Bench::complexityBigO(char const* benchmarkName, Op op) const {
+    return BigO(benchmarkName, BigO::collectRangeMeasure(mResults), op);
+}
+
+template <typename Op>
+BigO Bench::complexityBigO(std::string const& benchmarkName, Op op) const {
+    return BigO(benchmarkName, BigO::collectRangeMeasure(mResults), op);
+}
+
+// Set the batch size, e.g. number of processed bytes, or some other metric for the size of the processed data in each iteration.
+// Any argument is cast to double.
+template <typename T>
+Bench& Bench::batch(T b) noexcept {
+    mConfig.mBatch = static_cast<double>(b);
+    return *this;
+}
+
+// Sets the computation complexity of the next run. Any argument is cast to double.
+template <typename T>
+Bench& Bench::complexityN(T n) noexcept {
+    mConfig.mComplexityN = static_cast<double>(n);
+    return *this;
+}
+
+// Convenience: makes sure none of the given arguments are optimized away by the compiler.
+template <typename Arg>
+Bench& Bench::doNotOptimizeAway(Arg&& arg) {
+    detail::doNotOptimizeAway(std::forward<Arg>(arg));
+    return *this;
+}
+
+// Makes sure none of the given arguments are optimized away by the compiler.
+template <typename Arg>
+void doNotOptimizeAway(Arg&& arg) {
+    detail::doNotOptimizeAway(std::forward<Arg>(arg));
+}
+
+namespace detail {
+
+#if defined(_MSC_VER)
+template <typename T>
+void doNotOptimizeAway(T const& val) {
+    doNotOptimizeAwaySink(&val);
+}
+
+#endif
+
+} // namespace detail
+} // namespace nanobench
+} // namespace ankerl
+
+#if defined(ANKERL_NANOBENCH_IMPLEMENT)
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// implementation part - only visible in .cpp
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+#    include <algorithm> // sort, reverse
+#    include <atomic>    // compare_exchange_strong in loop overhead
+#    include <cstdlib>   // getenv
+#    include <cstring>   // strstr, strncmp
+#    include <fstream>   // ifstream to parse proc files
+#    include <iomanip>   // setw, setprecision
+#    include <iostream>  // cout
+#    include <numeric>   // accumulate
+#    include <random>    // random_device
+#    include <sstream>   // to_s in Number
+#    include <stdexcept> // throw for rendering templates
+#    include <tuple>     // std::tie
+#    if defined(__linux__)
+#        include <unistd.h> //sysconf
+#    endif
+#    if ANKERL_NANOBENCH(PERF_COUNTERS)
+#        include <map> // map
+
+#        include <linux/perf_event.h>
+#        include <sys/ioctl.h>
+#        include <sys/syscall.h>
+#        include <unistd.h>
+#    endif
+
+// declarations ///////////////////////////////////////////////////////////////////////////////////
+
+namespace ankerl {
+namespace nanobench {
+
+// helper stuff that is only intended to be used internally
+namespace detail {
+
+struct TableInfo;
+
+// formatting utilities
+namespace fmt {
+
+class NumSep;
+class StreamStateRestorer;
+class Number;
+class MarkDownColumn;
+class MarkDownCode;
+
+} // namespace fmt
+} // namespace detail
+} // namespace nanobench
+} // namespace ankerl
+
+// definitions ////////////////////////////////////////////////////////////////////////////////////
+
+namespace ankerl {
+namespace nanobench {
+
+uint64_t splitMix64(uint64_t& state) noexcept;
+
+namespace detail {
+
+// helpers to get double values
+template <typename T>
+inline double d(T t) noexcept {
+    return static_cast<double>(t);
+}
+inline double d(Clock::duration duration) noexcept {
+    return std::chrono::duration_cast<std::chrono::duration<double>>(duration).count();
+}
+
+// Calculates clock resolution once, and remembers the result
+inline Clock::duration clockResolution() noexcept;
+
+} // namespace detail
+
+namespace templates {
+
+char const* csv() noexcept {
+    return R"DELIM("title";"name";"unit";"batch";"elapsed";"error %";"instructions";"branches";"branch misses";"total"
+{{#result}}"{{title}}";"{{name}}";"{{unit}}";{{batch}};{{median(elapsed)}};{{medianAbsolutePercentError(elapsed)}};{{median(instructions)}};{{median(branchinstructions)}};{{median(branchmisses)}};{{sumProduct(iterations, elapsed)}}
+{{/result}})DELIM";
+}
+
+char const* htmlBoxplot() noexcept {
+    return R"DELIM(<html>
+
+<head>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+</head>
+
+<body>
+    <div id="myDiv"></div>
+    <script>
+        var data = [
+            {{#result}}{
+                name: '{{name}}',
+                y: [{{#measurement}}{{elapsed}}{{^-last}}, {{/last}}{{/measurement}}],
+            },
+            {{/result}}
+        ];
+        var title = '{{title}}';
+
+        data = data.map(a => Object.assign(a, { boxpoints: 'all', pointpos: 0, type: 'box' }));
+        var layout = { title: { text: title }, showlegend: false, yaxis: { title: 'time per unit', rangemode: 'tozero', autorange: true } }; Plotly.newPlot('myDiv', data, layout, {responsive: true});
+    </script>
+</body>
+
+</html>)DELIM";
+}
+
+char const* pyperf() noexcept {
+    return R"DELIM({
+    "benchmarks": [
+        {
+            "runs": [
+                {
+                    "values": [
+{{#measurement}}                        {{elapsed}}{{^-last}},
+{{/last}}{{/measurement}}
+                    ]
+                }
+            ]
+        }
+    ],
+    "metadata": {
+        "loops": {{sum(iterations)}},
+        "inner_loops": {{batch}},
+        "name": "{{title}}",
+        "unit": "second"
+    },
+    "version": "1.0"
+})DELIM";
+}
+
+char const* json() noexcept {
+    return R"DELIM({
+    "results": [
+{{#result}}        {
+            "title": "{{title}}",
+            "name": "{{name}}",
+            "unit": "{{unit}}",
+            "batch": {{batch}},
+            "complexityN": {{complexityN}},
+            "epochs": {{epochs}},
+            "clockResolution": {{clockResolution}},
+            "clockResolutionMultiple": {{clockResolutionMultiple}},
+            "maxEpochTime": {{maxEpochTime}},
+            "minEpochTime": {{minEpochTime}},
+            "minEpochIterations": {{minEpochIterations}},
+            "epochIterations": {{epochIterations}},
+            "warmup": {{warmup}},
+            "relative": {{relative}},
+            "median(elapsed)": {{median(elapsed)}},
+            "medianAbsolutePercentError(elapsed)": {{medianAbsolutePercentError(elapsed)}},
+            "median(instructions)": {{median(instructions)}},
+            "medianAbsolutePercentError(instructions)": {{medianAbsolutePercentError(instructions)}},
+            "median(cpucycles)": {{median(cpucycles)}},
+            "median(contextswitches)": {{median(contextswitches)}},
+            "median(pagefaults)": {{median(pagefaults)}},
+            "median(branchinstructions)": {{median(branchinstructions)}},
+            "median(branchmisses)": {{median(branchmisses)}},
+            "totalTime": {{sumProduct(iterations, elapsed)}},
+            "measurements": [
+{{#measurement}}                {
+                    "iterations": {{iterations}},
+                    "elapsed": {{elapsed}},
+                    "pagefaults": {{pagefaults}},
+                    "cpucycles": {{cpucycles}},
+                    "contextswitches": {{contextswitches}},
+      
