@@ -1655,4 +1655,242 @@ static void generateResultMeasurement(std::vector<Node> const& nodes, size_t idx
                 throw std::runtime_error("got a section inside measurement");
 
             case Node::Type::tag: {
- 
+                auto m = Result::fromString(std::string(n.begin, n.end));
+                if (m == Result::Measure::_size || !r.has(m)) {
+                    out << 0.0;
+                } else {
+                    out << r.get(idx, m);
+                }
+                break;
+            }
+            }
+        }
+    }
+}
+
+static void generateResult(std::vector<Node> const& nodes, size_t idx, std::vector<Result> const& results, std::ostream& out) {
+    auto const& r = results[idx];
+    for (auto const& n : nodes) {
+        if (!generateFirstLast(n, idx, results.size(), out)) {
+            ANKERL_NANOBENCH_LOG("n.type=" << static_cast<int>(n.type));
+            switch (n.type) {
+            case Node::Type::content:
+                out.write(n.begin, std::distance(n.begin, n.end));
+                break;
+
+            case Node::Type::inverted_section:
+                throw std::runtime_error("got a inverted section inside result");
+
+            case Node::Type::section:
+                if (n == "measurement") {
+                    for (size_t i = 0; i < r.size(); ++i) {
+                        generateResultMeasurement(n.children, i, r, out);
+                    }
+                } else {
+                    throw std::runtime_error("got a section inside result");
+                }
+                break;
+
+            case Node::Type::tag:
+                generateResultTag(n, r, out);
+                break;
+            }
+        }
+    }
+}
+
+} // namespace templates
+
+// helper stuff that only intended to be used internally
+namespace detail {
+
+char const* getEnv(char const* name);
+bool isEndlessRunning(std::string const& name);
+bool isWarningsEnabled();
+
+template <typename T>
+T parseFile(std::string const& filename);
+
+void gatherStabilityInformation(std::vector<std::string>& warnings, std::vector<std::string>& recommendations);
+void printStabilityInformationOnce(std::ostream* os);
+
+// remembers the last table settings used. When it changes, a new table header is automatically written for the new entry.
+uint64_t& singletonHeaderHash() noexcept;
+
+// determines resolution of the given clock. This is done by measuring multiple times and returning the minimum time difference.
+Clock::duration calcClockResolution(size_t numEvaluations) noexcept;
+
+// formatting utilities
+namespace fmt {
+
+// adds thousands separator to numbers
+ANKERL_NANOBENCH(IGNORE_PADDED_PUSH)
+class NumSep : public std::numpunct<char> {
+public:
+    explicit NumSep(char sep);
+    char do_thousands_sep() const override;
+    std::string do_grouping() const override;
+
+private:
+    char mSep;
+};
+ANKERL_NANOBENCH(IGNORE_PADDED_POP)
+
+// RAII to save & restore a stream's state
+ANKERL_NANOBENCH(IGNORE_PADDED_PUSH)
+class StreamStateRestorer {
+public:
+    explicit StreamStateRestorer(std::ostream& s);
+    ~StreamStateRestorer();
+
+    // sets back all stream info that we remembered at construction
+    void restore();
+
+    // don't allow copying / moving
+    StreamStateRestorer(StreamStateRestorer const&) = delete;
+    StreamStateRestorer& operator=(StreamStateRestorer const&) = delete;
+    StreamStateRestorer(StreamStateRestorer&&) = delete;
+    StreamStateRestorer& operator=(StreamStateRestorer&&) = delete;
+
+private:
+    std::ostream& mStream;
+    std::locale mLocale;
+    std::streamsize const mPrecision;
+    std::streamsize const mWidth;
+    std::ostream::char_type const mFill;
+    std::ostream::fmtflags const mFmtFlags;
+};
+ANKERL_NANOBENCH(IGNORE_PADDED_POP)
+
+// Number formatter
+class Number {
+public:
+    Number(int width, int precision, double value);
+    Number(int width, int precision, int64_t value);
+    std::string to_s() const;
+
+private:
+    friend std::ostream& operator<<(std::ostream& os, Number const& n);
+    std::ostream& write(std::ostream& os) const;
+
+    int mWidth;
+    int mPrecision;
+    double mValue;
+};
+
+// helper replacement for std::to_string of signed/unsigned numbers so we are locale independent
+std::string to_s(uint64_t s);
+
+std::ostream& operator<<(std::ostream& os, Number const& n);
+
+class MarkDownColumn {
+public:
+    MarkDownColumn(int w, int prec, std::string const& tit, std::string const& suff, double val);
+    std::string title() const;
+    std::string separator() const;
+    std::string invalid() const;
+    std::string value() const;
+
+private:
+    int mWidth;
+    int mPrecision;
+    std::string mTitle;
+    std::string mSuffix;
+    double mValue;
+};
+
+// Formats any text as markdown code, escaping backticks.
+class MarkDownCode {
+public:
+    explicit MarkDownCode(std::string const& what);
+
+private:
+    friend std::ostream& operator<<(std::ostream& os, MarkDownCode const& mdCode);
+    std::ostream& write(std::ostream& os) const;
+
+    std::string mWhat{};
+};
+
+std::ostream& operator<<(std::ostream& os, MarkDownCode const& mdCode);
+
+} // namespace fmt
+} // namespace detail
+} // namespace nanobench
+} // namespace ankerl
+
+// implementation /////////////////////////////////////////////////////////////////////////////////
+
+namespace ankerl {
+namespace nanobench {
+
+void render(char const* mustacheTemplate, std::vector<Result> const& results, std::ostream& out) {
+    detail::fmt::StreamStateRestorer restorer(out);
+
+    out.precision(std::numeric_limits<double>::digits10);
+    auto nodes = templates::parseMustacheTemplate(&mustacheTemplate);
+
+    for (auto const& n : nodes) {
+        ANKERL_NANOBENCH_LOG("n.type=" << static_cast<int>(n.type));
+        switch (n.type) {
+        case templates::Node::Type::content:
+            out.write(n.begin, std::distance(n.begin, n.end));
+            break;
+
+        case templates::Node::Type::inverted_section:
+            throw std::runtime_error("unknown list '" + std::string(n.begin, n.end) + "'");
+
+        case templates::Node::Type::section:
+            if (n == "result") {
+                const size_t nbResults = results.size();
+                for (size_t i = 0; i < nbResults; ++i) {
+                    generateResult(n.children, i, results, out);
+                }
+            } else if (n == "measurement") {
+                if (results.size() != 1) {
+                    throw std::runtime_error(
+                        "render: can only use section 'measurement' here if there is a single result, but there are " +
+                        detail::fmt::to_s(results.size()));
+                }
+                // when we only have a single result, we can immediately go into its measurement.
+                auto const& r = results.front();
+                for (size_t i = 0; i < r.size(); ++i) {
+                    generateResultMeasurement(n.children, i, r, out);
+                }
+            } else {
+                throw std::runtime_error("render: unknown section '" + std::string(n.begin, n.end) + "'");
+            }
+            break;
+
+        case templates::Node::Type::tag:
+            if (results.size() == 1) {
+                // result & config are both supported there
+                generateResultTag(n, results.front(), out);
+            } else {
+                // This just uses the last result's config.
+                if (!generateConfigTag(n, results.back().config(), out)) {
+                    throw std::runtime_error("unknown tag '" + std::string(n.begin, n.end) + "'");
+                }
+            }
+            break;
+        }
+    }
+}
+
+void render(std::string const& mustacheTemplate, std::vector<Result> const& results, std::ostream& out) {
+    render(mustacheTemplate.c_str(), results, out);
+}
+
+void render(char const* mustacheTemplate, const Bench& bench, std::ostream& out) {
+    render(mustacheTemplate, bench.results(), out);
+}
+
+void render(std::string const& mustacheTemplate, const Bench& bench, std::ostream& out) {
+    render(mustacheTemplate.c_str(), bench.results(), out);
+}
+
+namespace detail {
+
+PerformanceCounters& performanceCounters() {
+#    if defined(__clang__)
+#        pragma clang diagnostic push
+#        pragma clang 
