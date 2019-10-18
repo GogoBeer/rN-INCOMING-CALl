@@ -1414,4 +1414,245 @@ char const* json() noexcept {
                     "pagefaults": {{pagefaults}},
                     "cpucycles": {{cpucycles}},
                     "contextswitches": {{contextswitches}},
-      
+                    "instructions": {{instructions}},
+                    "branchinstructions": {{branchinstructions}},
+                    "branchmisses": {{branchmisses}}
+                }{{^-last}},{{/-last}}
+{{/measurement}}            ]
+        }{{^-last}},{{/-last}}
+{{/result}}    ]
+})DELIM";
+}
+
+ANKERL_NANOBENCH(IGNORE_PADDED_PUSH)
+struct Node {
+    enum class Type { tag, content, section, inverted_section };
+
+    char const* begin;
+    char const* end;
+    std::vector<Node> children;
+    Type type;
+
+    template <size_t N>
+    // NOLINTNEXTLINE(hicpp-avoid-c-arrays,modernize-avoid-c-arrays,cppcoreguidelines-avoid-c-arrays)
+    bool operator==(char const (&str)[N]) const noexcept {
+        return static_cast<size_t>(std::distance(begin, end) + 1) == N && 0 == strncmp(str, begin, N - 1);
+    }
+};
+ANKERL_NANOBENCH(IGNORE_PADDED_POP)
+
+static std::vector<Node> parseMustacheTemplate(char const** tpl) {
+    std::vector<Node> nodes;
+
+    while (true) {
+        auto begin = std::strstr(*tpl, "{{");
+        auto end = begin;
+        if (begin != nullptr) {
+            begin += 2;
+            end = std::strstr(begin, "}}");
+        }
+
+        if (begin == nullptr || end == nullptr) {
+            // nothing found, finish node
+            nodes.emplace_back(Node{*tpl, *tpl + std::strlen(*tpl), std::vector<Node>{}, Node::Type::content});
+            return nodes;
+        }
+
+        nodes.emplace_back(Node{*tpl, begin - 2, std::vector<Node>{}, Node::Type::content});
+
+        // we found a tag
+        *tpl = end + 2;
+        switch (*begin) {
+        case '/':
+            // finished! bail out
+            return nodes;
+
+        case '#':
+            nodes.emplace_back(Node{begin + 1, end, parseMustacheTemplate(tpl), Node::Type::section});
+            break;
+
+        case '^':
+            nodes.emplace_back(Node{begin + 1, end, parseMustacheTemplate(tpl), Node::Type::inverted_section});
+            break;
+
+        default:
+            nodes.emplace_back(Node{begin, end, std::vector<Node>{}, Node::Type::tag});
+            break;
+        }
+    }
+}
+
+static bool generateFirstLast(Node const& n, size_t idx, size_t size, std::ostream& out) {
+    ANKERL_NANOBENCH_LOG("n.type=" << static_cast<int>(n.type));
+    bool matchFirst = n == "-first";
+    bool matchLast = n == "-last";
+    if (!matchFirst && !matchLast) {
+        return false;
+    }
+
+    bool doWrite = false;
+    if (n.type == Node::Type::section) {
+        doWrite = (matchFirst && idx == 0) || (matchLast && idx == size - 1);
+    } else if (n.type == Node::Type::inverted_section) {
+        doWrite = (matchFirst && idx != 0) || (matchLast && idx != size - 1);
+    }
+
+    if (doWrite) {
+        for (auto const& child : n.children) {
+            if (child.type == Node::Type::content) {
+                out.write(child.begin, std::distance(child.begin, child.end));
+            }
+        }
+    }
+    return true;
+}
+
+static bool matchCmdArgs(std::string const& str, std::vector<std::string>& matchResult) {
+    matchResult.clear();
+    auto idxOpen = str.find('(');
+    auto idxClose = str.find(')', idxOpen);
+    if (idxClose == std::string::npos) {
+        return false;
+    }
+
+    matchResult.emplace_back(str.substr(0, idxOpen));
+
+    // split by comma
+    matchResult.emplace_back(std::string{});
+    for (size_t i = idxOpen + 1; i != idxClose; ++i) {
+        if (str[i] == ' ' || str[i] == '\t') {
+            // skip whitespace
+            continue;
+        }
+        if (str[i] == ',') {
+            // got a comma => new string
+            matchResult.emplace_back(std::string{});
+            continue;
+        }
+        // no whitespace no comma, append
+        matchResult.back() += str[i];
+    }
+    return true;
+}
+
+static bool generateConfigTag(Node const& n, Config const& config, std::ostream& out) {
+    using detail::d;
+
+    if (n == "title") {
+        out << config.mBenchmarkTitle;
+        return true;
+    } else if (n == "name") {
+        out << config.mBenchmarkName;
+        return true;
+    } else if (n == "unit") {
+        out << config.mUnit;
+        return true;
+    } else if (n == "batch") {
+        out << config.mBatch;
+        return true;
+    } else if (n == "complexityN") {
+        out << config.mComplexityN;
+        return true;
+    } else if (n == "epochs") {
+        out << config.mNumEpochs;
+        return true;
+    } else if (n == "clockResolution") {
+        out << d(detail::clockResolution());
+        return true;
+    } else if (n == "clockResolutionMultiple") {
+        out << config.mClockResolutionMultiple;
+        return true;
+    } else if (n == "maxEpochTime") {
+        out << d(config.mMaxEpochTime);
+        return true;
+    } else if (n == "minEpochTime") {
+        out << d(config.mMinEpochTime);
+        return true;
+    } else if (n == "minEpochIterations") {
+        out << config.mMinEpochIterations;
+        return true;
+    } else if (n == "epochIterations") {
+        out << config.mEpochIterations;
+        return true;
+    } else if (n == "warmup") {
+        out << config.mWarmup;
+        return true;
+    } else if (n == "relative") {
+        out << config.mIsRelative;
+        return true;
+    }
+    return false;
+}
+
+static std::ostream& generateResultTag(Node const& n, Result const& r, std::ostream& out) {
+    if (generateConfigTag(n, r.config(), out)) {
+        return out;
+    }
+    // match e.g. "median(elapsed)"
+    // g++ 4.8 doesn't implement std::regex :(
+    // static std::regex const regOpArg1("^([a-zA-Z]+)\\(([a-zA-Z]*)\\)$");
+    // std::cmatch matchResult;
+    // if (std::regex_match(n.begin, n.end, matchResult, regOpArg1)) {
+    std::vector<std::string> matchResult;
+    if (matchCmdArgs(std::string(n.begin, n.end), matchResult)) {
+        if (matchResult.size() == 2) {
+            auto m = Result::fromString(matchResult[1]);
+            if (m == Result::Measure::_size) {
+                return out << 0.0;
+            }
+
+            if (matchResult[0] == "median") {
+                return out << r.median(m);
+            }
+            if (matchResult[0] == "average") {
+                return out << r.average(m);
+            }
+            if (matchResult[0] == "medianAbsolutePercentError") {
+                return out << r.medianAbsolutePercentError(m);
+            }
+            if (matchResult[0] == "sum") {
+                return out << r.sum(m);
+            }
+            if (matchResult[0] == "minimum") {
+                return out << r.minimum(m);
+            }
+            if (matchResult[0] == "maximum") {
+                return out << r.maximum(m);
+            }
+        } else if (matchResult.size() == 3) {
+            auto m1 = Result::fromString(matchResult[1]);
+            auto m2 = Result::fromString(matchResult[2]);
+            if (m1 == Result::Measure::_size || m2 == Result::Measure::_size) {
+                return out << 0.0;
+            }
+
+            if (matchResult[0] == "sumProduct") {
+                return out << r.sumProduct(m1, m2);
+            }
+        }
+    }
+
+    // match e.g. "sumProduct(elapsed, iterations)"
+    // static std::regex const regOpArg2("^([a-zA-Z]+)\\(([a-zA-Z]*)\\s*,\\s+([a-zA-Z]*)\\)$");
+
+    // nothing matches :(
+    throw std::runtime_error("command '" + std::string(n.begin, n.end) + "' not understood");
+}
+
+static void generateResultMeasurement(std::vector<Node> const& nodes, size_t idx, Result const& r, std::ostream& out) {
+    for (auto const& n : nodes) {
+        if (!generateFirstLast(n, idx, r.size(), out)) {
+            ANKERL_NANOBENCH_LOG("n.type=" << static_cast<int>(n.type));
+            switch (n.type) {
+            case Node::Type::content:
+                out.write(n.begin, std::distance(n.begin, n.end));
+                break;
+
+            case Node::Type::inverted_section:
+                throw std::runtime_error("got a inverted section inside measurement");
+
+            case Node::Type::section:
+                throw std::runtime_error("got a section inside measurement");
+
+            case Node::Type::tag: {
+ 
