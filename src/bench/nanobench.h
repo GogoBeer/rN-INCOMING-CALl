@@ -1893,4 +1893,217 @@ namespace detail {
 PerformanceCounters& performanceCounters() {
 #    if defined(__clang__)
 #        pragma clang diagnostic push
-#        pragma clang 
+#        pragma clang diagnostic ignored "-Wexit-time-destructors"
+#    endif
+    static PerformanceCounters pc;
+#    if defined(__clang__)
+#        pragma clang diagnostic pop
+#    endif
+    return pc;
+}
+
+// Windows version of doNotOptimizeAway
+// see https://github.com/google/benchmark/blob/master/include/benchmark/benchmark.h#L307
+// see https://github.com/facebook/folly/blob/master/folly/Benchmark.h#L280
+// see https://docs.microsoft.com/en-us/cpp/preprocessor/optimize
+#    if defined(_MSC_VER)
+#        pragma optimize("", off)
+void doNotOptimizeAwaySink(void const*) {}
+#        pragma optimize("", on)
+#    endif
+
+template <typename T>
+T parseFile(std::string const& filename) {
+    std::ifstream fin(filename);
+    T num{};
+    fin >> num;
+    return num;
+}
+
+char const* getEnv(char const* name) {
+#    if defined(_MSC_VER)
+#        pragma warning(push)
+#        pragma warning(disable : 4996) // getenv': This function or variable may be unsafe.
+#    endif
+    return std::getenv(name);
+#    if defined(_MSC_VER)
+#        pragma warning(pop)
+#    endif
+}
+
+bool isEndlessRunning(std::string const& name) {
+    auto endless = getEnv("NANOBENCH_ENDLESS");
+    return nullptr != endless && endless == name;
+}
+
+// True when environment variable NANOBENCH_SUPPRESS_WARNINGS is either not set at all, or set to "0"
+bool isWarningsEnabled() {
+    auto suppression = getEnv("NANOBENCH_SUPPRESS_WARNINGS");
+    return nullptr == suppression || suppression == std::string("0");
+}
+
+void gatherStabilityInformation(std::vector<std::string>& warnings, std::vector<std::string>& recommendations) {
+    warnings.clear();
+    recommendations.clear();
+
+    bool recommendCheckFlags = false;
+
+#    if defined(DEBUG)
+    warnings.emplace_back("DEBUG defined");
+    recommendCheckFlags = true;
+#    endif
+
+    bool recommendPyPerf = false;
+#    if defined(__linux__)
+    auto nprocs = sysconf(_SC_NPROCESSORS_CONF);
+    if (nprocs <= 0) {
+        warnings.emplace_back("couldn't figure out number of processors - no governor, turbo check possible");
+    } else {
+
+        // check frequency scaling
+        for (long id = 0; id < nprocs; ++id) {
+            auto idStr = detail::fmt::to_s(static_cast<uint64_t>(id));
+            auto sysCpu = "/sys/devices/system/cpu/cpu" + idStr;
+            auto minFreq = parseFile<int64_t>(sysCpu + "/cpufreq/scaling_min_freq");
+            auto maxFreq = parseFile<int64_t>(sysCpu + "/cpufreq/scaling_max_freq");
+            if (minFreq != maxFreq) {
+                auto minMHz = static_cast<double>(minFreq) / 1000.0;
+                auto maxMHz = static_cast<double>(maxFreq) / 1000.0;
+                warnings.emplace_back("CPU frequency scaling enabled: CPU " + idStr + " between " +
+                                      detail::fmt::Number(1, 1, minMHz).to_s() + " and " + detail::fmt::Number(1, 1, maxMHz).to_s() +
+                                      " MHz");
+                recommendPyPerf = true;
+                break;
+            }
+        }
+
+        auto currentGovernor = parseFile<std::string>("/sys/devices/system/cpu/cpu0/cpufreq/scaling_governor");
+        if ("performance" != currentGovernor) {
+            warnings.emplace_back("CPU governor is '" + currentGovernor + "' but should be 'performance'");
+            recommendPyPerf = true;
+        }
+
+        if (0 == parseFile<int>("/sys/devices/system/cpu/intel_pstate/no_turbo")) {
+            warnings.emplace_back("Turbo is enabled, CPU frequency will fluctuate");
+            recommendPyPerf = true;
+        }
+    }
+#    endif
+
+    if (recommendCheckFlags) {
+        recommendations.emplace_back("Make sure you compile for Release");
+    }
+    if (recommendPyPerf) {
+        recommendations.emplace_back("Use 'pyperf system tune' before benchmarking. See https://github.com/psf/pyperf");
+    }
+}
+
+void printStabilityInformationOnce(std::ostream* outStream) {
+    static bool shouldPrint = true;
+    if (shouldPrint && outStream && isWarningsEnabled()) {
+        auto& os = *outStream;
+        shouldPrint = false;
+        std::vector<std::string> warnings;
+        std::vector<std::string> recommendations;
+        gatherStabilityInformation(warnings, recommendations);
+        if (warnings.empty()) {
+            return;
+        }
+
+        os << "Warning, results might be unstable:" << std::endl;
+        for (auto const& w : warnings) {
+            os << "* " << w << std::endl;
+        }
+
+        os << std::endl << "Recommendations" << std::endl;
+        for (auto const& r : recommendations) {
+            os << "* " << r << std::endl;
+        }
+    }
+}
+
+// remembers the last table settings used. When it changes, a new table header is automatically written for the new entry.
+uint64_t& singletonHeaderHash() noexcept {
+    static uint64_t sHeaderHash{};
+    return sHeaderHash;
+}
+
+ANKERL_NANOBENCH_NO_SANITIZE("integer", "undefined")
+inline uint64_t hash_combine(uint64_t seed, uint64_t val) {
+    return seed ^ (val + UINT64_C(0x9e3779b9) + (seed << 6U) + (seed >> 2U));
+}
+
+// determines resolution of the given clock. This is done by measuring multiple times and returning the minimum time difference.
+Clock::duration calcClockResolution(size_t numEvaluations) noexcept {
+    auto bestDuration = Clock::duration::max();
+    Clock::time_point tBegin;
+    Clock::time_point tEnd;
+    for (size_t i = 0; i < numEvaluations; ++i) {
+        tBegin = Clock::now();
+        do {
+            tEnd = Clock::now();
+        } while (tBegin == tEnd);
+        bestDuration = (std::min)(bestDuration, tEnd - tBegin);
+    }
+    return bestDuration;
+}
+
+// Calculates clock resolution once, and remembers the result
+Clock::duration clockResolution() noexcept {
+    static Clock::duration sResolution = calcClockResolution(20);
+    return sResolution;
+}
+
+ANKERL_NANOBENCH(IGNORE_PADDED_PUSH)
+struct IterationLogic::Impl {
+    enum class State { warmup, upscaling_runtime, measuring, endless };
+
+    explicit Impl(Bench const& bench)
+        : mBench(bench)
+        , mResult(bench.config()) {
+        printStabilityInformationOnce(mBench.output());
+
+        // determine target runtime per epoch
+        mTargetRuntimePerEpoch = detail::clockResolution() * mBench.clockResolutionMultiple();
+        if (mTargetRuntimePerEpoch > mBench.maxEpochTime()) {
+            mTargetRuntimePerEpoch = mBench.maxEpochTime();
+        }
+        if (mTargetRuntimePerEpoch < mBench.minEpochTime()) {
+            mTargetRuntimePerEpoch = mBench.minEpochTime();
+        }
+
+        if (isEndlessRunning(mBench.name())) {
+            std::cerr << "NANOBENCH_ENDLESS set: running '" << mBench.name() << "' endlessly" << std::endl;
+            mNumIters = (std::numeric_limits<uint64_t>::max)();
+            mState = State::endless;
+        } else if (0 != mBench.warmup()) {
+            mNumIters = mBench.warmup();
+            mState = State::warmup;
+        } else if (0 != mBench.epochIterations()) {
+            // exact number of iterations
+            mNumIters = mBench.epochIterations();
+            mState = State::measuring;
+        } else {
+            mNumIters = mBench.minEpochIterations();
+            mState = State::upscaling_runtime;
+        }
+    }
+
+    // directly calculates new iters based on elapsed&iters, and adds a 10% noise. Makes sure we don't underflow.
+    ANKERL_NANOBENCH(NODISCARD) uint64_t calcBestNumIters(std::chrono::nanoseconds elapsed, uint64_t iters) noexcept {
+        auto doubleElapsed = d(elapsed);
+        auto doubleTargetRuntimePerEpoch = d(mTargetRuntimePerEpoch);
+        auto doubleNewIters = doubleTargetRuntimePerEpoch / doubleElapsed * d(iters);
+
+        auto doubleMinEpochIters = d(mBench.minEpochIterations());
+        if (doubleNewIters < doubleMinEpochIters) {
+            doubleNewIters = doubleMinEpochIters;
+        }
+        doubleNewIters *= 1.0 + 0.2 * mRng.uniform01();
+
+        // +0.5 for correct rounding when casting
+        // NOLINTNEXTLINE(bugprone-incorrect-roundings)
+        return static_cast<uint64_t>(doubleNewIters + 0.5);
+    }
+
+    AN
