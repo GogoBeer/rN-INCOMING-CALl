@@ -2106,4 +2106,177 @@ struct IterationLogic::Impl {
         return static_cast<uint64_t>(doubleNewIters + 0.5);
     }
 
-    AN
+    ANKERL_NANOBENCH_NO_SANITIZE("integer", "undefined") void upscale(std::chrono::nanoseconds elapsed) {
+        if (elapsed * 10 < mTargetRuntimePerEpoch) {
+            // we are far below the target runtime. Multiply iterations by 10 (with overflow check)
+            if (mNumIters * 10 < mNumIters) {
+                // overflow :-(
+                showResult("iterations overflow. Maybe your code got optimized away?");
+                mNumIters = 0;
+                return;
+            }
+            mNumIters *= 10;
+        } else {
+            mNumIters = calcBestNumIters(elapsed, mNumIters);
+        }
+    }
+
+    void add(std::chrono::nanoseconds elapsed, PerformanceCounters const& pc) noexcept {
+#    if defined(ANKERL_NANOBENCH_LOG_ENABLED)
+        auto oldIters = mNumIters;
+#    endif
+
+        switch (mState) {
+        case State::warmup:
+            if (isCloseEnoughForMeasurements(elapsed)) {
+                // if elapsed is close enough, we can skip upscaling and go right to measurements
+                // still, we don't add the result to the measurements.
+                mState = State::measuring;
+                mNumIters = calcBestNumIters(elapsed, mNumIters);
+            } else {
+                // not close enough: switch to upscaling
+                mState = State::upscaling_runtime;
+                upscale(elapsed);
+            }
+            break;
+
+        case State::upscaling_runtime:
+            if (isCloseEnoughForMeasurements(elapsed)) {
+                // if we are close enough, add measurement and switch to always measuring
+                mState = State::measuring;
+                mTotalElapsed += elapsed;
+                mTotalNumIters += mNumIters;
+                mResult.add(elapsed, mNumIters, pc);
+                mNumIters = calcBestNumIters(mTotalElapsed, mTotalNumIters);
+            } else {
+                upscale(elapsed);
+            }
+            break;
+
+        case State::measuring:
+            // just add measurements - no questions asked. Even when runtime is low. But we can't ignore
+            // that fluctuation, or else we would bias the result
+            mTotalElapsed += elapsed;
+            mTotalNumIters += mNumIters;
+            mResult.add(elapsed, mNumIters, pc);
+            if (0 != mBench.epochIterations()) {
+                mNumIters = mBench.epochIterations();
+            } else {
+                mNumIters = calcBestNumIters(mTotalElapsed, mTotalNumIters);
+            }
+            break;
+
+        case State::endless:
+            mNumIters = (std::numeric_limits<uint64_t>::max)();
+            break;
+        }
+
+        if (static_cast<uint64_t>(mResult.size()) == mBench.epochs()) {
+            // we got all the results that we need, finish it
+            showResult("");
+            mNumIters = 0;
+        }
+
+        ANKERL_NANOBENCH_LOG(mBench.name() << ": " << detail::fmt::Number(20, 3, static_cast<double>(elapsed.count())) << " elapsed, "
+                                           << detail::fmt::Number(20, 3, static_cast<double>(mTargetRuntimePerEpoch.count()))
+                                           << " target. oldIters=" << oldIters << ", mNumIters=" << mNumIters
+                                           << ", mState=" << static_cast<int>(mState));
+    }
+
+    void showResult(std::string const& errorMessage) const {
+        ANKERL_NANOBENCH_LOG(errorMessage);
+
+        if (mBench.output() != nullptr) {
+            // prepare column data ///////
+            std::vector<fmt::MarkDownColumn> columns;
+
+            auto rMedian = mResult.median(Result::Measure::elapsed);
+
+            if (mBench.relative()) {
+                double d = 100.0;
+                if (!mBench.results().empty()) {
+                    d = rMedian <= 0.0 ? 0.0 : mBench.results().front().median(Result::Measure::elapsed) / rMedian * 100.0;
+                }
+                columns.emplace_back(11, 1, "relative", "%", d);
+            }
+
+            if (mBench.complexityN() > 0) {
+                columns.emplace_back(14, 0, "complexityN", "", mBench.complexityN());
+            }
+
+            columns.emplace_back(22, 2, mBench.timeUnitName() + "/" + mBench.unit(), "",
+                                 rMedian / (mBench.timeUnit().count() * mBench.batch()));
+            columns.emplace_back(22, 2, mBench.unit() + "/s", "", rMedian <= 0.0 ? 0.0 : mBench.batch() / rMedian);
+
+            double rErrorMedian = mResult.medianAbsolutePercentError(Result::Measure::elapsed);
+            columns.emplace_back(10, 1, "err%", "%", rErrorMedian * 100.0);
+
+            double rInsMedian = -1.0;
+            if (mBench.performanceCounters() && mResult.has(Result::Measure::instructions)) {
+                rInsMedian = mResult.median(Result::Measure::instructions);
+                columns.emplace_back(18, 2, "ins/" + mBench.unit(), "", rInsMedian / mBench.batch());
+            }
+
+            double rCycMedian = -1.0;
+            if (mBench.performanceCounters() && mResult.has(Result::Measure::cpucycles)) {
+                rCycMedian = mResult.median(Result::Measure::cpucycles);
+                columns.emplace_back(18, 2, "cyc/" + mBench.unit(), "", rCycMedian / mBench.batch());
+            }
+            if (rInsMedian > 0.0 && rCycMedian > 0.0) {
+                columns.emplace_back(9, 3, "IPC", "", rCycMedian <= 0.0 ? 0.0 : rInsMedian / rCycMedian);
+            }
+            if (mBench.performanceCounters() && mResult.has(Result::Measure::branchinstructions)) {
+                double rBraMedian = mResult.median(Result::Measure::branchinstructions);
+                columns.emplace_back(17, 2, "bra/" + mBench.unit(), "", rBraMedian / mBench.batch());
+                if (mResult.has(Result::Measure::branchmisses)) {
+                    double p = 0.0;
+                    if (rBraMedian >= 1e-9) {
+                        p = 100.0 * mResult.median(Result::Measure::branchmisses) / rBraMedian;
+                    }
+                    columns.emplace_back(10, 1, "miss%", "%", p);
+                }
+            }
+
+            columns.emplace_back(12, 2, "total", "", mResult.sumProduct(Result::Measure::iterations, Result::Measure::elapsed));
+
+            // write everything
+            auto& os = *mBench.output();
+
+            // combine all elements that are relevant for printing the header
+            uint64_t hash = 0;
+            hash = hash_combine(std::hash<std::string>{}(mBench.unit()), hash);
+            hash = hash_combine(std::hash<std::string>{}(mBench.title()), hash);
+            hash = hash_combine(std::hash<std::string>{}(mBench.timeUnitName()), hash);
+            hash = hash_combine(std::hash<double>{}(mBench.timeUnit().count()), hash);
+            hash = hash_combine(std::hash<bool>{}(mBench.relative()), hash);
+            hash = hash_combine(std::hash<bool>{}(mBench.performanceCounters()), hash);
+
+            if (hash != singletonHeaderHash()) {
+                singletonHeaderHash() = hash;
+
+                // no result yet, print header
+                os << std::endl;
+                for (auto const& col : columns) {
+                    os << col.title();
+                }
+                os << "| " << mBench.title() << std::endl;
+
+                for (auto const& col : columns) {
+                    os << col.separator();
+                }
+                os << "|:" << std::string(mBench.title().size() + 1U, '-') << std::endl;
+            }
+
+            if (!errorMessage.empty()) {
+                for (auto const& col : columns) {
+                    os << col.invalid();
+                }
+                os << "| :boom: " << fmt::MarkDownCode(mBench.name()) << " (" << errorMessage << ')' << std::endl;
+            } else {
+                for (auto const& col : columns) {
+                    os << col.value();
+                }
+                os << "| ";
+                auto showUnstable = isWarningsEnabled() && rErrorMedian >= 0.05;
+                if (showUnstable) {
+             
