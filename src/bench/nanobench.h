@@ -2526,4 +2526,266 @@ void LinuxPerformanceCounters::updateResults(uint64_t numIters) {
     }
 
     mTimeEnabledNanos = mCounters[1] - mCalibratedOverhead[1];
-    mTimeRun
+    mTimeRunningNanos = mCounters[2] - mCalibratedOverhead[2];
+
+    for (uint64_t i = 0; i < mCounters[0]; ++i) {
+        auto idx = static_cast<size_t>(3 + i * 2 + 0);
+        auto id = mCounters[idx + 1U];
+
+        auto it = mIdToTarget.find(id);
+        if (it != mIdToTarget.end()) {
+
+            auto& tgt = it->second;
+            *tgt.targetValue = mCounters[idx];
+            if (tgt.correctMeasuringOverhead) {
+                if (*tgt.targetValue >= mCalibratedOverhead[idx]) {
+                    *tgt.targetValue -= mCalibratedOverhead[idx];
+                } else {
+                    *tgt.targetValue = 0U;
+                }
+            }
+            if (tgt.correctLoopOverhead) {
+                auto correctionVal = mLoopOverhead[idx] * numIters;
+                if (*tgt.targetValue >= correctionVal) {
+                    *tgt.targetValue -= correctionVal;
+                } else {
+                    *tgt.targetValue = 0U;
+                }
+            }
+        }
+    }
+}
+
+bool LinuxPerformanceCounters::monitor(uint32_t type, uint64_t eventid, Target target) {
+    *target.targetValue = (std::numeric_limits<uint64_t>::max)();
+    if (mHasError) {
+        return false;
+    }
+
+    auto pea = perf_event_attr();
+    std::memset(&pea, 0, sizeof(perf_event_attr));
+    pea.type = type;
+    pea.size = sizeof(perf_event_attr);
+    pea.config = eventid;
+    pea.disabled = 1; // start counter as disabled
+    pea.exclude_kernel = 1;
+    pea.exclude_hv = 1;
+
+    // NOLINTNEXTLINE(hicpp-signed-bitwise)
+    pea.read_format = PERF_FORMAT_GROUP | PERF_FORMAT_ID | PERF_FORMAT_TOTAL_TIME_ENABLED | PERF_FORMAT_TOTAL_TIME_RUNNING;
+
+    const int pid = 0;                    // the current process
+    const int cpu = -1;                   // all CPUs
+#        if defined(PERF_FLAG_FD_CLOEXEC) // since Linux 3.14
+    const unsigned long flags = PERF_FLAG_FD_CLOEXEC;
+#        else
+    const unsigned long flags = 0;
+#        endif
+
+    auto fd = static_cast<int>(syscall(__NR_perf_event_open, &pea, pid, cpu, mFd, flags));
+    if (-1 == fd) {
+        return false;
+    }
+    if (-1 == mFd) {
+        // first call: set to fd, and use this from now on
+        mFd = fd;
+    }
+    uint64_t id = 0;
+    // NOLINTNEXTLINE(hicpp-signed-bitwise)
+    if (-1 == ioctl(fd, PERF_EVENT_IOC_ID, &id)) {
+        // couldn't get id
+        return false;
+    }
+
+    // insert into map, rely on the fact that map's references are constant.
+    mIdToTarget.emplace(id, target);
+
+    // prepare readformat with the correct size (after the insert)
+    auto size = 3 + 2 * mIdToTarget.size();
+    mCounters.resize(size);
+    mCalibratedOverhead.resize(size);
+    mLoopOverhead.resize(size);
+
+    return true;
+}
+
+PerformanceCounters::PerformanceCounters()
+    : mPc(new LinuxPerformanceCounters())
+    , mVal()
+    , mHas() {
+
+    mHas.pageFaults = mPc->monitor(PERF_COUNT_SW_PAGE_FAULTS, LinuxPerformanceCounters::Target(&mVal.pageFaults, true, false));
+    mHas.cpuCycles = mPc->monitor(PERF_COUNT_HW_REF_CPU_CYCLES, LinuxPerformanceCounters::Target(&mVal.cpuCycles, true, false));
+    mHas.contextSwitches =
+        mPc->monitor(PERF_COUNT_SW_CONTEXT_SWITCHES, LinuxPerformanceCounters::Target(&mVal.contextSwitches, true, false));
+    mHas.instructions = mPc->monitor(PERF_COUNT_HW_INSTRUCTIONS, LinuxPerformanceCounters::Target(&mVal.instructions, true, true));
+    mHas.branchInstructions =
+        mPc->monitor(PERF_COUNT_HW_BRANCH_INSTRUCTIONS, LinuxPerformanceCounters::Target(&mVal.branchInstructions, true, false));
+    mHas.branchMisses = mPc->monitor(PERF_COUNT_HW_BRANCH_MISSES, LinuxPerformanceCounters::Target(&mVal.branchMisses, true, false));
+    // mHas.branchMisses = false;
+
+    mPc->start();
+    mPc->calibrate([] {
+        auto before = ankerl::nanobench::Clock::now();
+        auto after = ankerl::nanobench::Clock::now();
+        (void)before;
+        (void)after;
+    });
+
+    if (mPc->hasError()) {
+        // something failed, don't monitor anything.
+        mHas = PerfCountSet<bool>{};
+    }
+}
+
+PerformanceCounters::~PerformanceCounters() {
+    if (nullptr != mPc) {
+        delete mPc;
+    }
+}
+
+void PerformanceCounters::beginMeasure() {
+    mPc->beginMeasure();
+}
+
+void PerformanceCounters::endMeasure() {
+    mPc->endMeasure();
+}
+
+void PerformanceCounters::updateResults(uint64_t numIters) {
+    mPc->updateResults(numIters);
+}
+
+#    else
+
+PerformanceCounters::PerformanceCounters() = default;
+PerformanceCounters::~PerformanceCounters() = default;
+void PerformanceCounters::beginMeasure() {}
+void PerformanceCounters::endMeasure() {}
+void PerformanceCounters::updateResults(uint64_t) {}
+
+#    endif
+
+ANKERL_NANOBENCH(NODISCARD) PerfCountSet<uint64_t> const& PerformanceCounters::val() const noexcept {
+    return mVal;
+}
+ANKERL_NANOBENCH(NODISCARD) PerfCountSet<bool> const& PerformanceCounters::has() const noexcept {
+    return mHas;
+}
+
+// formatting utilities
+namespace fmt {
+
+// adds thousands separator to numbers
+NumSep::NumSep(char sep)
+    : mSep(sep) {}
+
+char NumSep::do_thousands_sep() const {
+    return mSep;
+}
+
+std::string NumSep::do_grouping() const {
+    return "\003";
+}
+
+// RAII to save & restore a stream's state
+StreamStateRestorer::StreamStateRestorer(std::ostream& s)
+    : mStream(s)
+    , mLocale(s.getloc())
+    , mPrecision(s.precision())
+    , mWidth(s.width())
+    , mFill(s.fill())
+    , mFmtFlags(s.flags()) {}
+
+StreamStateRestorer::~StreamStateRestorer() {
+    restore();
+}
+
+// sets back all stream info that we remembered at construction
+void StreamStateRestorer::restore() {
+    mStream.imbue(mLocale);
+    mStream.precision(mPrecision);
+    mStream.width(mWidth);
+    mStream.fill(mFill);
+    mStream.flags(mFmtFlags);
+}
+
+Number::Number(int width, int precision, int64_t value)
+    : mWidth(width)
+    , mPrecision(precision)
+    , mValue(static_cast<double>(value)) {}
+
+Number::Number(int width, int precision, double value)
+    : mWidth(width)
+    , mPrecision(precision)
+    , mValue(value) {}
+
+std::ostream& Number::write(std::ostream& os) const {
+    StreamStateRestorer restorer(os);
+    os.imbue(std::locale(os.getloc(), new NumSep(',')));
+    os << std::setw(mWidth) << std::setprecision(mPrecision) << std::fixed << mValue;
+    return os;
+}
+
+std::string Number::to_s() const {
+    std::stringstream ss;
+    write(ss);
+    return ss.str();
+}
+
+std::string to_s(uint64_t n) {
+    std::string str;
+    do {
+        str += static_cast<char>('0' + static_cast<char>(n % 10));
+        n /= 10;
+    } while (n != 0);
+    std::reverse(str.begin(), str.end());
+    return str;
+}
+
+std::ostream& operator<<(std::ostream& os, Number const& n) {
+    return n.write(os);
+}
+
+MarkDownColumn::MarkDownColumn(int w, int prec, std::string const& tit, std::string const& suff, double val)
+    : mWidth(w)
+    , mPrecision(prec)
+    , mTitle(tit)
+    , mSuffix(suff)
+    , mValue(val) {}
+
+std::string MarkDownColumn::title() const {
+    std::stringstream ss;
+    ss << '|' << std::setw(mWidth - 2) << std::right << mTitle << ' ';
+    return ss.str();
+}
+
+std::string MarkDownColumn::separator() const {
+    std::string sep(static_cast<size_t>(mWidth), '-');
+    sep.front() = '|';
+    sep.back() = ':';
+    return sep;
+}
+
+std::string MarkDownColumn::invalid() const {
+    std::string sep(static_cast<size_t>(mWidth), ' ');
+    sep.front() = '|';
+    sep[sep.size() - 2] = '-';
+    return sep;
+}
+
+std::string MarkDownColumn::value() const {
+    std::stringstream ss;
+    auto width = mWidth - 2 - static_cast<int>(mSuffix.size());
+    ss << '|' << Number(width, mPrecision, mValue) << mSuffix << ' ';
+    return ss.str();
+}
+
+// Formats any text as markdown code, escaping backticks.
+MarkDownCode::MarkDownCode(std::string const& what) {
+    mWhat.reserve(what.size() + 2);
+    mWhat.push_back('`');
+    for (char c : what) {
+        mWhat.push_back(c);
+        if ('`' == c) {
+            mWhat.push_back('
