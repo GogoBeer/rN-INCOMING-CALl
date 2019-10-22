@@ -2279,4 +2279,251 @@ struct IterationLogic::Impl {
                 os << "| ";
                 auto showUnstable = isWarningsEnabled() && rErrorMedian >= 0.05;
                 if (showUnstable) {
-             
+                    os << ":wavy_dash: ";
+                }
+                os << fmt::MarkDownCode(mBench.name());
+                if (showUnstable) {
+                    auto avgIters = static_cast<double>(mTotalNumIters) / static_cast<double>(mBench.epochs());
+                    // NOLINTNEXTLINE(bugprone-incorrect-roundings)
+                    auto suggestedIters = static_cast<uint64_t>(avgIters * 10 + 0.5);
+
+                    os << " (Unstable with ~" << detail::fmt::Number(1, 1, avgIters)
+                       << " iters. Increase `minEpochIterations` to e.g. " << suggestedIters << ")";
+                }
+                os << std::endl;
+            }
+        }
+    }
+
+    ANKERL_NANOBENCH(NODISCARD) bool isCloseEnoughForMeasurements(std::chrono::nanoseconds elapsed) const noexcept {
+        return elapsed * 3 >= mTargetRuntimePerEpoch * 2;
+    }
+
+    uint64_t mNumIters = 1;
+    Bench const& mBench;
+    std::chrono::nanoseconds mTargetRuntimePerEpoch{};
+    Result mResult;
+    Rng mRng{123};
+    std::chrono::nanoseconds mTotalElapsed{};
+    uint64_t mTotalNumIters = 0;
+
+    State mState = State::upscaling_runtime;
+};
+ANKERL_NANOBENCH(IGNORE_PADDED_POP)
+
+IterationLogic::IterationLogic(Bench const& bench) noexcept
+    : mPimpl(new Impl(bench)) {}
+
+IterationLogic::~IterationLogic() {
+    if (mPimpl) {
+        delete mPimpl;
+    }
+}
+
+uint64_t IterationLogic::numIters() const noexcept {
+    ANKERL_NANOBENCH_LOG(mPimpl->mBench.name() << ": mNumIters=" << mPimpl->mNumIters);
+    return mPimpl->mNumIters;
+}
+
+void IterationLogic::add(std::chrono::nanoseconds elapsed, PerformanceCounters const& pc) noexcept {
+    mPimpl->add(elapsed, pc);
+}
+
+void IterationLogic::moveResultTo(std::vector<Result>& results) noexcept {
+    results.emplace_back(std::move(mPimpl->mResult));
+}
+
+#    if ANKERL_NANOBENCH(PERF_COUNTERS)
+
+ANKERL_NANOBENCH(IGNORE_PADDED_PUSH)
+class LinuxPerformanceCounters {
+public:
+    struct Target {
+        Target(uint64_t* targetValue_, bool correctMeasuringOverhead_, bool correctLoopOverhead_)
+            : targetValue(targetValue_)
+            , correctMeasuringOverhead(correctMeasuringOverhead_)
+            , correctLoopOverhead(correctLoopOverhead_) {}
+
+        uint64_t* targetValue{};
+        bool correctMeasuringOverhead{};
+        bool correctLoopOverhead{};
+    };
+
+    ~LinuxPerformanceCounters();
+
+    // quick operation
+    inline void start() {}
+
+    inline void stop() {}
+
+    bool monitor(perf_sw_ids swId, Target target);
+    bool monitor(perf_hw_id hwId, Target target);
+
+    bool hasError() const noexcept {
+        return mHasError;
+    }
+
+    // Just reading data is faster than enable & disabling.
+    // we subtract data ourselves.
+    inline void beginMeasure() {
+        if (mHasError) {
+            return;
+        }
+
+        // NOLINTNEXTLINE(hicpp-signed-bitwise)
+        mHasError = -1 == ioctl(mFd, PERF_EVENT_IOC_RESET, PERF_IOC_FLAG_GROUP);
+        if (mHasError) {
+            return;
+        }
+
+        // NOLINTNEXTLINE(hicpp-signed-bitwise)
+        mHasError = -1 == ioctl(mFd, PERF_EVENT_IOC_ENABLE, PERF_IOC_FLAG_GROUP);
+    }
+
+    inline void endMeasure() {
+        if (mHasError) {
+            return;
+        }
+
+        // NOLINTNEXTLINE(hicpp-signed-bitwise)
+        mHasError = (-1 == ioctl(mFd, PERF_EVENT_IOC_DISABLE, PERF_IOC_FLAG_GROUP));
+        if (mHasError) {
+            return;
+        }
+
+        auto const numBytes = sizeof(uint64_t) * mCounters.size();
+        auto ret = read(mFd, mCounters.data(), numBytes);
+        mHasError = ret != static_cast<ssize_t>(numBytes);
+    }
+
+    void updateResults(uint64_t numIters);
+
+    // rounded integer division
+    template <typename T>
+    static inline T divRounded(T a, T divisor) {
+        return (a + divisor / 2) / divisor;
+    }
+
+    ANKERL_NANOBENCH_NO_SANITIZE("integer", "undefined")
+    static inline uint32_t mix(uint32_t x) noexcept {
+        x ^= x << 13;
+        x ^= x >> 17;
+        x ^= x << 5;
+        return x;
+    }
+
+    template <typename Op>
+    ANKERL_NANOBENCH_NO_SANITIZE("integer", "undefined")
+    void calibrate(Op&& op) {
+        // clear current calibration data,
+        for (auto& v : mCalibratedOverhead) {
+            v = UINT64_C(0);
+        }
+
+        // create new calibration data
+        auto newCalibration = mCalibratedOverhead;
+        for (auto& v : newCalibration) {
+            v = (std::numeric_limits<uint64_t>::max)();
+        }
+        for (size_t iter = 0; iter < 100; ++iter) {
+            beginMeasure();
+            op();
+            endMeasure();
+            if (mHasError) {
+                return;
+            }
+
+            for (size_t i = 0; i < newCalibration.size(); ++i) {
+                auto diff = mCounters[i];
+                if (newCalibration[i] > diff) {
+                    newCalibration[i] = diff;
+                }
+            }
+        }
+
+        mCalibratedOverhead = std::move(newCalibration);
+
+        {
+            // calibrate loop overhead. For branches & instructions this makes sense, not so much for everything else like cycles.
+            // marsaglia's xorshift: mov, sal/shr, xor. Times 3.
+            // This has the nice property that the compiler doesn't seem to be able to optimize multiple calls any further.
+            // see https://godbolt.org/z/49RVQ5
+            uint64_t const numIters = 100000U + (std::random_device{}() & 3);
+            uint64_t n = numIters;
+            uint32_t x = 1234567;
+
+            beginMeasure();
+            while (n-- > 0) {
+                x = mix(x);
+            }
+            endMeasure();
+            detail::doNotOptimizeAway(x);
+            auto measure1 = mCounters;
+
+            n = numIters;
+            beginMeasure();
+            while (n-- > 0) {
+                // we now run *twice* so we can easily calculate the overhead
+                x = mix(x);
+                x = mix(x);
+            }
+            endMeasure();
+            detail::doNotOptimizeAway(x);
+            auto measure2 = mCounters;
+
+            for (size_t i = 0; i < mCounters.size(); ++i) {
+                // factor 2 because we have two instructions per loop
+                auto m1 = measure1[i] > mCalibratedOverhead[i] ? measure1[i] - mCalibratedOverhead[i] : 0;
+                auto m2 = measure2[i] > mCalibratedOverhead[i] ? measure2[i] - mCalibratedOverhead[i] : 0;
+                auto overhead = m1 * 2 > m2 ? m1 * 2 - m2 : 0;
+
+                mLoopOverhead[i] = divRounded(overhead, numIters);
+            }
+        }
+    }
+
+private:
+    bool monitor(uint32_t type, uint64_t eventid, Target target);
+
+    std::map<uint64_t, Target> mIdToTarget{};
+
+    // start with minimum size of 3 for read_format
+    std::vector<uint64_t> mCounters{3};
+    std::vector<uint64_t> mCalibratedOverhead{3};
+    std::vector<uint64_t> mLoopOverhead{3};
+
+    uint64_t mTimeEnabledNanos = 0;
+    uint64_t mTimeRunningNanos = 0;
+    int mFd = -1;
+    bool mHasError = false;
+};
+ANKERL_NANOBENCH(IGNORE_PADDED_POP)
+
+LinuxPerformanceCounters::~LinuxPerformanceCounters() {
+    if (-1 != mFd) {
+        close(mFd);
+    }
+}
+
+bool LinuxPerformanceCounters::monitor(perf_sw_ids swId, LinuxPerformanceCounters::Target target) {
+    return monitor(PERF_TYPE_SOFTWARE, swId, target);
+}
+
+bool LinuxPerformanceCounters::monitor(perf_hw_id hwId, LinuxPerformanceCounters::Target target) {
+    return monitor(PERF_TYPE_HARDWARE, hwId, target);
+}
+
+// overflow is ok, it's checked
+ANKERL_NANOBENCH_NO_SANITIZE("integer", "undefined")
+void LinuxPerformanceCounters::updateResults(uint64_t numIters) {
+    // clear old data
+    for (auto& id_value : mIdToTarget) {
+        *id_value.second.targetValue = UINT64_C(0);
+    }
+
+    if (mHasError) {
+        return;
+    }
+
+    mTimeEnabledNanos = mCounters[1] - mCalibratedOverhead[1];
+    mTimeRun
