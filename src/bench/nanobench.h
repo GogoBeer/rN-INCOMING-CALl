@@ -3319,4 +3319,47 @@ BigO::BigO(std::string const& bigOName, RangeMeasure const& rangeMeasure)
     }
 
     auto n = static_cast<double>(rangeMeasure.size());
-    auto mean = sumMeasure / n
+    auto mean = sumMeasure / n;
+    mNormalizedRootMeanSquare = std::sqrt(err / n) / mean;
+}
+
+BigO::BigO(const char* bigOName, RangeMeasure const& rangeMeasure)
+    : BigO(std::string(bigOName), rangeMeasure) {}
+
+std::string const& BigO::name() const noexcept {
+    return mName;
+}
+
+double BigO::constant() const noexcept {
+    return mConstant;
+}
+
+double BigO::normalizedRootMeanSquare() const noexcept {
+    return mNormalizedRootMeanSquare;
+}
+
+bool BigO::operator<(BigO const& other) const noexcept {
+    return std::tie(mNormalizedRootMeanSquare, mName) < std::tie(other.mNormalizedRootMeanSquare, other.mName);
+}
+
+std::ostream& operator<<(std::ostream& os, BigO const& bigO) {
+    return os << bigO.constant() << " * " << bigO.name() << ", rms=" << bigO.normalizedRootMeanSquare();
+}
+
+std::ostream& operator<<(std::ostream& os, std::vector<ankerl::nanobench::BigO> const& bigOs) {
+    detail::fmt::StreamStateRestorer restorer(os);
+    os << std::endl << "|   coefficient |   err% | complexity" << std::endl << "|--------------:|-------:|------------" << std::endl;
+    for (auto const& bigO : bigOs) {
+        os << "|" << std::setw(14) << std::setprecision(7) << std::scientific << bigO.constant() << " ";
+        os << "|" << detail::fmt::Number(6, 1, bigO.normalizedRootMeanSquare() * 100.0) << "% ";
+        os << "| " << bigO.name();
+        os << std::endl;
+    }
+    return os;
+}
+
+} // namespace nanobench
+} // namespace ankerl
+
+#endif // ANKERL_NANOBENCH_IMPLEMENT
+#endif // ANKERL_NANOBENCH_H_INCLUDED
