@@ -3040,4 +3040,283 @@ bool Bench::relative() const noexcept {
 }
 
 Bench& Bench::performanceCounters(bool showPerformanceCounters) noexcept {
-    mConfig.mShowPerformanceCounters = showPerformanc
+    mConfig.mShowPerformanceCounters = showPerformanceCounters;
+    return *this;
+}
+bool Bench::performanceCounters() const noexcept {
+    return mConfig.mShowPerformanceCounters;
+}
+
+// Operation unit. Defaults to "op", could be e.g. "byte" for string processing.
+// If u differs from currently set unit, the stored results will be cleared.
+// Use singular (byte, not bytes).
+Bench& Bench::unit(char const* u) {
+    if (u != mConfig.mUnit) {
+        mResults.clear();
+    }
+    mConfig.mUnit = u;
+    return *this;
+}
+
+Bench& Bench::unit(std::string const& u) {
+    return unit(u.c_str());
+}
+
+std::string const& Bench::unit() const noexcept {
+    return mConfig.mUnit;
+}
+
+Bench& Bench::timeUnit(std::chrono::duration<double> const& tu, std::string const& tuName) {
+    mConfig.mTimeUnit = tu;
+    mConfig.mTimeUnitName = tuName;
+    return *this;
+}
+
+std::string const& Bench::timeUnitName() const noexcept {
+    return mConfig.mTimeUnitName;
+}
+
+std::chrono::duration<double> const& Bench::timeUnit() const noexcept {
+    return mConfig.mTimeUnit;
+}
+
+// If benchmarkTitle differs from currently set title, the stored results will be cleared.
+Bench& Bench::title(const char* benchmarkTitle) {
+    if (benchmarkTitle != mConfig.mBenchmarkTitle) {
+        mResults.clear();
+    }
+    mConfig.mBenchmarkTitle = benchmarkTitle;
+    return *this;
+}
+Bench& Bench::title(std::string const& benchmarkTitle) {
+    if (benchmarkTitle != mConfig.mBenchmarkTitle) {
+        mResults.clear();
+    }
+    mConfig.mBenchmarkTitle = benchmarkTitle;
+    return *this;
+}
+
+std::string const& Bench::title() const noexcept {
+    return mConfig.mBenchmarkTitle;
+}
+
+Bench& Bench::name(const char* benchmarkName) {
+    mConfig.mBenchmarkName = benchmarkName;
+    return *this;
+}
+
+Bench& Bench::name(std::string const& benchmarkName) {
+    mConfig.mBenchmarkName = benchmarkName;
+    return *this;
+}
+
+std::string const& Bench::name() const noexcept {
+    return mConfig.mBenchmarkName;
+}
+
+// Number of epochs to evaluate. The reported result will be the median of evaluation of each epoch.
+Bench& Bench::epochs(size_t numEpochs) noexcept {
+    mConfig.mNumEpochs = numEpochs;
+    return *this;
+}
+size_t Bench::epochs() const noexcept {
+    return mConfig.mNumEpochs;
+}
+
+// Desired evaluation time is a multiple of clock resolution. Default is to be 1000 times above this measurement precision.
+Bench& Bench::clockResolutionMultiple(size_t multiple) noexcept {
+    mConfig.mClockResolutionMultiple = multiple;
+    return *this;
+}
+size_t Bench::clockResolutionMultiple() const noexcept {
+    return mConfig.mClockResolutionMultiple;
+}
+
+// Sets the maximum time each epoch should take. Default is 100ms.
+Bench& Bench::maxEpochTime(std::chrono::nanoseconds t) noexcept {
+    mConfig.mMaxEpochTime = t;
+    return *this;
+}
+std::chrono::nanoseconds Bench::maxEpochTime() const noexcept {
+    return mConfig.mMaxEpochTime;
+}
+
+// Sets the maximum time each epoch should take. Default is 100ms.
+Bench& Bench::minEpochTime(std::chrono::nanoseconds t) noexcept {
+    mConfig.mMinEpochTime = t;
+    return *this;
+}
+std::chrono::nanoseconds Bench::minEpochTime() const noexcept {
+    return mConfig.mMinEpochTime;
+}
+
+Bench& Bench::minEpochIterations(uint64_t numIters) noexcept {
+    mConfig.mMinEpochIterations = (numIters == 0) ? 1 : numIters;
+    return *this;
+}
+uint64_t Bench::minEpochIterations() const noexcept {
+    return mConfig.mMinEpochIterations;
+}
+
+Bench& Bench::epochIterations(uint64_t numIters) noexcept {
+    mConfig.mEpochIterations = numIters;
+    return *this;
+}
+uint64_t Bench::epochIterations() const noexcept {
+    return mConfig.mEpochIterations;
+}
+
+Bench& Bench::warmup(uint64_t numWarmupIters) noexcept {
+    mConfig.mWarmup = numWarmupIters;
+    return *this;
+}
+uint64_t Bench::warmup() const noexcept {
+    return mConfig.mWarmup;
+}
+
+Bench& Bench::config(Config const& benchmarkConfig) {
+    mConfig = benchmarkConfig;
+    return *this;
+}
+Config const& Bench::config() const noexcept {
+    return mConfig;
+}
+
+Bench& Bench::output(std::ostream* outstream) noexcept {
+    mConfig.mOut = outstream;
+    return *this;
+}
+
+ANKERL_NANOBENCH(NODISCARD) std::ostream* Bench::output() const noexcept {
+    return mConfig.mOut;
+}
+
+std::vector<Result> const& Bench::results() const noexcept {
+    return mResults;
+}
+
+Bench& Bench::render(char const* templateContent, std::ostream& os) {
+    ::ankerl::nanobench::render(templateContent, *this, os);
+    return *this;
+}
+
+Bench& Bench::render(std::string const& templateContent, std::ostream& os) {
+    ::ankerl::nanobench::render(templateContent, *this, os);
+    return *this;
+}
+
+std::vector<BigO> Bench::complexityBigO() const {
+    std::vector<BigO> bigOs;
+    auto rangeMeasure = BigO::collectRangeMeasure(mResults);
+    bigOs.emplace_back("O(1)", rangeMeasure, [](double) {
+        return 1.0;
+    });
+    bigOs.emplace_back("O(n)", rangeMeasure, [](double n) {
+        return n;
+    });
+    bigOs.emplace_back("O(log n)", rangeMeasure, [](double n) {
+        return std::log2(n);
+    });
+    bigOs.emplace_back("O(n log n)", rangeMeasure, [](double n) {
+        return n * std::log2(n);
+    });
+    bigOs.emplace_back("O(n^2)", rangeMeasure, [](double n) {
+        return n * n;
+    });
+    bigOs.emplace_back("O(n^3)", rangeMeasure, [](double n) {
+        return n * n * n;
+    });
+    std::sort(bigOs.begin(), bigOs.end());
+    return bigOs;
+}
+
+Rng::Rng()
+    : mX(0)
+    , mY(0) {
+    std::random_device rd;
+    std::uniform_int_distribution<uint64_t> dist;
+    do {
+        mX = dist(rd);
+        mY = dist(rd);
+    } while (mX == 0 && mY == 0);
+}
+
+ANKERL_NANOBENCH_NO_SANITIZE("integer", "undefined")
+uint64_t splitMix64(uint64_t& state) noexcept {
+    uint64_t z = (state += UINT64_C(0x9e3779b97f4a7c15));
+    z = (z ^ (z >> 30U)) * UINT64_C(0xbf58476d1ce4e5b9);
+    z = (z ^ (z >> 27U)) * UINT64_C(0x94d049bb133111eb);
+    return z ^ (z >> 31U);
+}
+
+// Seeded as described in romu paper (update april 2020)
+Rng::Rng(uint64_t seed) noexcept
+    : mX(splitMix64(seed))
+    , mY(splitMix64(seed)) {
+    for (size_t i = 0; i < 10; ++i) {
+        operator()();
+    }
+}
+
+// only internally used to copy the RNG.
+Rng::Rng(uint64_t x, uint64_t y) noexcept
+    : mX(x)
+    , mY(y) {}
+
+Rng Rng::copy() const noexcept {
+    return Rng{mX, mY};
+}
+
+Rng::Rng(std::vector<uint64_t> const& data)
+    : mX(0)
+    , mY(0) {
+    if (data.size() != 2) {
+        throw std::runtime_error("ankerl::nanobench::Rng::Rng: needed exactly 2 entries in data, but got " +
+                                 detail::fmt::to_s(data.size()));
+    }
+    mX = data[0];
+    mY = data[1];
+}
+
+std::vector<uint64_t> Rng::state() const {
+    std::vector<uint64_t> data(2);
+    data[0] = mX;
+    data[1] = mY;
+    return data;
+}
+
+BigO::RangeMeasure BigO::collectRangeMeasure(std::vector<Result> const& results) {
+    BigO::RangeMeasure rangeMeasure;
+    for (auto const& result : results) {
+        if (result.config().mComplexityN > 0.0) {
+            rangeMeasure.emplace_back(result.config().mComplexityN, result.median(Result::Measure::elapsed));
+        }
+    }
+    return rangeMeasure;
+}
+
+BigO::BigO(std::string const& bigOName, RangeMeasure const& rangeMeasure)
+    : mName(bigOName) {
+
+    // estimate the constant factor
+    double sumRangeMeasure = 0.0;
+    double sumRangeRange = 0.0;
+
+    for (size_t i = 0; i < rangeMeasure.size(); ++i) {
+        sumRangeMeasure += rangeMeasure[i].first * rangeMeasure[i].second;
+        sumRangeRange += rangeMeasure[i].first * rangeMeasure[i].first;
+    }
+    mConstant = sumRangeMeasure / sumRangeRange;
+
+    // calculate root mean square
+    double err = 0.0;
+    double sumMeasure = 0.0;
+    for (size_t i = 0; i < rangeMeasure.size(); ++i) {
+        auto diff = mConstant * rangeMeasure[i].first - rangeMeasure[i].second;
+        err += diff * diff;
+
+        sumMeasure += rangeMeasure[i].second;
+    }
+
+    auto n = static_cast<double>(rangeMeasure.size());
+    auto mean = sumMeasure / n
