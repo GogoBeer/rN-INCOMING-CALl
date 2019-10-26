@@ -2788,4 +2788,256 @@ MarkDownCode::MarkDownCode(std::string const& what) {
     for (char c : what) {
         mWhat.push_back(c);
         if ('`' == c) {
-            mWhat.push_back('
+            mWhat.push_back('`');
+        }
+    }
+    mWhat.push_back('`');
+}
+
+std::ostream& MarkDownCode::write(std::ostream& os) const {
+    return os << mWhat;
+}
+
+std::ostream& operator<<(std::ostream& os, MarkDownCode const& mdCode) {
+    return mdCode.write(os);
+}
+} // namespace fmt
+} // namespace detail
+
+// provide implementation here so it's only generated once
+Config::Config() = default;
+Config::~Config() = default;
+Config& Config::operator=(Config const&) = default;
+Config& Config::operator=(Config&&) = default;
+Config::Config(Config const&) = default;
+Config::Config(Config&&) noexcept = default;
+
+// provide implementation here so it's only generated once
+Result::~Result() = default;
+Result& Result::operator=(Result const&) = default;
+Result& Result::operator=(Result&&) = default;
+Result::Result(Result const&) = default;
+Result::Result(Result&&) noexcept = default;
+
+namespace detail {
+template <typename T>
+inline constexpr typename std::underlying_type<T>::type u(T val) noexcept {
+    return static_cast<typename std::underlying_type<T>::type>(val);
+}
+} // namespace detail
+
+// Result returned after a benchmark has finished. Can be used as a baseline for relative().
+Result::Result(Config const& benchmarkConfig)
+    : mConfig(benchmarkConfig)
+    , mNameToMeasurements{detail::u(Result::Measure::_size)} {}
+
+void Result::add(Clock::duration totalElapsed, uint64_t iters, detail::PerformanceCounters const& pc) {
+    using detail::d;
+    using detail::u;
+
+    double dIters = d(iters);
+    mNameToMeasurements[u(Result::Measure::iterations)].push_back(dIters);
+
+    mNameToMeasurements[u(Result::Measure::elapsed)].push_back(d(totalElapsed) / dIters);
+    if (pc.has().pageFaults) {
+        mNameToMeasurements[u(Result::Measure::pagefaults)].push_back(d(pc.val().pageFaults) / dIters);
+    }
+    if (pc.has().cpuCycles) {
+        mNameToMeasurements[u(Result::Measure::cpucycles)].push_back(d(pc.val().cpuCycles) / dIters);
+    }
+    if (pc.has().contextSwitches) {
+        mNameToMeasurements[u(Result::Measure::contextswitches)].push_back(d(pc.val().contextSwitches) / dIters);
+    }
+    if (pc.has().instructions) {
+        mNameToMeasurements[u(Result::Measure::instructions)].push_back(d(pc.val().instructions) / dIters);
+    }
+    if (pc.has().branchInstructions) {
+        double branchInstructions = 0.0;
+        // correcting branches: remove branch introduced by the while (...) loop for each iteration.
+        if (pc.val().branchInstructions > iters + 1U) {
+            branchInstructions = d(pc.val().branchInstructions - (iters + 1U));
+        }
+        mNameToMeasurements[u(Result::Measure::branchinstructions)].push_back(branchInstructions / dIters);
+
+        if (pc.has().branchMisses) {
+            // correcting branch misses
+            double branchMisses = d(pc.val().branchMisses);
+            if (branchMisses > branchInstructions) {
+                // can't have branch misses when there were branches...
+                branchMisses = branchInstructions;
+            }
+
+            // assuming at least one missed branch for the loop
+            branchMisses -= 1.0;
+            if (branchMisses < 1.0) {
+                branchMisses = 1.0;
+            }
+            mNameToMeasurements[u(Result::Measure::branchmisses)].push_back(branchMisses / dIters);
+        }
+    }
+}
+
+Config const& Result::config() const noexcept {
+    return mConfig;
+}
+
+inline double calcMedian(std::vector<double>& data) {
+    if (data.empty()) {
+        return 0.0;
+    }
+    std::sort(data.begin(), data.end());
+
+    auto midIdx = data.size() / 2U;
+    if (1U == (data.size() & 1U)) {
+        return data[midIdx];
+    }
+    return (data[midIdx - 1U] + data[midIdx]) / 2U;
+}
+
+double Result::median(Measure m) const {
+    // create a copy so we can sort
+    auto data = mNameToMeasurements[detail::u(m)];
+    return calcMedian(data);
+}
+
+double Result::average(Measure m) const {
+    using detail::d;
+    auto const& data = mNameToMeasurements[detail::u(m)];
+    if (data.empty()) {
+        return 0.0;
+    }
+
+    // create a copy so we can sort
+    return sum(m) / d(data.size());
+}
+
+double Result::medianAbsolutePercentError(Measure m) const {
+    // create copy
+    auto data = mNameToMeasurements[detail::u(m)];
+
+    // calculates MdAPE which is the median of percentage error
+    // see https://www.spiderfinancial.com/support/documentation/numxl/reference-manual/forecasting-performance/mdape
+    auto med = calcMedian(data);
+
+    // transform the data to absolute error
+    for (auto& x : data) {
+        x = (x - med) / x;
+        if (x < 0) {
+            x = -x;
+        }
+    }
+    return calcMedian(data);
+}
+
+double Result::sum(Measure m) const noexcept {
+    auto const& data = mNameToMeasurements[detail::u(m)];
+    return std::accumulate(data.begin(), data.end(), 0.0);
+}
+
+double Result::sumProduct(Measure m1, Measure m2) const noexcept {
+    auto const& data1 = mNameToMeasurements[detail::u(m1)];
+    auto const& data2 = mNameToMeasurements[detail::u(m2)];
+
+    if (data1.size() != data2.size()) {
+        return 0.0;
+    }
+
+    double result = 0.0;
+    for (size_t i = 0, s = data1.size(); i != s; ++i) {
+        result += data1[i] * data2[i];
+    }
+    return result;
+}
+
+bool Result::has(Measure m) const noexcept {
+    return !mNameToMeasurements[detail::u(m)].empty();
+}
+
+double Result::get(size_t idx, Measure m) const {
+    auto const& data = mNameToMeasurements[detail::u(m)];
+    return data.at(idx);
+}
+
+bool Result::empty() const noexcept {
+    return 0U == size();
+}
+
+size_t Result::size() const noexcept {
+    auto const& data = mNameToMeasurements[detail::u(Measure::elapsed)];
+    return data.size();
+}
+
+double Result::minimum(Measure m) const noexcept {
+    auto const& data = mNameToMeasurements[detail::u(m)];
+    if (data.empty()) {
+        return 0.0;
+    }
+
+    // here its save to assume that at least one element is there
+    return *std::min_element(data.begin(), data.end());
+}
+
+double Result::maximum(Measure m) const noexcept {
+    auto const& data = mNameToMeasurements[detail::u(m)];
+    if (data.empty()) {
+        return 0.0;
+    }
+
+    // here its save to assume that at least one element is there
+    return *std::max_element(data.begin(), data.end());
+}
+
+Result::Measure Result::fromString(std::string const& str) {
+    if (str == "elapsed") {
+        return Measure::elapsed;
+    } else if (str == "iterations") {
+        return Measure::iterations;
+    } else if (str == "pagefaults") {
+        return Measure::pagefaults;
+    } else if (str == "cpucycles") {
+        return Measure::cpucycles;
+    } else if (str == "contextswitches") {
+        return Measure::contextswitches;
+    } else if (str == "instructions") {
+        return Measure::instructions;
+    } else if (str == "branchinstructions") {
+        return Measure::branchinstructions;
+    } else if (str == "branchmisses") {
+        return Measure::branchmisses;
+    } else {
+        // not found, return _size
+        return Measure::_size;
+    }
+}
+
+// Configuration of a microbenchmark.
+Bench::Bench() {
+    mConfig.mOut = &std::cout;
+}
+
+Bench::Bench(Bench&&) = default;
+Bench& Bench::operator=(Bench&&) = default;
+Bench::Bench(Bench const&) = default;
+Bench& Bench::operator=(Bench const&) = default;
+Bench::~Bench() noexcept = default;
+
+double Bench::batch() const noexcept {
+    return mConfig.mBatch;
+}
+
+double Bench::complexityN() const noexcept {
+    return mConfig.mComplexityN;
+}
+
+// Set a baseline to compare it to. 100% it is exactly as fast as the baseline, >100% means it is faster than the baseline, <100%
+// means it is slower than the baseline.
+Bench& Bench::relative(bool isRelativeEnabled) noexcept {
+    mConfig.mIsRelative = isRelativeEnabled;
+    return *this;
+}
+bool Bench::relative() const noexcept {
+    return mConfig.mIsRelative;
+}
+
+Bench& Bench::performanceCounters(bool showPerformanceCounters) noexcept {
+    mConfig.mShowPerformanceCounters = showPerformanc
