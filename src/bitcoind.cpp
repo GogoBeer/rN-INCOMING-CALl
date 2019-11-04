@@ -258,4 +258,15 @@ int main(int argc, char* argv[])
 
     NodeContext node;
     int exit_status;
-    std::unique_ptr<interfaces::Init> init = interfaces::MakeNode
+    std::unique_ptr<interfaces::Init> init = interfaces::MakeNodeInit(node, argc, argv, exit_status);
+    if (!init) {
+        return exit_status;
+    }
+
+    SetupEnvironment();
+
+    // Connect bitcoind signal handlers
+    noui_connect();
+
+    return (AppInit(node, argc, argv) ? EXIT_SUCCESS : EXIT_FAILURE);
+}
