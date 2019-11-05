@@ -239,4 +239,39 @@ BlockFilter::BlockFilter(BlockFilterType filter_type, const CBlock& block, const
     m_filter = GCSFilter(params, BasicFilterElements(block, block_undo));
 }
 
-bool BlockFilter::BuildParams(GCSFilte
+bool BlockFilter::BuildParams(GCSFilter::Params& params) const
+{
+    switch (m_filter_type) {
+    case BlockFilterType::BASIC:
+        params.m_siphash_k0 = m_block_hash.GetUint64(0);
+        params.m_siphash_k1 = m_block_hash.GetUint64(1);
+        params.m_P = BASIC_FILTER_P;
+        params.m_M = BASIC_FILTER_M;
+        return true;
+    case BlockFilterType::INVALID:
+        return false;
+    }
+
+    return false;
+}
+
+uint256 BlockFilter::GetHash() const
+{
+    const std::vector<unsigned char>& data = GetEncodedFilter();
+
+    uint256 result;
+    CHash256().Write(data).Finalize(result);
+    return result;
+}
+
+uint256 BlockFilter::ComputeHeader(const uint256& prev_header) const
+{
+    const uint256& filter_hash = GetHash();
+
+    uint256 result;
+    CHash256()
+        .Write(filter_hash)
+        .Write(prev_header)
+        .Finalize(result);
+    return result;
+}
