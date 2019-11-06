@@ -210,4 +210,100 @@ bool CCoinsViewCache::BatchWrite(CCoinsMap &mapCoins, const uint256 &hashBlockIn
                 throw std::logic_error("FRESH flag misapplied to coin that exists in parent cache");
             }
 
-            if ((itUs->second.flags & CCoinsCacheEntry::FRESH) && it->secon
+            if ((itUs->second.flags & CCoinsCacheEntry::FRESH) && it->second.coin.IsSpent()) {
+                // The grandparent cache does not have an entry, and the coin
+                // has been spent. We can just delete it from the parent cache.
+                cachedCoinsUsage -= itUs->second.coin.DynamicMemoryUsage();
+                cacheCoins.erase(itUs);
+            } else {
+                // A normal modification.
+                cachedCoinsUsage -= itUs->second.coin.DynamicMemoryUsage();
+                itUs->second.coin = std::move(it->second.coin);
+                cachedCoinsUsage += itUs->second.coin.DynamicMemoryUsage();
+                itUs->second.flags |= CCoinsCacheEntry::DIRTY;
+                // NOTE: It isn't safe to mark the coin as FRESH in the parent
+                // cache. If it already existed and was spent in the parent
+                // cache then marking it FRESH would prevent that spentness
+                // from being flushed to the grandparent.
+            }
+        }
+    }
+    hashBlock = hashBlockIn;
+    return true;
+}
+
+bool CCoinsViewCache::Flush() {
+    bool fOk = base->BatchWrite(cacheCoins, hashBlock);
+    cacheCoins.clear();
+    cachedCoinsUsage = 0;
+    return fOk;
+}
+
+void CCoinsViewCache::Uncache(const COutPoint& hash)
+{
+    CCoinsMap::iterator it = cacheCoins.find(hash);
+    if (it != cacheCoins.end() && it->second.flags == 0) {
+        cachedCoinsUsage -= it->second.coin.DynamicMemoryUsage();
+        TRACE5(utxocache, uncache,
+               hash.hash.data(),
+               (uint32_t)hash.n,
+               (uint32_t)it->second.coin.nHeight,
+               (int64_t)it->second.coin.out.nValue,
+               (bool)it->second.coin.IsCoinBase());
+        cacheCoins.erase(it);
+    }
+}
+
+unsigned int CCoinsViewCache::GetCacheSize() const {
+    return cacheCoins.size();
+}
+
+bool CCoinsViewCache::HaveInputs(const CTransaction& tx) const
+{
+    if (!tx.IsCoinBase()) {
+        for (unsigned int i = 0; i < tx.vin.size(); i++) {
+            if (!HaveCoin(tx.vin[i].prevout)) {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+void CCoinsViewCache::ReallocateCache()
+{
+    // Cache should be empty when we're calling this.
+    assert(cacheCoins.size() == 0);
+    cacheCoins.~CCoinsMap();
+    ::new (&cacheCoins) CCoinsMap();
+}
+
+static const size_t MIN_TRANSACTION_OUTPUT_WEIGHT = WITNESS_SCALE_FACTOR * ::GetSerializeSize(CTxOut(), PROTOCOL_VERSION);
+static const size_t MAX_OUTPUTS_PER_BLOCK = MAX_BLOCK_WEIGHT / MIN_TRANSACTION_OUTPUT_WEIGHT;
+
+const Coin& AccessByTxid(const CCoinsViewCache& view, const uint256& txid)
+{
+    COutPoint iter(txid, 0);
+    while (iter.n < MAX_OUTPUTS_PER_BLOCK) {
+        const Coin& alternate = view.AccessCoin(iter);
+        if (!alternate.IsSpent()) return alternate;
+        ++iter.n;
+    }
+    return coinEmpty;
+}
+
+bool CCoinsViewErrorCatcher::GetCoin(const COutPoint &outpoint, Coin &coin) const {
+    try {
+        return CCoinsViewBacked::GetCoin(outpoint, coin);
+    } catch(const std::runtime_error& e) {
+        for (auto f : m_err_callbacks) {
+            f();
+        }
+        LogPrintf("Error reading from database: %s\n", e.what());
+        // Starting the shutdown sequence and returning false to the caller would be
+        // interpreted as 'entry not found' (as opposed to unable to read data), and
+        // could lead to invalid interpretation. Just exit immediately, as we can't
+        // continue anyway, and all writes should be atomic.
+        std::abort();
+    }
+}
