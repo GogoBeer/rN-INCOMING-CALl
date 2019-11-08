@@ -37,4 +37,24 @@ std::string ScriptToAsmStr(const CScript& script, const bool fAttemptSighashDeco
 bool DecodeHexBlockHeader(CBlockHeader&, const std::string& hex_header);
 
 /**
- * Parse a
+ * Parse a hex string into 256 bits
+ * @param[in] strHex a hex-formatted, 64-character string
+ * @param[out] result the result of the parsing
+ * @returns true if successful, false if not
+ *
+ * @see ParseHashV for an RPC-oriented version of this
+ */
+bool ParseHashStr(const std::string& strHex, uint256& result);
+std::vector<unsigned char> ParseHexUV(const UniValue& v, const std::string& strName);
+int ParseSighashString(const UniValue& sighash);
+
+// core_write.cpp
+UniValue ValueFromAmount(const CAmount amount);
+std::string FormatScript(const CScript& script);
+std::string EncodeHexTx(const CTransaction& tx, const int serializeFlags = 0);
+std::string SighashToStr(unsigned char sighash_type);
+void ScriptPubKeyToUniv(const CScript& scriptPubKey, UniValue& out, bool include_hex, bool include_address = true);
+void ScriptToUniv(const CScript& script, UniValue& out);
+void TxToUniv(const CTransaction& tx, const uint256& hashBlock, UniValue& entry, bool include_hex = true, int serialize_flags = 0, const CTxUndo* txundo = nullptr, TxVerbosity verbosity = TxVerbosity::SHOW_DETAILS);
+
+#endif // BITCOIN_CORE_IO_H
