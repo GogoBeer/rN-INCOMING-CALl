@@ -43,4 +43,19 @@ bool sanity_test_list(unsigned int size)
 // trigger: string::at(x) on an empty string to trigger __throw_out_of_range_fmt.
 // test: force std::string to throw an out_of_range exception. Verify that
 //   it's caught correctly.
-bool sanity_test_ra
+bool sanity_test_range_fmt()
+{
+    std::string test;
+    try {
+        test.at(1);
+    } catch (const std::out_of_range&) {
+        return true;
+    } catch (...) {
+    }
+    return false;
+}
+
+bool glibcxx_sanity_test()
+{
+    return sanity_test_widen('a') && sanity_test_list(100) && sanity_test_range_fmt();
+}
