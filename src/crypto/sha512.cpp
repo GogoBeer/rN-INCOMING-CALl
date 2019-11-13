@@ -193,4 +193,15 @@ void CSHA512::Finalize(unsigned char hash[OUTPUT_SIZE])
     WriteBE64(hash + 8, s[1]);
     WriteBE64(hash + 16, s[2]);
     WriteBE64(hash + 24, s[3]);
-    Write
+    WriteBE64(hash + 32, s[4]);
+    WriteBE64(hash + 40, s[5]);
+    WriteBE64(hash + 48, s[6]);
+    WriteBE64(hash + 56, s[7]);
+}
+
+CSHA512& CSHA512::Reset()
+{
+    bytes = 0;
+    sha512::Initialize(s);
+    return *this;
+}
