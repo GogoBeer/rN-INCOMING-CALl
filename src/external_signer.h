@@ -55,4 +55,12 @@ public:
     //! Calls `<command> getdescriptors --account <account>`
     //! @param[in] account  which BIP32 account to use (e.g. `m/44'/0'/account'`)
     //! @returns see doc/external-signer.md
-    UniValue GetDescriptors(const in
+    UniValue GetDescriptors(const int account);
+
+    //! Sign PartiallySignedTransaction on the device.
+    //! Calls `<command> signtransaction` and passes the PSBT via stdin.
+    //! @param[in,out] psbt  PartiallySignedTransaction to be signed
+    bool SignTransaction(PartiallySignedTransaction& psbt, std::string& error);
+};
+
+#endif // BITCOIN_EXTERNAL_SIGNER_H
