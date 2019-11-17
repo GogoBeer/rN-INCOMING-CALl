@@ -205,4 +205,10 @@ void BIP32Hash(const ChainCode &chainCode, unsigned int nChild, unsigned char he
 
 /** Return a CHashWriter primed for tagged hashes (as specified in BIP 340).
  *
- * The returned object will have SHA256(tag) written to it twice (= 6
+ * The returned object will have SHA256(tag) written to it twice (= 64 bytes).
+ * A tagged hash can be computed by feeding the message into this object, and
+ * then calling CHashWriter::GetSHA256().
+ */
+CHashWriter TaggedHash(const std::string& tag);
+
+#endif // BITCOIN_HASH_H
