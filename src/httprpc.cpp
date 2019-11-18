@@ -218,4 +218,109 @@ static bool HTTPReq_JSONRPC(const std::any& context, HTTPRequest* req)
                             LogPrintf("RPC User %s not allowed to call method %s\n", jreq.authUser, strMethod);
                             req->WriteReply(HTTP_FORBIDDEN);
                             return false;
-             
+                        }
+                    }
+                }
+            }
+            strReply = JSONRPCExecBatch(jreq, valRequest.get_array());
+        }
+        else
+            throw JSONRPCError(RPC_PARSE_ERROR, "Top-level object parse error");
+
+        req->WriteHeader("Content-Type", "application/json");
+        req->WriteReply(HTTP_OK, strReply);
+    } catch (const UniValue& objError) {
+        JSONErrorReply(req, objError, jreq.id);
+        return false;
+    } catch (const std::exception& e) {
+        JSONErrorReply(req, JSONRPCError(RPC_PARSE_ERROR, e.what()), jreq.id);
+        return false;
+    }
+    return true;
+}
+
+static bool InitRPCAuthentication()
+{
+    if (gArgs.GetArg("-rpcpassword", "") == "")
+    {
+        LogPrintf("Using random cookie authentication.\n");
+        if (!GenerateAuthCookie(&strRPCUserColonPass)) {
+            return false;
+        }
+    } else {
+        LogPrintf("Config options rpcuser and rpcpassword will soon be deprecated. Locally-run instances may remove rpcuser to use cookie-based auth, or may be replaced with rpcauth. Please see share/rpcauth for rpcauth auth generation.\n");
+        strRPCUserColonPass = gArgs.GetArg("-rpcuser", "") + ":" + gArgs.GetArg("-rpcpassword", "");
+    }
+    if (gArgs.GetArg("-rpcauth","") != "")
+    {
+        LogPrintf("Using rpcauth authentication.\n");
+        for (const std::string& rpcauth : gArgs.GetArgs("-rpcauth")) {
+            std::vector<std::string> fields;
+            boost::split(fields, rpcauth, boost::is_any_of(":$"));
+            if (fields.size() == 3) {
+                g_rpcauth.push_back(fields);
+            } else {
+                LogPrintf("Invalid -rpcauth argument.\n");
+                return false;
+            }
+        }
+    }
+
+    g_rpc_whitelist_default = gArgs.GetBoolArg("-rpcwhitelistdefault", gArgs.IsArgSet("-rpcwhitelist"));
+    for (const std::string& strRPCWhitelist : gArgs.GetArgs("-rpcwhitelist")) {
+        auto pos = strRPCWhitelist.find(':');
+        std::string strUser = strRPCWhitelist.substr(0, pos);
+        bool intersect = g_rpc_whitelist.count(strUser);
+        std::set<std::string>& whitelist = g_rpc_whitelist[strUser];
+        if (pos != std::string::npos) {
+            std::string strWhitelist = strRPCWhitelist.substr(pos + 1);
+            std::set<std::string> new_whitelist;
+            boost::split(new_whitelist, strWhitelist, boost::is_any_of(", "));
+            if (intersect) {
+                std::set<std::string> tmp_whitelist;
+                std::set_intersection(new_whitelist.begin(), new_whitelist.end(),
+                       whitelist.begin(), whitelist.end(), std::inserter(tmp_whitelist, tmp_whitelist.end()));
+                new_whitelist = std::move(tmp_whitelist);
+            }
+            whitelist = std::move(new_whitelist);
+        }
+    }
+
+    return true;
+}
+
+bool StartHTTPRPC(const std::any& context)
+{
+    LogPrint(BCLog::RPC, "Starting HTTP RPC server\n");
+    if (!InitRPCAuthentication())
+        return false;
+
+    auto handle_rpc = [context](HTTPRequest* req, const std::string&) { return HTTPReq_JSONRPC(context, req); };
+    RegisterHTTPHandler("/", true, handle_rpc);
+    if (g_wallet_init_interface.HasWalletSupport()) {
+        RegisterHTTPHandler("/wallet/", false, handle_rpc);
+    }
+    struct event_base* eventBase = EventBase();
+    assert(eventBase);
+    httpRPCTimerInterface = std::make_unique<HTTPRPCTimerInterface>(eventBase);
+    RPCSetTimerInterface(httpRPCTimerInterface.get());
+    return true;
+}
+
+void InterruptHTTPRPC()
+{
+    LogPrint(BCLog::RPC, "Interrupting HTTP RPC server\n");
+}
+
+void StopHTTPRPC()
+{
+    LogPrint(BCLog::RPC, "Stopping HTTP RPC server\n");
+    UnregisterHTTPHandler("/", true);
+    if (g_wallet_init_interface.HasWalletSupport()) {
+        UnregisterHTTPHandler("/wallet/", false);
+    }
+    if (httpRPCTimerInterface) {
+        RPCUnsetTimerInterface(httpRPCTimerInterface.get());
+        httpRPCTimerInterface.reset();
+    }
+}
