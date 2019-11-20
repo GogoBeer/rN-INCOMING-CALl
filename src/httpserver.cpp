@@ -320,3 +320,246 @@ static bool HTTPBindAddresses(struct evhttp* http)
         if (bind_handle) {
             CNetAddr addr;
             if (i->first.empty() || (LookupHost(i->first, addr, false) && addr.IsBindAny())) {
+                LogPrintf("WARNING: the RPC server is not safe to expose to untrusted networks such as the public internet\n");
+            }
+            boundSockets.push_back(bind_handle);
+        } else {
+            LogPrintf("Binding RPC on address %s port %i failed.\n", i->first, i->second);
+        }
+    }
+    return !boundSockets.empty();
+}
+
+/** Simple wrapper to set thread name and run work queue */
+static void HTTPWorkQueueRun(WorkQueue<HTTPClosure>* queue, int worker_num)
+{
+    util::ThreadRename(strprintf("httpworker.%i", worker_num));
+    SetSyscallSandboxPolicy(SyscallSandboxPolicy::NET_HTTP_SERVER_WORKER);
+    queue->Run();
+}
+
+/** libevent event log callback */
+static void libevent_log_cb(int severity, const char *msg)
+{
+    if (severity >= EVENT_LOG_WARN) // Log warn messages and higher without debug category
+        LogPrintf("libevent: %s\n", msg);
+    else
+        LogPrint(BCLog::LIBEVENT, "libevent: %s\n", msg);
+}
+
+bool InitHTTPServer()
+{
+    if (!InitHTTPAllowList())
+        return false;
+
+    // Redirect libevent's logging to our own log
+    event_set_log_callback(&libevent_log_cb);
+    // Update libevent's log handling. Returns false if our version of
+    // libevent doesn't support debug logging, in which case we should
+    // clear the BCLog::LIBEVENT flag.
+    if (!UpdateHTTPServerLogging(LogInstance().WillLogCategory(BCLog::LIBEVENT))) {
+        LogInstance().DisableCategory(BCLog::LIBEVENT);
+    }
+
+#ifdef WIN32
+    evthread_use_windows_threads();
+#else
+    evthread_use_pthreads();
+#endif
+
+    raii_event_base base_ctr = obtain_event_base();
+
+    /* Create a new evhttp object to handle requests. */
+    raii_evhttp http_ctr = obtain_evhttp(base_ctr.get());
+    struct evhttp* http = http_ctr.get();
+    if (!http) {
+        LogPrintf("couldn't create evhttp. Exiting.\n");
+        return false;
+    }
+
+    evhttp_set_timeout(http, gArgs.GetIntArg("-rpcservertimeout", DEFAULT_HTTP_SERVER_TIMEOUT));
+    evhttp_set_max_headers_size(http, MAX_HEADERS_SIZE);
+    evhttp_set_max_body_size(http, MAX_SIZE);
+    evhttp_set_gencb(http, http_request_cb, nullptr);
+
+    if (!HTTPBindAddresses(http)) {
+        LogPrintf("Unable to bind any endpoint for RPC server\n");
+        return false;
+    }
+
+    LogPrint(BCLog::HTTP, "Initialized HTTP server\n");
+    int workQueueDepth = std::max((long)gArgs.GetIntArg("-rpcworkqueue", DEFAULT_HTTP_WORKQUEUE), 1L);
+    LogPrintf("HTTP: creating work queue of depth %d\n", workQueueDepth);
+
+    g_work_queue = std::make_unique<WorkQueue<HTTPClosure>>(workQueueDepth);
+    // transfer ownership to eventBase/HTTP via .release()
+    eventBase = base_ctr.release();
+    eventHTTP = http_ctr.release();
+    return true;
+}
+
+bool UpdateHTTPServerLogging(bool enable) {
+#if LIBEVENT_VERSION_NUMBER >= 0x02010100
+    if (enable) {
+        event_enable_debug_logging(EVENT_DBG_ALL);
+    } else {
+        event_enable_debug_logging(EVENT_DBG_NONE);
+    }
+    return true;
+#else
+    // Can't update libevent logging if version < 02010100
+    return false;
+#endif
+}
+
+static std::thread g_thread_http;
+static std::vector<std::thread> g_thread_http_workers;
+
+void StartHTTPServer()
+{
+    LogPrint(BCLog::HTTP, "Starting HTTP server\n");
+    int rpcThreads = std::max((long)gArgs.GetIntArg("-rpcthreads", DEFAULT_HTTP_THREADS), 1L);
+    LogPrintf("HTTP: starting %d worker threads\n", rpcThreads);
+    g_thread_http = std::thread(ThreadHTTP, eventBase);
+
+    for (int i = 0; i < rpcThreads; i++) {
+        g_thread_http_workers.emplace_back(HTTPWorkQueueRun, g_work_queue.get(), i);
+    }
+}
+
+void InterruptHTTPServer()
+{
+    LogPrint(BCLog::HTTP, "Interrupting HTTP server\n");
+    if (eventHTTP) {
+        // Reject requests on current connections
+        evhttp_set_gencb(eventHTTP, http_reject_request_cb, nullptr);
+    }
+    if (g_work_queue) {
+        g_work_queue->Interrupt();
+    }
+}
+
+void StopHTTPServer()
+{
+    LogPrint(BCLog::HTTP, "Stopping HTTP server\n");
+    if (g_work_queue) {
+        LogPrint(BCLog::HTTP, "Waiting for HTTP worker threads to exit\n");
+        for (auto& thread : g_thread_http_workers) {
+            thread.join();
+        }
+        g_thread_http_workers.clear();
+    }
+    // Unlisten sockets, these are what make the event loop running, which means
+    // that after this and all connections are closed the event loop will quit.
+    for (evhttp_bound_socket *socket : boundSockets) {
+        evhttp_del_accept_socket(eventHTTP, socket);
+    }
+    boundSockets.clear();
+    if (eventBase) {
+        LogPrint(BCLog::HTTP, "Waiting for HTTP event thread to exit\n");
+        if (g_thread_http.joinable()) g_thread_http.join();
+    }
+    if (eventHTTP) {
+        evhttp_free(eventHTTP);
+        eventHTTP = nullptr;
+    }
+    if (eventBase) {
+        event_base_free(eventBase);
+        eventBase = nullptr;
+    }
+    g_work_queue.reset();
+    LogPrint(BCLog::HTTP, "Stopped HTTP server\n");
+}
+
+struct event_base* EventBase()
+{
+    return eventBase;
+}
+
+static void httpevent_callback_fn(evutil_socket_t, short, void* data)
+{
+    // Static handler: simply call inner handler
+    HTTPEvent *self = static_cast<HTTPEvent*>(data);
+    self->handler();
+    if (self->deleteWhenTriggered)
+        delete self;
+}
+
+HTTPEvent::HTTPEvent(struct event_base* base, bool _deleteWhenTriggered, const std::function<void()>& _handler):
+    deleteWhenTriggered(_deleteWhenTriggered), handler(_handler)
+{
+    ev = event_new(base, -1, 0, httpevent_callback_fn, this);
+    assert(ev);
+}
+HTTPEvent::~HTTPEvent()
+{
+    event_free(ev);
+}
+void HTTPEvent::trigger(struct timeval* tv)
+{
+    if (tv == nullptr)
+        event_active(ev, 0, 0); // immediately trigger event in main thread
+    else
+        evtimer_add(ev, tv); // trigger after timeval passed
+}
+HTTPRequest::HTTPRequest(struct evhttp_request* _req, bool _replySent) : req(_req), replySent(_replySent)
+{
+}
+
+HTTPRequest::~HTTPRequest()
+{
+    if (!replySent) {
+        // Keep track of whether reply was sent to avoid request leaks
+        LogPrintf("%s: Unhandled request\n", __func__);
+        WriteReply(HTTP_INTERNAL_SERVER_ERROR, "Unhandled request");
+    }
+    // evhttpd cleans up the request, as long as a reply was sent.
+}
+
+std::pair<bool, std::string> HTTPRequest::GetHeader(const std::string& hdr) const
+{
+    const struct evkeyvalq* headers = evhttp_request_get_input_headers(req);
+    assert(headers);
+    const char* val = evhttp_find_header(headers, hdr.c_str());
+    if (val)
+        return std::make_pair(true, val);
+    else
+        return std::make_pair(false, "");
+}
+
+std::string HTTPRequest::ReadBody()
+{
+    struct evbuffer* buf = evhttp_request_get_input_buffer(req);
+    if (!buf)
+        return "";
+    size_t size = evbuffer_get_length(buf);
+    /** Trivial implementation: if this is ever a performance bottleneck,
+     * internal copying can be avoided in multi-segment buffers by using
+     * evbuffer_peek and an awkward loop. Though in that case, it'd be even
+     * better to not copy into an intermediate string but use a stream
+     * abstraction to consume the evbuffer on the fly in the parsing algorithm.
+     */
+    const char* data = (const char*)evbuffer_pullup(buf, size);
+    if (!data) // returns nullptr in case of empty buffer
+        return "";
+    std::string rv(data, size);
+    evbuffer_drain(buf, size);
+    return rv;
+}
+
+void HTTPRequest::WriteHeader(const std::string& hdr, const std::string& value)
+{
+    struct evkeyvalq* headers = evhttp_request_get_output_headers(req);
+    assert(headers);
+    evhttp_add_header(headers, hdr.c_str(), value.c_str());
+}
+
+/** Closure sent to main thread to request a reply to be sent to
+ * a HTTP request.
+ * Replies must be sent in the main loop in the main http thread,
+ * this cannot be done from worker threads.
+ */
+void HTTPRequest::WriteReply(int nStatus, const std::string& strReply)
+{
+    assert(!replySent && req);
+    if (Shu
