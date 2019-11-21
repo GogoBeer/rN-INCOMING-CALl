@@ -562,4 +562,89 @@ void HTTPRequest::WriteHeader(const std::string& hdr, const std::string& value)
 void HTTPRequest::WriteReply(int nStatus, const std::string& strReply)
 {
     assert(!replySent && req);
-    if (Shu
+    if (ShutdownRequested()) {
+        WriteHeader("Connection", "close");
+    }
+    // Send event to main http thread to send reply message
+    struct evbuffer* evb = evhttp_request_get_output_buffer(req);
+    assert(evb);
+    evbuffer_add(evb, strReply.data(), strReply.size());
+    auto req_copy = req;
+    HTTPEvent* ev = new HTTPEvent(eventBase, true, [req_copy, nStatus]{
+        evhttp_send_reply(req_copy, nStatus, nullptr, nullptr);
+        // Re-enable reading from the socket. This is the second part of the libevent
+        // workaround above.
+        if (event_get_version_number() >= 0x02010600 && event_get_version_number() < 0x02020001) {
+            evhttp_connection* conn = evhttp_request_get_connection(req_copy);
+            if (conn) {
+                bufferevent* bev = evhttp_connection_get_bufferevent(conn);
+                if (bev) {
+                    bufferevent_enable(bev, EV_READ | EV_WRITE);
+                }
+            }
+        }
+    });
+    ev->trigger(nullptr);
+    replySent = true;
+    req = nullptr; // transferred back to main thread
+}
+
+CService HTTPRequest::GetPeer() const
+{
+    evhttp_connection* con = evhttp_request_get_connection(req);
+    CService peer;
+    if (con) {
+        // evhttp retains ownership over returned address string
+        const char* address = "";
+        uint16_t port = 0;
+        evhttp_connection_get_peer(con, (char**)&address, &port);
+        peer = LookupNumeric(address, port);
+    }
+    return peer;
+}
+
+std::string HTTPRequest::GetURI() const
+{
+    return evhttp_request_get_uri(req);
+}
+
+HTTPRequest::RequestMethod HTTPRequest::GetRequestMethod() const
+{
+    switch (evhttp_request_get_command(req)) {
+    case EVHTTP_REQ_GET:
+        return GET;
+        break;
+    case EVHTTP_REQ_POST:
+        return POST;
+        break;
+    case EVHTTP_REQ_HEAD:
+        return HEAD;
+        break;
+    case EVHTTP_REQ_PUT:
+        return PUT;
+        break;
+    default:
+        return UNKNOWN;
+        break;
+    }
+}
+
+void RegisterHTTPHandler(const std::string &prefix, bool exactMatch, const HTTPRequestHandler &handler)
+{
+    LogPrint(BCLog::HTTP, "Registering HTTP handler for %s (exactmatch %d)\n", prefix, exactMatch);
+    pathHandlers.push_back(HTTPPathHandler(prefix, exactMatch, handler));
+}
+
+void UnregisterHTTPHandler(const std::string &prefix, bool exactMatch)
+{
+    std::vector<HTTPPathHandler>::iterator i = pathHandlers.begin();
+    std::vector<HTTPPathHandler>::iterator iend = pathHandlers.end();
+    for (; i != iend; ++i)
+        if (i->prefix == prefix && i->exactMatch == exactMatch)
+            break;
+    if (i != iend)
+    {
+        LogPrint(BCLog::HTTP, "Unregistering HTTP handler for %s (exactmatch %d)\n", prefix, exactMatch);
+        pathHandlers.erase(i);
+    }
+}
