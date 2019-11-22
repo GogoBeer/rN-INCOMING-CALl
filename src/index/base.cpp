@@ -287,3 +287,91 @@ void BaseIndex::ChainStateFlushed(const CBlockLocator& locator)
     {
         LOCK(cs_main);
         locator_tip_index = m_chainstate->m_blockman.LookupBlockIndex(locator_tip_hash);
+    }
+
+    if (!locator_tip_index) {
+        FatalError("%s: First block (hash=%s) in locator was not found",
+                   __func__, locator_tip_hash.ToString());
+        return;
+    }
+
+    // This checks that ChainStateFlushed callbacks are received after BlockConnected. The check may fail
+    // immediately after the sync thread catches up and sets m_synced. Consider the case where
+    // there is a reorg and the blocks on the stale branch are in the ValidationInterface queue
+    // backlog even after the sync thread has caught up to the new chain tip. In this unlikely
+    // event, log a warning and let the queue clear.
+    const CBlockIndex* best_block_index = m_best_block_index.load();
+    if (best_block_index->GetAncestor(locator_tip_index->nHeight) != locator_tip_index) {
+        LogPrintf("%s: WARNING: Locator contains block (hash=%s) not on known best " /* Continued */
+                  "chain (tip=%s); not writing index locator\n",
+                  __func__, locator_tip_hash.ToString(),
+                  best_block_index->GetBlockHash().ToString());
+        return;
+    }
+
+    // No need to handle errors in Commit. If it fails, the error will be already be logged. The
+    // best way to recover is to continue, as index cannot be corrupted by a missed commit to disk
+    // for an advanced index state.
+    Commit();
+}
+
+bool BaseIndex::BlockUntilSyncedToCurrentChain() const
+{
+    AssertLockNotHeld(cs_main);
+
+    if (!m_synced) {
+        return false;
+    }
+
+    {
+        // Skip the queue-draining stuff if we know we're caught up with
+        // m_chain.Tip().
+        LOCK(cs_main);
+        const CBlockIndex* chain_tip = m_chainstate->m_chain.Tip();
+        const CBlockIndex* best_block_index = m_best_block_index.load();
+        if (best_block_index->GetAncestor(chain_tip->nHeight) == chain_tip) {
+            return true;
+        }
+    }
+
+    LogPrintf("%s: %s is catching up on block notifications\n", __func__, GetName());
+    SyncWithValidationInterfaceQueue();
+    return true;
+}
+
+void BaseIndex::Interrupt()
+{
+    m_interrupt();
+}
+
+bool BaseIndex::Start(CChainState& active_chainstate)
+{
+    m_chainstate = &active_chainstate;
+    // Need to register this ValidationInterface before running Init(), so that
+    // callbacks are not missed if Init sets m_synced to true.
+    RegisterValidationInterface(this);
+    if (!Init()) {
+        return false;
+    }
+
+    m_thread_sync = std::thread(&util::TraceThread, GetName(), [this] { ThreadSync(); });
+    return true;
+}
+
+void BaseIndex::Stop()
+{
+    UnregisterValidationInterface(this);
+
+    if (m_thread_sync.joinable()) {
+        m_thread_sync.join();
+    }
+}
+
+IndexSummary BaseIndex::GetSummary() const
+{
+    IndexSummary summary{};
+    summary.name = GetName();
+    summary.synced = m_synced;
+    summary.best_block_height = m_best_block_index ? m_best_block_index.load()->nHeight : 0;
+    return summary;
+}
