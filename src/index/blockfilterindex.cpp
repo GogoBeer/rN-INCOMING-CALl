@@ -218,4 +218,223 @@ bool BlockFilterIndex::WriteBlock(const CBlock& block, const CBlockIndex* pindex
         }
 
         std::pair<uint256, DBVal> read_out;
-        if (!m_db->Read(DBHeigh
+        if (!m_db->Read(DBHeightKey(pindex->nHeight - 1), read_out)) {
+            return false;
+        }
+
+        uint256 expected_block_hash = pindex->pprev->GetBlockHash();
+        if (read_out.first != expected_block_hash) {
+            return error("%s: previous block header belongs to unexpected block %s; expected %s",
+                         __func__, read_out.first.ToString(), expected_block_hash.ToString());
+        }
+
+        prev_header = read_out.second.header;
+    }
+
+    BlockFilter filter(m_filter_type, block, block_undo);
+
+    size_t bytes_written = WriteFilterToDisk(m_next_filter_pos, filter);
+    if (bytes_written == 0) return false;
+
+    std::pair<uint256, DBVal> value;
+    value.first = pindex->GetBlockHash();
+    value.second.hash = filter.GetHash();
+    value.second.header = filter.ComputeHeader(prev_header);
+    value.second.pos = m_next_filter_pos;
+
+    if (!m_db->Write(DBHeightKey(pindex->nHeight), value)) {
+        return false;
+    }
+
+    m_next_filter_pos.nPos += bytes_written;
+    return true;
+}
+
+static bool CopyHeightIndexToHashIndex(CDBIterator& db_it, CDBBatch& batch,
+                                       const std::string& index_name,
+                                       int start_height, int stop_height)
+{
+    DBHeightKey key(start_height);
+    db_it.Seek(key);
+
+    for (int height = start_height; height <= stop_height; ++height) {
+        if (!db_it.GetKey(key) || key.height != height) {
+            return error("%s: unexpected key in %s: expected (%c, %d)",
+                         __func__, index_name, DB_BLOCK_HEIGHT, height);
+        }
+
+        std::pair<uint256, DBVal> value;
+        if (!db_it.GetValue(value)) {
+            return error("%s: unable to read value in %s at key (%c, %d)",
+                         __func__, index_name, DB_BLOCK_HEIGHT, height);
+        }
+
+        batch.Write(DBHashKey(value.first), std::move(value.second));
+
+        db_it.Next();
+    }
+    return true;
+}
+
+bool BlockFilterIndex::Rewind(const CBlockIndex* current_tip, const CBlockIndex* new_tip)
+{
+    assert(current_tip->GetAncestor(new_tip->nHeight) == new_tip);
+
+    CDBBatch batch(*m_db);
+    std::unique_ptr<CDBIterator> db_it(m_db->NewIterator());
+
+    // During a reorg, we need to copy all filters for blocks that are getting disconnected from the
+    // height index to the hash index so we can still find them when the height index entries are
+    // overwritten.
+    if (!CopyHeightIndexToHashIndex(*db_it, batch, m_name, new_tip->nHeight, current_tip->nHeight)) {
+        return false;
+    }
+
+    // The latest filter position gets written in Commit by the call to the BaseIndex::Rewind.
+    // But since this creates new references to the filter, the position should get updated here
+    // atomically as well in case Commit fails.
+    batch.Write(DB_FILTER_POS, m_next_filter_pos);
+    if (!m_db->WriteBatch(batch)) return false;
+
+    return BaseIndex::Rewind(current_tip, new_tip);
+}
+
+static bool LookupOne(const CDBWrapper& db, const CBlockIndex* block_index, DBVal& result)
+{
+    // First check if the result is stored under the height index and the value there matches the
+    // block hash. This should be the case if the block is on the active chain.
+    std::pair<uint256, DBVal> read_out;
+    if (!db.Read(DBHeightKey(block_index->nHeight), read_out)) {
+        return false;
+    }
+    if (read_out.first == block_index->GetBlockHash()) {
+        result = std::move(read_out.second);
+        return true;
+    }
+
+    // If value at the height index corresponds to an different block, the result will be stored in
+    // the hash index.
+    return db.Read(DBHashKey(block_index->GetBlockHash()), result);
+}
+
+static bool LookupRange(CDBWrapper& db, const std::string& index_name, int start_height,
+                        const CBlockIndex* stop_index, std::vector<DBVal>& results)
+{
+    if (start_height < 0) {
+        return error("%s: start height (%d) is negative", __func__, start_height);
+    }
+    if (start_height > stop_index->nHeight) {
+        return error("%s: start height (%d) is greater than stop height (%d)",
+                     __func__, start_height, stop_index->nHeight);
+    }
+
+    size_t results_size = static_cast<size_t>(stop_index->nHeight - start_height + 1);
+    std::vector<std::pair<uint256, DBVal>> values(results_size);
+
+    DBHeightKey key(start_height);
+    std::unique_ptr<CDBIterator> db_it(db.NewIterator());
+    db_it->Seek(DBHeightKey(start_height));
+    for (int height = start_height; height <= stop_index->nHeight; ++height) {
+        if (!db_it->Valid() || !db_it->GetKey(key) || key.height != height) {
+            return false;
+        }
+
+        size_t i = static_cast<size_t>(height - start_height);
+        if (!db_it->GetValue(values[i])) {
+            return error("%s: unable to read value in %s at key (%c, %d)",
+                         __func__, index_name, DB_BLOCK_HEIGHT, height);
+        }
+
+        db_it->Next();
+    }
+
+    results.resize(results_size);
+
+    // Iterate backwards through block indexes collecting results in order to access the block hash
+    // of each entry in case we need to look it up in the hash index.
+    for (const CBlockIndex* block_index = stop_index;
+         block_index && block_index->nHeight >= start_height;
+         block_index = block_index->pprev) {
+        uint256 block_hash = block_index->GetBlockHash();
+
+        size_t i = static_cast<size_t>(block_index->nHeight - start_height);
+        if (block_hash == values[i].first) {
+            results[i] = std::move(values[i].second);
+            continue;
+        }
+
+        if (!db.Read(DBHashKey(block_hash), results[i])) {
+            return error("%s: unable to read value in %s at key (%c, %s)",
+                         __func__, index_name, DB_BLOCK_HASH, block_hash.ToString());
+        }
+    }
+
+    return true;
+}
+
+bool BlockFilterIndex::LookupFilter(const CBlockIndex* block_index, BlockFilter& filter_out) const
+{
+    DBVal entry;
+    if (!LookupOne(*m_db, block_index, entry)) {
+        return false;
+    }
+
+    return ReadFilterFromDisk(entry.pos, filter_out);
+}
+
+bool BlockFilterIndex::LookupFilterHeader(const CBlockIndex* block_index, uint256& header_out)
+{
+    LOCK(m_cs_headers_cache);
+
+    bool is_checkpoint{block_index->nHeight % CFCHECKPT_INTERVAL == 0};
+
+    if (is_checkpoint) {
+        // Try to find the block in the headers cache if this is a checkpoint height.
+        auto header = m_headers_cache.find(block_index->GetBlockHash());
+        if (header != m_headers_cache.end()) {
+            header_out = header->second;
+            return true;
+        }
+    }
+
+    DBVal entry;
+    if (!LookupOne(*m_db, block_index, entry)) {
+        return false;
+    }
+
+    if (is_checkpoint &&
+        m_headers_cache.size() < CF_HEADERS_CACHE_MAX_SZ) {
+        // Add to the headers cache if this is a checkpoint height.
+        m_headers_cache.emplace(block_index->GetBlockHash(), entry.header);
+    }
+
+    header_out = entry.header;
+    return true;
+}
+
+bool BlockFilterIndex::LookupFilterRange(int start_height, const CBlockIndex* stop_index,
+                                         std::vector<BlockFilter>& filters_out) const
+{
+    std::vector<DBVal> entries;
+    if (!LookupRange(*m_db, m_name, start_height, stop_index, entries)) {
+        return false;
+    }
+
+    filters_out.resize(entries.size());
+    auto filter_pos_it = filters_out.begin();
+    for (const auto& entry : entries) {
+        if (!ReadFilterFromDisk(entry.pos, *filter_pos_it)) {
+            return false;
+        }
+        ++filter_pos_it;
+    }
+
+    return true;
+}
+
+bool BlockFilterIndex::LookupFilterHashRange(int start_height, const CBlockIndex* stop_index,
+                                             std::vector<uint256>& hashes_out) const
+
+{
+    std::vector<DBVal> entries;
+    if (!LookupR
