@@ -677,3 +677,197 @@ void InitParameterInteraction(ArgsManager& args)
     if (!args.GetBoolArg("-listen", DEFAULT_LISTEN)) {
         // do not map ports or try to retrieve public IP when not listening (pointless)
         if (args.SoftSetBoolArg("-upnp", false))
+            LogPrintf("%s: parameter interaction: -listen=0 -> setting -upnp=0\n", __func__);
+        if (args.SoftSetBoolArg("-natpmp", false)) {
+            LogPrintf("%s: parameter interaction: -listen=0 -> setting -natpmp=0\n", __func__);
+        }
+        if (args.SoftSetBoolArg("-discover", false))
+            LogPrintf("%s: parameter interaction: -listen=0 -> setting -discover=0\n", __func__);
+        if (args.SoftSetBoolArg("-listenonion", false))
+            LogPrintf("%s: parameter interaction: -listen=0 -> setting -listenonion=0\n", __func__);
+        if (args.SoftSetBoolArg("-i2pacceptincoming", false)) {
+            LogPrintf("%s: parameter interaction: -listen=0 -> setting -i2pacceptincoming=0\n", __func__);
+        }
+    }
+
+    if (args.IsArgSet("-externalip")) {
+        // if an explicit public IP is specified, do not try to find others
+        if (args.SoftSetBoolArg("-discover", false))
+            LogPrintf("%s: parameter interaction: -externalip set -> setting -discover=0\n", __func__);
+    }
+
+    // disable whitelistrelay in blocksonly mode
+    if (args.GetBoolArg("-blocksonly", DEFAULT_BLOCKSONLY)) {
+        if (args.SoftSetBoolArg("-whitelistrelay", false))
+            LogPrintf("%s: parameter interaction: -blocksonly=1 -> setting -whitelistrelay=0\n", __func__);
+    }
+
+    // Forcing relay from whitelisted hosts implies we will accept relays from them in the first place.
+    if (args.GetBoolArg("-whitelistforcerelay", DEFAULT_WHITELISTFORCERELAY)) {
+        if (args.SoftSetBoolArg("-whitelistrelay", true))
+            LogPrintf("%s: parameter interaction: -whitelistforcerelay=1 -> setting -whitelistrelay=1\n", __func__);
+    }
+}
+
+/**
+ * Initialize global loggers.
+ *
+ * Note that this is called very early in the process lifetime, so you should be
+ * careful about what global state you rely on here.
+ */
+void InitLogging(const ArgsManager& args)
+{
+    init::SetLoggingOptions(args);
+    init::LogPackageVersion();
+}
+
+namespace { // Variables internal to initialization process only
+
+int nMaxConnections;
+int nUserMaxConnections;
+int nFD;
+ServiceFlags nLocalServices = ServiceFlags(NODE_NETWORK | NODE_NETWORK_LIMITED | NODE_WITNESS);
+int64_t peer_connect_timeout;
+std::set<BlockFilterType> g_enabled_filter_types;
+
+} // namespace
+
+[[noreturn]] static void new_handler_terminate()
+{
+    // Rather than throwing std::bad-alloc if allocation fails, terminate
+    // immediately to (try to) avoid chain corruption.
+    // Since LogPrintf may itself allocate memory, set the handler directly
+    // to terminate first.
+    std::set_new_handler(std::terminate);
+    LogPrintf("Error: Out of memory. Terminating.\n");
+
+    // The log was successful, terminate now.
+    std::terminate();
+};
+
+bool AppInitBasicSetup(const ArgsManager& args)
+{
+    // ********************************************************* Step 1: setup
+#ifdef _MSC_VER
+    // Turn off Microsoft heap dump noise
+    _CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_FILE);
+    _CrtSetReportFile(_CRT_WARN, CreateFileA("NUL", GENERIC_WRITE, 0, nullptr, OPEN_EXISTING, 0, 0));
+    // Disable confusing "helpful" text message on abort, Ctrl-C
+    _set_abort_behavior(0, _WRITE_ABORT_MSG | _CALL_REPORTFAULT);
+#endif
+#ifdef WIN32
+    // Enable heap terminate-on-corruption
+    HeapSetInformation(nullptr, HeapEnableTerminationOnCorruption, nullptr, 0);
+#endif
+    if (!InitShutdownState()) {
+        return InitError(Untranslated("Initializing wait-for-shutdown state failed."));
+    }
+
+    if (!SetupNetworking()) {
+        return InitError(Untranslated("Initializing networking failed."));
+    }
+
+#ifndef WIN32
+    if (!args.GetBoolArg("-sysperms", false)) {
+        umask(077);
+    }
+
+    // Clean shutdown on SIGTERM
+    registerSignalHandler(SIGTERM, HandleSIGTERM);
+    registerSignalHandler(SIGINT, HandleSIGTERM);
+
+    // Reopen debug.log on SIGHUP
+    registerSignalHandler(SIGHUP, HandleSIGHUP);
+
+    // Ignore SIGPIPE, otherwise it will bring the daemon down if the client closes unexpectedly
+    signal(SIGPIPE, SIG_IGN);
+#else
+    SetConsoleCtrlHandler(consoleCtrlHandler, true);
+#endif
+
+    std::set_new_handler(new_handler_terminate);
+
+    return true;
+}
+
+bool AppInitParameterInteraction(const ArgsManager& args)
+{
+    const CChainParams& chainparams = Params();
+    // ********************************************************* Step 2: parameter interactions
+
+    // also see: InitParameterInteraction()
+
+    // Error if network-specific options (-addnode, -connect, etc) are
+    // specified in default section of config file, but not overridden
+    // on the command line or in this network's section of the config file.
+    std::string network = args.GetChainName();
+    if (network == CBaseChainParams::SIGNET) {
+        LogPrintf("Signet derived magic (message start): %s\n", HexStr(chainparams.MessageStart()));
+    }
+    bilingual_str errors;
+    for (const auto& arg : args.GetUnsuitableSectionOnlyArgs()) {
+        errors += strprintf(_("Config setting for %s only applied on %s network when in [%s] section.") + Untranslated("\n"), arg, network, network);
+    }
+
+    if (!errors.empty()) {
+        return InitError(errors);
+    }
+
+    // Warn if unrecognized section name are present in the config file.
+    bilingual_str warnings;
+    for (const auto& section : args.GetUnrecognizedSections()) {
+        warnings += strprintf(Untranslated("%s:%i ") + _("Section [%s] is not recognized.") + Untranslated("\n"), section.m_file, section.m_line, section.m_name);
+    }
+
+    if (!warnings.empty()) {
+        InitWarning(warnings);
+    }
+
+    if (!fs::is_directory(gArgs.GetBlocksDirPath())) {
+        return InitError(strprintf(_("Specified blocks directory \"%s\" does not exist."), args.GetArg("-blocksdir", "")));
+    }
+
+    // parse and validate enabled filter types
+    std::string blockfilterindex_value = args.GetArg("-blockfilterindex", DEFAULT_BLOCKFILTERINDEX);
+    if (blockfilterindex_value == "" || blockfilterindex_value == "1") {
+        g_enabled_filter_types = AllBlockFilterTypes();
+    } else if (blockfilterindex_value != "0") {
+        const std::vector<std::string> names = args.GetArgs("-blockfilterindex");
+        for (const auto& name : names) {
+            BlockFilterType filter_type;
+            if (!BlockFilterTypeByName(name, filter_type)) {
+                return InitError(strprintf(_("Unknown -blockfilterindex value %s."), name));
+            }
+            g_enabled_filter_types.insert(filter_type);
+        }
+    }
+
+    // Signal NODE_COMPACT_FILTERS if peerblockfilters and basic filters index are both enabled.
+    if (args.GetBoolArg("-peerblockfilters", DEFAULT_PEERBLOCKFILTERS)) {
+        if (g_enabled_filter_types.count(BlockFilterType::BASIC) != 1) {
+            return InitError(_("Cannot set -peerblockfilters without -blockfilterindex."));
+        }
+
+        nLocalServices = ServiceFlags(nLocalServices | NODE_COMPACT_FILTERS);
+    }
+
+    // if using block pruning, then disallow txindex and coinstatsindex
+    if (args.GetIntArg("-prune", 0)) {
+        if (args.GetBoolArg("-txindex", DEFAULT_TXINDEX))
+            return InitError(_("Prune mode is incompatible with -txindex."));
+        if (args.GetBoolArg("-coinstatsindex", DEFAULT_COINSTATSINDEX))
+            return InitError(_("Prune mode is incompatible with -coinstatsindex."));
+    }
+
+    // If -forcednsseed is set to true, ensure -dnsseed has not been set to false
+    if (args.GetBoolArg("-forcednsseed", DEFAULT_FORCEDNSSEED) && !args.GetBoolArg("-dnsseed", DEFAULT_DNSSEED)){
+        return InitError(_("Cannot set -forcednsseed to true when setting -dnsseed to false."));
+    }
+
+    // -bind and -whitebind can't be set when not listening
+    size_t nUserBind = args.GetArgs("-bind").size() + args.GetArgs("-whitebind").size();
+    if (nUserBind != 0 && !args.GetBoolArg("-listen", DEFAULT_LISTEN)) {
+        return InitError(Untranslated("Cannot set -bind or -whitebind together with -listen=0"));
+    }
+
+    // if listen
