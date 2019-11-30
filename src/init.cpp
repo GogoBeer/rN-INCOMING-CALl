@@ -549,4 +549,131 @@ void SetupServerArgs(ArgsManager& argsman)
     argsman.AddArg("-rpcbind=<addr>[:port]", "Bind to given address to listen for JSON-RPC connections. Do not expose the RPC server to untrusted networks such as the public internet! This option is ignored unless -rpcallowip is also passed. Port is optional and overrides -rpcport. Use [host]:port notation for IPv6. This option can be specified multiple times (default: 127.0.0.1 and ::1 i.e., localhost)", ArgsManager::ALLOW_ANY | ArgsManager::NETWORK_ONLY | ArgsManager::SENSITIVE, OptionsCategory::RPC);
     argsman.AddArg("-rpccookiefile=<loc>", "Location of the auth cookie. Relative paths will be prefixed by a net-specific datadir location. (default: data dir)", ArgsManager::ALLOW_ANY, OptionsCategory::RPC);
     argsman.AddArg("-rpcpassword=<pw>", "Password for JSON-RPC connections", ArgsManager::ALLOW_ANY | ArgsManager::SENSITIVE, OptionsCategory::RPC);
-   
+    argsman.AddArg("-rpcport=<port>", strprintf("Listen for JSON-RPC connections on <port> (default: %u, testnet: %u, signet: %u, regtest: %u)", defaultBaseParams->RPCPort(), testnetBaseParams->RPCPort(), signetBaseParams->RPCPort(), regtestBaseParams->RPCPort()), ArgsManager::ALLOW_ANY | ArgsManager::NETWORK_ONLY, OptionsCategory::RPC);
+    argsman.AddArg("-rpcserialversion", strprintf("Sets the serialization of raw transaction or block hex returned in non-verbose mode, non-segwit(0) or segwit(1) (default: %d)", DEFAULT_RPC_SERIALIZE_VERSION), ArgsManager::ALLOW_ANY, OptionsCategory::RPC);
+    argsman.AddArg("-rpcservertimeout=<n>", strprintf("Timeout during HTTP requests (default: %d)", DEFAULT_HTTP_SERVER_TIMEOUT), ArgsManager::ALLOW_ANY | ArgsManager::DEBUG_ONLY, OptionsCategory::RPC);
+    argsman.AddArg("-rpcthreads=<n>", strprintf("Set the number of threads to service RPC calls (default: %d)", DEFAULT_HTTP_THREADS), ArgsManager::ALLOW_ANY, OptionsCategory::RPC);
+    argsman.AddArg("-rpcuser=<user>", "Username for JSON-RPC connections", ArgsManager::ALLOW_ANY | ArgsManager::SENSITIVE, OptionsCategory::RPC);
+    argsman.AddArg("-rpcwhitelist=<whitelist>", "Set a whitelist to filter incoming RPC calls for a specific user. The field <whitelist> comes in the format: <USERNAME>:<rpc 1>,<rpc 2>,...,<rpc n>. If multiple whitelists are set for a given user, they are set-intersected. See -rpcwhitelistdefault documentation for information on default whitelist behavior.", ArgsManager::ALLOW_ANY, OptionsCategory::RPC);
+    argsman.AddArg("-rpcwhitelistdefault", "Sets default behavior for rpc whitelisting. Unless rpcwhitelistdefault is set to 0, if any -rpcwhitelist is set, the rpc server acts as if all rpc users are subject to empty-unless-otherwise-specified whitelists. If rpcwhitelistdefault is set to 1 and no -rpcwhitelist is set, rpc server acts as if all rpc users are subject to empty whitelists.", ArgsManager::ALLOW_ANY, OptionsCategory::RPC);
+    argsman.AddArg("-rpcworkqueue=<n>", strprintf("Set the depth of the work queue to service RPC calls (default: %d)", DEFAULT_HTTP_WORKQUEUE), ArgsManager::ALLOW_ANY | ArgsManager::DEBUG_ONLY, OptionsCategory::RPC);
+    argsman.AddArg("-server", "Accept command line and JSON-RPC commands", ArgsManager::ALLOW_ANY, OptionsCategory::RPC);
+
+#if HAVE_DECL_FORK
+    argsman.AddArg("-daemon", strprintf("Run in the background as a daemon and accept commands (default: %d)", DEFAULT_DAEMON), ArgsManager::ALLOW_ANY, OptionsCategory::OPTIONS);
+    argsman.AddArg("-daemonwait", strprintf("Wait for initialization to be finished before exiting. This implies -daemon (default: %d)", DEFAULT_DAEMONWAIT), ArgsManager::ALLOW_ANY, OptionsCategory::OPTIONS);
+#else
+    hidden_args.emplace_back("-daemon");
+    hidden_args.emplace_back("-daemonwait");
+#endif
+
+#if defined(USE_SYSCALL_SANDBOX)
+    argsman.AddArg("-sandbox=<mode>", "Use the experimental syscall sandbox in the specified mode (-sandbox=log-and-abort or -sandbox=abort). Allow only expected syscalls to be used by bitcoind. Note that this is an experimental new feature that may cause bitcoind to exit or crash unexpectedly: use with caution. In the \"log-and-abort\" mode the invocation of an unexpected syscall results in a debug handler being invoked which will log the incident and terminate the program (without executing the unexpected syscall). In the \"abort\" mode the invocation of an unexpected syscall results in the entire process being killed immediately by the kernel without executing the unexpected syscall.", ArgsManager::ALLOW_ANY, OptionsCategory::OPTIONS);
+#endif // USE_SYSCALL_SANDBOX
+
+    // Add the hidden options
+    argsman.AddHiddenArgs(hidden_args);
+}
+
+std::string LicenseInfo()
+{
+    const std::string URL_SOURCE_CODE = "<https://github.com/bitcoin/bitcoin>";
+
+    return CopyrightHolders(strprintf(_("Copyright (C) %i-%i").translated, 2009, COPYRIGHT_YEAR) + " ") + "\n" +
+           "\n" +
+           strprintf(_("Please contribute if you find %s useful. "
+                       "Visit %s for further information about the software.").translated,
+               PACKAGE_NAME, "<" PACKAGE_URL ">") +
+           "\n" +
+           strprintf(_("The source code is available from %s.").translated,
+               URL_SOURCE_CODE) +
+           "\n" +
+           "\n" +
+           _("This is experimental software.").translated + "\n" +
+           strprintf(_("Distributed under the MIT software license, see the accompanying file %s or %s").translated, "COPYING", "<https://opensource.org/licenses/MIT>") +
+           "\n";
+}
+
+static bool fHaveGenesis = false;
+static Mutex g_genesis_wait_mutex;
+static std::condition_variable g_genesis_wait_cv;
+
+static void BlockNotifyGenesisWait(const CBlockIndex* pBlockIndex)
+{
+    if (pBlockIndex != nullptr) {
+        {
+            LOCK(g_genesis_wait_mutex);
+            fHaveGenesis = true;
+        }
+        g_genesis_wait_cv.notify_all();
+    }
+}
+
+#if HAVE_SYSTEM
+static void StartupNotify(const ArgsManager& args)
+{
+    std::string cmd = args.GetArg("-startupnotify", "");
+    if (!cmd.empty()) {
+        std::thread t(runCommand, cmd);
+        t.detach(); // thread runs free
+    }
+}
+#endif
+
+static bool AppInitServers(NodeContext& node)
+{
+    const ArgsManager& args = *Assert(node.args);
+    RPCServer::OnStarted(&OnRPCStarted);
+    RPCServer::OnStopped(&OnRPCStopped);
+    if (!InitHTTPServer())
+        return false;
+    StartRPC();
+    node.rpc_interruption_point = RpcInterruptionPoint;
+    if (!StartHTTPRPC(&node))
+        return false;
+    if (args.GetBoolArg("-rest", DEFAULT_REST_ENABLE)) StartREST(&node);
+    StartHTTPServer();
+    return true;
+}
+
+// Parameter interaction based on rules
+void InitParameterInteraction(ArgsManager& args)
+{
+    // when specifying an explicit binding address, you want to listen on it
+    // even when -connect or -proxy is specified
+    if (args.IsArgSet("-bind")) {
+        if (args.SoftSetBoolArg("-listen", true))
+            LogPrintf("%s: parameter interaction: -bind set -> setting -listen=1\n", __func__);
+    }
+    if (args.IsArgSet("-whitebind")) {
+        if (args.SoftSetBoolArg("-listen", true))
+            LogPrintf("%s: parameter interaction: -whitebind set -> setting -listen=1\n", __func__);
+    }
+
+    if (args.IsArgSet("-connect")) {
+        // when only connecting to trusted nodes, do not seed via DNS, or listen by default
+        if (args.SoftSetBoolArg("-dnsseed", false))
+            LogPrintf("%s: parameter interaction: -connect set -> setting -dnsseed=0\n", __func__);
+        if (args.SoftSetBoolArg("-listen", false))
+            LogPrintf("%s: parameter interaction: -connect set -> setting -listen=0\n", __func__);
+    }
+
+    if (args.IsArgSet("-proxy")) {
+        // to protect privacy, do not listen by default if a default proxy server is specified
+        if (args.SoftSetBoolArg("-listen", false))
+            LogPrintf("%s: parameter interaction: -proxy set -> setting -listen=0\n", __func__);
+        // to protect privacy, do not map ports when a proxy is set. The user may still specify -listen=1
+        // to listen locally, so don't rely on this happening through -listen below.
+        if (args.SoftSetBoolArg("-upnp", false))
+            LogPrintf("%s: parameter interaction: -proxy set -> setting -upnp=0\n", __func__);
+        if (args.SoftSetBoolArg("-natpmp", false)) {
+            LogPrintf("%s: parameter interaction: -proxy set -> setting -natpmp=0\n", __func__);
+        }
+        // to protect privacy, do not discover addresses by default
+        if (args.SoftSetBoolArg("-discover", false))
+            LogPrintf("%s: parameter interaction: -proxy set -> setting -discover=0\n", __func__);
+    }
+
+    if (!args.GetBoolArg("-listen", DEFAULT_LISTEN)) {
+        // do not map ports or try to retrieve public IP when not listening (pointless)
+        if (args.SoftSetBoolArg("-upnp", false))
