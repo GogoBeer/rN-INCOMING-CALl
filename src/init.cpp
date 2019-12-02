@@ -1015,4 +1015,188 @@ bool AppInitParameterInteraction(const ArgsManager& args)
     if (args.GetBoolArg("-peerbloomfilters", DEFAULT_PEERBLOOMFILTERS))
         nLocalServices = ServiceFlags(nLocalServices | NODE_BLOOM);
 
-    if (args.GetIntArg("-rpcserialversion", DEFAULT_RPC_SERIALIZE_VERSION) < 0
+    if (args.GetIntArg("-rpcserialversion", DEFAULT_RPC_SERIALIZE_VERSION) < 0)
+        return InitError(Untranslated("rpcserialversion must be non-negative."));
+
+    if (args.GetIntArg("-rpcserialversion", DEFAULT_RPC_SERIALIZE_VERSION) > 1)
+        return InitError(Untranslated("Unknown rpcserialversion requested."));
+
+    nMaxTipAge = args.GetIntArg("-maxtipage", DEFAULT_MAX_TIP_AGE);
+
+    if (args.IsArgSet("-proxy") && args.GetArg("-proxy", "").empty()) {
+        return InitError(_("No proxy server specified. Use -proxy=<ip> or -proxy=<ip:port>."));
+    }
+
+#if defined(USE_SYSCALL_SANDBOX)
+    if (args.IsArgSet("-sandbox") && !args.IsArgNegated("-sandbox")) {
+        const std::string sandbox_arg{args.GetArg("-sandbox", "")};
+        bool log_syscall_violation_before_terminating{false};
+        if (sandbox_arg == "log-and-abort") {
+            log_syscall_violation_before_terminating = true;
+        } else if (sandbox_arg == "abort") {
+            // log_syscall_violation_before_terminating is false by default.
+        } else {
+            return InitError(Untranslated("Unknown syscall sandbox mode (-sandbox=<mode>). Available modes are \"log-and-abort\" and \"abort\"."));
+        }
+        // execve(...) is not allowed by the syscall sandbox.
+        const std::vector<std::string> features_using_execve{
+            "-alertnotify",
+            "-blocknotify",
+            "-signer",
+            "-startupnotify",
+            "-walletnotify",
+        };
+        for (const std::string& feature_using_execve : features_using_execve) {
+            if (!args.GetArg(feature_using_execve, "").empty()) {
+                return InitError(Untranslated(strprintf("The experimental syscall sandbox feature (-sandbox=<mode>) is incompatible with %s (which uses execve).", feature_using_execve)));
+            }
+        }
+        if (!SetupSyscallSandbox(log_syscall_violation_before_terminating)) {
+            return InitError(Untranslated("Installation of the syscall sandbox failed."));
+        }
+        LogPrintf("Experimental syscall sandbox enabled (-sandbox=%s): bitcoind will terminate if an unexpected (not allowlisted) syscall is invoked.\n", sandbox_arg);
+    }
+#endif // USE_SYSCALL_SANDBOX
+
+    return true;
+}
+
+static bool LockDataDirectory(bool probeOnly)
+{
+    // Make sure only a single Bitcoin process is using the data directory.
+    fs::path datadir = gArgs.GetDataDirNet();
+    if (!DirIsWritable(datadir)) {
+        return InitError(strprintf(_("Cannot write to data directory '%s'; check permissions."), fs::PathToString(datadir)));
+    }
+    if (!LockDirectory(datadir, ".lock", probeOnly)) {
+        return InitError(strprintf(_("Cannot obtain a lock on data directory %s. %s is probably already running."), fs::PathToString(datadir), PACKAGE_NAME));
+    }
+    return true;
+}
+
+bool AppInitSanityChecks()
+{
+    // ********************************************************* Step 4: sanity checks
+
+    init::SetGlobals();
+
+    if (!init::SanityChecks()) {
+        return InitError(strprintf(_("Initialization sanity check failed. %s is shutting down."), PACKAGE_NAME));
+    }
+
+    // Probe the data directory lock to give an early error message, if possible
+    // We cannot hold the data directory lock here, as the forking for daemon() hasn't yet happened,
+    // and a fork will cause weird behavior to it.
+    return LockDataDirectory(true);
+}
+
+bool AppInitLockDataDirectory()
+{
+    // After daemonization get the data directory lock again and hold on to it until exit
+    // This creates a slight window for a race condition to happen, however this condition is harmless: it
+    // will at most make us exit without printing a message to console.
+    if (!LockDataDirectory(false)) {
+        // Detailed error printed inside LockDataDirectory
+        return false;
+    }
+    return true;
+}
+
+bool AppInitInterfaces(NodeContext& node)
+{
+    node.chain = node.init->makeChain();
+    return true;
+}
+
+bool AppInitMain(NodeContext& node, interfaces::BlockAndHeaderTipInfo* tip_info)
+{
+    const ArgsManager& args = *Assert(node.args);
+    const CChainParams& chainparams = Params();
+
+    auto opt_max_upload = ParseByteUnits(args.GetArg("-maxuploadtarget", DEFAULT_MAX_UPLOAD_TARGET), ByteUnit::M);
+    if (!opt_max_upload) {
+        return InitError(strprintf(_("Unable to parse -maxuploadtarget: '%s' (possible integer overflow?)"), args.GetArg("-maxuploadtarget", "")));
+    }
+
+    // ********************************************************* Step 4a: application initialization
+    if (!CreatePidFile(args)) {
+        // Detailed error printed inside CreatePidFile().
+        return false;
+    }
+    if (!init::StartLogging(args)) {
+        // Detailed error printed inside StartLogging().
+        return false;
+    }
+
+    LogPrintf("Using at most %i automatic connections (%i file descriptors available)\n", nMaxConnections, nFD);
+
+    // Warn about relative -datadir path.
+    if (args.IsArgSet("-datadir") && !fs::PathFromString(args.GetArg("-datadir", "")).is_absolute()) {
+        LogPrintf("Warning: relative datadir option '%s' specified, which will be interpreted relative to the " /* Continued */
+                  "current working directory '%s'. This is fragile, because if bitcoin is started in the future "
+                  "from a different location, it will be unable to locate the current data files. There could "
+                  "also be data loss if bitcoin is started while in a temporary directory.\n",
+                  args.GetArg("-datadir", ""), fs::PathToString(fs::current_path()));
+    }
+
+    InitSignatureCache();
+    InitScriptExecutionCache();
+
+    int script_threads = args.GetIntArg("-par", DEFAULT_SCRIPTCHECK_THREADS);
+    if (script_threads <= 0) {
+        // -par=0 means autodetect (number of cores - 1 script threads)
+        // -par=-n means "leave n cores free" (number of cores - n - 1 script threads)
+        script_threads += GetNumCores();
+    }
+
+    // Subtract 1 because the main thread counts towards the par threads
+    script_threads = std::max(script_threads - 1, 0);
+
+    // Number of script-checking threads <= MAX_SCRIPTCHECK_THREADS
+    script_threads = std::min(script_threads, MAX_SCRIPTCHECK_THREADS);
+
+    LogPrintf("Script verification uses %d additional threads\n", script_threads);
+    if (script_threads >= 1) {
+        g_parallel_script_checks = true;
+        StartScriptCheckWorkerThreads(script_threads);
+    }
+
+    assert(!node.scheduler);
+    node.scheduler = std::make_unique<CScheduler>();
+
+    // Start the lightweight task scheduler thread
+    node.scheduler->m_service_thread = std::thread(util::TraceThread, "scheduler", [&] { node.scheduler->serviceQueue(); });
+
+    // Gather some entropy once per minute.
+    node.scheduler->scheduleEvery([]{
+        RandAddPeriodic();
+    }, std::chrono::minutes{1});
+
+    GetMainSignals().RegisterBackgroundSignalScheduler(*node.scheduler);
+
+    // Create client interfaces for wallets that are supposed to be loaded
+    // according to -wallet and -disablewallet options. This only constructs
+    // the interfaces, it doesn't load wallet data. Wallets actually get loaded
+    // when load() and start() interface methods are called below.
+    g_wallet_init_interface.Construct(node);
+    uiInterface.InitWallet();
+
+    /* Register RPC commands regardless of -server setting so they will be
+     * available in the GUI RPC console even if external calls are disabled.
+     */
+    RegisterAllCoreRPCCommands(tableRPC);
+    for (const auto& client : node.chain_clients) {
+        client->registerRpcs();
+    }
+#if ENABLE_ZMQ
+    RegisterZMQRPCCommands(tableRPC);
+#endif
+
+    /* Start the RPC server already.  It will be started in "warmup" mode
+     * and not really process calls already (but it will signify connections
+     * that the server is there and will be ready later).  Warmup mode will
+     * be disabled when initialisation is finished.
+     */
+    if (args.GetBoolArg("-server", false)) {
+        uiInterface.InitMessage_connect(SetRPCWarmupStatus);
+        if (!AppInitS
