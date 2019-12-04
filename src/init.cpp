@@ -1372,4 +1372,136 @@ bool AppInitMain(NodeContext& node, interfaces::BlockAndHeaderTipInfo* tip_info)
     g_zmq_notification_interface = CZMQNotificationInterface::Create();
 
     if (g_zmq_notification_interface) {
-        Register
+        RegisterValidationInterface(g_zmq_notification_interface);
+    }
+#endif
+
+    // ********************************************************* Step 7: load block chain
+
+    fReindex = args.GetBoolArg("-reindex", false);
+    bool fReindexChainState = args.GetBoolArg("-reindex-chainstate", false);
+
+    // cache size calculations
+    CacheSizes cache_sizes = CalculateCacheSizes(args, g_enabled_filter_types.size());
+
+    int64_t nMempoolSizeMax = args.GetIntArg("-maxmempool", DEFAULT_MAX_MEMPOOL_SIZE) * 1000000;
+    LogPrintf("Cache configuration:\n");
+    LogPrintf("* Using %.1f MiB for block index database\n", cache_sizes.block_tree_db * (1.0 / 1024 / 1024));
+    if (args.GetBoolArg("-txindex", DEFAULT_TXINDEX)) {
+        LogPrintf("* Using %.1f MiB for transaction index database\n", cache_sizes.tx_index * (1.0 / 1024 / 1024));
+    }
+    for (BlockFilterType filter_type : g_enabled_filter_types) {
+        LogPrintf("* Using %.1f MiB for %s block filter index database\n",
+                  cache_sizes.filter_index * (1.0 / 1024 / 1024), BlockFilterTypeName(filter_type));
+    }
+    LogPrintf("* Using %.1f MiB for chain state database\n", cache_sizes.coins_db * (1.0 / 1024 / 1024));
+    LogPrintf("* Using %.1f MiB for in-memory UTXO set (plus up to %.1f MiB of unused mempool space)\n", cache_sizes.coins * (1.0 / 1024 / 1024), nMempoolSizeMax * (1.0 / 1024 / 1024));
+
+    bool fLoaded = false;
+    while (!fLoaded && !ShutdownRequested()) {
+        const bool fReset = fReindex;
+        bilingual_str strLoadError;
+
+        uiInterface.InitMessage(_("Loading block index…").translated);
+        const int64_t load_block_index_start_time = GetTimeMillis();
+        std::optional<ChainstateLoadingError> maybe_load_error;
+        try {
+            maybe_load_error = LoadChainstate(fReset,
+                                              chainman,
+                                              Assert(node.mempool.get()),
+                                              fPruneMode,
+                                              chainparams.GetConsensus(),
+                                              fReindexChainState,
+                                              cache_sizes.block_tree_db,
+                                              cache_sizes.coins_db,
+                                              cache_sizes.coins,
+                                              /*block_tree_db_in_memory=*/false,
+                                              /*coins_db_in_memory=*/false,
+                                              /*shutdown_requested=*/ShutdownRequested,
+                                              /*coins_error_cb=*/[]() {
+                                                  uiInterface.ThreadSafeMessageBox(
+                                                                                   _("Error reading from database, shutting down."),
+                                                                                   "", CClientUIInterface::MSG_ERROR);
+                                              });
+        } catch (const std::exception& e) {
+            LogPrintf("%s\n", e.what());
+            maybe_load_error = ChainstateLoadingError::ERROR_GENERIC_BLOCKDB_OPEN_FAILED;
+        }
+        if (maybe_load_error.has_value()) {
+            switch (maybe_load_error.value()) {
+            case ChainstateLoadingError::ERROR_LOADING_BLOCK_DB:
+                strLoadError = _("Error loading block database");
+                break;
+            case ChainstateLoadingError::ERROR_BAD_GENESIS_BLOCK:
+                // If the loaded chain has a wrong genesis, bail out immediately
+                // (we're likely using a testnet datadir, or the other way around).
+                return InitError(_("Incorrect or no genesis block found. Wrong datadir for network?"));
+            case ChainstateLoadingError::ERROR_PRUNED_NEEDS_REINDEX:
+                strLoadError = _("You need to rebuild the database using -reindex to go back to unpruned mode.  This will redownload the entire blockchain");
+                break;
+            case ChainstateLoadingError::ERROR_LOAD_GENESIS_BLOCK_FAILED:
+                strLoadError = _("Error initializing block database");
+                break;
+            case ChainstateLoadingError::ERROR_CHAINSTATE_UPGRADE_FAILED:
+                strLoadError = _("Error upgrading chainstate database");
+                break;
+            case ChainstateLoadingError::ERROR_REPLAYBLOCKS_FAILED:
+                strLoadError = _("Unable to replay blocks. You will need to rebuild the database using -reindex-chainstate.");
+                break;
+            case ChainstateLoadingError::ERROR_LOADCHAINTIP_FAILED:
+                strLoadError = _("Error initializing block database");
+                break;
+            case ChainstateLoadingError::ERROR_GENERIC_BLOCKDB_OPEN_FAILED:
+                strLoadError = _("Error opening block database");
+                break;
+            case ChainstateLoadingError::ERROR_BLOCKS_WITNESS_INSUFFICIENTLY_VALIDATED:
+                strLoadError = strprintf(_("Witness data for blocks after height %d requires validation. Please restart with -reindex."),
+                                         chainparams.GetConsensus().SegwitHeight);
+                break;
+            case ChainstateLoadingError::SHUTDOWN_PROBED:
+                break;
+            }
+        } else {
+            std::optional<ChainstateLoadVerifyError> maybe_verify_error;
+            try {
+                uiInterface.InitMessage(_("Verifying blocks…").translated);
+                auto check_blocks = args.GetIntArg("-checkblocks", DEFAULT_CHECKBLOCKS);
+                if (fHavePruned && check_blocks > MIN_BLOCKS_TO_KEEP) {
+                    LogPrintf("Prune: pruned datadir may not have more than %d blocks; only checking available blocks\n",
+                              MIN_BLOCKS_TO_KEEP);
+                }
+                maybe_verify_error = VerifyLoadedChainstate(chainman,
+                                                            fReset,
+                                                            fReindexChainState,
+                                                            chainparams.GetConsensus(),
+                                                            check_blocks,
+                                                            args.GetIntArg("-checklevel", DEFAULT_CHECKLEVEL),
+                                                            /*get_unix_time_seconds=*/static_cast<int64_t(*)()>(GetTime));
+            } catch (const std::exception& e) {
+                LogPrintf("%s\n", e.what());
+                maybe_verify_error = ChainstateLoadVerifyError::ERROR_GENERIC_FAILURE;
+            }
+            if (maybe_verify_error.has_value()) {
+                switch (maybe_verify_error.value()) {
+                case ChainstateLoadVerifyError::ERROR_BLOCK_FROM_FUTURE:
+                    strLoadError = _("The block database contains a block which appears to be from the future. "
+                                     "This may be due to your computer's date and time being set incorrectly. "
+                                     "Only rebuild the block database if you are sure that your computer's date and time are correct");
+                    break;
+                case ChainstateLoadVerifyError::ERROR_CORRUPTED_BLOCK_DB:
+                    strLoadError = _("Corrupted block database detected");
+                    break;
+                case ChainstateLoadVerifyError::ERROR_GENERIC_FAILURE:
+                    strLoadError = _("Error opening block database");
+                    break;
+                }
+            } else {
+                fLoaded = true;
+                LogPrintf(" block index %15dms\n", GetTimeMillis() - load_block_index_start_time);
+            }
+        }
+
+        if (!fLoaded && !ShutdownRequested()) {
+            // first suggest a reindex
+            if (!fReset) {
+                bool fRet = uiInterface.ThreadSafeQues
