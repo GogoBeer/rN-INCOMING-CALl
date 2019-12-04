@@ -1504,4 +1504,184 @@ bool AppInitMain(NodeContext& node, interfaces::BlockAndHeaderTipInfo* tip_info)
         if (!fLoaded && !ShutdownRequested()) {
             // first suggest a reindex
             if (!fReset) {
-                bool fRet = uiInterface.ThreadSafeQues
+                bool fRet = uiInterface.ThreadSafeQuestion(
+                    strLoadError + Untranslated(".\n\n") + _("Do you want to rebuild the block database now?"),
+                    strLoadError.original + ".\nPlease restart with -reindex or -reindex-chainstate to recover.",
+                    "", CClientUIInterface::MSG_ERROR | CClientUIInterface::BTN_ABORT);
+                if (fRet) {
+                    fReindex = true;
+                    AbortShutdown();
+                } else {
+                    LogPrintf("Aborted block database rebuild. Exiting.\n");
+                    return false;
+                }
+            } else {
+                return InitError(strLoadError);
+            }
+        }
+    }
+
+    // As LoadBlockIndex can take several minutes, it's possible the user
+    // requested to kill the GUI during the last operation. If so, exit.
+    // As the program has not fully started yet, Shutdown() is possibly overkill.
+    if (ShutdownRequested()) {
+        LogPrintf("Shutdown requested. Exiting.\n");
+        return false;
+    }
+
+    // ********************************************************* Step 8: start indexers
+    if (args.GetBoolArg("-txindex", DEFAULT_TXINDEX)) {
+        if (const auto error{CheckLegacyTxindex(*Assert(chainman.m_blockman.m_block_tree_db))}) {
+            return InitError(*error);
+        }
+
+        g_txindex = std::make_unique<TxIndex>(cache_sizes.tx_index, false, fReindex);
+        if (!g_txindex->Start(chainman.ActiveChainstate())) {
+            return false;
+        }
+    }
+
+    for (const auto& filter_type : g_enabled_filter_types) {
+        InitBlockFilterIndex(filter_type, cache_sizes.filter_index, false, fReindex);
+        if (!GetBlockFilterIndex(filter_type)->Start(chainman.ActiveChainstate())) {
+            return false;
+        }
+    }
+
+    if (args.GetBoolArg("-coinstatsindex", DEFAULT_COINSTATSINDEX)) {
+        g_coin_stats_index = std::make_unique<CoinStatsIndex>(/* cache size */ 0, false, fReindex);
+        if (!g_coin_stats_index->Start(chainman.ActiveChainstate())) {
+            return false;
+        }
+    }
+
+    // ********************************************************* Step 9: load wallet
+    for (const auto& client : node.chain_clients) {
+        if (!client->load()) {
+            return false;
+        }
+    }
+
+    // ********************************************************* Step 10: data directory maintenance
+
+    // if pruning, unset the service bit and perform the initial blockstore prune
+    // after any wallet rescanning has taken place.
+    if (fPruneMode) {
+        LogPrintf("Unsetting NODE_NETWORK on prune mode\n");
+        nLocalServices = ServiceFlags(nLocalServices & ~NODE_NETWORK);
+        if (!fReindex) {
+            LOCK(cs_main);
+            for (CChainState* chainstate : chainman.GetAll()) {
+                uiInterface.InitMessage(_("Pruning blockstore…").translated);
+                chainstate->PruneAndFlush();
+            }
+        }
+    }
+
+    // ********************************************************* Step 11: import blocks
+
+    if (!CheckDiskSpace(gArgs.GetDataDirNet())) {
+        InitError(strprintf(_("Error: Disk space is low for %s"), fs::quoted(fs::PathToString(gArgs.GetDataDirNet()))));
+        return false;
+    }
+    if (!CheckDiskSpace(gArgs.GetBlocksDirPath())) {
+        InitError(strprintf(_("Error: Disk space is low for %s"), fs::quoted(fs::PathToString(gArgs.GetBlocksDirPath()))));
+        return false;
+    }
+
+    // Either install a handler to notify us when genesis activates, or set fHaveGenesis directly.
+    // No locking, as this happens before any background thread is started.
+    boost::signals2::connection block_notify_genesis_wait_connection;
+    if (chainman.ActiveChain().Tip() == nullptr) {
+        block_notify_genesis_wait_connection = uiInterface.NotifyBlockTip_connect(std::bind(BlockNotifyGenesisWait, std::placeholders::_2));
+    } else {
+        fHaveGenesis = true;
+    }
+
+#if HAVE_SYSTEM
+    const std::string block_notify = args.GetArg("-blocknotify", "");
+    if (!block_notify.empty()) {
+        uiInterface.NotifyBlockTip_connect([block_notify](SynchronizationState sync_state, const CBlockIndex* pBlockIndex) {
+            if (sync_state != SynchronizationState::POST_INIT || !pBlockIndex) return;
+            std::string command = block_notify;
+            boost::replace_all(command, "%s", pBlockIndex->GetBlockHash().GetHex());
+            std::thread t(runCommand, command);
+            t.detach(); // thread runs free
+        });
+    }
+#endif
+
+    std::vector<fs::path> vImportFiles;
+    for (const std::string& strFile : args.GetArgs("-loadblock")) {
+        vImportFiles.push_back(fs::PathFromString(strFile));
+    }
+
+    chainman.m_load_block = std::thread(&util::TraceThread, "loadblk", [=, &chainman, &args] {
+        ThreadImport(chainman, vImportFiles, args);
+    });
+
+    // Wait for genesis block to be processed
+    {
+        WAIT_LOCK(g_genesis_wait_mutex, lock);
+        // We previously could hang here if StartShutdown() is called prior to
+        // ThreadImport getting started, so instead we just wait on a timer to
+        // check ShutdownRequested() regularly.
+        while (!fHaveGenesis && !ShutdownRequested()) {
+            g_genesis_wait_cv.wait_for(lock, std::chrono::milliseconds(500));
+        }
+        block_notify_genesis_wait_connection.disconnect();
+    }
+
+    if (ShutdownRequested()) {
+        return false;
+    }
+
+    // ********************************************************* Step 12: start node
+
+    int chain_active_height;
+
+    //// debug print
+    {
+        LOCK(cs_main);
+        LogPrintf("block tree size = %u\n", chainman.BlockIndex().size());
+        chain_active_height = chainman.ActiveChain().Height();
+        if (tip_info) {
+            tip_info->block_height = chain_active_height;
+            tip_info->block_time = chainman.ActiveChain().Tip() ? chainman.ActiveChain().Tip()->GetBlockTime() : Params().GenesisBlock().GetBlockTime();
+            tip_info->verification_progress = GuessVerificationProgress(Params().TxData(), chainman.ActiveChain().Tip());
+        }
+        if (tip_info && ::pindexBestHeader) {
+            tip_info->header_height = ::pindexBestHeader->nHeight;
+            tip_info->header_time = ::pindexBestHeader->GetBlockTime();
+        }
+    }
+    LogPrintf("nBestHeight = %d\n", chain_active_height);
+    if (node.peerman) node.peerman->SetBestHeight(chain_active_height);
+
+    Discover();
+
+    // Map ports with UPnP or NAT-PMP.
+    StartMapPort(args.GetBoolArg("-upnp", DEFAULT_UPNP), gArgs.GetBoolArg("-natpmp", DEFAULT_NATPMP));
+
+    CConnman::Options connOptions;
+    connOptions.nLocalServices = nLocalServices;
+    connOptions.nMaxConnections = nMaxConnections;
+    connOptions.m_max_outbound_full_relay = std::min(MAX_OUTBOUND_FULL_RELAY_CONNECTIONS, connOptions.nMaxConnections);
+    connOptions.m_max_outbound_block_relay = std::min(MAX_BLOCK_RELAY_ONLY_CONNECTIONS, connOptions.nMaxConnections-connOptions.m_max_outbound_full_relay);
+    connOptions.nMaxAddnode = MAX_ADDNODE_CONNECTIONS;
+    connOptions.nMaxFeeler = MAX_FEELER_CONNECTIONS;
+    connOptions.uiInterface = &uiInterface;
+    connOptions.m_banman = node.banman.get();
+    connOptions.m_msgproc = node.peerman.get();
+    connOptions.nSendBufferMaxSize = 1000 * args.GetIntArg("-maxsendbuffer", DEFAULT_MAXSENDBUFFER);
+    connOptions.nReceiveFloodSize = 1000 * args.GetIntArg("-maxreceivebuffer", DEFAULT_MAXRECEIVEBUFFER);
+    connOptions.m_added_nodes = args.GetArgs("-addnode");
+    connOptions.nMaxOutboundLimit = *opt_max_upload;
+    connOptions.m_peer_connect_timeout = peer_connect_timeout;
+
+    for (const std::string& bind_arg : args.GetArgs("-bind")) {
+        CService bind_addr;
+        const size_t index = bind_arg.rfind('=');
+        if (index == std::string::npos) {
+            if (Lookup(bind_arg, bind_addr, GetListenPort(), false)) {
+              
