@@ -374,4 +374,58 @@ struct WalletBalances
         return balance != prev.balance || unconfirmed_balance != prev.unconfirmed_balance ||
                immature_balance != prev.immature_balance || watch_only_balance != prev.watch_only_balance ||
                unconfirmed_watch_only_balance != prev.unconfirmed_watch_only_balance ||
-               immature_watch_only_balance != prev.immature_wa
+               immature_watch_only_balance != prev.immature_watch_only_balance;
+    }
+};
+
+// Wallet transaction information.
+struct WalletTx
+{
+    CTransactionRef tx;
+    std::vector<isminetype> txin_is_mine;
+    std::vector<isminetype> txout_is_mine;
+    std::vector<CTxDestination> txout_address;
+    std::vector<isminetype> txout_address_is_mine;
+    CAmount credit;
+    CAmount debit;
+    CAmount change;
+    int64_t time;
+    std::map<std::string, std::string> value_map;
+    bool is_coinbase;
+};
+
+//! Updated transaction status.
+struct WalletTxStatus
+{
+    int block_height;
+    int blocks_to_maturity;
+    int depth_in_main_chain;
+    unsigned int time_received;
+    uint32_t lock_time;
+    bool is_final;
+    bool is_trusted;
+    bool is_abandoned;
+    bool is_coinbase;
+    bool is_in_main_chain;
+};
+
+//! Wallet transaction output.
+struct WalletTxOut
+{
+    CTxOut txout;
+    int64_t time;
+    int depth_in_main_chain = -1;
+    bool is_spent = false;
+};
+
+//! Return implementation of Wallet interface. This function is defined in
+//! dummywallet.cpp and throws if the wallet component is not compiled.
+std::unique_ptr<Wallet> MakeWallet(WalletContext& context, const std::shared_ptr<CWallet>& wallet);
+
+//! Return implementation of ChainClient interface for a wallet loader. This
+//! function will be undefined in builds where ENABLE_WALLET is false.
+std::unique_ptr<WalletLoader> MakeWalletLoader(Chain& chain, ArgsManager& args);
+
+} // namespace interfaces
+
+#endif // BITCOIN_INTERFACES_WALLET_H
