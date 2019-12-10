@@ -31,4 +31,12 @@ public:
     //! Parse command line and determine if current process is a spawned child
     //! process. If so, return true and a file descriptor for communicating
     //! with the parent process.
-    virtual bool checkSp
+    virtual bool checkSpawned(int argc, char* argv[], int& fd) = 0;
+};
+
+//! Constructor for Process interface. Implementation will vary depending on
+//! the platform (unix or windows).
+std::unique_ptr<Process> MakeProcess();
+} // namespace ipc
+
+#endif // BITCOIN_IPC_PROCESS_H
