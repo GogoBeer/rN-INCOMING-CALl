@@ -389,4 +389,77 @@ if(LEVELDB_BUILD_BENCHMARKS)
   endfunction(leveldb_benchmark)
 
   if(NOT BUILD_SHARED_LIBS)
-    leveldb_benchmark("be
+    leveldb_benchmark("benchmarks/db_bench.cc")
+  endif(NOT BUILD_SHARED_LIBS)
+
+  check_library_exists(sqlite3 sqlite3_open "" HAVE_SQLITE3)
+  if(HAVE_SQLITE3)
+    leveldb_benchmark("benchmarks/db_bench_sqlite3.cc")
+    target_link_libraries(db_bench_sqlite3 sqlite3)
+  endif(HAVE_SQLITE3)
+
+  # check_library_exists is insufficient here because the library names have
+  # different manglings when compiled with clang or gcc, at least when installed
+  # with Homebrew on Mac.
+  set(OLD_CMAKE_REQURED_LIBRARIES ${CMAKE_REQUIRED_LIBRARIES})
+  list(APPEND CMAKE_REQUIRED_LIBRARIES kyotocabinet)
+  check_cxx_source_compiles("
+#include <kcpolydb.h>
+
+int main() {
+  kyotocabinet::TreeDB* db = new kyotocabinet::TreeDB();
+  delete db;
+  return 0;
+}
+  "  HAVE_KYOTOCABINET)
+  set(CMAKE_REQUIRED_LIBRARIES ${OLD_CMAKE_REQURED_LIBRARIES})
+  if(HAVE_KYOTOCABINET)
+    leveldb_benchmark("benchmarks/db_bench_tree_db.cc")
+    target_link_libraries(db_bench_tree_db kyotocabinet)
+  endif(HAVE_KYOTOCABINET)
+endif(LEVELDB_BUILD_BENCHMARKS)
+
+if(LEVELDB_INSTALL)
+  install(TARGETS leveldb
+    EXPORT leveldbTargets
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+  )
+  install(
+    FILES
+      "${LEVELDB_PUBLIC_INCLUDE_DIR}/c.h"
+      "${LEVELDB_PUBLIC_INCLUDE_DIR}/cache.h"
+      "${LEVELDB_PUBLIC_INCLUDE_DIR}/comparator.h"
+      "${LEVELDB_PUBLIC_INCLUDE_DIR}/db.h"
+      "${LEVELDB_PUBLIC_INCLUDE_DIR}/dumpfile.h"
+      "${LEVELDB_PUBLIC_INCLUDE_DIR}/env.h"
+      "${LEVELDB_PUBLIC_INCLUDE_DIR}/export.h"
+      "${LEVELDB_PUBLIC_INCLUDE_DIR}/filter_policy.h"
+      "${LEVELDB_PUBLIC_INCLUDE_DIR}/iterator.h"
+      "${LEVELDB_PUBLIC_INCLUDE_DIR}/options.h"
+      "${LEVELDB_PUBLIC_INCLUDE_DIR}/slice.h"
+      "${LEVELDB_PUBLIC_INCLUDE_DIR}/status.h"
+      "${LEVELDB_PUBLIC_INCLUDE_DIR}/table_builder.h"
+      "${LEVELDB_PUBLIC_INCLUDE_DIR}/table.h"
+      "${LEVELDB_PUBLIC_INCLUDE_DIR}/write_batch.h"
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/leveldb
+  )
+
+  include(CMakePackageConfigHelpers)
+  write_basic_package_version_file(
+      "${PROJECT_BINARY_DIR}/leveldbConfigVersion.cmake"
+      COMPATIBILITY SameMajorVersion
+  )
+  install(
+    EXPORT leveldbTargets
+    NAMESPACE leveldb::
+    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/leveldb"
+  )
+  install(
+    FILES
+      "cmake/leveldbConfig.cmake"
+      "${PROJECT_BINARY_DIR}/leveldbConfigVersion.cmake"
+    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/leveldb"
+  )
+endif(LEVELDB_INSTALL)
