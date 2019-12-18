@@ -130,4 +130,261 @@ DBImpl::DBImpl(const Options& raw_options, const std::string& dbname)
       internal_filter_policy_(raw_options.filter_policy),
       options_(SanitizeOptions(dbname, &internal_comparator_,
                                &internal_filter_policy_, raw_options)),
-      owns_info_log_(options_.info_log
+      owns_info_log_(options_.info_log != raw_options.info_log),
+      owns_cache_(options_.block_cache != raw_options.block_cache),
+      dbname_(dbname),
+      table_cache_(new TableCache(dbname_, options_, TableCacheSize(options_))),
+      db_lock_(nullptr),
+      shutting_down_(false),
+      background_work_finished_signal_(&mutex_),
+      mem_(nullptr),
+      imm_(nullptr),
+      has_imm_(false),
+      logfile_(nullptr),
+      logfile_number_(0),
+      log_(nullptr),
+      seed_(0),
+      tmp_batch_(new WriteBatch),
+      background_compaction_scheduled_(false),
+      manual_compaction_(nullptr),
+      versions_(new VersionSet(dbname_, &options_, table_cache_,
+                               &internal_comparator_)) {}
+
+DBImpl::~DBImpl() {
+  // Wait for background work to finish.
+  mutex_.Lock();
+  shutting_down_.store(true, std::memory_order_release);
+  while (background_compaction_scheduled_) {
+    background_work_finished_signal_.Wait();
+  }
+  mutex_.Unlock();
+
+  if (db_lock_ != nullptr) {
+    env_->UnlockFile(db_lock_);
+  }
+
+  delete versions_;
+  if (mem_ != nullptr) mem_->Unref();
+  if (imm_ != nullptr) imm_->Unref();
+  delete tmp_batch_;
+  delete log_;
+  delete logfile_;
+  delete table_cache_;
+
+  if (owns_info_log_) {
+    delete options_.info_log;
+  }
+  if (owns_cache_) {
+    delete options_.block_cache;
+  }
+}
+
+Status DBImpl::NewDB() {
+  VersionEdit new_db;
+  new_db.SetComparatorName(user_comparator()->Name());
+  new_db.SetLogNumber(0);
+  new_db.SetNextFile(2);
+  new_db.SetLastSequence(0);
+
+  const std::string manifest = DescriptorFileName(dbname_, 1);
+  WritableFile* file;
+  Status s = env_->NewWritableFile(manifest, &file);
+  if (!s.ok()) {
+    return s;
+  }
+  {
+    log::Writer log(file);
+    std::string record;
+    new_db.EncodeTo(&record);
+    s = log.AddRecord(record);
+    if (s.ok()) {
+      s = file->Close();
+    }
+  }
+  delete file;
+  if (s.ok()) {
+    // Make "CURRENT" file that points to the new manifest file.
+    s = SetCurrentFile(env_, dbname_, 1);
+  } else {
+    env_->DeleteFile(manifest);
+  }
+  return s;
+}
+
+void DBImpl::MaybeIgnoreError(Status* s) const {
+  if (s->ok() || options_.paranoid_checks) {
+    // No change needed
+  } else {
+    Log(options_.info_log, "Ignoring error %s", s->ToString().c_str());
+    *s = Status::OK();
+  }
+}
+
+void DBImpl::DeleteObsoleteFiles() {
+  mutex_.AssertHeld();
+
+  if (!bg_error_.ok()) {
+    // After a background error, we don't know whether a new version may
+    // or may not have been committed, so we cannot safely garbage collect.
+    return;
+  }
+
+  // Make a set of all of the live files
+  std::set<uint64_t> live = pending_outputs_;
+  versions_->AddLiveFiles(&live);
+
+  std::vector<std::string> filenames;
+  env_->GetChildren(dbname_, &filenames);  // Ignoring errors on purpose
+  uint64_t number;
+  FileType type;
+  std::vector<std::string> files_to_delete;
+  for (std::string& filename : filenames) {
+    if (ParseFileName(filename, &number, &type)) {
+      bool keep = true;
+      switch (type) {
+        case kLogFile:
+          keep = ((number >= versions_->LogNumber()) ||
+                  (number == versions_->PrevLogNumber()));
+          break;
+        case kDescriptorFile:
+          // Keep my manifest file, and any newer incarnations'
+          // (in case there is a race that allows other incarnations)
+          keep = (number >= versions_->ManifestFileNumber());
+          break;
+        case kTableFile:
+          keep = (live.find(number) != live.end());
+          break;
+        case kTempFile:
+          // Any temp files that are currently being written to must
+          // be recorded in pending_outputs_, which is inserted into "live"
+          keep = (live.find(number) != live.end());
+          break;
+        case kCurrentFile:
+        case kDBLockFile:
+        case kInfoLogFile:
+          keep = true;
+          break;
+      }
+
+      if (!keep) {
+        files_to_delete.push_back(std::move(filename));
+        if (type == kTableFile) {
+          table_cache_->Evict(number);
+        }
+        Log(options_.info_log, "Delete type=%d #%lld\n", static_cast<int>(type),
+            static_cast<unsigned long long>(number));
+      }
+    }
+  }
+
+  // While deleting all files unblock other threads. All files being deleted
+  // have unique names which will not collide with newly created files and
+  // are therefore safe to delete while allowing other threads to proceed.
+  mutex_.Unlock();
+  for (const std::string& filename : files_to_delete) {
+    env_->DeleteFile(dbname_ + "/" + filename);
+  }
+  mutex_.Lock();
+}
+
+Status DBImpl::Recover(VersionEdit* edit, bool* save_manifest) {
+  mutex_.AssertHeld();
+
+  // Ignore error from CreateDir since the creation of the DB is
+  // committed only when the descriptor is created, and this directory
+  // may already exist from a previous failed creation attempt.
+  env_->CreateDir(dbname_);
+  assert(db_lock_ == nullptr);
+  Status s = env_->LockFile(LockFileName(dbname_), &db_lock_);
+  if (!s.ok()) {
+    return s;
+  }
+
+  if (!env_->FileExists(CurrentFileName(dbname_))) {
+    if (options_.create_if_missing) {
+      s = NewDB();
+      if (!s.ok()) {
+        return s;
+      }
+    } else {
+      return Status::InvalidArgument(
+          dbname_, "does not exist (create_if_missing is false)");
+    }
+  } else {
+    if (options_.error_if_exists) {
+      return Status::InvalidArgument(dbname_,
+                                     "exists (error_if_exists is true)");
+    }
+  }
+
+  s = versions_->Recover(save_manifest);
+  if (!s.ok()) {
+    return s;
+  }
+  SequenceNumber max_sequence(0);
+
+  // Recover from all newer log files than the ones named in the
+  // descriptor (new log files may have been added by the previous
+  // incarnation without registering them in the descriptor).
+  //
+  // Note that PrevLogNumber() is no longer used, but we pay
+  // attention to it in case we are recovering a database
+  // produced by an older version of leveldb.
+  const uint64_t min_log = versions_->LogNumber();
+  const uint64_t prev_log = versions_->PrevLogNumber();
+  std::vector<std::string> filenames;
+  s = env_->GetChildren(dbname_, &filenames);
+  if (!s.ok()) {
+    return s;
+  }
+  std::set<uint64_t> expected;
+  versions_->AddLiveFiles(&expected);
+  uint64_t number;
+  FileType type;
+  std::vector<uint64_t> logs;
+  for (size_t i = 0; i < filenames.size(); i++) {
+    if (ParseFileName(filenames[i], &number, &type)) {
+      expected.erase(number);
+      if (type == kLogFile && ((number >= min_log) || (number == prev_log)))
+        logs.push_back(number);
+    }
+  }
+  if (!expected.empty()) {
+    char buf[50];
+    snprintf(buf, sizeof(buf), "%d missing files; e.g.",
+             static_cast<int>(expected.size()));
+    return Status::Corruption(buf, TableFileName(dbname_, *(expected.begin())));
+  }
+
+  // Recover in the order in which the logs were generated
+  std::sort(logs.begin(), logs.end());
+  for (size_t i = 0; i < logs.size(); i++) {
+    s = RecoverLogFile(logs[i], (i == logs.size() - 1), save_manifest, edit,
+                       &max_sequence);
+    if (!s.ok()) {
+      return s;
+    }
+
+    // The previous incarnation may not have written any MANIFEST
+    // records after allocating this log number.  So we manually
+    // update the file number allocation counter in VersionSet.
+    versions_->MarkFileNumberUsed(logs[i]);
+  }
+
+  if (versions_->LastSequence() < max_sequence) {
+    versions_->SetLastSequence(max_sequence);
+  }
+
+  return Status::OK();
+}
+
+Status DBImpl::RecoverLogFile(uint64_t log_number, bool last_log,
+                              bool* save_manifest, VersionEdit* edit,
+                              SequenceNumber* max_sequence) {
+  struct LogReporter : public log::Reader::Reporter {
+    Env* env;
+    Logger* info_log;
+    const char* fname;
+    Status* status;  // null if options_.paranoid_checks==false
+    void Corruption(size_t bytes, const Status& s) override {
+      Log(info_log, "%s%s: drop
