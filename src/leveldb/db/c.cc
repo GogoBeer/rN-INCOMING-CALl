@@ -452,4 +452,111 @@ leveldb_filterpolicy_t* leveldb_filterpolicy_create(
     const char* (*name)(void*)) {
   leveldb_filterpolicy_t* result = new leveldb_filterpolicy_t;
   result->state_ = state;
-  result->
+  result->destructor_ = destructor;
+  result->create_ = create_filter;
+  result->key_match_ = key_may_match;
+  result->name_ = name;
+  return result;
+}
+
+void leveldb_filterpolicy_destroy(leveldb_filterpolicy_t* filter) {
+  delete filter;
+}
+
+leveldb_filterpolicy_t* leveldb_filterpolicy_create_bloom(int bits_per_key) {
+  // Make a leveldb_filterpolicy_t, but override all of its methods so
+  // they delegate to a NewBloomFilterPolicy() instead of user
+  // supplied C functions.
+  struct Wrapper : public leveldb_filterpolicy_t {
+    static void DoNothing(void*) {}
+
+    ~Wrapper() { delete rep_; }
+    const char* Name() const { return rep_->Name(); }
+    void CreateFilter(const Slice* keys, int n, std::string* dst) const {
+      return rep_->CreateFilter(keys, n, dst);
+    }
+    bool KeyMayMatch(const Slice& key, const Slice& filter) const {
+      return rep_->KeyMayMatch(key, filter);
+    }
+
+    const FilterPolicy* rep_;
+  };
+  Wrapper* wrapper = new Wrapper;
+  wrapper->rep_ = NewBloomFilterPolicy(bits_per_key);
+  wrapper->state_ = nullptr;
+  wrapper->destructor_ = &Wrapper::DoNothing;
+  return wrapper;
+}
+
+leveldb_readoptions_t* leveldb_readoptions_create() {
+  return new leveldb_readoptions_t;
+}
+
+void leveldb_readoptions_destroy(leveldb_readoptions_t* opt) { delete opt; }
+
+void leveldb_readoptions_set_verify_checksums(leveldb_readoptions_t* opt,
+                                              uint8_t v) {
+  opt->rep.verify_checksums = v;
+}
+
+void leveldb_readoptions_set_fill_cache(leveldb_readoptions_t* opt, uint8_t v) {
+  opt->rep.fill_cache = v;
+}
+
+void leveldb_readoptions_set_snapshot(leveldb_readoptions_t* opt,
+                                      const leveldb_snapshot_t* snap) {
+  opt->rep.snapshot = (snap ? snap->rep : nullptr);
+}
+
+leveldb_writeoptions_t* leveldb_writeoptions_create() {
+  return new leveldb_writeoptions_t;
+}
+
+void leveldb_writeoptions_destroy(leveldb_writeoptions_t* opt) { delete opt; }
+
+void leveldb_writeoptions_set_sync(leveldb_writeoptions_t* opt, uint8_t v) {
+  opt->rep.sync = v;
+}
+
+leveldb_cache_t* leveldb_cache_create_lru(size_t capacity) {
+  leveldb_cache_t* c = new leveldb_cache_t;
+  c->rep = NewLRUCache(capacity);
+  return c;
+}
+
+void leveldb_cache_destroy(leveldb_cache_t* cache) {
+  delete cache->rep;
+  delete cache;
+}
+
+leveldb_env_t* leveldb_create_default_env() {
+  leveldb_env_t* result = new leveldb_env_t;
+  result->rep = Env::Default();
+  result->is_default = true;
+  return result;
+}
+
+void leveldb_env_destroy(leveldb_env_t* env) {
+  if (!env->is_default) delete env->rep;
+  delete env;
+}
+
+char* leveldb_env_get_test_directory(leveldb_env_t* env) {
+  std::string result;
+  if (!env->rep->GetTestDirectory(&result).ok()) {
+    return nullptr;
+  }
+
+  char* buffer = static_cast<char*>(malloc(result.size() + 1));
+  memcpy(buffer, result.data(), result.size());
+  buffer[result.size()] = '\0';
+  return buffer;
+}
+
+void leveldb_free(void* ptr) { free(ptr); }
+
+int leveldb_major_version() { return kMajorVersion; }
+
+int leveldb_minor_version() { return kMinorVersion; }
+
+}  // end extern "C"
