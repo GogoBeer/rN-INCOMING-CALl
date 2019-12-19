@@ -387,4 +387,273 @@ Status DBImpl::RecoverLogFile(uint64_t log_number, bool last_log,
     const char* fname;
     Status* status;  // null if options_.paranoid_checks==false
     void Corruption(size_t bytes, const Status& s) override {
-      Log(info_log, "%s%s: drop
+      Log(info_log, "%s%s: dropping %d bytes; %s",
+          (this->status == nullptr ? "(ignoring error) " : ""), fname,
+          static_cast<int>(bytes), s.ToString().c_str());
+      if (this->status != nullptr && this->status->ok()) *this->status = s;
+    }
+  };
+
+  mutex_.AssertHeld();
+
+  // Open the log file
+  std::string fname = LogFileName(dbname_, log_number);
+  SequentialFile* file;
+  Status status = env_->NewSequentialFile(fname, &file);
+  if (!status.ok()) {
+    MaybeIgnoreError(&status);
+    return status;
+  }
+
+  // Create the log reader.
+  LogReporter reporter;
+  reporter.env = env_;
+  reporter.info_log = options_.info_log;
+  reporter.fname = fname.c_str();
+  reporter.status = (options_.paranoid_checks ? &status : nullptr);
+  // We intentionally make log::Reader do checksumming even if
+  // paranoid_checks==false so that corruptions cause entire commits
+  // to be skipped instead of propagating bad information (like overly
+  // large sequence numbers).
+  log::Reader reader(file, &reporter, true /*checksum*/, 0 /*initial_offset*/);
+  Log(options_.info_log, "Recovering log #%llu",
+      (unsigned long long)log_number);
+
+  // Read all the records and add to a memtable
+  std::string scratch;
+  Slice record;
+  WriteBatch batch;
+  int compactions = 0;
+  MemTable* mem = nullptr;
+  while (reader.ReadRecord(&record, &scratch) && status.ok()) {
+    if (record.size() < 12) {
+      reporter.Corruption(record.size(),
+                          Status::Corruption("log record too small", fname));
+      continue;
+    }
+    WriteBatchInternal::SetContents(&batch, record);
+
+    if (mem == nullptr) {
+      mem = new MemTable(internal_comparator_);
+      mem->Ref();
+    }
+    status = WriteBatchInternal::InsertInto(&batch, mem);
+    MaybeIgnoreError(&status);
+    if (!status.ok()) {
+      break;
+    }
+    const SequenceNumber last_seq = WriteBatchInternal::Sequence(&batch) +
+                                    WriteBatchInternal::Count(&batch) - 1;
+    if (last_seq > *max_sequence) {
+      *max_sequence = last_seq;
+    }
+
+    if (mem->ApproximateMemoryUsage() > options_.write_buffer_size) {
+      compactions++;
+      *save_manifest = true;
+      status = WriteLevel0Table(mem, edit, nullptr);
+      mem->Unref();
+      mem = nullptr;
+      if (!status.ok()) {
+        // Reflect errors immediately so that conditions like full
+        // file-systems cause the DB::Open() to fail.
+        break;
+      }
+    }
+  }
+
+  delete file;
+
+  // See if we should keep reusing the last log file.
+  if (status.ok() && options_.reuse_logs && last_log && compactions == 0) {
+    assert(logfile_ == nullptr);
+    assert(log_ == nullptr);
+    assert(mem_ == nullptr);
+    uint64_t lfile_size;
+    if (env_->GetFileSize(fname, &lfile_size).ok() &&
+        env_->NewAppendableFile(fname, &logfile_).ok()) {
+      Log(options_.info_log, "Reusing old log %s \n", fname.c_str());
+      log_ = new log::Writer(logfile_, lfile_size);
+      logfile_number_ = log_number;
+      if (mem != nullptr) {
+        mem_ = mem;
+        mem = nullptr;
+      } else {
+        // mem can be nullptr if lognum exists but was empty.
+        mem_ = new MemTable(internal_comparator_);
+        mem_->Ref();
+      }
+    }
+  }
+
+  if (mem != nullptr) {
+    // mem did not get reused; compact it.
+    if (status.ok()) {
+      *save_manifest = true;
+      status = WriteLevel0Table(mem, edit, nullptr);
+    }
+    mem->Unref();
+  }
+
+  return status;
+}
+
+Status DBImpl::WriteLevel0Table(MemTable* mem, VersionEdit* edit,
+                                Version* base) {
+  mutex_.AssertHeld();
+  const uint64_t start_micros = env_->NowMicros();
+  FileMetaData meta;
+  meta.number = versions_->NewFileNumber();
+  pending_outputs_.insert(meta.number);
+  Iterator* iter = mem->NewIterator();
+  Log(options_.info_log, "Level-0 table #%llu: started",
+      (unsigned long long)meta.number);
+
+  Status s;
+  {
+    mutex_.Unlock();
+    s = BuildTable(dbname_, env_, options_, table_cache_, iter, &meta);
+    mutex_.Lock();
+  }
+
+  Log(options_.info_log, "Level-0 table #%llu: %lld bytes %s",
+      (unsigned long long)meta.number, (unsigned long long)meta.file_size,
+      s.ToString().c_str());
+  delete iter;
+  pending_outputs_.erase(meta.number);
+
+  // Note that if file_size is zero, the file has been deleted and
+  // should not be added to the manifest.
+  int level = 0;
+  if (s.ok() && meta.file_size > 0) {
+    const Slice min_user_key = meta.smallest.user_key();
+    const Slice max_user_key = meta.largest.user_key();
+    if (base != nullptr) {
+      level = base->PickLevelForMemTableOutput(min_user_key, max_user_key);
+    }
+    edit->AddFile(level, meta.number, meta.file_size, meta.smallest,
+                  meta.largest);
+  }
+
+  CompactionStats stats;
+  stats.micros = env_->NowMicros() - start_micros;
+  stats.bytes_written = meta.file_size;
+  stats_[level].Add(stats);
+  return s;
+}
+
+void DBImpl::CompactMemTable() {
+  mutex_.AssertHeld();
+  assert(imm_ != nullptr);
+
+  // Save the contents of the memtable as a new Table
+  VersionEdit edit;
+  Version* base = versions_->current();
+  base->Ref();
+  Status s = WriteLevel0Table(imm_, &edit, base);
+  base->Unref();
+
+  if (s.ok() && shutting_down_.load(std::memory_order_acquire)) {
+    s = Status::IOError("Deleting DB during memtable compaction");
+  }
+
+  // Replace immutable memtable with the generated Table
+  if (s.ok()) {
+    edit.SetPrevLogNumber(0);
+    edit.SetLogNumber(logfile_number_);  // Earlier logs no longer needed
+    s = versions_->LogAndApply(&edit, &mutex_);
+  }
+
+  if (s.ok()) {
+    // Commit to the new state
+    imm_->Unref();
+    imm_ = nullptr;
+    has_imm_.store(false, std::memory_order_release);
+    DeleteObsoleteFiles();
+  } else {
+    RecordBackgroundError(s);
+  }
+}
+
+void DBImpl::CompactRange(const Slice* begin, const Slice* end) {
+  int max_level_with_files = 1;
+  {
+    MutexLock l(&mutex_);
+    Version* base = versions_->current();
+    for (int level = 1; level < config::kNumLevels; level++) {
+      if (base->OverlapInLevel(level, begin, end)) {
+        max_level_with_files = level;
+      }
+    }
+  }
+  TEST_CompactMemTable();  // TODO(sanjay): Skip if memtable does not overlap
+  for (int level = 0; level < max_level_with_files; level++) {
+    TEST_CompactRange(level, begin, end);
+  }
+}
+
+void DBImpl::TEST_CompactRange(int level, const Slice* begin,
+                               const Slice* end) {
+  assert(level >= 0);
+  assert(level + 1 < config::kNumLevels);
+
+  InternalKey begin_storage, end_storage;
+
+  ManualCompaction manual;
+  manual.level = level;
+  manual.done = false;
+  if (begin == nullptr) {
+    manual.begin = nullptr;
+  } else {
+    begin_storage = InternalKey(*begin, kMaxSequenceNumber, kValueTypeForSeek);
+    manual.begin = &begin_storage;
+  }
+  if (end == nullptr) {
+    manual.end = nullptr;
+  } else {
+    end_storage = InternalKey(*end, 0, static_cast<ValueType>(0));
+    manual.end = &end_storage;
+  }
+
+  MutexLock l(&mutex_);
+  while (!manual.done && !shutting_down_.load(std::memory_order_acquire) &&
+         bg_error_.ok()) {
+    if (manual_compaction_ == nullptr) {  // Idle
+      manual_compaction_ = &manual;
+      MaybeScheduleCompaction();
+    } else {  // Running either my compaction or another compaction.
+      background_work_finished_signal_.Wait();
+    }
+  }
+  if (manual_compaction_ == &manual) {
+    // Cancel my manual compaction since we aborted early for some reason.
+    manual_compaction_ = nullptr;
+  }
+}
+
+Status DBImpl::TEST_CompactMemTable() {
+  // nullptr batch means just wait for earlier writes to be done
+  Status s = Write(WriteOptions(), nullptr);
+  if (s.ok()) {
+    // Wait until the compaction completes
+    MutexLock l(&mutex_);
+    while (imm_ != nullptr && bg_error_.ok()) {
+      background_work_finished_signal_.Wait();
+    }
+    if (imm_ != nullptr) {
+      s = bg_error_;
+    }
+  }
+  return s;
+}
+
+void DBImpl::RecordBackgroundError(const Status& s) {
+  mutex_.AssertHeld();
+  if (bg_error_.ok()) {
+    bg_error_ = s;
+    background_work_finished_signal_.SignalAll();
+  }
+}
+
+void DBImpl::MaybeScheduleCompaction() {
+  
