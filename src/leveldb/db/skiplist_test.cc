@@ -255,3 +255,116 @@ class ConcurrentTest {
         ASSERT_TRUE((gen(pos) == 0) ||
                     (gen(pos) > static_cast<Key>(initial_state.Get(key(pos)))))
             << "key: " << key(pos) << "; gen: " << gen(pos)
+            << "; initgen: " << initial_state.Get(key(pos));
+
+        // Advance to next key in the valid key space
+        if (key(pos) < key(current)) {
+          pos = MakeKey(key(pos) + 1, 0);
+        } else {
+          pos = MakeKey(key(pos), gen(pos) + 1);
+        }
+      }
+
+      if (!iter.Valid()) {
+        break;
+      }
+
+      if (rnd->Next() % 2) {
+        iter.Next();
+        pos = MakeKey(key(pos), gen(pos) + 1);
+      } else {
+        Key new_target = RandomTarget(rnd);
+        if (new_target > pos) {
+          pos = new_target;
+          iter.Seek(new_target);
+        }
+      }
+    }
+  }
+};
+const uint32_t ConcurrentTest::K;
+
+// Simple test that does single-threaded testing of the ConcurrentTest
+// scaffolding.
+TEST(SkipTest, ConcurrentWithoutThreads) {
+  ConcurrentTest test;
+  Random rnd(test::RandomSeed());
+  for (int i = 0; i < 10000; i++) {
+    test.ReadStep(&rnd);
+    test.WriteStep(&rnd);
+  }
+}
+
+class TestState {
+ public:
+  ConcurrentTest t_;
+  int seed_;
+  std::atomic<bool> quit_flag_;
+
+  enum ReaderState { STARTING, RUNNING, DONE };
+
+  explicit TestState(int s)
+      : seed_(s), quit_flag_(false), state_(STARTING), state_cv_(&mu_) {}
+
+  void Wait(ReaderState s) LOCKS_EXCLUDED(mu_) {
+    mu_.Lock();
+    while (state_ != s) {
+      state_cv_.Wait();
+    }
+    mu_.Unlock();
+  }
+
+  void Change(ReaderState s) LOCKS_EXCLUDED(mu_) {
+    mu_.Lock();
+    state_ = s;
+    state_cv_.Signal();
+    mu_.Unlock();
+  }
+
+ private:
+  port::Mutex mu_;
+  ReaderState state_ GUARDED_BY(mu_);
+  port::CondVar state_cv_ GUARDED_BY(mu_);
+};
+
+static void ConcurrentReader(void* arg) {
+  TestState* state = reinterpret_cast<TestState*>(arg);
+  Random rnd(state->seed_);
+  int64_t reads = 0;
+  state->Change(TestState::RUNNING);
+  while (!state->quit_flag_.load(std::memory_order_acquire)) {
+    state->t_.ReadStep(&rnd);
+    ++reads;
+  }
+  state->Change(TestState::DONE);
+}
+
+static void RunConcurrent(int run) {
+  const int seed = test::RandomSeed() + (run * 100);
+  Random rnd(seed);
+  const int N = 1000;
+  const int kSize = 1000;
+  for (int i = 0; i < N; i++) {
+    if ((i % 100) == 0) {
+      fprintf(stderr, "Run %d of %d\n", i, N);
+    }
+    TestState state(seed + 1);
+    Env::Default()->Schedule(ConcurrentReader, &state);
+    state.Wait(TestState::RUNNING);
+    for (int i = 0; i < kSize; i++) {
+      state.t_.WriteStep(&rnd);
+    }
+    state.quit_flag_.store(true, std::memory_order_release);
+    state.Wait(TestState::DONE);
+  }
+}
+
+TEST(SkipTest, Concurrent1) { RunConcurrent(1); }
+TEST(SkipTest, Concurrent2) { RunConcurrent(2); }
+TEST(SkipTest, Concurrent3) { RunConcurrent(3); }
+TEST(SkipTest, Concurrent4) { RunConcurrent(4); }
+TEST(SkipTest, Concurrent5) { RunConcurrent(5); }
+
+}  // namespace leveldb
+
+int main(int argc, char** argv) { return leveldb::test::RunAllTests(); }
