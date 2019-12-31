@@ -43,4 +43,33 @@ Example: consider a sequence of user records:
     B: length 97270
     C: length 8000
 
-**A** will be stored as a FU
+**A** will be stored as a FULL record in the first block.
+
+**B** will be split into three fragments: first fragment occupies the rest of
+the first block, second fragment occupies the entirety of the second block, and
+the third fragment occupies a prefix of the third block.  This will leave six
+bytes free in the third block, which will be left empty as the trailer.
+
+**C** will be stored as a FULL record in the fourth block.
+
+----
+
+## Some benefits over the recordio format:
+
+1. We do not need any heuristics for resyncing - just go to next block boundary
+   and scan.  If there is a corruption, skip to the next block.  As a
+   side-benefit, we do not get confused when part of the contents of one log
+   file are embedded as a record inside another log file.
+
+2. Splitting at approximate boundaries (e.g., for mapreduce) is simple: find the
+   next block boundary and skip records until we hit a FULL or FIRST record.
+
+3. We do not need extra buffering for large records.
+
+## Some downsides compared to recordio format:
+
+1. No packing of tiny records.  This could be fixed by adding a new record type,
+   so it is a shortcoming of the current implementation, not necessarily the
+   format.
+
+2. No compression.  Again, this could be fixed by adding new record types.
