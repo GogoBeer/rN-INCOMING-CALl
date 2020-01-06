@@ -113,4 +113,59 @@ void TwoLevelIterator::Prev() {
 }
 
 void TwoLevelIterator::SkipEmptyDataBlocksForward() {
-  while (data_iter_.iter() == nullptr || !d
+  while (data_iter_.iter() == nullptr || !data_iter_.Valid()) {
+    // Move to next block
+    if (!index_iter_.Valid()) {
+      SetDataIterator(nullptr);
+      return;
+    }
+    index_iter_.Next();
+    InitDataBlock();
+    if (data_iter_.iter() != nullptr) data_iter_.SeekToFirst();
+  }
+}
+
+void TwoLevelIterator::SkipEmptyDataBlocksBackward() {
+  while (data_iter_.iter() == nullptr || !data_iter_.Valid()) {
+    // Move to next block
+    if (!index_iter_.Valid()) {
+      SetDataIterator(nullptr);
+      return;
+    }
+    index_iter_.Prev();
+    InitDataBlock();
+    if (data_iter_.iter() != nullptr) data_iter_.SeekToLast();
+  }
+}
+
+void TwoLevelIterator::SetDataIterator(Iterator* data_iter) {
+  if (data_iter_.iter() != nullptr) SaveError(data_iter_.status());
+  data_iter_.Set(data_iter);
+}
+
+void TwoLevelIterator::InitDataBlock() {
+  if (!index_iter_.Valid()) {
+    SetDataIterator(nullptr);
+  } else {
+    Slice handle = index_iter_.value();
+    if (data_iter_.iter() != nullptr &&
+        handle.compare(data_block_handle_) == 0) {
+      // data_iter_ is already constructed with this iterator, so
+      // no need to change anything
+    } else {
+      Iterator* iter = (*block_function_)(arg_, options_, handle);
+      data_block_handle_.assign(handle.data(), handle.size());
+      SetDataIterator(iter);
+    }
+  }
+}
+
+}  // namespace
+
+Iterator* NewTwoLevelIterator(Iterator* index_iter,
+                              BlockFunction block_function, void* arg,
+                              const ReadOptions& options) {
+  return new TwoLevelIterator(index_iter, block_function, arg, options);
+}
+
+}  // namespace leveldb
