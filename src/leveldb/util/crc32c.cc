@@ -329,3 +329,53 @@ uint32_t Extend(uint32_t crc, const char* data, size_t n) {
       STEP1;
     }
   }
+
+  if ((e - p) >= 16) {
+    // Load a 16-byte swath into the stride partial results.
+    uint32_t crc0 = ReadUint32LE(p + 0 * 4) ^ l;
+    uint32_t crc1 = ReadUint32LE(p + 1 * 4);
+    uint32_t crc2 = ReadUint32LE(p + 2 * 4);
+    uint32_t crc3 = ReadUint32LE(p + 3 * 4);
+    p += 16;
+
+    // It is possible to get better speeds (at least on x86) by interleaving
+    // prefetching 256 bytes ahead with processing 64 bytes at a time. See the
+    // portable implementation in https://github.com/google/crc32c/.
+
+    // Process one 16-byte swath at a time.
+    while ((e - p) >= 16) {
+      STEP16;
+    }
+
+    // Advance one word at a time as far as possible.
+    while ((e - p) >= 4) {
+      STEP4(0);
+      uint32_t tmp = crc0;
+      crc0 = crc1;
+      crc1 = crc2;
+      crc2 = crc3;
+      crc3 = tmp;
+      p += 4;
+    }
+
+    // Combine the 4 partial stride results.
+    l = 0;
+    STEP4W(crc0);
+    STEP4W(crc1);
+    STEP4W(crc2);
+    STEP4W(crc3);
+  }
+
+  // Process the last few bytes.
+  while (p != e) {
+    STEP1;
+  }
+#undef STEP4W
+#undef STEP16
+#undef STEP4
+#undef STEP1
+  return l ^ kCRC32Xor;
+}
+
+}  // namespace crc32c
+}  // namespace leveldb
