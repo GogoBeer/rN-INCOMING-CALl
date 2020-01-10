@@ -291,4 +291,226 @@ class WindowsWritableFile : public WritableFile {
 
   Status Close() override {
     Status status = FlushBuffer();
-    if (!handle_.Close() && status.ok()
+    if (!handle_.Close() && status.ok()) {
+      status = WindowsError(filename_, ::GetLastError());
+    }
+    return status;
+  }
+
+  Status Flush() override { return FlushBuffer(); }
+
+  Status Sync() override {
+    // On Windows no need to sync parent directory. Its metadata will be updated
+    // via the creation of the new file, without an explicit sync.
+
+    Status status = FlushBuffer();
+    if (!status.ok()) {
+      return status;
+    }
+
+    if (!::FlushFileBuffers(handle_.get())) {
+      return Status::IOError(filename_,
+                             GetWindowsErrorMessage(::GetLastError()));
+    }
+    return Status::OK();
+  }
+
+  std::string GetName() const override { return filename_; }
+
+ private:
+  Status FlushBuffer() {
+    Status status = WriteUnbuffered(buf_, pos_);
+    pos_ = 0;
+    return status;
+  }
+
+  Status WriteUnbuffered(const char* data, size_t size) {
+    DWORD bytes_written;
+    if (!::WriteFile(handle_.get(), data, static_cast<DWORD>(size),
+                     &bytes_written, nullptr)) {
+      return Status::IOError(filename_,
+                             GetWindowsErrorMessage(::GetLastError()));
+    }
+    return Status::OK();
+  }
+
+  // buf_[0, pos_-1] contains data to be written to handle_.
+  char buf_[kWritableFileBufferSize];
+  size_t pos_;
+
+  ScopedHandle handle_;
+  const std::string filename_;
+};
+
+// Lock or unlock the entire file as specified by |lock|. Returns true
+// when successful, false upon failure. Caller should call ::GetLastError()
+// to determine cause of failure
+bool LockOrUnlock(HANDLE handle, bool lock) {
+  if (lock) {
+    return ::LockFile(handle,
+                      /*dwFileOffsetLow=*/0, /*dwFileOffsetHigh=*/0,
+                      /*nNumberOfBytesToLockLow=*/MAXDWORD,
+                      /*nNumberOfBytesToLockHigh=*/MAXDWORD);
+  } else {
+    return ::UnlockFile(handle,
+                        /*dwFileOffsetLow=*/0, /*dwFileOffsetHigh=*/0,
+                        /*nNumberOfBytesToLockLow=*/MAXDWORD,
+                        /*nNumberOfBytesToLockHigh=*/MAXDWORD);
+  }
+}
+
+class WindowsFileLock : public FileLock {
+ public:
+  WindowsFileLock(ScopedHandle handle, std::string filename)
+      : handle_(std::move(handle)), filename_(std::move(filename)) {}
+
+  const ScopedHandle& handle() const { return handle_; }
+  const std::string& filename() const { return filename_; }
+
+ private:
+  const ScopedHandle handle_;
+  const std::string filename_;
+};
+
+class WindowsEnv : public Env {
+ public:
+  WindowsEnv();
+  ~WindowsEnv() override {
+    static const char msg[] =
+        "WindowsEnv singleton destroyed. Unsupported behavior!\n";
+    std::fwrite(msg, 1, sizeof(msg), stderr);
+    std::abort();
+  }
+
+  Status NewSequentialFile(const std::string& filename,
+                           SequentialFile** result) override {
+    *result = nullptr;
+    DWORD desired_access = GENERIC_READ;
+    DWORD share_mode = FILE_SHARE_READ;
+    auto wFilename = toUtf16(filename);
+    ScopedHandle handle = ::CreateFileW(
+        wFilename.c_str(), desired_access, share_mode,
+        /*lpSecurityAttributes=*/nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL,
+        /*hTemplateFile=*/nullptr);
+    if (!handle.is_valid()) {
+      return WindowsError(filename, ::GetLastError());
+    }
+
+    *result = new WindowsSequentialFile(filename, std::move(handle));
+    return Status::OK();
+  }
+
+  Status NewRandomAccessFile(const std::string& filename,
+                             RandomAccessFile** result) override {
+    *result = nullptr;
+    DWORD desired_access = GENERIC_READ;
+    DWORD share_mode = FILE_SHARE_READ;
+    auto wFilename = toUtf16(filename);
+    ScopedHandle handle =
+        ::CreateFileW(wFilename.c_str(), desired_access, share_mode,
+                      /*lpSecurityAttributes=*/nullptr, OPEN_EXISTING,
+                      FILE_ATTRIBUTE_READONLY,
+                      /*hTemplateFile=*/nullptr);
+    if (!handle.is_valid()) {
+      return WindowsError(filename, ::GetLastError());
+    }
+    if (!mmap_limiter_.Acquire()) {
+      *result = new WindowsRandomAccessFile(filename, std::move(handle));
+      return Status::OK();
+    }
+
+    LARGE_INTEGER file_size;
+    Status status;
+    if (!::GetFileSizeEx(handle.get(), &file_size)) {
+      mmap_limiter_.Release();
+      return WindowsError(filename, ::GetLastError());
+    }
+
+    ScopedHandle mapping =
+        ::CreateFileMappingW(handle.get(),
+                             /*security attributes=*/nullptr, PAGE_READONLY,
+                             /*dwMaximumSizeHigh=*/0,
+                             /*dwMaximumSizeLow=*/0,
+                             /*lpName=*/nullptr);
+    if (mapping.is_valid()) {
+      void* mmap_base = ::MapViewOfFile(mapping.get(), FILE_MAP_READ,
+                                        /*dwFileOffsetHigh=*/0,
+                                        /*dwFileOffsetLow=*/0,
+                                        /*dwNumberOfBytesToMap=*/0);
+      if (mmap_base) {
+        *result = new WindowsMmapReadableFile(
+            filename, reinterpret_cast<char*>(mmap_base),
+            static_cast<size_t>(file_size.QuadPart), &mmap_limiter_);
+        return Status::OK();
+      }
+    }
+    mmap_limiter_.Release();
+    return WindowsError(filename, ::GetLastError());
+  }
+
+  Status NewWritableFile(const std::string& filename,
+                         WritableFile** result) override {
+    DWORD desired_access = GENERIC_WRITE;
+    DWORD share_mode = 0;  // Exclusive access.
+    auto wFilename = toUtf16(filename);
+    ScopedHandle handle = ::CreateFileW(
+        wFilename.c_str(), desired_access, share_mode,
+        /*lpSecurityAttributes=*/nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL,
+        /*hTemplateFile=*/nullptr);
+    if (!handle.is_valid()) {
+      *result = nullptr;
+      return WindowsError(filename, ::GetLastError());
+    }
+
+    *result = new WindowsWritableFile(filename, std::move(handle));
+    return Status::OK();
+  }
+
+  Status NewAppendableFile(const std::string& filename,
+                           WritableFile** result) override {
+    DWORD desired_access = FILE_APPEND_DATA;
+    DWORD share_mode = 0;  // Exclusive access.
+    auto wFilename = toUtf16(filename);
+    ScopedHandle handle = ::CreateFileW(
+        wFilename.c_str(), desired_access, share_mode,
+        /*lpSecurityAttributes=*/nullptr, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL,
+        /*hTemplateFile=*/nullptr);
+    if (!handle.is_valid()) {
+      *result = nullptr;
+      return WindowsError(filename, ::GetLastError());
+    }
+
+    *result = new WindowsWritableFile(filename, std::move(handle));
+    return Status::OK();
+  }
+
+  bool FileExists(const std::string& filename) override {
+    auto wFilename = toUtf16(filename);
+    return GetFileAttributesW(wFilename.c_str()) != INVALID_FILE_ATTRIBUTES;
+  }
+
+  Status GetChildren(const std::string& directory_path,
+                     std::vector<std::string>* result) override {
+    const std::string find_pattern = directory_path + "\\*";
+    WIN32_FIND_DATAW find_data;
+    auto wFind_pattern = toUtf16(find_pattern);
+    HANDLE dir_handle = ::FindFirstFileW(wFind_pattern.c_str(), &find_data);
+    if (dir_handle == INVALID_HANDLE_VALUE) {
+      DWORD last_error = ::GetLastError();
+      if (last_error == ERROR_FILE_NOT_FOUND) {
+        return Status::OK();
+      }
+      return WindowsError(directory_path, last_error);
+    }
+    do {
+      char base_name[_MAX_FNAME];
+      char ext[_MAX_EXT];
+
+      auto find_data_filename = toUtf8(find_data.cFileName);
+      if (!_splitpath_s(find_data_filename.c_str(), nullptr, 0, nullptr, 0,
+                        base_name, ARRAYSIZE(base_name), ext, ARRAYSIZE(ext))) {
+        result->emplace_back(std::string(base_name) + ext);
+      }
+    } while (::FindNextFileW(dir_handle, &find_data));
+    DWORD last_error = ::GetLastError();
+    ::F
