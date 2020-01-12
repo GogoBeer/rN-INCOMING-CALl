@@ -513,4 +513,234 @@ class WindowsEnv : public Env {
       }
     } while (::FindNextFileW(dir_handle, &find_data));
     DWORD last_error = ::GetLastError();
-    ::F
+    ::FindClose(dir_handle);
+    if (last_error != ERROR_NO_MORE_FILES) {
+      return WindowsError(directory_path, last_error);
+    }
+    return Status::OK();
+  }
+
+  Status DeleteFile(const std::string& filename) override {
+    auto wFilename = toUtf16(filename);
+    if (!::DeleteFileW(wFilename.c_str())) {
+      return WindowsError(filename, ::GetLastError());
+    }
+    return Status::OK();
+  }
+
+  Status CreateDir(const std::string& dirname) override {
+    auto wDirname = toUtf16(dirname);
+    if (!::CreateDirectoryW(wDirname.c_str(), nullptr)) {
+      return WindowsError(dirname, ::GetLastError());
+    }
+    return Status::OK();
+  }
+
+  Status DeleteDir(const std::string& dirname) override {
+    auto wDirname = toUtf16(dirname);
+    if (!::RemoveDirectoryW(wDirname.c_str())) {
+      return WindowsError(dirname, ::GetLastError());
+    }
+    return Status::OK();
+  }
+
+  Status GetFileSize(const std::string& filename, uint64_t* size) override {
+    WIN32_FILE_ATTRIBUTE_DATA file_attributes;
+    auto wFilename = toUtf16(filename);
+    if (!::GetFileAttributesExW(wFilename.c_str(), GetFileExInfoStandard,
+                                &file_attributes)) {
+      return WindowsError(filename, ::GetLastError());
+    }
+    ULARGE_INTEGER file_size;
+    file_size.HighPart = file_attributes.nFileSizeHigh;
+    file_size.LowPart = file_attributes.nFileSizeLow;
+    *size = file_size.QuadPart;
+    return Status::OK();
+  }
+
+  Status RenameFile(const std::string& from, const std::string& to) override {
+    // Try a simple move first. It will only succeed when |to| doesn't already
+    // exist.
+    auto wFrom = toUtf16(from);
+    auto wTo = toUtf16(to);
+    if (::MoveFileW(wFrom.c_str(), wTo.c_str())) {
+      return Status::OK();
+    }
+    DWORD move_error = ::GetLastError();
+
+    // Try the full-blown replace if the move fails, as ReplaceFile will only
+    // succeed when |to| does exist. When writing to a network share, we may not
+    // be able to change the ACLs. Ignore ACL errors then
+    // (REPLACEFILE_IGNORE_MERGE_ERRORS).
+    if (::ReplaceFileW(wTo.c_str(), wFrom.c_str(), /*lpBackupFileName=*/nullptr,
+                       REPLACEFILE_IGNORE_MERGE_ERRORS,
+                       /*lpExclude=*/nullptr, /*lpReserved=*/nullptr)) {
+      return Status::OK();
+    }
+    DWORD replace_error = ::GetLastError();
+    // In the case of FILE_ERROR_NOT_FOUND from ReplaceFile, it is likely that
+    // |to| does not exist. In this case, the more relevant error comes from the
+    // call to MoveFile.
+    if (replace_error == ERROR_FILE_NOT_FOUND ||
+        replace_error == ERROR_PATH_NOT_FOUND) {
+      return WindowsError(from, move_error);
+    } else {
+      return WindowsError(from, replace_error);
+    }
+  }
+
+  Status LockFile(const std::string& filename, FileLock** lock) override {
+    *lock = nullptr;
+    Status result;
+    auto wFilename = toUtf16(filename);
+    ScopedHandle handle = ::CreateFileW(
+        wFilename.c_str(), GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ,
+        /*lpSecurityAttributes=*/nullptr, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL,
+        nullptr);
+    if (!handle.is_valid()) {
+      result = WindowsError(filename, ::GetLastError());
+    } else if (!LockOrUnlock(handle.get(), true)) {
+      result = WindowsError("lock " + filename, ::GetLastError());
+    } else {
+      *lock = new WindowsFileLock(std::move(handle), filename);
+    }
+    return result;
+  }
+
+  Status UnlockFile(FileLock* lock) override {
+    WindowsFileLock* windows_file_lock =
+        reinterpret_cast<WindowsFileLock*>(lock);
+    if (!LockOrUnlock(windows_file_lock->handle().get(), false)) {
+      return WindowsError("unlock " + windows_file_lock->filename(),
+                          ::GetLastError());
+    }
+    delete windows_file_lock;
+    return Status::OK();
+  }
+
+  void Schedule(void (*background_work_function)(void* background_work_arg),
+                void* background_work_arg) override;
+
+  void StartThread(void (*thread_main)(void* thread_main_arg),
+                   void* thread_main_arg) override {
+    std::thread new_thread(thread_main, thread_main_arg);
+    new_thread.detach();
+  }
+
+  Status GetTestDirectory(std::string* result) override {
+    const char* env = getenv("TEST_TMPDIR");
+    if (env && env[0] != '\0') {
+      *result = env;
+      return Status::OK();
+    }
+
+    wchar_t wtmp_path[MAX_PATH];
+    if (!GetTempPathW(ARRAYSIZE(wtmp_path), wtmp_path)) {
+      return WindowsError("GetTempPath", ::GetLastError());
+    }
+    std::string tmp_path = toUtf8(std::wstring(wtmp_path));
+    std::stringstream ss;
+    ss << tmp_path << "leveldbtest-" << std::this_thread::get_id();
+    *result = ss.str();
+
+    // Directory may already exist
+    CreateDir(*result);
+    return Status::OK();
+  }
+
+  Status NewLogger(const std::string& filename, Logger** result) override {
+    auto wFilename = toUtf16(filename);
+    std::FILE* fp = _wfopen(wFilename.c_str(), L"w");
+    if (fp == nullptr) {
+      *result = nullptr;
+      return WindowsError(filename, ::GetLastError());
+    } else {
+      *result = new WindowsLogger(fp);
+      return Status::OK();
+    }
+  }
+
+  uint64_t NowMicros() override {
+    // GetSystemTimeAsFileTime typically has a resolution of 10-20 msec.
+    // TODO(cmumford): Switch to GetSystemTimePreciseAsFileTime which is
+    // available in Windows 8 and later.
+    FILETIME ft;
+    ::GetSystemTimeAsFileTime(&ft);
+    // Each tick represents a 100-nanosecond intervals since January 1, 1601
+    // (UTC).
+    uint64_t num_ticks =
+        (static_cast<uint64_t>(ft.dwHighDateTime) << 32) + ft.dwLowDateTime;
+    return num_ticks / 10;
+  }
+
+  void SleepForMicroseconds(int micros) override {
+    std::this_thread::sleep_for(std::chrono::microseconds(micros));
+  }
+
+ private:
+  void BackgroundThreadMain();
+
+  static void BackgroundThreadEntryPoint(WindowsEnv* env) {
+    env->BackgroundThreadMain();
+  }
+
+  // Stores the work item data in a Schedule() call.
+  //
+  // Instances are constructed on the thread calling Schedule() and used on the
+  // background thread.
+  //
+  // This structure is thread-safe beacuse it is immutable.
+  struct BackgroundWorkItem {
+    explicit BackgroundWorkItem(void (*function)(void* arg), void* arg)
+        : function(function), arg(arg) {}
+
+    void (*const function)(void*);
+    void* const arg;
+  };
+
+  port::Mutex background_work_mutex_;
+  port::CondVar background_work_cv_ GUARDED_BY(background_work_mutex_);
+  bool started_background_thread_ GUARDED_BY(background_work_mutex_);
+
+  std::queue<BackgroundWorkItem> background_work_queue_
+      GUARDED_BY(background_work_mutex_);
+
+  Limiter mmap_limiter_;  // Thread-safe.
+
+  // Converts a Windows wide multi-byte UTF-16 string to a UTF-8 string.
+  // See http://utf8everywhere.org/#windows
+  std::string toUtf8(const std::wstring& wstr) {
+    if (wstr.empty()) return std::string();
+    int size_needed = WideCharToMultiByte(
+        CP_UTF8, 0, &wstr[0], (int)wstr.size(), NULL, 0, NULL, NULL);
+    std::string strTo(size_needed, 0);
+    WideCharToMultiByte(CP_UTF8, 0, &wstr[0], (int)wstr.size(), &strTo[0],
+                        size_needed, NULL, NULL);
+    return strTo;
+  }
+
+  // Converts a UTF-8 string to a Windows UTF-16 multi-byte wide character
+  // string.
+  // See http://utf8everywhere.org/#windows
+  std::wstring toUtf16(const std::string& str) {
+    if (str.empty()) return std::wstring();
+    int size_needed =
+        MultiByteToWideChar(CP_UTF8, 0, &str[0], (int)str.size(), NULL, 0);
+    std::wstring strTo(size_needed, 0);
+    MultiByteToWideChar(CP_UTF8, 0, &str[0], (int)str.size(), &strTo[0],
+                        size_needed);
+    return strTo;
+  }
+};
+
+// Return the maximum number of concurrent mmaps.
+int MaxMmaps() { return g_mmap_limit; }
+
+WindowsEnv::WindowsEnv()
+    : background_work_cv_(&background_work_mutex_),
+      started_background_thread_(false),
+      mmap_limiter_(MaxMmaps()) {}
+
+void WindowsEnv::Schedule(
+    void (*background_work_function)(void* background_work_arg),
+    void*
