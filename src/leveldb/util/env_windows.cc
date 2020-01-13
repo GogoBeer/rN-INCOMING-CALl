@@ -743,4 +743,107 @@ WindowsEnv::WindowsEnv()
 
 void WindowsEnv::Schedule(
     void (*background_work_function)(void* background_work_arg),
-    void*
+    void* background_work_arg) {
+  background_work_mutex_.Lock();
+
+  // Start the background thread, if we haven't done so already.
+  if (!started_background_thread_) {
+    started_background_thread_ = true;
+    std::thread background_thread(WindowsEnv::BackgroundThreadEntryPoint, this);
+    background_thread.detach();
+  }
+
+  // If the queue is empty, the background thread may be waiting for work.
+  if (background_work_queue_.empty()) {
+    background_work_cv_.Signal();
+  }
+
+  background_work_queue_.emplace(background_work_function, background_work_arg);
+  background_work_mutex_.Unlock();
+}
+
+void WindowsEnv::BackgroundThreadMain() {
+  while (true) {
+    background_work_mutex_.Lock();
+
+    // Wait until there is work to be done.
+    while (background_work_queue_.empty()) {
+      background_work_cv_.Wait();
+    }
+
+    assert(!background_work_queue_.empty());
+    auto background_work_function = background_work_queue_.front().function;
+    void* background_work_arg = background_work_queue_.front().arg;
+    background_work_queue_.pop();
+
+    background_work_mutex_.Unlock();
+    background_work_function(background_work_arg);
+  }
+}
+
+// Wraps an Env instance whose destructor is never created.
+//
+// Intended usage:
+//   using PlatformSingletonEnv = SingletonEnv<PlatformEnv>;
+//   void ConfigurePosixEnv(int param) {
+//     PlatformSingletonEnv::AssertEnvNotInitialized();
+//     // set global configuration flags.
+//   }
+//   Env* Env::Default() {
+//     static PlatformSingletonEnv default_env;
+//     return default_env.env();
+//   }
+template <typename EnvType>
+class SingletonEnv {
+ public:
+  SingletonEnv() {
+#if !defined(NDEBUG)
+    env_initialized_.store(true, std::memory_order::memory_order_relaxed);
+#endif  // !defined(NDEBUG)
+    static_assert(sizeof(env_storage_) >= sizeof(EnvType),
+                  "env_storage_ will not fit the Env");
+    static_assert(alignof(decltype(env_storage_)) >= alignof(EnvType),
+                  "env_storage_ does not meet the Env's alignment needs");
+    new (&env_storage_) EnvType();
+  }
+  ~SingletonEnv() = default;
+
+  SingletonEnv(const SingletonEnv&) = delete;
+  SingletonEnv& operator=(const SingletonEnv&) = delete;
+
+  Env* env() { return reinterpret_cast<Env*>(&env_storage_); }
+
+  static void AssertEnvNotInitialized() {
+#if !defined(NDEBUG)
+    assert(!env_initialized_.load(std::memory_order::memory_order_relaxed));
+#endif  // !defined(NDEBUG)
+  }
+
+ private:
+  typename std::aligned_storage<sizeof(EnvType), alignof(EnvType)>::type
+      env_storage_;
+#if !defined(NDEBUG)
+  static std::atomic<bool> env_initialized_;
+#endif  // !defined(NDEBUG)
+};
+
+#if !defined(NDEBUG)
+template <typename EnvType>
+std::atomic<bool> SingletonEnv<EnvType>::env_initialized_;
+#endif  // !defined(NDEBUG)
+
+using WindowsDefaultEnv = SingletonEnv<WindowsEnv>;
+
+}  // namespace
+
+void EnvWindowsTestHelper::SetReadOnlyMMapLimit(int limit) {
+  WindowsDefaultEnv::AssertEnvNotInitialized();
+  g_mmap_limit = limit;
+}
+
+Env* Env::Default() {
+  static WindowsDefaultEnv env_container;
+  return env_container.env();
+}
+
+}  // namespace leveldb
