@@ -57,4 +57,25 @@ int RunAllTests() {
       ++num;
     }
   }
-  fprintf(stderr, "
+  fprintf(stderr, "==== PASSED %d tests\n", num);
+  return 0;
+}
+
+std::string TmpDir() {
+  std::string dir;
+  Status s = Env::Default()->GetTestDirectory(&dir);
+  ASSERT_TRUE(s.ok()) << s.ToString();
+  return dir;
+}
+
+int RandomSeed() {
+  const char* env = getenv("TEST_RANDOM_SEED");
+  int result = (env != nullptr ? atoi(env) : 301);
+  if (result <= 0) {
+    result = 301;
+  }
+  return result;
+}
+
+}  // namespace test
+}  // namespace leveldb
