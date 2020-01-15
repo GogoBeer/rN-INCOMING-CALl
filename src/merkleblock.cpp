@@ -104,4 +104,77 @@ uint256 CPartialMerkleTree::TraverseAndExtract(int height, unsigned int pos, uns
         if (nHashUsed >= vHash.size()) {
             // overflowed the hash array - failure
             fBad = true;
-            return ui
+            return uint256();
+        }
+        const uint256 &hash = vHash[nHashUsed++];
+        if (height==0 && fParentOfMatch) { // in case of height 0, we have a matched txid
+            vMatch.push_back(hash);
+            vnIndex.push_back(pos);
+        }
+        return hash;
+    } else {
+        // otherwise, descend into the subtrees to extract matched txids and hashes
+        uint256 left = TraverseAndExtract(height-1, pos*2, nBitsUsed, nHashUsed, vMatch, vnIndex), right;
+        if (pos*2+1 < CalcTreeWidth(height-1)) {
+            right = TraverseAndExtract(height-1, pos*2+1, nBitsUsed, nHashUsed, vMatch, vnIndex);
+            if (right == left) {
+                // The left and right branches should never be identical, as the transaction
+                // hashes covered by them must each be unique.
+                fBad = true;
+            }
+        } else {
+            right = left;
+        }
+        // and combine them before returning
+        return Hash(left, right);
+    }
+}
+
+CPartialMerkleTree::CPartialMerkleTree(const std::vector<uint256> &vTxid, const std::vector<bool> &vMatch) : nTransactions(vTxid.size()), fBad(false) {
+    // reset state
+    vBits.clear();
+    vHash.clear();
+
+    // calculate height of tree
+    int nHeight = 0;
+    while (CalcTreeWidth(nHeight) > 1)
+        nHeight++;
+
+    // traverse the partial tree
+    TraverseAndBuild(nHeight, 0, vTxid, vMatch);
+}
+
+CPartialMerkleTree::CPartialMerkleTree() : nTransactions(0), fBad(true) {}
+
+uint256 CPartialMerkleTree::ExtractMatches(std::vector<uint256> &vMatch, std::vector<unsigned int> &vnIndex) {
+    vMatch.clear();
+    // An empty set will not work
+    if (nTransactions == 0)
+        return uint256();
+    // check for excessively high numbers of transactions
+    if (nTransactions > MAX_BLOCK_WEIGHT / MIN_TRANSACTION_WEIGHT)
+        return uint256();
+    // there can never be more hashes provided than one for every txid
+    if (vHash.size() > nTransactions)
+        return uint256();
+    // there must be at least one bit per node in the partial tree, and at least one node per hash
+    if (vBits.size() < vHash.size())
+        return uint256();
+    // calculate height of tree
+    int nHeight = 0;
+    while (CalcTreeWidth(nHeight) > 1)
+        nHeight++;
+    // traverse the partial tree
+    unsigned int nBitsUsed = 0, nHashUsed = 0;
+    uint256 hashMerkleRoot = TraverseAndExtract(nHeight, 0, nBitsUsed, nHashUsed, vMatch, vnIndex);
+    // verify that no problems occurred during the tree traversal
+    if (fBad)
+        return uint256();
+    // verify that all bits were consumed (except for the padding caused by serializing it as a byte sequence)
+    if ((nBitsUsed+7)/8 != (vBits.size()+7)/8)
+        return uint256();
+    // verify that all hashes were consumed
+    if (nHashUsed != vHash.size())
+        return uint256();
+    return hashMerkleRoot;
+}
