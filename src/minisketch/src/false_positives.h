@@ -98,4 +98,13 @@ size_t ComputeMaxElements(uint32_t bits, size_t capacity, uint32_t fpbits) {
         if (capacity_for_max_elements <= capacity) return max_elements;
         size_t adjust = capacity_for_max_elements - capacity;
         // Decrementing max_elements by N will at most decrement the corresponding capacity by N.
-        // As the observ
+        // As the observed capacity is adjust too high, we can safely decrease max_elements by adjust.
+        // If that brings us into negative max_elements territory, no solution exists and we return 0.
+        if (max_elements < adjust) return 0;
+        max_elements -= adjust;
+    }
+}
+
+}  // namespace
+
+#endif
