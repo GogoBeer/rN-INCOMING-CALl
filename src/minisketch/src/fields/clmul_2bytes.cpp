@@ -98,4 +98,57 @@ typedef FieldTri<uint16_t, 15, 1, StatTableTRI15, &SQR_TABLE_TRI15, &SQR2_TABLE_
 // 16 bit field
 typedef RecLinTrans<uint16_t, 6, 5, 5> StatTable16;
 constexpr StatTable16 SQR_TABLE_16({0x1, 0x4, 0x10, 0x40, 0x100, 0x400, 0x1000, 0x4000, 0x2b, 0xac, 0x2b0, 0xac0, 0x2b00, 0xac00, 0xb056, 0xc10e});
-constexpr StatTable16 SQR2_TABL
+constexpr StatTable16 SQR2_TABLE_16({0x1, 0x10, 0x100, 0x1000, 0x2b, 0x2b0, 0x2b00, 0xb056, 0x445, 0x4450, 0x45ac, 0x5a6c, 0xa647, 0x657e, 0x571a, 0x7127});
+constexpr StatTable16 SQR4_TABLE_16({0x1, 0x2b, 0x445, 0xa647, 0x12a1, 0xf69d, 0x7f07, 0x9825, 0x6fad, 0x399d, 0xb515, 0xd7d1, 0x3fb4, 0x4b06, 0xe4df, 0x93c7});
+constexpr StatTable16 QRT_TABLE_16({0x732, 0x72b8, 0x72ba, 0x7e96, 0x72be, 0x78b2, 0x7e9e, 0x8cba, 0x72ae, 0xfa24, 0x7892, 0x5892, 0x7ede, 0xbec6, 0x8c3a, 0});
+typedef Field<uint16_t, 16, 43, StatTable16, &SQR_TABLE_16, &SQR2_TABLE_16, &SQR4_TABLE_16, &QRT_TABLE_16, &QRT_TABLE_16, &QRT_TABLE_16, IdTrans, &ID_TRANS, &ID_TRANS> Field16;
+#endif
+}
+
+Sketch* ConstructClMul2Bytes(int bits, int implementation) {
+    switch (bits) {
+#ifdef ENABLE_FIELD_INT_10
+    case 10: return new SketchImpl<Field10>(implementation, 10);
+#endif
+#ifdef ENABLE_FIELD_INT_11
+    case 11: return new SketchImpl<Field11>(implementation, 11);
+#endif
+#ifdef ENABLE_FIELD_INT_12
+    case 12: return new SketchImpl<Field12>(implementation, 12);
+#endif
+#ifdef ENABLE_FIELD_INT_13
+    case 13: return new SketchImpl<Field13>(implementation, 13);
+#endif
+#ifdef ENABLE_FIELD_INT_14
+    case 14: return new SketchImpl<Field14>(implementation, 14);
+#endif
+#ifdef ENABLE_FIELD_INT_16
+    case 16: return new SketchImpl<Field16>(implementation, 16);
+#endif
+    }
+    return nullptr;
+}
+
+Sketch* ConstructClMulTri2Bytes(int bits, int implementation) {
+    switch (bits) {
+#ifdef ENABLE_FIELD_INT_9
+    case 9: return new SketchImpl<FieldTri9>(implementation, 9);
+#endif
+#ifdef ENABLE_FIELD_INT_10
+    case 10: return new SketchImpl<FieldTri10>(implementation, 10);
+#endif
+#ifdef ENABLE_FIELD_INT_11
+    case 11: return new SketchImpl<FieldTri11>(implementation, 11);
+#endif
+#ifdef ENABLE_FIELD_INT_12
+    case 12: return new SketchImpl<FieldTri12>(implementation, 12);
+#endif
+#ifdef ENABLE_FIELD_INT_14
+    case 14: return new SketchImpl<FieldTri14>(implementation, 14);
+#endif
+#ifdef ENABLE_FIELD_INT_15
+    case 15: return new SketchImpl<FieldTri15>(implementation, 15);
+#endif
+    }
+    return nullptr;
+}
