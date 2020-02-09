@@ -156,4 +156,11 @@ Sketch* ConstructClMulTri3Bytes(int bits, int implementation) {
     case 21: return new SketchImpl<FieldTri21>(implementation, 21);
 #endif
 #ifdef ENABLE_FIELD_INT_22
-    case 22: return new SketchImpl<FieldT
+    case 22: return new SketchImpl<FieldTri22>(implementation, 22);
+#endif
+#ifdef ENABLE_FIELD_INT_23
+    case 23: return new SketchImpl<FieldTri23>(implementation, 23);
+#endif
+    }
+    return nullptr;
+}
