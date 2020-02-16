@@ -162,4 +162,14 @@ Sketch* ConstructClMulTri8Bytes(int bits, int implementation) {
     case 58: return new SketchImpl<FieldTri58>(implementation, 58);
 #endif
 #ifdef ENABLE_FIELD_INT_60
-    case 60: return new SketchImpl<FieldTri60>(implemen
+    case 60: return new SketchImpl<FieldTri60>(implementation, 60);
+#endif
+#ifdef ENABLE_FIELD_INT_62
+    case 62: return new SketchImpl<FieldTri62>(implementation, 62);
+#endif
+#ifdef ENABLE_FIELD_INT_63
+    case 63: return new SketchImpl<FieldTri63>(implementation, 63);
+#endif
+    }
+    return nullptr;
+}
