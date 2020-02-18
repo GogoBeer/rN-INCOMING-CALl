@@ -92,4 +92,33 @@ typedef Field<uint32_t, 24, 27, StatTable24, DynTable24, &SQR_TABLE_24, &QRT_TAB
 #endif
 }
 
-Sketch* ConstructGeneric3Bytes(int bits, int implementati
+Sketch* ConstructGeneric3Bytes(int bits, int implementation)
+{
+    switch (bits) {
+#ifdef ENABLE_FIELD_INT_17
+    case 17: return new SketchImpl<Field17>(implementation, 17);
+#endif
+#ifdef ENABLE_FIELD_INT_18
+    case 18: return new SketchImpl<Field18>(implementation, 18);
+#endif
+#ifdef ENABLE_FIELD_INT_19
+    case 19: return new SketchImpl<Field19>(implementation, 19);
+#endif
+#ifdef ENABLE_FIELD_INT_20
+    case 20: return new SketchImpl<Field20>(implementation, 20);
+#endif
+#ifdef ENABLE_FIELD_INT_21
+    case 21: return new SketchImpl<Field21>(implementation, 21);
+#endif
+#ifdef ENABLE_FIELD_INT_22
+    case 22: return new SketchImpl<Field22>(implementation, 22);
+#endif
+#ifdef ENABLE_FIELD_INT_23
+    case 23: return new SketchImpl<Field23>(implementation, 23);
+#endif
+#ifdef ENABLE_FIELD_INT_24
+    case 24: return new SketchImpl<Field24>(implementation, 24);
+#endif
+    default: return nullptr;
+    }
+}
