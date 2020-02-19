@@ -69,4 +69,56 @@ typedef Field<uint64_t, 37, 83, StatTable37, DynTable37, &SQR_TABLE_37, &QRT_TAB
 typedef RecLinTrans<uint64_t, 6, 6, 6, 5, 5, 5, 5> StatTable38;
 typedef RecLinTrans<uint64_t, 4, 4, 4, 4, 4, 4, 4, 4, 3, 3> DynTable38;
 constexpr StatTable38 SQR_TABLE_38({0x1, 0x4, 0x10, 0x40, 0x100, 0x400, 0x1000, 0x4000, 0x10000, 0x40000, 0x100000, 0x400000, 0x1000000, 0x4000000, 0x10000000, 0x40000000, 0x100000000, 0x400000000, 0x1000000000, 0x63, 0x18c, 0x630, 0x18c0, 0x6300, 0x18c00, 0x63000, 0x18c000, 0x630000, 0x18c0000, 0x6300000, 0x18c00000, 0x63000000, 0x18c000000, 0x630000000, 0x18c0000000, 0x2300000063, 0xc0000014a, 0x3000000528});
-constexpr StatTable38 QRT_TABLE_38({0x34b0ac6430, 0x2223262fa, 0x2223262f8, 0x35554405fe, 0x2223262fc, 0x355514098a, 0x35554405f6, 0x
+constexpr StatTable38 QRT_TABLE_38({0x34b0ac6430, 0x2223262fa, 0x2223262f8, 0x35554405fe, 0x2223262fc, 0x355514098a, 0x35554405f6, 0x400840, 0x2223262ec, 0x1777726532, 0x35551409aa, 0x15c06fc0, 0x35554405b6, 0x1f5303fec, 0x4008c0, 0x236a21030, 0x2223263ec, 0x1a9008c00, 0x1777726732, 0x3692c60ab6, 0x3555140daa, 0x15556007ee, 0x15c067c0, 0x14a0b030f2, 0x35554415b6, 0x227c06d168, 0x1f5301fec, 0x16c3928fc2, 0x4048c0, 0x3a942c4c0, 0x236a29030, 0x1636a2902e, 0x2223363ec, 0x3a6e898276, 0x1a9028c00, 0x6de74eb2c, 0x1777766732, 0});
+typedef Field<uint64_t, 38, 99, StatTable38, DynTable38, &SQR_TABLE_38, &QRT_TABLE_38> Field38;
+#endif
+
+#ifdef ENABLE_FIELD_INT_39
+// 39 bit field
+typedef RecLinTrans<uint64_t, 6, 6, 6, 6, 5, 5, 5> StatTable39;
+typedef RecLinTrans<uint64_t, 4, 4, 4, 4, 4, 4, 4, 4, 4, 3> DynTable39;
+constexpr StatTable39 SQR_TABLE_39({0x1, 0x4, 0x10, 0x40, 0x100, 0x400, 0x1000, 0x4000, 0x10000, 0x40000, 0x100000, 0x400000, 0x1000000, 0x4000000, 0x10000000, 0x40000000, 0x100000000, 0x400000000, 0x1000000000, 0x4000000000, 0x22, 0x88, 0x220, 0x880, 0x2200, 0x8800, 0x22000, 0x88000, 0x220000, 0x880000, 0x2200000, 0x8800000, 0x22000000, 0x88000000, 0x220000000, 0x880000000, 0x2200000000, 0x800000011, 0x2000000044});
+constexpr StatTable39 QRT_TABLE_39({0x66b02a408c, 0x100420, 0x100422, 0x14206080, 0x100426, 0x5dccefab1c, 0x14206088, 0x9fc11e5b6, 0x100436, 0x5466bea62a, 0x5dccefab3c, 0x9aa110536, 0x142060c8, 0x54739ed6e2, 0x9fc11e536, 0xe7a82c080, 0x100536, 0x4002000, 0x5466bea42a, 0x6a4022000, 0x5dccefaf3c, 0x9e8118536, 0x9aa110d36, 0x5680e080, 0x142070c8, 0x7d293c5b6, 0x54739ef6e2, 0x8d680e080, 0x9fc11a536, 0x6d282c080, 0xe7a824080, 0x800000000, 0x110536, 0x2d680e080, 0x4022000, 0, 0x5466baa42a, 0x46b03a44aa, 0x6a40a2000});
+typedef Field<uint64_t, 39, 17, StatTable39, DynTable39, &SQR_TABLE_39, &QRT_TABLE_39> Field39;
+#endif
+
+#ifdef ENABLE_FIELD_INT_40
+// 40 bit field
+typedef RecLinTrans<uint64_t, 6, 6, 6, 6, 6, 5, 5> StatTable40;
+typedef RecLinTrans<uint64_t, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4> DynTable40;
+constexpr StatTable40 SQR_TABLE_40({0x1, 0x4, 0x10, 0x40, 0x100, 0x400, 0x1000, 0x4000, 0x10000, 0x40000, 0x100000, 0x400000, 0x1000000, 0x4000000, 0x10000000, 0x40000000, 0x100000000, 0x400000000, 0x1000000000, 0x4000000000, 0x39, 0xe4, 0x390, 0xe40, 0x3900, 0xe400, 0x39000, 0xe4000, 0x390000, 0xe40000, 0x3900000, 0xe400000, 0x39000000, 0xe4000000, 0x390000000, 0xe40000000, 0x3900000000, 0xe400000000, 0x900000004b, 0x400000015e});
+constexpr StatTable40 QRT_TABLE_40({0x624b3cecc, 0xbc5c3f4c6, 0xbc5c3f4c4, 0xde1603e2c, 0xbc5c3f4c0, 0xaabec06cea, 0xde1603e24, 0x6cd9f724c2, 0xbc5c3f4d0, 0xcde1743818, 0xaabec06cca, 0xa138c314ca, 0xde1603e64, 0xaafc00f01a, 0x6cd9f72442, 0xcdca11bb4, 0xbc5c3f5d0, 0xa00002001a, 0xcde1743a18, 0xdf1407b90, 0xaabec068ca, 0xc043b482c8, 0xa138c31cca, 0xcb86977e3c, 0xde1602e64, 0x604596a326, 0xaafc00d01a, 0xcc1c165d0, 0x6cd9f76442, 0x673c94da26, 0xcdca19bb4, 0x67c0940a26, 0xbc5c2f5d0, 0xa4dca19bae, 0xa00000001a, 0x1bc5c2f5d0, 0xcde1703a18, 0, 0xdf1487b90, 0x8df1487b8a});
+typedef Field<uint64_t, 40, 57, StatTable40, DynTable40, &SQR_TABLE_40, &QRT_TABLE_40> Field40;
+#endif
+}
+
+Sketch* ConstructGeneric5Bytes(int bits, int implementation)
+{
+    switch (bits) {
+#ifdef ENABLE_FIELD_INT_33
+    case 33: return new SketchImpl<Field33>(implementation, 33);
+#endif
+#ifdef ENABLE_FIELD_INT_34
+    case 34: return new SketchImpl<Field34>(implementation, 34);
+#endif
+#ifdef ENABLE_FIELD_INT_35
+    case 35: return new SketchImpl<Field35>(implementation, 35);
+#endif
+#ifdef ENABLE_FIELD_INT_36
+    case 36: return new SketchImpl<Field36>(implementation, 36);
+#endif
+#ifdef ENABLE_FIELD_INT_37
+    case 37: return new SketchImpl<Field37>(implementation, 37);
+#endif
+#ifdef ENABLE_FIELD_INT_38
+    case 38: return new SketchImpl<Field38>(implementation, 38);
+#endif
+#ifdef ENABLE_FIELD_INT_39
+    case 39: return new SketchImpl<Field39>(implementation, 39);
+#endif
+#ifdef ENABLE_FIELD_INT_40
+    case 40: return new SketchImpl<Field40>(implementation, 40);
+#endif
+    default: return nullptr;
+    }
+}
