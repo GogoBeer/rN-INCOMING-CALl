@@ -111,4 +111,14 @@ Sketch* ConstructGeneric8Bytes(int bits, int implementation)
     case 61: return new SketchImpl<Field61>(implementation, 61);
 #endif
 #ifdef ENABLE_FIELD_INT_62
-    case 6
+    case 62: return new SketchImpl<Field62>(implementation, 62);
+#endif
+#ifdef ENABLE_FIELD_INT_63
+    case 63: return new SketchImpl<Field63>(implementation, 63);
+#endif
+#ifdef ENABLE_FIELD_INT_64
+    case 64: return new SketchImpl<Field64>(implementation, 64);
+#endif
+    default: return nullptr;
+    }
+}
