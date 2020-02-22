@@ -227,4 +227,64 @@ template<typename I, int N, typename L, typename F, int K> struct GFMulHelper
 };
 
 /** Compute the carry-less multiplication of a and b, with N bits, using L as LFSR type. */
-template<typename I, int N, typename L, typename F> inline constexpr I GFMul(const I& a, const I& b) { return GFMulHelper<I, N, L, F, N>::
+template<typename I, int N, typename L, typename F> inline constexpr I GFMul(const I& a, const I& b) { return GFMulHelper<I, N, L, F, N>::Run(a, b); }
+
+/** Compute the inverse of x using an extgcd algorithm. */
+template<typename I, typename F, int BITS, uint32_t MOD>
+inline I InvExtGCD(I x)
+{
+    if (F::IsZero(x)) return x;
+    I t(0), newt(1);
+    I r(MOD), newr = x;
+    int rlen = BITS + 1, newrlen = F::Bits(newr, BITS);
+    while (newr) {
+        int q = rlen - newrlen;
+        r ^= F::Shift(newr, q);
+        t ^= F::UnsafeShift(newt, q);
+        rlen = F::Bits(r, rlen - 1);
+        if (r < newr) {
+            F::Swap(t, newt);
+            F::Swap(r, newr);
+            std::swap(rlen, newrlen);
+        }
+    }
+    return t;
+}
+
+/** Compute the inverse of x1 using an exponentiation ladder.
+ *
+ * The `MUL` argument is a multiplication function, `SQR` is a squaring function, and the `SQRi` arguments
+ * compute x**(2**i).
+ */
+template<typename I, typename F, int BITS, I (*MUL)(I, I), I (*SQR)(I), I (*SQR2)(I), I(*SQR4)(I), I(*SQR8)(I), I(*SQR16)(I)>
+inline I InvLadder(I x1)
+{
+    static constexpr int INV_EXP = BITS - 1;
+    I x2 = (INV_EXP >= 2) ? MUL(SQR(x1), x1) : I();
+    I x4 = (INV_EXP >= 4) ? MUL(SQR2(x2), x2) : I();
+    I x8 = (INV_EXP >= 8) ? MUL(SQR4(x4), x4) : I();
+    I x16 = (INV_EXP >= 16) ? MUL(SQR8(x8), x8) : I();
+    I x32 = (INV_EXP >= 32) ? MUL(SQR16(x16), x16) : I();
+    I r;
+    if (INV_EXP >= 32) {
+        r = x32;
+    } else if (INV_EXP >= 16) {
+        r = x16;
+    } else if (INV_EXP >= 8) {
+        r = x8;
+    } else if (INV_EXP >= 4) {
+        r = x4;
+    } else if (INV_EXP >= 2) {
+        r = x2;
+    } else {
+        r = x1;
+    }
+    if (INV_EXP >= 32 && (INV_EXP & 16)) r = MUL(SQR16(r), x16);
+    if (INV_EXP >= 16 && (INV_EXP & 8)) r = MUL(SQR8(r), x8);
+    if (INV_EXP >= 8 && (INV_EXP & 4)) r = MUL(SQR4(r), x4);
+    if (INV_EXP >= 4 && (INV_EXP & 2)) r = MUL(SQR2(r), x2);
+    if (INV_EXP >= 2 && (INV_EXP & 1)) r = MUL(SQR(r), x1);
+    return SQR(r);
+}
+
+#endif
