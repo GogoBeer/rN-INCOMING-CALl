@@ -21,4 +21,22 @@ public:
     Sketch(int implementation, int bits) : m_implementation(implementation), m_bits(bits) {}
 
     void Ready() { m_canary = 0x6d496e536b65LU; }
-    void Check() const { if (m_canary != 0x
+    void Check() const { if (m_canary != 0x6d496e536b65LU) abort(); }
+    void UnReady() { m_canary = 1; }
+    int Implementation() const { return m_implementation; }
+    int Bits() const { return m_bits; }
+
+    virtual ~Sketch() {}
+    virtual size_t Syndromes() const = 0;
+
+    virtual void Init(int syndromes) = 0;
+    virtual void Add(uint64_t element) = 0;
+    virtual void Serialize(unsigned char*) const = 0;
+    virtual void Deserialize(const unsigned char*) = 0;
+    virtual size_t Merge(const Sketch* other_sketch) = 0;
+    virtual void SetSeed(uint64_t seed) = 0;
+
+    virtual int Decode(int max_count, uint64_t* roots) const = 0;
+};
+
+#endif
