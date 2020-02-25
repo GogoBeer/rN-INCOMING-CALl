@@ -308,4 +308,9 @@ int main(int argc, char** argv) {
             if (capacity * bits != weight) continue;
             TestExhaustive(bits, capacity);
         }
-        if (weight >= 16 && test_compl
+        if (weight >= 16 && test_complexity >> (weight - 16) == 0) break;
+    }
+
+    printf("All tests successful.\n");
+    return 0;
+}
