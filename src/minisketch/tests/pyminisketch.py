@@ -178,4 +178,187 @@ class TestGF2Ops(unittest.TestCase):
 # The operations below operate on polynomials over GF(2^field_size), represented as lists of
 # integers:
 #
-#   [a, b, c, ...] = a + b*x + c
+#   [a, b, c, ...] = a + b*x + c*x^2 + ...
+#
+# As an invariant, there are never any trailing zeroes in the list representation.
+#
+# Examples:
+# * [] = 0
+# * [3] = 3
+# * [0, 1] = x
+# * [2, 0, 5] = 5*x^2 + 2
+
+def poly_monic(poly, gf):
+    """Return a monic version of the polynomial poly."""
+    # Multiply every coefficient with the inverse of the top coefficient.
+    inv = gf.inv(poly[-1])
+    return [gf.mul(inv, v) for v in poly]
+
+def poly_divmod(poly, mod, gf):
+    """Return the polynomial (quotient, remainder) of poly divided by mod."""
+    assert len(mod) > 0 and mod[-1] == 1 # Require monic mod.
+    if len(poly) < len(mod):
+        return ([], poly)
+    val = list(poly)
+    div = [0 for _ in range(len(val) - len(mod) + 1)]
+    while len(val) >= len(mod):
+        term = val[-1]
+        div[len(val) - len(mod)] = term
+        # If the highest coefficient in val is nonzero, subtract a multiple of mod from it.
+        val.pop()
+        if term != 0:
+            for x in range(len(mod) - 1):
+                val[1 + x - len(mod)] ^= gf.mul(term, mod[x])
+    # Prune trailing zero coefficients.
+    while len(val) > 0 and val[-1] == 0:
+        val.pop()
+    return div, val
+
+def poly_gcd(a, b, gf):
+    """Return the polynomial GCD of a and b."""
+    if len(a) < len(b):
+        a, b = b, a
+    # Use Euclid's algorithm to find the GCD of a and b.
+    # see https://en.wikipedia.org/wiki/Polynomial_greatest_common_divisor#Euclid's_algorithm.
+    while len(b) > 0:
+        b = poly_monic(b, gf)
+        (_, b), a = poly_divmod(a, b, gf), b
+    return a
+
+def poly_sqr(poly, gf):
+    """Return the square of polynomial poly."""
+    if len(poly) == 0:
+        return []
+    # In characteristic-2 fields, thanks to Frobenius' endomorphism ((a + b)^2 = a^2 + b^2),
+    # squaring a polynomial is easy: square all the coefficients and interleave with zeroes.
+    # E.g., (3 + 5*x + 17*x^2)^2 = 3^2 + (5*x)^2 + (17*x^2)^2.
+    # See https://en.wikipedia.org/wiki/Frobenius_endomorphism.
+    return [0 if i & 1 else gf.sqr(poly[i // 2]) for i in range(2 * len(poly) - 1)]
+
+def poly_tracemod(poly, param, gf):
+    """Compute y + y^2 + y^4 + ... + y^(2^(field_size-1)) mod poly, where y = param*x."""
+    out = [0, param]
+    for _ in range(gf.field_size - 1):
+        # In each loop iteration i, we start with out = y + y^2 + ... + y^(2^i). By squaring that we
+        # transform it into out = y^2 + y^4 + ... + y^(2^(i+1)).
+        out = poly_sqr(out, gf)
+        # Thus, we just need to add y again to it to get out = y + ... + y^(2^(i+1)).
+        while len(out) < 2:
+            out.append(0)
+        out[1] = param
+        # Finally take a modulus to keep the intermediary polynomials small.
+        _, out = poly_divmod(out, poly, gf)
+    return out
+
+def poly_frobeniusmod(poly, gf):
+    """Compute x^(2^field_size) mod poly."""
+    out = [0, 1]
+    for _ in range(gf.field_size):
+        _, out = poly_divmod(poly_sqr(out, gf), poly, gf)
+    return out
+
+def poly_find_roots(poly, gf):
+    """Find the roots of poly if fully factorizable with unique roots, [] otherwise."""
+    assert len(poly) > 0
+    # If the polynomial is constant (and nonzero), it has no roots.
+    if len(poly) == 1:
+        return []
+    # Make the polynomial monic (which doesn't change its roots).
+    poly = poly_monic(poly, gf)
+    # If the polynomial is of the form x+a, return a.
+    if len(poly) == 2:
+        return [poly[0]]
+    # Otherwise, first test that poly can be completely factored into unique roots. The polynomial
+    # x^(2^fieldsize)-x has every field element once as root. Thus we want to know that that is a
+    # multiple of poly. Compute x^(field_size) mod poly, which needs to equal x if that is the case
+    # (unless poly has degree <= 1, but that case is handled above).
+    if poly_frobeniusmod(poly, gf) != [0, 1]:
+        return []
+
+    def rec_split(poly, randv):
+        """Recursively split poly using the Berlekamp trace algorithm."""
+        # See https://hal.archives-ouvertes.fr/hal-00626997/document.
+        assert len(poly) > 1 and poly[-1] == 1 # Require a monic poly.
+        # If poly is of the form x+a, its root is a.
+        if len(poly) == 2:
+            return [poly[0]]
+        # Try consecutive randomization factors randv, until one is found that factors poly.
+        while True:
+            # Compute the trace of (randv*x) mod poly. This is a polynomial that maps half of the
+            # domain to 0, and the other half to 1. Which half that is is controlled by randv.
+            # By taking it modulo poly, we only add a multiple of poly. Thus the result has at least
+            # the shared roots of the trace polynomial and poly still, but may have others.
+            trace = poly_tracemod(poly, randv, gf)
+            # Using the set {2^i*a for i=0..fieldsize-1} gives optimally independent randv values
+            # (no more than fieldsize are ever needed).
+            randv = gf.mul2(randv)
+            # Now take the GCD of this trace polynomial with poly. The result is a polynomial
+            # that only has the shared roots of the trace polynomial and poly as roots.
+            gcd = poly_gcd(trace, poly, gf)
+            # If the result has a degree higher than 1, and lower than that of poly, we found a
+            # useful factorization.
+            if len(gcd) != len(poly) and len(gcd) > 1:
+                break
+            # Otherwise, continue with another randv.
+        # Find the actual factors: the monic version of the GCD above, and poly divided by it.
+        factor1 = poly_monic(gcd, gf)
+        factor2, _ = poly_divmod(poly, gcd, gf)
+        # Recurse.
+        return rec_split(factor1, randv) + rec_split(factor2, randv)
+
+    # Invoke the recursive splitting with a random initial factor, and sort the results.
+    return sorted(rec_split(poly, random.randrange(1, 1 << gf.field_size)))
+
+class TestPolyFindRoots(unittest.TestCase):
+    """Test class for poly_find_roots."""
+
+    def field_size_test(self, field_size):
+        """Run tests for given field_size."""
+        gf = GF2Ops(field_size)
+        for test_size in [0, 1, 2, 3, 10]:
+            roots = [random.randrange(1 << field_size) for _ in range(test_size)]
+            roots_set = set(roots)
+            # Construct a polynomial with all elements of roots as roots (with multiplicity).
+            poly = [1]
+            for root in roots:
+                new_poly = [0] + poly
+                for n, c in enumerate(poly):
+                    new_poly[n] ^= gf.mul(c, root)
+                poly = new_poly
+            # Invoke the root finding algorithm.
+            found_roots = poly_find_roots(poly, gf)
+            # The result must match the input, unless any roots were repeated.
+            if len(roots) == len(roots_set):
+                self.assertEqual(found_roots, sorted(roots))
+            else:
+                self.assertEqual(found_roots, [])
+
+    def test(self):
+        """Run tests."""
+        for field_size in range(2, 65):
+            self.field_size_test(field_size)
+
+def berlekamp_massey(syndromes, gf):
+    """Implement the Berlekamp-Massey algorithm.
+
+    Takes as input a sequence of GF(2^field_size) elements, and returns the shortest LSFR
+    that generates it, represented as a polynomial.
+    """
+    # See https://en.wikipedia.org/wiki/Berlekamp%E2%80%93Massey_algorithm.
+    current = [1]
+    prev = [1]
+    b_inv = 1
+    for n, discrepancy in enumerate(syndromes):
+        # Compute discrepancy
+        for i in range(1, len(current)):
+            discrepancy ^= gf.mul(syndromes[n - i], current[i])
+
+        # Correct if discrepancy is nonzero.
+        if discrepancy:
+            x = n + 1 - (len(current) - 1) - (len(prev) - 1)
+            if 2 * (len(current) - 1) <= n:
+                tmp = list(current)
+                current.extend(0 for _ in range(len(prev) + x - len(current)))
+                mul = gf.mul(discrepancy, b_inv)
+                for i, v in enumerate(prev):
+                    curr
