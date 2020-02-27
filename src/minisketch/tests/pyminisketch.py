@@ -361,4 +361,147 @@ def berlekamp_massey(syndromes, gf):
                 current.extend(0 for _ in range(len(prev) + x - len(current)))
                 mul = gf.mul(discrepancy, b_inv)
                 for i, v in enumerate(prev):
-                    curr
+                    current[i + x] ^= gf.mul(mul, v)
+                prev = tmp
+                b_inv = gf.inv(discrepancy)
+            else:
+                mul = gf.mul(discrepancy, b_inv)
+                for i, v in enumerate(prev):
+                    current[i + x] ^= gf.mul(mul, v)
+    return current
+
+class Minisketch:
+    """A Minisketch sketch.
+
+    This represents a sketch of a certain capacity, with elements of a certain bit size.
+    """
+
+    def __init__(self, field_size, capacity):
+        """Initialize an empty sketch with the specified field_size size and capacity."""
+        self.field_size = field_size
+        self.capacity = capacity
+        self.odd_syndromes = [0] * capacity
+        self.gf = GF2Ops(field_size)
+
+    def add(self, element):
+        """Add an element to this sketch. 1 <= element < 2**field_size."""
+        sqr = self.gf.sqr(element)
+        for pos in range(self.capacity):
+            self.odd_syndromes[pos] ^= element
+            element = self.gf.mul(sqr, element)
+
+    def serialized_size(self):
+        """Compute how many bytes a serialization of this sketch will be in size."""
+        return (self.capacity * self.field_size + 7) // 8
+
+    def serialize(self):
+        """Serialize this sketch to bytes."""
+        val = 0
+        for i in range(self.capacity):
+            val |= self.odd_syndromes[i] << (self.field_size * i)
+        return val.to_bytes(self.serialized_size(), 'little')
+
+    def deserialize(self, byte_data):
+        """Deserialize a byte array into this sketch, overwriting its contents."""
+        assert len(byte_data) == self.serialized_size()
+        val = int.from_bytes(byte_data, 'little')
+        for i in range(self.capacity):
+            self.odd_syndromes[i] = (val >> (self.field_size * i)) & ((1 << self.field_size) - 1)
+
+    def clone(self):
+        """Return a clone of this sketch."""
+        ret = Minisketch(self.field_size, self.capacity)
+        ret.odd_syndromes = list(self.odd_syndromes)
+        ret.gf = self.gf
+        return ret
+
+    def merge(self, other):
+        """Merge a sketch with another sketch. Corresponds to XOR'ing their serializations."""
+        assert self.capacity == other.capacity
+        assert self.field_size == other.field_size
+        for i in range(self.capacity):
+            self.odd_syndromes[i] ^= other.odd_syndromes[i]
+
+    def decode(self, max_count=None):
+        """Decode the contents of this sketch.
+
+        Returns either a list of elements or None if undecodable.
+        """
+        # We know the odd syndromes s1=x+y+..., s3=x^3+y^3+..., s5=..., and reconstruct the even
+        # syndromes from this:
+        #  * s2 = x^2+y^2+.... = (x+y+...)^2 = s1^2
+        #  * s4 = x^4+y^4+.... = (x^2+y^2+...)^2 = s2^2
+        #  * s6 = x^6+y^6+.... = (x^3+y^3+...)^2 = s3^2
+        all_syndromes = [0 for _ in range(2 * len(self.odd_syndromes))]
+        for i in range(len(self.odd_syndromes)):
+            all_syndromes[i * 2] = self.odd_syndromes[i]
+            all_syndromes[i * 2 + 1] = self.gf.sqr(all_syndromes[i])
+        # Given the syndromes, find the polynomial that generates them.
+        poly = berlekamp_massey(all_syndromes, self.gf)
+        # Deal with failure and trivial cases.
+        if len(poly) == 0:
+            return None
+        if len(poly) == 1:
+            return []
+        if max_count is not None and len(poly) > 1 + max_count:
+            return None
+        # If the polynomial can be factored into (1-m1*x)*(1-m2*x)*...*(1-mn*x), then {m1,m2,...,mn}
+        # is our set. As each factor (1-m*x) has 1/m as root, we're really just looking for the
+        # inverses of the roots. We find these by reversing the order of the coefficients, and
+        # finding the roots.
+        roots = poly_find_roots(list(reversed(poly)), self.gf)
+        if len(roots) == 0:
+            return None
+        return roots
+
+class TestMinisketch(unittest.TestCase):
+    """Test class for Minisketch."""
+
+    @classmethod
+    def construct_data(cls, field_size, num_a_only, num_b_only, num_both):
+        """Construct two random lists of elements in [1..2**field_size-1].
+
+        Each list will have unique elements that don't appear in the other (num_a_only in the first
+        and num_b_only in the second), and num_both elements will appear in both."""
+        sample = []
+        # Simulate random.sample here (which doesn't work with ranges over 2**63).
+        for _ in range(num_a_only + num_b_only + num_both):
+            while True:
+                r = random.randrange(1, 1 << field_size)
+                if r not in sample:
+                    sample.append(r)
+                    break
+        full_a = sample[:num_a_only + num_both]
+        full_b = sample[num_a_only:]
+        random.shuffle(full_a)
+        random.shuffle(full_b)
+        return full_a, full_b
+
+    def field_size_capacity_test(self, field_size, capacity):
+        """Test Minisketch methods for a specific field and capacity."""
+        used_capacity = random.randrange(capacity + 1)
+        num_a = random.randrange(used_capacity + 1)
+        num_both = random.randrange(min(2 * capacity, (1 << field_size) - 1 - used_capacity) + 1)
+        full_a, full_b = self.construct_data(field_size, num_a, used_capacity - num_a, num_both)
+        sketch_a = Minisketch(field_size, capacity)
+        sketch_b = Minisketch(field_size, capacity)
+        for v in full_a:
+            sketch_a.add(v)
+        for v in full_b:
+            sketch_b.add(v)
+        sketch_combined = sketch_a.clone()
+        sketch_b_ser = sketch_b.serialize()
+        sketch_b_received = Minisketch(field_size, capacity)
+        sketch_b_received.deserialize(sketch_b_ser)
+        sketch_combined.merge(sketch_b_received)
+        decode = sketch_combined.decode()
+        self.assertEqual(decode, sorted(set(full_a) ^ set(full_b)))
+
+    def test(self):
+        """Run tests."""
+        for field_size in range(2, 65):
+            for capacity in [0, 1, 2, 5, 10, field_size]:
+                self.field_size_capacity_test(field_size, min(capacity, (1 << field_size) - 1))
+
+if __name__ == '__main__':
+    unittest.main()
