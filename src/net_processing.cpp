@@ -540,4 +540,165 @@ private:
      */
     void FindNextBlocksToDownload(NodeId nodeid, unsigned int count, std::vector<const CBlockIndex*>& vBlocks, NodeId& nodeStaller) EXCLUSIVE_LOCKS_REQUIRED(cs_main);
 
-    std::map<uint256, std::pair<NodeId, std::list<QueuedBlock>::ite
+    std::map<uint256, std::pair<NodeId, std::list<QueuedBlock>::iterator> > mapBlocksInFlight GUARDED_BY(cs_main);
+
+    /** When our tip was last updated. */
+    std::atomic<std::chrono::seconds> m_last_tip_update{0s};
+
+    /** Determine whether or not a peer can request a transaction, and return it (or nullptr if not found or not allowed). */
+    CTransactionRef FindTxForGetData(const CNode& peer, const GenTxid& gtxid, const std::chrono::seconds mempool_req, const std::chrono::seconds now) LOCKS_EXCLUDED(cs_main);
+
+    void ProcessGetData(CNode& pfrom, Peer& peer, const std::atomic<bool>& interruptMsgProc) EXCLUSIVE_LOCKS_REQUIRED(peer.m_getdata_requests_mutex) LOCKS_EXCLUDED(::cs_main);
+
+    /** Process a new block. Perform any post-processing housekeeping */
+    void ProcessBlock(CNode& node, const std::shared_ptr<const CBlock>& block, bool force_processing);
+
+    /** Relay map (txid or wtxid -> CTransactionRef) */
+    typedef std::map<uint256, CTransactionRef> MapRelay;
+    MapRelay mapRelay GUARDED_BY(cs_main);
+    /** Expiration-time ordered list of (expire time, relay map entry) pairs. */
+    std::deque<std::pair<std::chrono::microseconds, MapRelay::iterator>> g_relay_expiration GUARDED_BY(cs_main);
+
+    /**
+     * When a peer sends us a valid block, instruct it to announce blocks to us
+     * using CMPCTBLOCK if possible by adding its nodeid to the end of
+     * lNodesAnnouncingHeaderAndIDs, and keeping that list under a certain size by
+     * removing the first element if necessary.
+     */
+    void MaybeSetPeerAsAnnouncingHeaderAndIDs(NodeId nodeid) EXCLUSIVE_LOCKS_REQUIRED(cs_main);
+
+    /** Stack of nodes which we have set to announce using compact blocks */
+    std::list<NodeId> lNodesAnnouncingHeaderAndIDs GUARDED_BY(cs_main);
+
+    /** Number of peers from which we're downloading blocks. */
+    int m_peers_downloading_from GUARDED_BY(cs_main) = 0;
+
+    /** Storage for orphan information */
+    TxOrphanage m_orphanage;
+
+    void AddToCompactExtraTransactions(const CTransactionRef& tx) EXCLUSIVE_LOCKS_REQUIRED(g_cs_orphans);
+
+    /** Orphan/conflicted/etc transactions that are kept for compact block reconstruction.
+     *  The last -blockreconstructionextratxn/DEFAULT_BLOCK_RECONSTRUCTION_EXTRA_TXN of
+     *  these are kept in a ring buffer */
+    std::vector<std::pair<uint256, CTransactionRef>> vExtraTxnForCompact GUARDED_BY(g_cs_orphans);
+    /** Offset into vExtraTxnForCompact to insert the next tx */
+    size_t vExtraTxnForCompactIt GUARDED_BY(g_cs_orphans) = 0;
+
+    /** Check whether the last unknown block a peer advertised is not yet known. */
+    void ProcessBlockAvailability(NodeId nodeid) EXCLUSIVE_LOCKS_REQUIRED(cs_main);
+    /** Update tracking information about which blocks a peer is assumed to have. */
+    void UpdateBlockAvailability(NodeId nodeid, const uint256& hash) EXCLUSIVE_LOCKS_REQUIRED(cs_main);
+    bool CanDirectFetch() EXCLUSIVE_LOCKS_REQUIRED(cs_main);
+
+    /**
+     * To prevent fingerprinting attacks, only send blocks/headers outside of
+     * the active chain if they are no more than a month older (both in time,
+     * and in best equivalent proof of work) than the best header chain we know
+     * about and we fully-validated them at some point.
+     */
+    bool BlockRequestAllowed(const CBlockIndex* pindex) EXCLUSIVE_LOCKS_REQUIRED(cs_main);
+    bool AlreadyHaveBlock(const uint256& block_hash) EXCLUSIVE_LOCKS_REQUIRED(cs_main);
+    void ProcessGetBlockData(CNode& pfrom, Peer& peer, const CInv& inv);
+
+    /**
+     * Validation logic for compact filters request handling.
+     *
+     * May disconnect from the peer in the case of a bad request.
+     *
+     * @param[in]   peer            The peer that we received the request from
+     * @param[in]   filter_type     The filter type the request is for. Must be basic filters.
+     * @param[in]   start_height    The start height for the request
+     * @param[in]   stop_hash       The stop_hash for the request
+     * @param[in]   max_height_diff The maximum number of items permitted to request, as specified in BIP 157
+     * @param[out]  stop_index      The CBlockIndex for the stop_hash block, if the request can be serviced.
+     * @param[out]  filter_index    The filter index, if the request can be serviced.
+     * @return                      True if the request can be serviced.
+     */
+    bool PrepareBlockFilterRequest(CNode& peer,
+                                   BlockFilterType filter_type, uint32_t start_height,
+                                   const uint256& stop_hash, uint32_t max_height_diff,
+                                   const CBlockIndex*& stop_index,
+                                   BlockFilterIndex*& filter_index);
+
+    /**
+     * Handle a cfilters request.
+     *
+     * May disconnect from the peer in the case of a bad request.
+     *
+     * @param[in]   peer            The peer that we received the request from
+     * @param[in]   vRecv           The raw message received
+     */
+    void ProcessGetCFilters(CNode& peer, CDataStream& vRecv);
+
+    /**
+     * Handle a cfheaders request.
+     *
+     * May disconnect from the peer in the case of a bad request.
+     *
+     * @param[in]   peer            The peer that we received the request from
+     * @param[in]   vRecv           The raw message received
+     */
+    void ProcessGetCFHeaders(CNode& peer, CDataStream& vRecv);
+
+    /**
+     * Handle a getcfcheckpt request.
+     *
+     * May disconnect from the peer in the case of a bad request.
+     *
+     * @param[in]   peer            The peer that we received the request from
+     * @param[in]   vRecv           The raw message received
+     */
+    void ProcessGetCFCheckPt(CNode& peer, CDataStream& vRecv);
+
+    /** Checks if address relay is permitted with peer. If needed, initializes
+     * the m_addr_known bloom filter and sets m_addr_relay_enabled to true.
+     *
+     *  @return   True if address relay is enabled with peer
+     *            False if address relay is disallowed
+     */
+    bool SetupAddressRelay(const CNode& node, Peer& peer);
+};
+} // namespace
+
+namespace {
+    /** Number of preferable block download peers. */
+    int nPreferredDownload GUARDED_BY(cs_main) = 0;
+} // namespace
+
+namespace {
+/**
+ * Maintain validation-specific state about nodes, protected by cs_main, instead
+ * by CNode's own locks. This simplifies asynchronous operation, where
+ * processing of incoming data is done after the ProcessMessage call returns,
+ * and we're no longer holding the node's locks.
+ */
+struct CNodeState {
+    //! The best known block we know this peer has announced.
+    const CBlockIndex* pindexBestKnownBlock{nullptr};
+    //! The hash of the last unknown block this peer has announced.
+    uint256 hashLastUnknownBlock{};
+    //! The last full block we both have.
+    const CBlockIndex* pindexLastCommonBlock{nullptr};
+    //! The best header we have sent our peer.
+    const CBlockIndex* pindexBestHeaderSent{nullptr};
+    //! Length of current-streak of unconnecting headers announcements
+    int nUnconnectingHeaders{0};
+    //! Whether we've started headers synchronization with this peer.
+    bool fSyncStarted{false};
+    //! When to potentially disconnect peer for stalling headers download
+    std::chrono::microseconds m_headers_sync_timeout{0us};
+    //! Since when we're stalling block download progress (in microseconds), or 0.
+    std::chrono::microseconds m_stalling_since{0us};
+    std::list<QueuedBlock> vBlocksInFlight;
+    //! When the first entry in vBlocksInFlight started downloading. Don't care when vBlocksInFlight is empty.
+    std::chrono::microseconds m_downloading_since{0us};
+    int nBlocksInFlight{0};
+    //! Whether we consider this a preferred download peer.
+    bool fPreferredDownload{false};
+    //! Whether this peer wants invs or headers (when possible) for block announcements.
+    bool fPreferHeaders{false};
+    //! Whether this peer wants invs or cmpctblocks (when possible) for block announcements.
+    bool fPreferHeaderAndIDs{false};
+    /**
+   
