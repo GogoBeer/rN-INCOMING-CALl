@@ -701,4 +701,195 @@ struct CNodeState {
     //! Whether this peer wants invs or cmpctblocks (when possible) for block announcements.
     bool fPreferHeaderAndIDs{false};
     /**
-   
+      * Whether this peer will send us cmpctblocks if we request them.
+      * This is not used to gate request logic, as we really only care about fSupportsDesiredCmpctVersion,
+      * but is used as a flag to "lock in" the version of compact blocks (fWantsCmpctWitness) we send.
+      */
+    bool fProvidesHeaderAndIDs{false};
+    //! Whether this peer can give us witnesses
+    bool fHaveWitness{false};
+    //! Whether this peer wants witnesses in cmpctblocks/blocktxns
+    bool fWantsCmpctWitness{false};
+    /**
+     * If we've announced NODE_WITNESS to this peer: whether the peer sends witnesses in cmpctblocks/blocktxns,
+     * otherwise: whether this peer sends non-witnesses in cmpctblocks/blocktxns.
+     */
+    bool fSupportsDesiredCmpctVersion{false};
+
+    /** State used to enforce CHAIN_SYNC_TIMEOUT and EXTRA_PEER_CHECK_INTERVAL logic.
+      *
+      * Both are only in effect for outbound, non-manual, non-protected connections.
+      * Any peer protected (m_protect = true) is not chosen for eviction. A peer is
+      * marked as protected if all of these are true:
+      *   - its connection type is IsBlockOnlyConn() == false
+      *   - it gave us a valid connecting header
+      *   - we haven't reached MAX_OUTBOUND_PEERS_TO_PROTECT_FROM_DISCONNECT yet
+      *   - its chain tip has at least as much work as ours
+      *
+      * CHAIN_SYNC_TIMEOUT: if a peer's best known block has less work than our tip,
+      * set a timeout CHAIN_SYNC_TIMEOUT in the future:
+      *   - If at timeout their best known block now has more work than our tip
+      *     when the timeout was set, then either reset the timeout or clear it
+      *     (after comparing against our current tip's work)
+      *   - If at timeout their best known block still has less work than our
+      *     tip did when the timeout was set, then send a getheaders message,
+      *     and set a shorter timeout, HEADERS_RESPONSE_TIME seconds in future.
+      *     If their best known block is still behind when that new timeout is
+      *     reached, disconnect.
+      *
+      * EXTRA_PEER_CHECK_INTERVAL: after each interval, if we have too many outbound peers,
+      * drop the outbound one that least recently announced us a new block.
+      */
+    struct ChainSyncTimeoutState {
+        //! A timeout used for checking whether our peer has sufficiently synced
+        std::chrono::seconds m_timeout{0s};
+        //! A header with the work we require on our peer's chain
+        const CBlockIndex* m_work_header{nullptr};
+        //! After timeout is reached, set to true after sending getheaders
+        bool m_sent_getheaders{false};
+        //! Whether this peer is protected from disconnection due to a bad/slow chain
+        bool m_protect{false};
+    };
+
+    ChainSyncTimeoutState m_chain_sync;
+
+    //! Time of last new block announcement
+    int64_t m_last_block_announcement{0};
+
+    //! Whether this peer is an inbound connection
+    const bool m_is_inbound;
+
+    //! A rolling bloom filter of all announced tx CInvs to this peer.
+    CRollingBloomFilter m_recently_announced_invs = CRollingBloomFilter{INVENTORY_MAX_RECENT_RELAY, 0.000001};
+
+    //! Whether this peer relays txs via wtxid
+    bool m_wtxid_relay{false};
+
+    CNodeState(bool is_inbound) : m_is_inbound(is_inbound) {}
+};
+
+/** Map maintaining per-node state. */
+static std::map<NodeId, CNodeState> mapNodeState GUARDED_BY(cs_main);
+
+static CNodeState *State(NodeId pnode) EXCLUSIVE_LOCKS_REQUIRED(cs_main) {
+    std::map<NodeId, CNodeState>::iterator it = mapNodeState.find(pnode);
+    if (it == mapNodeState.end())
+        return nullptr;
+    return &it->second;
+}
+
+/**
+ * Whether the peer supports the address. For example, a peer that does not
+ * implement BIP155 cannot receive Tor v3 addresses because it requires
+ * ADDRv2 (BIP155) encoding.
+ */
+static bool IsAddrCompatible(const Peer& peer, const CAddress& addr)
+{
+    return peer.m_wants_addrv2 || addr.IsAddrV1Compatible();
+}
+
+static void AddAddressKnown(Peer& peer, const CAddress& addr)
+{
+    assert(peer.m_addr_known);
+    peer.m_addr_known->insert(addr.GetKey());
+}
+
+static void PushAddress(Peer& peer, const CAddress& addr, FastRandomContext& insecure_rand)
+{
+    // Known checking here is only to save space from duplicates.
+    // Before sending, we'll filter it again for known addresses that were
+    // added after addresses were pushed.
+    assert(peer.m_addr_known);
+    if (addr.IsValid() && !peer.m_addr_known->contains(addr.GetKey()) && IsAddrCompatible(peer, addr)) {
+        if (peer.m_addrs_to_send.size() >= MAX_ADDR_TO_SEND) {
+            peer.m_addrs_to_send[insecure_rand.randrange(peer.m_addrs_to_send.size())] = addr;
+        } else {
+            peer.m_addrs_to_send.push_back(addr);
+        }
+    }
+}
+
+static void UpdatePreferredDownload(const CNode& node, CNodeState* state) EXCLUSIVE_LOCKS_REQUIRED(cs_main)
+{
+    nPreferredDownload -= state->fPreferredDownload;
+
+    // Whether this node should be marked as a preferred download node.
+    state->fPreferredDownload = (!node.IsInboundConn() || node.HasPermission(NetPermissionFlags::NoBan)) && !node.IsAddrFetchConn() && !node.fClient;
+
+    nPreferredDownload += state->fPreferredDownload;
+}
+
+bool PeerManagerImpl::IsBlockRequested(const uint256& hash)
+{
+    return mapBlocksInFlight.find(hash) != mapBlocksInFlight.end();
+}
+
+void PeerManagerImpl::RemoveBlockRequest(const uint256& hash)
+{
+    auto it = mapBlocksInFlight.find(hash);
+    if (it == mapBlocksInFlight.end()) {
+        // Block was not requested
+        return;
+    }
+
+    auto [node_id, list_it] = it->second;
+    CNodeState *state = State(node_id);
+    assert(state != nullptr);
+
+    if (state->vBlocksInFlight.begin() == list_it) {
+        // First block on the queue was received, update the start download time for the next one
+        state->m_downloading_since = std::max(state->m_downloading_since, GetTime<std::chrono::microseconds>());
+    }
+    state->vBlocksInFlight.erase(list_it);
+
+    state->nBlocksInFlight--;
+    if (state->nBlocksInFlight == 0) {
+        // Last validated block on the queue was received.
+        m_peers_downloading_from--;
+    }
+    state->m_stalling_since = 0us;
+    mapBlocksInFlight.erase(it);
+}
+
+bool PeerManagerImpl::BlockRequested(NodeId nodeid, const CBlockIndex& block, std::list<QueuedBlock>::iterator** pit)
+{
+    const uint256& hash{block.GetBlockHash()};
+
+    CNodeState *state = State(nodeid);
+    assert(state != nullptr);
+
+    // Short-circuit most stuff in case it is from the same node
+    std::map<uint256, std::pair<NodeId, std::list<QueuedBlock>::iterator> >::iterator itInFlight = mapBlocksInFlight.find(hash);
+    if (itInFlight != mapBlocksInFlight.end() && itInFlight->second.first == nodeid) {
+        if (pit) {
+            *pit = &itInFlight->second.second;
+        }
+        return false;
+    }
+
+    // Make sure it's not listed somewhere already.
+    RemoveBlockRequest(hash);
+
+    std::list<QueuedBlock>::iterator it = state->vBlocksInFlight.insert(state->vBlocksInFlight.end(),
+            {&block, std::unique_ptr<PartiallyDownloadedBlock>(pit ? new PartiallyDownloadedBlock(&m_mempool) : nullptr)});
+    state->nBlocksInFlight++;
+    if (state->nBlocksInFlight == 1) {
+        // We're starting a block download (batch) from this peer.
+        state->m_downloading_since = GetTime<std::chrono::microseconds>();
+        m_peers_downloading_from++;
+    }
+    itInFlight = mapBlocksInFlight.insert(std::make_pair(hash, std::make_pair(nodeid, it))).first;
+    if (pit) {
+        *pit = &itInFlight->second.second;
+    }
+    return true;
+}
+
+void PeerManagerImpl::MaybeSetPeerAsAnnouncingHeaderAndIDs(NodeId nodeid)
+{
+    AssertLockHeld(cs_main);
+
+    // Never request high-bandwidth mode from peers if we're blocks-only. Our
+    // mempool will not contain the transactions necessary to reconstruct the
+    // compact block.
+    if
