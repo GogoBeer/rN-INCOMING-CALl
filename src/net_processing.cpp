@@ -892,4 +892,164 @@ void PeerManagerImpl::MaybeSetPeerAsAnnouncingHeaderAndIDs(NodeId nodeid)
     // Never request high-bandwidth mode from peers if we're blocks-only. Our
     // mempool will not contain the transactions necessary to reconstruct the
     // compact block.
-    if
+    if (m_ignore_incoming_txs) return;
+
+    CNodeState* nodestate = State(nodeid);
+    if (!nodestate || !nodestate->fSupportsDesiredCmpctVersion) {
+        // Never ask from peers who can't provide witnesses.
+        return;
+    }
+    if (nodestate->fProvidesHeaderAndIDs) {
+        int num_outbound_hb_peers = 0;
+        for (std::list<NodeId>::iterator it = lNodesAnnouncingHeaderAndIDs.begin(); it != lNodesAnnouncingHeaderAndIDs.end(); it++) {
+            if (*it == nodeid) {
+                lNodesAnnouncingHeaderAndIDs.erase(it);
+                lNodesAnnouncingHeaderAndIDs.push_back(nodeid);
+                return;
+            }
+            CNodeState *state = State(*it);
+            if (state != nullptr && !state->m_is_inbound) ++num_outbound_hb_peers;
+        }
+        if (nodestate->m_is_inbound) {
+            // If we're adding an inbound HB peer, make sure we're not removing
+            // our last outbound HB peer in the process.
+            if (lNodesAnnouncingHeaderAndIDs.size() >= 3 && num_outbound_hb_peers == 1) {
+                CNodeState *remove_node = State(lNodesAnnouncingHeaderAndIDs.front());
+                if (remove_node != nullptr && !remove_node->m_is_inbound) {
+                    // Put the HB outbound peer in the second slot, so that it
+                    // doesn't get removed.
+                    std::swap(lNodesAnnouncingHeaderAndIDs.front(), *std::next(lNodesAnnouncingHeaderAndIDs.begin()));
+                }
+            }
+        }
+        m_connman.ForNode(nodeid, [this](CNode* pfrom) EXCLUSIVE_LOCKS_REQUIRED(::cs_main) {
+            AssertLockHeld(::cs_main);
+            uint64_t nCMPCTBLOCKVersion = 2;
+            if (lNodesAnnouncingHeaderAndIDs.size() >= 3) {
+                // As per BIP152, we only get 3 of our peers to announce
+                // blocks using compact encodings.
+                m_connman.ForNode(lNodesAnnouncingHeaderAndIDs.front(), [this, nCMPCTBLOCKVersion](CNode* pnodeStop){
+                    m_connman.PushMessage(pnodeStop, CNetMsgMaker(pnodeStop->GetCommonVersion()).Make(NetMsgType::SENDCMPCT, /*fAnnounceUsingCMPCTBLOCK=*/false, nCMPCTBLOCKVersion));
+                    // save BIP152 bandwidth state: we select peer to be low-bandwidth
+                    pnodeStop->m_bip152_highbandwidth_to = false;
+                    return true;
+                });
+                lNodesAnnouncingHeaderAndIDs.pop_front();
+            }
+            m_connman.PushMessage(pfrom, CNetMsgMaker(pfrom->GetCommonVersion()).Make(NetMsgType::SENDCMPCT, /*fAnnounceUsingCMPCTBLOCK=*/true, nCMPCTBLOCKVersion));
+            // save BIP152 bandwidth state: we select peer to be high-bandwidth
+            pfrom->m_bip152_highbandwidth_to = true;
+            lNodesAnnouncingHeaderAndIDs.push_back(pfrom->GetId());
+            return true;
+        });
+    }
+}
+
+bool PeerManagerImpl::TipMayBeStale()
+{
+    AssertLockHeld(cs_main);
+    const Consensus::Params& consensusParams = m_chainparams.GetConsensus();
+    if (m_last_tip_update.load() == 0s) {
+        m_last_tip_update = GetTime<std::chrono::seconds>();
+    }
+    return m_last_tip_update.load() < GetTime<std::chrono::seconds>() - std::chrono::seconds{consensusParams.nPowTargetSpacing * 3} && mapBlocksInFlight.empty();
+}
+
+bool PeerManagerImpl::CanDirectFetch()
+{
+    return m_chainman.ActiveChain().Tip()->GetBlockTime() > GetAdjustedTime() - m_chainparams.GetConsensus().nPowTargetSpacing * 20;
+}
+
+static bool PeerHasHeader(CNodeState *state, const CBlockIndex *pindex) EXCLUSIVE_LOCKS_REQUIRED(cs_main)
+{
+    if (state->pindexBestKnownBlock && pindex == state->pindexBestKnownBlock->GetAncestor(pindex->nHeight))
+        return true;
+    if (state->pindexBestHeaderSent && pindex == state->pindexBestHeaderSent->GetAncestor(pindex->nHeight))
+        return true;
+    return false;
+}
+
+void PeerManagerImpl::ProcessBlockAvailability(NodeId nodeid) {
+    CNodeState *state = State(nodeid);
+    assert(state != nullptr);
+
+    if (!state->hashLastUnknownBlock.IsNull()) {
+        const CBlockIndex* pindex = m_chainman.m_blockman.LookupBlockIndex(state->hashLastUnknownBlock);
+        if (pindex && pindex->nChainWork > 0) {
+            if (state->pindexBestKnownBlock == nullptr || pindex->nChainWork >= state->pindexBestKnownBlock->nChainWork) {
+                state->pindexBestKnownBlock = pindex;
+            }
+            state->hashLastUnknownBlock.SetNull();
+        }
+    }
+}
+
+void PeerManagerImpl::UpdateBlockAvailability(NodeId nodeid, const uint256 &hash) {
+    CNodeState *state = State(nodeid);
+    assert(state != nullptr);
+
+    ProcessBlockAvailability(nodeid);
+
+    const CBlockIndex* pindex = m_chainman.m_blockman.LookupBlockIndex(hash);
+    if (pindex && pindex->nChainWork > 0) {
+        // An actually better block was announced.
+        if (state->pindexBestKnownBlock == nullptr || pindex->nChainWork >= state->pindexBestKnownBlock->nChainWork) {
+            state->pindexBestKnownBlock = pindex;
+        }
+    } else {
+        // An unknown block was announced; just assume that the latest one is the best one.
+        state->hashLastUnknownBlock = hash;
+    }
+}
+
+void PeerManagerImpl::FindNextBlocksToDownload(NodeId nodeid, unsigned int count, std::vector<const CBlockIndex*>& vBlocks, NodeId& nodeStaller)
+{
+    if (count == 0)
+        return;
+
+    vBlocks.reserve(vBlocks.size() + count);
+    CNodeState *state = State(nodeid);
+    assert(state != nullptr);
+
+    // Make sure pindexBestKnownBlock is up to date, we'll need it.
+    ProcessBlockAvailability(nodeid);
+
+    if (state->pindexBestKnownBlock == nullptr || state->pindexBestKnownBlock->nChainWork < m_chainman.ActiveChain().Tip()->nChainWork || state->pindexBestKnownBlock->nChainWork < nMinimumChainWork) {
+        // This peer has nothing interesting.
+        return;
+    }
+
+    if (state->pindexLastCommonBlock == nullptr) {
+        // Bootstrap quickly by guessing a parent of our best tip is the forking point.
+        // Guessing wrong in either direction is not a problem.
+        state->pindexLastCommonBlock = m_chainman.ActiveChain()[std::min(state->pindexBestKnownBlock->nHeight, m_chainman.ActiveChain().Height())];
+    }
+
+    // If the peer reorganized, our previous pindexLastCommonBlock may not be an ancestor
+    // of its current tip anymore. Go back enough to fix that.
+    state->pindexLastCommonBlock = LastCommonAncestor(state->pindexLastCommonBlock, state->pindexBestKnownBlock);
+    if (state->pindexLastCommonBlock == state->pindexBestKnownBlock)
+        return;
+
+    const Consensus::Params& consensusParams = m_chainparams.GetConsensus();
+    std::vector<const CBlockIndex*> vToFetch;
+    const CBlockIndex *pindexWalk = state->pindexLastCommonBlock;
+    // Never fetch further than the best block we know the peer has, or more than BLOCK_DOWNLOAD_WINDOW + 1 beyond the last
+    // linked block we have in common with this peer. The +1 is so we can detect stalling, namely if we would be able to
+    // download that next block if the window were 1 larger.
+    int nWindowEnd = state->pindexLastCommonBlock->nHeight + BLOCK_DOWNLOAD_WINDOW;
+    int nMaxHeight = std::min<int>(state->pindexBestKnownBlock->nHeight, nWindowEnd + 1);
+    NodeId waitingfor = -1;
+    while (pindexWalk->nHeight < nMaxHeight) {
+        // Read up to 128 (or more, if more blocks than that are needed) successors of pindexWalk (towards
+        // pindexBestKnownBlock) into vToFetch. We fetch 128, because CBlockIndex::GetAncestor may be as expensive
+        // as iterating over ~100 CBlockIndex* entries anyway.
+        int nToFetch = std::min(nMaxHeight - pindexWalk->nHeight, std::max<int>(count - vBlocks.size(), 128));
+        vToFetch.resize(nToFetch);
+        pindexWalk = state->pindexBestKnownBlock->GetAncestor(pindexWalk->nHeight + nToFetch);
+        vToFetch[nToFetch - 1] = pindexWalk;
+        for (unsigned int i = nToFetch - 1; i > 0; i--) {
+            vToFetch[i - 1] = vToFetch[i]->pprev;
+        }
+
+        // Iterate over those blocks i
