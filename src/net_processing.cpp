@@ -1223,4 +1223,209 @@ void PeerManagerImpl::FinalizeNode(const CNode& node)
     WITH_LOCK(g_cs_orphans, m_orphanage.EraseForPeer(nodeid));
     m_txrequest.DisconnectedPeer(nodeid);
     nPreferredDownload -= state->fPreferredDownload;
-    m_peers_downloading_from -= (state->nBlocksInFlig
+    m_peers_downloading_from -= (state->nBlocksInFlight != 0);
+    assert(m_peers_downloading_from >= 0);
+    m_outbound_peers_with_protect_from_disconnect -= state->m_chain_sync.m_protect;
+    assert(m_outbound_peers_with_protect_from_disconnect >= 0);
+    m_wtxid_relay_peers -= state->m_wtxid_relay;
+    assert(m_wtxid_relay_peers >= 0);
+
+    mapNodeState.erase(nodeid);
+
+    if (mapNodeState.empty()) {
+        // Do a consistency check after the last peer is removed.
+        assert(mapBlocksInFlight.empty());
+        assert(nPreferredDownload == 0);
+        assert(m_peers_downloading_from == 0);
+        assert(m_outbound_peers_with_protect_from_disconnect == 0);
+        assert(m_wtxid_relay_peers == 0);
+        assert(m_txrequest.Size() == 0);
+        assert(m_orphanage.Size() == 0);
+    }
+    } // cs_main
+    if (node.fSuccessfullyConnected && misbehavior == 0 &&
+        !node.IsBlockOnlyConn() && !node.IsInboundConn()) {
+        // Only change visible addrman state for full outbound peers.  We don't
+        // call Connected() for feeler connections since they don't have
+        // fSuccessfullyConnected set.
+        m_addrman.Connected(node.addr);
+    }
+    LogPrint(BCLog::NET, "Cleared nodestate for peer=%d\n", nodeid);
+}
+
+PeerRef PeerManagerImpl::GetPeerRef(NodeId id) const
+{
+    LOCK(m_peer_mutex);
+    auto it = m_peer_map.find(id);
+    return it != m_peer_map.end() ? it->second : nullptr;
+}
+
+PeerRef PeerManagerImpl::RemovePeer(NodeId id)
+{
+    PeerRef ret;
+    LOCK(m_peer_mutex);
+    auto it = m_peer_map.find(id);
+    if (it != m_peer_map.end()) {
+        ret = std::move(it->second);
+        m_peer_map.erase(it);
+    }
+    return ret;
+}
+
+bool PeerManagerImpl::GetNodeStateStats(NodeId nodeid, CNodeStateStats& stats) const
+{
+    {
+        LOCK(cs_main);
+        CNodeState* state = State(nodeid);
+        if (state == nullptr)
+            return false;
+        stats.nSyncHeight = state->pindexBestKnownBlock ? state->pindexBestKnownBlock->nHeight : -1;
+        stats.nCommonHeight = state->pindexLastCommonBlock ? state->pindexLastCommonBlock->nHeight : -1;
+        for (const QueuedBlock& queue : state->vBlocksInFlight) {
+            if (queue.pindex)
+                stats.vHeightInFlight.push_back(queue.pindex->nHeight);
+        }
+    }
+
+    PeerRef peer = GetPeerRef(nodeid);
+    if (peer == nullptr) return false;
+    stats.m_starting_height = peer->m_starting_height;
+    // It is common for nodes with good ping times to suddenly become lagged,
+    // due to a new block arriving or other large transfer.
+    // Merely reporting pingtime might fool the caller into thinking the node was still responsive,
+    // since pingtime does not update until the ping is complete, which might take a while.
+    // So, if a ping is taking an unusually long time in flight,
+    // the caller can immediately detect that this is happening.
+    auto ping_wait{0us};
+    if ((0 != peer->m_ping_nonce_sent) && (0 != peer->m_ping_start.load().count())) {
+        ping_wait = GetTime<std::chrono::microseconds>() - peer->m_ping_start.load();
+    }
+
+    stats.m_ping_wait = ping_wait;
+    stats.m_addr_processed = peer->m_addr_processed.load();
+    stats.m_addr_rate_limited = peer->m_addr_rate_limited.load();
+    stats.m_addr_relay_enabled = peer->m_addr_relay_enabled.load();
+
+    return true;
+}
+
+void PeerManagerImpl::AddToCompactExtraTransactions(const CTransactionRef& tx)
+{
+    size_t max_extra_txn = gArgs.GetIntArg("-blockreconstructionextratxn", DEFAULT_BLOCK_RECONSTRUCTION_EXTRA_TXN);
+    if (max_extra_txn <= 0)
+        return;
+    if (!vExtraTxnForCompact.size())
+        vExtraTxnForCompact.resize(max_extra_txn);
+    vExtraTxnForCompact[vExtraTxnForCompactIt] = std::make_pair(tx->GetWitnessHash(), tx);
+    vExtraTxnForCompactIt = (vExtraTxnForCompactIt + 1) % max_extra_txn;
+}
+
+void PeerManagerImpl::Misbehaving(const NodeId pnode, const int howmuch, const std::string& message)
+{
+    assert(howmuch > 0);
+
+    PeerRef peer = GetPeerRef(pnode);
+    if (peer == nullptr) return;
+
+    LOCK(peer->m_misbehavior_mutex);
+    const int score_before{peer->m_misbehavior_score};
+    peer->m_misbehavior_score += howmuch;
+    const int score_now{peer->m_misbehavior_score};
+
+    const std::string message_prefixed = message.empty() ? "" : (": " + message);
+    std::string warning;
+
+    if (score_now >= DISCOURAGEMENT_THRESHOLD && score_before < DISCOURAGEMENT_THRESHOLD) {
+        warning = " DISCOURAGE THRESHOLD EXCEEDED";
+        peer->m_should_discourage = true;
+    }
+
+    LogPrint(BCLog::NET, "Misbehaving: peer=%d (%d -> %d)%s%s\n",
+             pnode, score_before, score_now, warning, message_prefixed);
+}
+
+bool PeerManagerImpl::MaybePunishNodeForBlock(NodeId nodeid, const BlockValidationState& state,
+                                              bool via_compact_block, const std::string& message)
+{
+    switch (state.GetResult()) {
+    case BlockValidationResult::BLOCK_RESULT_UNSET:
+        break;
+    // The node is providing invalid data:
+    case BlockValidationResult::BLOCK_CONSENSUS:
+    case BlockValidationResult::BLOCK_MUTATED:
+        if (!via_compact_block) {
+            Misbehaving(nodeid, 100, message);
+            return true;
+        }
+        break;
+    case BlockValidationResult::BLOCK_CACHED_INVALID:
+        {
+            LOCK(cs_main);
+            CNodeState *node_state = State(nodeid);
+            if (node_state == nullptr) {
+                break;
+            }
+
+            // Discourage outbound (but not inbound) peers if on an invalid chain.
+            // Exempt HB compact block peers. Manual connections are always protected from discouragement.
+            if (!via_compact_block && !node_state->m_is_inbound) {
+                Misbehaving(nodeid, 100, message);
+                return true;
+            }
+            break;
+        }
+    case BlockValidationResult::BLOCK_INVALID_HEADER:
+    case BlockValidationResult::BLOCK_CHECKPOINT:
+    case BlockValidationResult::BLOCK_INVALID_PREV:
+        Misbehaving(nodeid, 100, message);
+        return true;
+    // Conflicting (but not necessarily invalid) data or different policy:
+    case BlockValidationResult::BLOCK_MISSING_PREV:
+        // TODO: Handle this much more gracefully (10 DoS points is super arbitrary)
+        Misbehaving(nodeid, 10, message);
+        return true;
+    case BlockValidationResult::BLOCK_RECENT_CONSENSUS_CHANGE:
+    case BlockValidationResult::BLOCK_TIME_FUTURE:
+        break;
+    }
+    if (message != "") {
+        LogPrint(BCLog::NET, "peer=%d: %s\n", nodeid, message);
+    }
+    return false;
+}
+
+bool PeerManagerImpl::MaybePunishNodeForTx(NodeId nodeid, const TxValidationState& state, const std::string& message)
+{
+    switch (state.GetResult()) {
+    case TxValidationResult::TX_RESULT_UNSET:
+        break;
+    // The node is providing invalid data:
+    case TxValidationResult::TX_CONSENSUS:
+        Misbehaving(nodeid, 100, message);
+        return true;
+    // Conflicting (but not necessarily invalid) data or different policy:
+    case TxValidationResult::TX_RECENT_CONSENSUS_CHANGE:
+    case TxValidationResult::TX_INPUTS_NOT_STANDARD:
+    case TxValidationResult::TX_NOT_STANDARD:
+    case TxValidationResult::TX_MISSING_INPUTS:
+    case TxValidationResult::TX_PREMATURE_SPEND:
+    case TxValidationResult::TX_WITNESS_MUTATED:
+    case TxValidationResult::TX_WITNESS_STRIPPED:
+    case TxValidationResult::TX_CONFLICT:
+    case TxValidationResult::TX_MEMPOOL_POLICY:
+    case TxValidationResult::TX_NO_MEMPOOL:
+        break;
+    }
+    if (message != "") {
+        LogPrint(BCLog::NET, "peer=%d: %s\n", nodeid, message);
+    }
+    return false;
+}
+
+bool PeerManagerImpl::BlockRequestAllowed(const CBlockIndex* pindex)
+{
+    AssertLockHeld(cs_main);
+    if (m_chainman.ActiveChain().Contains(pindex)) return true;
+    return pindex->IsValid(BLOCK_VALID_SCRIPTS) && (pindexBestHeader != nullptr) &&
+           (pindexBestHeader->GetBlockTime() - pindex->GetBlockTime() < STALE_RELAY_AGE_LIMIT) &&
+           (GetBlockProofEquivalentTime(*pindexBestHe
