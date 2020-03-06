@@ -1052,4 +1052,175 @@ void PeerManagerImpl::FindNextBlocksToDownload(NodeId nodeid, unsigned int count
             vToFetch[i - 1] = vToFetch[i]->pprev;
         }
 
-        // Iterate over those blocks i
+        // Iterate over those blocks in vToFetch (in forward direction), adding the ones that
+        // are not yet downloaded and not in flight to vBlocks. In the meantime, update
+        // pindexLastCommonBlock as long as all ancestors are already downloaded, or if it's
+        // already part of our chain (and therefore don't need it even if pruned).
+        for (const CBlockIndex* pindex : vToFetch) {
+            if (!pindex->IsValid(BLOCK_VALID_TREE)) {
+                // We consider the chain that this peer is on invalid.
+                return;
+            }
+            if (!State(nodeid)->fHaveWitness && DeploymentActiveAt(*pindex, consensusParams, Consensus::DEPLOYMENT_SEGWIT)) {
+                // We wouldn't download this block or its descendants from this peer.
+                return;
+            }
+            if (pindex->nStatus & BLOCK_HAVE_DATA || m_chainman.ActiveChain().Contains(pindex)) {
+                if (pindex->HaveTxsDownloaded())
+                    state->pindexLastCommonBlock = pindex;
+            } else if (!IsBlockRequested(pindex->GetBlockHash())) {
+                // The block is not already downloaded, and not yet in flight.
+                if (pindex->nHeight > nWindowEnd) {
+                    // We reached the end of the window.
+                    if (vBlocks.size() == 0 && waitingfor != nodeid) {
+                        // We aren't able to fetch anything, but we would be if the download window was one larger.
+                        nodeStaller = waitingfor;
+                    }
+                    return;
+                }
+                vBlocks.push_back(pindex);
+                if (vBlocks.size() == count) {
+                    return;
+                }
+            } else if (waitingfor == -1) {
+                // This is the first already-in-flight block.
+                waitingfor = mapBlocksInFlight[pindex->GetBlockHash()].first;
+            }
+        }
+    }
+}
+
+} // namespace
+
+void PeerManagerImpl::PushNodeVersion(CNode& pnode)
+{
+    // Note that pnode->GetLocalServices() is a reflection of the local
+    // services we were offering when the CNode object was created for this
+    // peer.
+    uint64_t my_services{pnode.GetLocalServices()};
+    const int64_t nTime{count_seconds(GetTime<std::chrono::seconds>())};
+    uint64_t nonce = pnode.GetLocalNonce();
+    const int nNodeStartingHeight{m_best_height};
+    NodeId nodeid = pnode.GetId();
+    CAddress addr = pnode.addr;
+
+    CService addr_you = addr.IsRoutable() && !IsProxy(addr) && addr.IsAddrV1Compatible() ? addr : CService();
+    uint64_t your_services{addr.nServices};
+
+    const bool tx_relay = !m_ignore_incoming_txs && pnode.m_tx_relay != nullptr && !pnode.IsFeelerConn();
+    m_connman.PushMessage(&pnode, CNetMsgMaker(INIT_PROTO_VERSION).Make(NetMsgType::VERSION, PROTOCOL_VERSION, my_services, nTime,
+            your_services, addr_you, // Together the pre-version-31402 serialization of CAddress "addrYou" (without nTime)
+            my_services, CService(), // Together the pre-version-31402 serialization of CAddress "addrMe" (without nTime)
+            nonce, strSubVersion, nNodeStartingHeight, tx_relay));
+
+    if (fLogIPs) {
+        LogPrint(BCLog::NET, "send version message: version %d, blocks=%d, them=%s, txrelay=%d, peer=%d\n", PROTOCOL_VERSION, nNodeStartingHeight, addr_you.ToString(), tx_relay, nodeid);
+    } else {
+        LogPrint(BCLog::NET, "send version message: version %d, blocks=%d, txrelay=%d, peer=%d\n", PROTOCOL_VERSION, nNodeStartingHeight, tx_relay, nodeid);
+    }
+}
+
+void PeerManagerImpl::AddTxAnnouncement(const CNode& node, const GenTxid& gtxid, std::chrono::microseconds current_time)
+{
+    AssertLockHeld(::cs_main); // For m_txrequest
+    NodeId nodeid = node.GetId();
+    if (!node.HasPermission(NetPermissionFlags::Relay) && m_txrequest.Count(nodeid) >= MAX_PEER_TX_ANNOUNCEMENTS) {
+        // Too many queued announcements from this peer
+        return;
+    }
+    const CNodeState* state = State(nodeid);
+
+    // Decide the TxRequestTracker parameters for this announcement:
+    // - "preferred": if fPreferredDownload is set (= outbound, or NetPermissionFlags::NoBan permission)
+    // - "reqtime": current time plus delays for:
+    //   - NONPREF_PEER_TX_DELAY for announcements from non-preferred connections
+    //   - TXID_RELAY_DELAY for txid announcements while wtxid peers are available
+    //   - OVERLOADED_PEER_TX_DELAY for announcements from peers which have at least
+    //     MAX_PEER_TX_REQUEST_IN_FLIGHT requests in flight (and don't have NetPermissionFlags::Relay).
+    auto delay{0us};
+    const bool preferred = state->fPreferredDownload;
+    if (!preferred) delay += NONPREF_PEER_TX_DELAY;
+    if (!gtxid.IsWtxid() && m_wtxid_relay_peers > 0) delay += TXID_RELAY_DELAY;
+    const bool overloaded = !node.HasPermission(NetPermissionFlags::Relay) &&
+        m_txrequest.CountInFlight(nodeid) >= MAX_PEER_TX_REQUEST_IN_FLIGHT;
+    if (overloaded) delay += OVERLOADED_PEER_TX_DELAY;
+    m_txrequest.ReceivedInv(nodeid, gtxid, preferred, current_time + delay);
+}
+
+// This function is used for testing the stale tip eviction logic, see
+// denialofservice_tests.cpp
+void UpdateLastBlockAnnounceTime(NodeId node, int64_t time_in_seconds)
+{
+    LOCK(cs_main);
+    CNodeState *state = State(node);
+    if (state) state->m_last_block_announcement = time_in_seconds;
+}
+
+void PeerManagerImpl::InitializeNode(CNode *pnode)
+{
+    NodeId nodeid = pnode->GetId();
+    {
+        LOCK(cs_main);
+        mapNodeState.emplace_hint(mapNodeState.end(), std::piecewise_construct, std::forward_as_tuple(nodeid), std::forward_as_tuple(pnode->IsInboundConn()));
+        assert(m_txrequest.Count(nodeid) == 0);
+    }
+    {
+        PeerRef peer = std::make_shared<Peer>(nodeid);
+        LOCK(m_peer_mutex);
+        m_peer_map.emplace_hint(m_peer_map.end(), nodeid, std::move(peer));
+    }
+    if (!pnode->IsInboundConn()) {
+        PushNodeVersion(*pnode);
+    }
+}
+
+void PeerManagerImpl::ReattemptInitialBroadcast(CScheduler& scheduler)
+{
+    std::set<uint256> unbroadcast_txids = m_mempool.GetUnbroadcastTxs();
+
+    for (const auto& txid : unbroadcast_txids) {
+        CTransactionRef tx = m_mempool.get(txid);
+
+        if (tx != nullptr) {
+            LOCK(cs_main);
+            _RelayTransaction(txid, tx->GetWitnessHash());
+        } else {
+            m_mempool.RemoveUnbroadcastTx(txid, true);
+        }
+    }
+
+    // Schedule next run for 10-15 minutes in the future.
+    // We add randomness on every cycle to avoid the possibility of P2P fingerprinting.
+    const std::chrono::milliseconds delta = 10min + GetRandMillis(5min);
+    scheduler.scheduleFromNow([&] { ReattemptInitialBroadcast(scheduler); }, delta);
+}
+
+void PeerManagerImpl::FinalizeNode(const CNode& node)
+{
+    NodeId nodeid = node.GetId();
+    int misbehavior{0};
+    {
+    LOCK(cs_main);
+    {
+        // We remove the PeerRef from g_peer_map here, but we don't always
+        // destruct the Peer. Sometimes another thread is still holding a
+        // PeerRef, so the refcount is >= 1. Be careful not to do any
+        // processing here that assumes Peer won't be changed before it's
+        // destructed.
+        PeerRef peer = RemovePeer(nodeid);
+        assert(peer != nullptr);
+        misbehavior = WITH_LOCK(peer->m_misbehavior_mutex, return peer->m_misbehavior_score);
+    }
+    CNodeState *state = State(nodeid);
+    assert(state != nullptr);
+
+    if (state->fSyncStarted)
+        nSyncStarted--;
+
+    for (const QueuedBlock& entry : state->vBlocksInFlight) {
+        mapBlocksInFlight.erase(entry.pindex->GetBlockHash());
+    }
+    WITH_LOCK(g_cs_orphans, m_orphanage.EraseForPeer(nodeid));
+    m_txrequest.DisconnectedPeer(nodeid);
+    nPreferredDownload -= state->fPreferredDownload;
+    m_peers_downloading_from -= (state->nBlocksInFlig
