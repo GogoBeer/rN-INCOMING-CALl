@@ -1428,4 +1428,183 @@ bool PeerManagerImpl::BlockRequestAllowed(const CBlockIndex* pindex)
     if (m_chainman.ActiveChain().Contains(pindex)) return true;
     return pindex->IsValid(BLOCK_VALID_SCRIPTS) && (pindexBestHeader != nullptr) &&
            (pindexBestHeader->GetBlockTime() - pindex->GetBlockTime() < STALE_RELAY_AGE_LIMIT) &&
-           (GetBlockProofEquivalentTime(*pindexBestHe
+           (GetBlockProofEquivalentTime(*pindexBestHeader, *pindex, *pindexBestHeader, m_chainparams.GetConsensus()) < STALE_RELAY_AGE_LIMIT);
+}
+
+bool PeerManagerImpl::FetchBlock(NodeId id, const uint256& hash, const CBlockIndex& index)
+{
+    if (fImporting || fReindex) return false;
+
+    LOCK(cs_main);
+    // Ensure this peer exists and hasn't been disconnected
+    CNodeState* state = State(id);
+    if (state == nullptr) return false;
+    // Ignore pre-segwit peers
+    if (!state->fHaveWitness) return false;
+
+    // Mark block as in-flight unless it already is
+    if (!BlockRequested(id, index)) return false;
+
+    // Construct message to request the block
+    std::vector<CInv> invs{CInv(MSG_BLOCK | MSG_WITNESS_FLAG, hash)};
+
+    // Send block request message to the peer
+    bool success = m_connman.ForNode(id, [this, &invs](CNode* node) {
+        const CNetMsgMaker msgMaker(node->GetCommonVersion());
+        this->m_connman.PushMessage(node, msgMaker.Make(NetMsgType::GETDATA, invs));
+        return true;
+    });
+
+    if (success) {
+        LogPrint(BCLog::NET, "Requesting block %s from peer=%d\n",
+                 hash.ToString(), id);
+    } else {
+        RemoveBlockRequest(hash);
+        LogPrint(BCLog::NET, "Failed to request block %s from peer=%d\n",
+                 hash.ToString(), id);
+    }
+    return success;
+}
+
+std::unique_ptr<PeerManager> PeerManager::make(const CChainParams& chainparams, CConnman& connman, AddrMan& addrman,
+                                               BanMan* banman, ChainstateManager& chainman,
+                                               CTxMemPool& pool, bool ignore_incoming_txs)
+{
+    return std::make_unique<PeerManagerImpl>(chainparams, connman, addrman, banman, chainman, pool, ignore_incoming_txs);
+}
+
+PeerManagerImpl::PeerManagerImpl(const CChainParams& chainparams, CConnman& connman, AddrMan& addrman,
+                                 BanMan* banman, ChainstateManager& chainman,
+                                 CTxMemPool& pool, bool ignore_incoming_txs)
+    : m_chainparams(chainparams),
+      m_connman(connman),
+      m_addrman(addrman),
+      m_banman(banman),
+      m_chainman(chainman),
+      m_mempool(pool),
+      m_ignore_incoming_txs(ignore_incoming_txs)
+{
+}
+
+void PeerManagerImpl::StartScheduledTasks(CScheduler& scheduler)
+{
+    // Stale tip checking and peer eviction are on two different timers, but we
+    // don't want them to get out of sync due to drift in the scheduler, so we
+    // combine them in one function and schedule at the quicker (peer-eviction)
+    // timer.
+    static_assert(EXTRA_PEER_CHECK_INTERVAL < STALE_CHECK_INTERVAL, "peer eviction timer should be less than stale tip check timer");
+    scheduler.scheduleEvery([this] { this->CheckForStaleTipAndEvictPeers(); }, std::chrono::seconds{EXTRA_PEER_CHECK_INTERVAL});
+
+    // schedule next run for 10-15 minutes in the future
+    const std::chrono::milliseconds delta = 10min + GetRandMillis(5min);
+    scheduler.scheduleFromNow([&] { ReattemptInitialBroadcast(scheduler); }, delta);
+}
+
+/**
+ * Evict orphan txn pool entries based on a newly connected
+ * block, remember the recently confirmed transactions, and delete tracked
+ * announcements for them. Also save the time of the last tip update.
+ */
+void PeerManagerImpl::BlockConnected(const std::shared_ptr<const CBlock>& pblock, const CBlockIndex* pindex)
+{
+    m_orphanage.EraseForBlock(*pblock);
+    m_last_tip_update = GetTime<std::chrono::seconds>();
+
+    {
+        LOCK(m_recent_confirmed_transactions_mutex);
+        for (const auto& ptx : pblock->vtx) {
+            m_recent_confirmed_transactions.insert(ptx->GetHash());
+            if (ptx->GetHash() != ptx->GetWitnessHash()) {
+                m_recent_confirmed_transactions.insert(ptx->GetWitnessHash());
+            }
+        }
+    }
+    {
+        LOCK(cs_main);
+        for (const auto& ptx : pblock->vtx) {
+            m_txrequest.ForgetTxHash(ptx->GetHash());
+            m_txrequest.ForgetTxHash(ptx->GetWitnessHash());
+        }
+    }
+}
+
+void PeerManagerImpl::BlockDisconnected(const std::shared_ptr<const CBlock> &block, const CBlockIndex* pindex)
+{
+    // To avoid relay problems with transactions that were previously
+    // confirmed, clear our filter of recently confirmed transactions whenever
+    // there's a reorg.
+    // This means that in a 1-block reorg (where 1 block is disconnected and
+    // then another block reconnected), our filter will drop to having only one
+    // block's worth of transactions in it, but that should be fine, since
+    // presumably the most common case of relaying a confirmed transaction
+    // should be just after a new block containing it is found.
+    LOCK(m_recent_confirmed_transactions_mutex);
+    m_recent_confirmed_transactions.reset();
+}
+
+// All of the following cache a recent block, and are protected by cs_most_recent_block
+static RecursiveMutex cs_most_recent_block;
+static std::shared_ptr<const CBlock> most_recent_block GUARDED_BY(cs_most_recent_block);
+static std::shared_ptr<const CBlockHeaderAndShortTxIDs> most_recent_compact_block GUARDED_BY(cs_most_recent_block);
+static uint256 most_recent_block_hash GUARDED_BY(cs_most_recent_block);
+static bool fWitnessesPresentInMostRecentCompactBlock GUARDED_BY(cs_most_recent_block);
+
+/**
+ * Maintain state about the best-seen block and fast-announce a compact block
+ * to compatible peers.
+ */
+void PeerManagerImpl::NewPoWValidBlock(const CBlockIndex *pindex, const std::shared_ptr<const CBlock>& pblock)
+{
+    std::shared_ptr<const CBlockHeaderAndShortTxIDs> pcmpctblock = std::make_shared<const CBlockHeaderAndShortTxIDs> (*pblock, true);
+    const CNetMsgMaker msgMaker(PROTOCOL_VERSION);
+
+    LOCK(cs_main);
+
+    static int nHighestFastAnnounce = 0;
+    if (pindex->nHeight <= nHighestFastAnnounce)
+        return;
+    nHighestFastAnnounce = pindex->nHeight;
+
+    bool fWitnessEnabled = DeploymentActiveAt(*pindex, m_chainparams.GetConsensus(), Consensus::DEPLOYMENT_SEGWIT);
+    uint256 hashBlock(pblock->GetHash());
+
+    {
+        LOCK(cs_most_recent_block);
+        most_recent_block_hash = hashBlock;
+        most_recent_block = pblock;
+        most_recent_compact_block = pcmpctblock;
+        fWitnessesPresentInMostRecentCompactBlock = fWitnessEnabled;
+    }
+
+    m_connman.ForEachNode([this, &pcmpctblock, pindex, &msgMaker, fWitnessEnabled, &hashBlock](CNode* pnode) EXCLUSIVE_LOCKS_REQUIRED(::cs_main) {
+        AssertLockHeld(::cs_main);
+
+        // TODO: Avoid the repeated-serialization here
+        if (pnode->GetCommonVersion() < INVALID_CB_NO_BAN_VERSION || pnode->fDisconnect)
+            return;
+        ProcessBlockAvailability(pnode->GetId());
+        CNodeState &state = *State(pnode->GetId());
+        // If the peer has, or we announced to them the previous block already,
+        // but we don't think they have this one, go ahead and announce it
+        if (state.fPreferHeaderAndIDs && (!fWitnessEnabled || state.fWantsCmpctWitness) &&
+                !PeerHasHeader(&state, pindex) && PeerHasHeader(&state, pindex->pprev)) {
+
+            LogPrint(BCLog::NET, "%s sending header-and-ids %s to peer=%d\n", "PeerManager::NewPoWValidBlock",
+                    hashBlock.ToString(), pnode->GetId());
+            m_connman.PushMessage(pnode, msgMaker.Make(NetMsgType::CMPCTBLOCK, *pcmpctblock));
+            state.pindexBestHeaderSent = pindex;
+        }
+    });
+}
+
+/**
+ * Update our best height and announce any block hashes which weren't previously
+ * in m_chainman.ActiveChain() to our peers.
+ */
+void PeerManagerImpl::UpdatedBlockTip(const CBlockIndex *pindexNew, const CBlockIndex *pindexFork, bool fInitialDownload)
+{
+    SetBestHeight(pindexNew->nHeight);
+    SetServiceFlagsIBDCache(!fInitialDownload);
+
+    // Don't relay inventory during initial block download.
+    if (fInitialDownlo
