@@ -1607,4 +1607,204 @@ void PeerManagerImpl::UpdatedBlockTip(const CBlockIndex *pindexNew, const CBlock
     SetServiceFlagsIBDCache(!fInitialDownload);
 
     // Don't relay inventory during initial block download.
-    if (fInitialDownlo
+    if (fInitialDownload) return;
+
+    // Find the hashes of all blocks that weren't previously in the best chain.
+    std::vector<uint256> vHashes;
+    const CBlockIndex *pindexToAnnounce = pindexNew;
+    while (pindexToAnnounce != pindexFork) {
+        vHashes.push_back(pindexToAnnounce->GetBlockHash());
+        pindexToAnnounce = pindexToAnnounce->pprev;
+        if (vHashes.size() == MAX_BLOCKS_TO_ANNOUNCE) {
+            // Limit announcements in case of a huge reorganization.
+            // Rely on the peer's synchronization mechanism in that case.
+            break;
+        }
+    }
+
+    {
+        LOCK(m_peer_mutex);
+        for (auto& it : m_peer_map) {
+            Peer& peer = *it.second;
+            LOCK(peer.m_block_inv_mutex);
+            for (const uint256& hash : reverse_iterate(vHashes)) {
+                peer.m_blocks_for_headers_relay.push_back(hash);
+            }
+        }
+    }
+
+    m_connman.WakeMessageHandler();
+}
+
+/**
+ * Handle invalid block rejection and consequent peer discouragement, maintain which
+ * peers announce compact blocks.
+ */
+void PeerManagerImpl::BlockChecked(const CBlock& block, const BlockValidationState& state)
+{
+    LOCK(cs_main);
+
+    const uint256 hash(block.GetHash());
+    std::map<uint256, std::pair<NodeId, bool>>::iterator it = mapBlockSource.find(hash);
+
+    // If the block failed validation, we know where it came from and we're still connected
+    // to that peer, maybe punish.
+    if (state.IsInvalid() &&
+        it != mapBlockSource.end() &&
+        State(it->second.first)) {
+            MaybePunishNodeForBlock(/*nodeid=*/ it->second.first, state, /*via_compact_block=*/ !it->second.second);
+    }
+    // Check that:
+    // 1. The block is valid
+    // 2. We're not in initial block download
+    // 3. This is currently the best block we're aware of. We haven't updated
+    //    the tip yet so we have no way to check this directly here. Instead we
+    //    just check that there are currently no other blocks in flight.
+    else if (state.IsValid() &&
+             !m_chainman.ActiveChainstate().IsInitialBlockDownload() &&
+             mapBlocksInFlight.count(hash) == mapBlocksInFlight.size()) {
+        if (it != mapBlockSource.end()) {
+            MaybeSetPeerAsAnnouncingHeaderAndIDs(it->second.first);
+        }
+    }
+    if (it != mapBlockSource.end())
+        mapBlockSource.erase(it);
+}
+
+//////////////////////////////////////////////////////////////////////////////
+//
+// Messages
+//
+
+
+bool PeerManagerImpl::AlreadyHaveTx(const GenTxid& gtxid)
+{
+    if (m_chainman.ActiveChain().Tip()->GetBlockHash() != hashRecentRejectsChainTip) {
+        // If the chain tip has changed previously rejected transactions
+        // might be now valid, e.g. due to a nLockTime'd tx becoming valid,
+        // or a double-spend. Reset the rejects filter and give those
+        // txs a second chance.
+        hashRecentRejectsChainTip = m_chainman.ActiveChain().Tip()->GetBlockHash();
+        m_recent_rejects.reset();
+    }
+
+    const uint256& hash = gtxid.GetHash();
+
+    if (m_orphanage.HaveTx(gtxid)) return true;
+
+    {
+        LOCK(m_recent_confirmed_transactions_mutex);
+        if (m_recent_confirmed_transactions.contains(hash)) return true;
+    }
+
+    return m_recent_rejects.contains(hash) || m_mempool.exists(gtxid);
+}
+
+bool PeerManagerImpl::AlreadyHaveBlock(const uint256& block_hash)
+{
+    return m_chainman.m_blockman.LookupBlockIndex(block_hash) != nullptr;
+}
+
+void PeerManagerImpl::SendPings()
+{
+    LOCK(m_peer_mutex);
+    for(auto& it : m_peer_map) it.second->m_ping_queued = true;
+}
+
+void PeerManagerImpl::RelayTransaction(const uint256& txid, const uint256& wtxid)
+{
+    WITH_LOCK(cs_main, _RelayTransaction(txid, wtxid););
+}
+
+void PeerManagerImpl::_RelayTransaction(const uint256& txid, const uint256& wtxid)
+{
+    m_connman.ForEachNode([&txid, &wtxid](CNode* pnode) EXCLUSIVE_LOCKS_REQUIRED(::cs_main) {
+        AssertLockHeld(::cs_main);
+
+        CNodeState* state = State(pnode->GetId());
+        if (state == nullptr) return;
+        if (state->m_wtxid_relay) {
+            pnode->PushTxInventory(wtxid);
+        } else {
+            pnode->PushTxInventory(txid);
+        }
+    });
+}
+
+void PeerManagerImpl::RelayAddress(NodeId originator,
+                                   const CAddress& addr,
+                                   bool fReachable)
+{
+    // We choose the same nodes within a given 24h window (if the list of connected
+    // nodes does not change) and we don't relay to nodes that already know an
+    // address. So within 24h we will likely relay a given address once. This is to
+    // prevent a peer from unjustly giving their address better propagation by sending
+    // it to us repeatedly.
+
+    if (!fReachable && !addr.IsRelayable()) return;
+
+    // Relay to a limited number of other nodes
+    // Use deterministic randomness to send to the same nodes for 24 hours
+    // at a time so the m_addr_knowns of the chosen nodes prevent repeats
+    const uint64_t hashAddr{addr.GetHash()};
+    const CSipHasher hasher{m_connman.GetDeterministicRandomizer(RANDOMIZER_ID_ADDRESS_RELAY).Write(hashAddr).Write((GetTime() + hashAddr) / (24 * 60 * 60))};
+    FastRandomContext insecure_rand;
+
+    // Relay reachable addresses to 2 peers. Unreachable addresses are relayed randomly to 1 or 2 peers.
+    unsigned int nRelayNodes = (fReachable || (hasher.Finalize() & 1)) ? 2 : 1;
+
+    std::array<std::pair<uint64_t, Peer*>, 2> best{{{0, nullptr}, {0, nullptr}}};
+    assert(nRelayNodes <= best.size());
+
+    LOCK(m_peer_mutex);
+
+    for (auto& [id, peer] : m_peer_map) {
+        if (peer->m_addr_relay_enabled && id != originator && IsAddrCompatible(*peer, addr)) {
+            uint64_t hashKey = CSipHasher(hasher).Write(id).Finalize();
+            for (unsigned int i = 0; i < nRelayNodes; i++) {
+                 if (hashKey > best[i].first) {
+                     std::copy(best.begin() + i, best.begin() + nRelayNodes - 1, best.begin() + i + 1);
+                     best[i] = std::make_pair(hashKey, peer.get());
+                     break;
+                 }
+            }
+        }
+    };
+
+    for (unsigned int i = 0; i < nRelayNodes && best[i].first != 0; i++) {
+        PushAddress(*best[i].second, addr, insecure_rand);
+    }
+}
+
+void PeerManagerImpl::ProcessGetBlockData(CNode& pfrom, Peer& peer, const CInv& inv)
+{
+    std::shared_ptr<const CBlock> a_recent_block;
+    std::shared_ptr<const CBlockHeaderAndShortTxIDs> a_recent_compact_block;
+    bool fWitnessesPresentInARecentCompactBlock;
+    {
+        LOCK(cs_most_recent_block);
+        a_recent_block = most_recent_block;
+        a_recent_compact_block = most_recent_compact_block;
+        fWitnessesPresentInARecentCompactBlock = fWitnessesPresentInMostRecentCompactBlock;
+    }
+
+    bool need_activate_chain = false;
+    {
+        LOCK(cs_main);
+        const CBlockIndex* pindex = m_chainman.m_blockman.LookupBlockIndex(inv.hash);
+        if (pindex) {
+            if (pindex->HaveTxsDownloaded() && !pindex->IsValid(BLOCK_VALID_SCRIPTS) &&
+                    pindex->IsValid(BLOCK_VALID_TREE)) {
+                // If we have the block and all of its parents, but have not yet validated it,
+                // we might be in the middle of connecting it (ie in the unlock of cs_main
+                // before ActivateBestChain but after AcceptBlock).
+                // In this case, we need to run ActivateBestChain prior to checking the relay
+                // conditions below.
+                need_activate_chain = true;
+            }
+        }
+    } // release cs_main before calling ActivateBestChain
+    if (need_activate_chain) {
+        BlockValidationState state;
+        if (!m_chainman.ActiveChainstate().ActivateBestChain(state, a_recent_block)) {
+            LogPrint(BCLog::NET, "failed to activate chain (%s)\n", state.ToSt
