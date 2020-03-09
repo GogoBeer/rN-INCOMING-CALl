@@ -1955,4 +1955,168 @@ CTransactionRef PeerManagerImpl::FindTxForGetData(const CNode& peer, const GenTx
     return {};
 }
 
-void Pee
+void PeerManagerImpl::ProcessGetData(CNode& pfrom, Peer& peer, const std::atomic<bool>& interruptMsgProc)
+{
+    AssertLockNotHeld(cs_main);
+
+    std::deque<CInv>::iterator it = peer.m_getdata_requests.begin();
+    std::vector<CInv> vNotFound;
+    const CNetMsgMaker msgMaker(pfrom.GetCommonVersion());
+
+    const auto now{GetTime<std::chrono::seconds>()};
+    // Get last mempool request time
+    const auto mempool_req = pfrom.m_tx_relay != nullptr ? pfrom.m_tx_relay->m_last_mempool_req.load() : std::chrono::seconds::min();
+
+    // Process as many TX items from the front of the getdata queue as
+    // possible, since they're common and it's efficient to batch process
+    // them.
+    while (it != peer.m_getdata_requests.end() && it->IsGenTxMsg()) {
+        if (interruptMsgProc) return;
+        // The send buffer provides backpressure. If there's no space in
+        // the buffer, pause processing until the next call.
+        if (pfrom.fPauseSend) break;
+
+        const CInv &inv = *it++;
+
+        if (pfrom.m_tx_relay == nullptr) {
+            // Ignore GETDATA requests for transactions from blocks-only peers.
+            continue;
+        }
+
+        CTransactionRef tx = FindTxForGetData(pfrom, ToGenTxid(inv), mempool_req, now);
+        if (tx) {
+            // WTX and WITNESS_TX imply we serialize with witness
+            int nSendFlags = (inv.IsMsgTx() ? SERIALIZE_TRANSACTION_NO_WITNESS : 0);
+            m_connman.PushMessage(&pfrom, msgMaker.Make(nSendFlags, NetMsgType::TX, *tx));
+            m_mempool.RemoveUnbroadcastTx(tx->GetHash());
+            // As we're going to send tx, make sure its unconfirmed parents are made requestable.
+            std::vector<uint256> parent_ids_to_add;
+            {
+                LOCK(m_mempool.cs);
+                auto txiter = m_mempool.GetIter(tx->GetHash());
+                if (txiter) {
+                    const CTxMemPoolEntry::Parents& parents = (*txiter)->GetMemPoolParentsConst();
+                    parent_ids_to_add.reserve(parents.size());
+                    for (const CTxMemPoolEntry& parent : parents) {
+                        if (parent.GetTime() > now - UNCONDITIONAL_RELAY_DELAY) {
+                            parent_ids_to_add.push_back(parent.GetTx().GetHash());
+                        }
+                    }
+                }
+            }
+            for (const uint256& parent_txid : parent_ids_to_add) {
+                // Relaying a transaction with a recent but unconfirmed parent.
+                if (WITH_LOCK(pfrom.m_tx_relay->cs_tx_inventory, return !pfrom.m_tx_relay->filterInventoryKnown.contains(parent_txid))) {
+                    LOCK(cs_main);
+                    State(pfrom.GetId())->m_recently_announced_invs.insert(parent_txid);
+                }
+            }
+        } else {
+            vNotFound.push_back(inv);
+        }
+    }
+
+    // Only process one BLOCK item per call, since they're uncommon and can be
+    // expensive to process.
+    if (it != peer.m_getdata_requests.end() && !pfrom.fPauseSend) {
+        const CInv &inv = *it++;
+        if (inv.IsGenBlkMsg()) {
+            ProcessGetBlockData(pfrom, peer, inv);
+        }
+        // else: If the first item on the queue is an unknown type, we erase it
+        // and continue processing the queue on the next call.
+    }
+
+    peer.m_getdata_requests.erase(peer.m_getdata_requests.begin(), it);
+
+    if (!vNotFound.empty()) {
+        // Let the peer know that we didn't find what it asked for, so it doesn't
+        // have to wait around forever.
+        // SPV clients care about this message: it's needed when they are
+        // recursively walking the dependencies of relevant unconfirmed
+        // transactions. SPV clients want to do that because they want to know
+        // about (and store and rebroadcast and risk analyze) the dependencies
+        // of transactions relevant to them, without having to download the
+        // entire memory pool.
+        // Also, other nodes can use these messages to automatically request a
+        // transaction from some other peer that annnounced it, and stop
+        // waiting for us to respond.
+        // In normal operation, we often send NOTFOUND messages for parents of
+        // transactions that we relay; if a peer is missing a parent, they may
+        // assume we have them and request the parents from us.
+        m_connman.PushMessage(&pfrom, msgMaker.Make(NetMsgType::NOTFOUND, vNotFound));
+    }
+}
+
+static uint32_t GetFetchFlags(const CNode& pfrom) EXCLUSIVE_LOCKS_REQUIRED(cs_main) {
+    uint32_t nFetchFlags = 0;
+    if (State(pfrom.GetId())->fHaveWitness) {
+        nFetchFlags |= MSG_WITNESS_FLAG;
+    }
+    return nFetchFlags;
+}
+
+void PeerManagerImpl::SendBlockTransactions(CNode& pfrom, const CBlock& block, const BlockTransactionsRequest& req)
+{
+    BlockTransactions resp(req);
+    for (size_t i = 0; i < req.indexes.size(); i++) {
+        if (req.indexes[i] >= block.vtx.size()) {
+            Misbehaving(pfrom.GetId(), 100, "getblocktxn with out-of-bounds tx indices");
+            return;
+        }
+        resp.txn[i] = block.vtx[req.indexes[i]];
+    }
+    LOCK(cs_main);
+    const CNetMsgMaker msgMaker(pfrom.GetCommonVersion());
+    int nSendFlags = State(pfrom.GetId())->fWantsCmpctWitness ? 0 : SERIALIZE_TRANSACTION_NO_WITNESS;
+    m_connman.PushMessage(&pfrom, msgMaker.Make(nSendFlags, NetMsgType::BLOCKTXN, resp));
+}
+
+void PeerManagerImpl::ProcessHeadersMessage(CNode& pfrom, const Peer& peer,
+                                            const std::vector<CBlockHeader>& headers,
+                                            bool via_compact_block)
+{
+    const CNetMsgMaker msgMaker(pfrom.GetCommonVersion());
+    size_t nCount = headers.size();
+
+    if (nCount == 0) {
+        // Nothing interesting. Stop asking this peers for more headers.
+        return;
+    }
+
+    bool received_new_header = false;
+    const CBlockIndex *pindexLast = nullptr;
+    {
+        LOCK(cs_main);
+        CNodeState *nodestate = State(pfrom.GetId());
+
+        // If this looks like it could be a block announcement (nCount <
+        // MAX_BLOCKS_TO_ANNOUNCE), use special logic for handling headers that
+        // don't connect:
+        // - Send a getheaders message in response to try to connect the chain.
+        // - The peer can send up to MAX_UNCONNECTING_HEADERS in a row that
+        //   don't connect before giving DoS points
+        // - Once a headers message is received that is valid and does connect,
+        //   nUnconnectingHeaders gets reset back to 0.
+        if (!m_chainman.m_blockman.LookupBlockIndex(headers[0].hashPrevBlock) && nCount < MAX_BLOCKS_TO_ANNOUNCE) {
+            nodestate->nUnconnectingHeaders++;
+            m_connman.PushMessage(&pfrom, msgMaker.Make(NetMsgType::GETHEADERS, m_chainman.ActiveChain().GetLocator(pindexBestHeader), uint256()));
+            LogPrint(BCLog::NET, "received header %s: missing prev block %s, sending getheaders (%d) to end (peer=%d, nUnconnectingHeaders=%d)\n",
+                    headers[0].GetHash().ToString(),
+                    headers[0].hashPrevBlock.ToString(),
+                    pindexBestHeader->nHeight,
+                    pfrom.GetId(), nodestate->nUnconnectingHeaders);
+            // Set hashLastUnknownBlock for this peer, so that if we
+            // eventually get the headers - even from a different peer -
+            // we can use this peer to download.
+            UpdateBlockAvailability(pfrom.GetId(), headers.back().GetHash());
+
+            if (nodestate->nUnconnectingHeaders % MAX_UNCONNECTING_HEADERS == 0) {
+                Misbehaving(pfrom.GetId(), 20, strprintf("%d non-connecting headers", nodestate->nUnconnectingHeaders));
+            }
+            return;
+        }
+
+        uint256 hashLastBlock;
+        for (const CBlockHeader& header : headers) {
+            if (!hashLastBlo
