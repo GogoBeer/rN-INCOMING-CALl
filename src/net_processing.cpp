@@ -2420,4 +2420,211 @@ void PeerManagerImpl::ProcessGetCFilters(CNode& peer, CDataStream& vRecv)
     for (const auto& filter : filters) {
         CSerializedNetMsg msg = CNetMsgMaker(peer.GetCommonVersion())
             .Make(NetMsgType::CFILTER, filter);
-        m_connman.PushMessag
+        m_connman.PushMessage(&peer, std::move(msg));
+    }
+}
+
+void PeerManagerImpl::ProcessGetCFHeaders(CNode& peer, CDataStream& vRecv)
+{
+    uint8_t filter_type_ser;
+    uint32_t start_height;
+    uint256 stop_hash;
+
+    vRecv >> filter_type_ser >> start_height >> stop_hash;
+
+    const BlockFilterType filter_type = static_cast<BlockFilterType>(filter_type_ser);
+
+    const CBlockIndex* stop_index;
+    BlockFilterIndex* filter_index;
+    if (!PrepareBlockFilterRequest(peer, filter_type, start_height, stop_hash,
+                                   MAX_GETCFHEADERS_SIZE, stop_index, filter_index)) {
+        return;
+    }
+
+    uint256 prev_header;
+    if (start_height > 0) {
+        const CBlockIndex* const prev_block =
+            stop_index->GetAncestor(static_cast<int>(start_height - 1));
+        if (!filter_index->LookupFilterHeader(prev_block, prev_header)) {
+            LogPrint(BCLog::NET, "Failed to find block filter header in index: filter_type=%s, block_hash=%s\n",
+                         BlockFilterTypeName(filter_type), prev_block->GetBlockHash().ToString());
+            return;
+        }
+    }
+
+    std::vector<uint256> filter_hashes;
+    if (!filter_index->LookupFilterHashRange(start_height, stop_index, filter_hashes)) {
+        LogPrint(BCLog::NET, "Failed to find block filter hashes in index: filter_type=%s, start_height=%d, stop_hash=%s\n",
+                     BlockFilterTypeName(filter_type), start_height, stop_hash.ToString());
+        return;
+    }
+
+    CSerializedNetMsg msg = CNetMsgMaker(peer.GetCommonVersion())
+        .Make(NetMsgType::CFHEADERS,
+              filter_type_ser,
+              stop_index->GetBlockHash(),
+              prev_header,
+              filter_hashes);
+    m_connman.PushMessage(&peer, std::move(msg));
+}
+
+void PeerManagerImpl::ProcessGetCFCheckPt(CNode& peer, CDataStream& vRecv)
+{
+    uint8_t filter_type_ser;
+    uint256 stop_hash;
+
+    vRecv >> filter_type_ser >> stop_hash;
+
+    const BlockFilterType filter_type = static_cast<BlockFilterType>(filter_type_ser);
+
+    const CBlockIndex* stop_index;
+    BlockFilterIndex* filter_index;
+    if (!PrepareBlockFilterRequest(peer, filter_type, /*start_height=*/0, stop_hash,
+                                   /*max_height_diff=*/std::numeric_limits<uint32_t>::max(),
+                                   stop_index, filter_index)) {
+        return;
+    }
+
+    std::vector<uint256> headers(stop_index->nHeight / CFCHECKPT_INTERVAL);
+
+    // Populate headers.
+    const CBlockIndex* block_index = stop_index;
+    for (int i = headers.size() - 1; i >= 0; i--) {
+        int height = (i + 1) * CFCHECKPT_INTERVAL;
+        block_index = block_index->GetAncestor(height);
+
+        if (!filter_index->LookupFilterHeader(block_index, headers[i])) {
+            LogPrint(BCLog::NET, "Failed to find block filter header in index: filter_type=%s, block_hash=%s\n",
+                         BlockFilterTypeName(filter_type), block_index->GetBlockHash().ToString());
+            return;
+        }
+    }
+
+    CSerializedNetMsg msg = CNetMsgMaker(peer.GetCommonVersion())
+        .Make(NetMsgType::CFCHECKPT,
+              filter_type_ser,
+              stop_index->GetBlockHash(),
+              headers);
+    m_connman.PushMessage(&peer, std::move(msg));
+}
+
+void PeerManagerImpl::ProcessBlock(CNode& node, const std::shared_ptr<const CBlock>& block, bool force_processing)
+{
+    bool new_block{false};
+    m_chainman.ProcessNewBlock(m_chainparams, block, force_processing, &new_block);
+    if (new_block) {
+        node.m_last_block_time = GetTime<std::chrono::seconds>();
+    } else {
+        LOCK(cs_main);
+        mapBlockSource.erase(block->GetHash());
+    }
+}
+
+void PeerManagerImpl::ProcessMessage(CNode& pfrom, const std::string& msg_type, CDataStream& vRecv,
+                                     const std::chrono::microseconds time_received,
+                                     const std::atomic<bool>& interruptMsgProc)
+{
+    LogPrint(BCLog::NET, "received: %s (%u bytes) peer=%d\n", SanitizeString(msg_type), vRecv.size(), pfrom.GetId());
+
+    PeerRef peer = GetPeerRef(pfrom.GetId());
+    if (peer == nullptr) return;
+
+    if (msg_type == NetMsgType::VERSION) {
+        if (pfrom.nVersion != 0) {
+            LogPrint(BCLog::NET, "redundant version message from peer=%d\n", pfrom.GetId());
+            return;
+        }
+
+        int64_t nTime;
+        CService addrMe;
+        uint64_t nNonce = 1;
+        ServiceFlags nServices;
+        int nVersion;
+        std::string cleanSubVer;
+        int starting_height = -1;
+        bool fRelay = true;
+
+        vRecv >> nVersion >> Using<CustomUintFormatter<8>>(nServices) >> nTime;
+        if (nTime < 0) {
+            nTime = 0;
+        }
+        vRecv.ignore(8); // Ignore the addrMe service bits sent by the peer
+        vRecv >> addrMe;
+        if (!pfrom.IsInboundConn())
+        {
+            m_addrman.SetServices(pfrom.addr, nServices);
+        }
+        if (pfrom.ExpectServicesFromConn() && !HasAllDesirableServiceFlags(nServices))
+        {
+            LogPrint(BCLog::NET, "peer=%d does not offer the expected services (%08x offered, %08x expected); disconnecting\n", pfrom.GetId(), nServices, GetDesirableServiceFlags(nServices));
+            pfrom.fDisconnect = true;
+            return;
+        }
+
+        if (nVersion < MIN_PEER_PROTO_VERSION) {
+            // disconnect from peers older than this proto version
+            LogPrint(BCLog::NET, "peer=%d using obsolete version %i; disconnecting\n", pfrom.GetId(), nVersion);
+            pfrom.fDisconnect = true;
+            return;
+        }
+
+        if (!vRecv.empty()) {
+            // The version message includes information about the sending node which we don't use:
+            //   - 8 bytes (service bits)
+            //   - 16 bytes (ipv6 address)
+            //   - 2 bytes (port)
+            vRecv.ignore(26);
+            vRecv >> nNonce;
+        }
+        if (!vRecv.empty()) {
+            std::string strSubVer;
+            vRecv >> LIMITED_STRING(strSubVer, MAX_SUBVERSION_LENGTH);
+            cleanSubVer = SanitizeString(strSubVer);
+        }
+        if (!vRecv.empty()) {
+            vRecv >> starting_height;
+        }
+        if (!vRecv.empty())
+            vRecv >> fRelay;
+        // Disconnect if we connected to ourself
+        if (pfrom.IsInboundConn() && !m_connman.CheckIncomingNonce(nNonce))
+        {
+            LogPrintf("connected to self at %s, disconnecting\n", pfrom.addr.ToString());
+            pfrom.fDisconnect = true;
+            return;
+        }
+
+        if (pfrom.IsInboundConn() && addrMe.IsRoutable())
+        {
+            SeenLocal(addrMe);
+        }
+
+        // Inbound peers send us their version message when they connect.
+        // We send our version message in response.
+        if (pfrom.IsInboundConn()) {
+            PushNodeVersion(pfrom);
+        }
+
+        // Change version
+        const int greatest_common_version = std::min(nVersion, PROTOCOL_VERSION);
+        pfrom.SetCommonVersion(greatest_common_version);
+        pfrom.nVersion = nVersion;
+
+        const CNetMsgMaker msg_maker(greatest_common_version);
+
+        if (greatest_common_version >= WTXID_RELAY_VERSION) {
+            m_connman.PushMessage(&pfrom, msg_maker.Make(NetMsgType::WTXIDRELAY));
+        }
+
+        // Signal ADDRv2 support (BIP155).
+        if (greatest_common_version >= 70016) {
+            // BIP155 defines addrv2 and sendaddrv2 for all protocol versions, but some
+            // implementations reject messages they don't know. As a courtesy, don't send
+            // it to nodes with a version before 70016, as no software is known to support
+            // BIP155 that doesn't announce at least that protocol version number.
+            m_connman.PushMessage(&pfrom, msg_maker.Make(NetMsgType::SENDADDRV2));
+        }
+
+        m_connman.PushMessage(&pfrom, msg_maker.Make(NetMsgType::VERACK));
+
+        pfrom.nServices = nServ
