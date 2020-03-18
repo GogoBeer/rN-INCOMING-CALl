@@ -2958,4 +2958,175 @@ void PeerManagerImpl::ProcessMessage(CNode& pfrom, const std::string& msg_type, 
     if (msg_type == NetMsgType::INV) {
         std::vector<CInv> vInv;
         vRecv >> vInv;
-        if (vInv.size() > MAX_INV_
+        if (vInv.size() > MAX_INV_SZ)
+        {
+            Misbehaving(pfrom.GetId(), 20, strprintf("inv message size = %u", vInv.size()));
+            return;
+        }
+
+        // Reject tx INVs when the -blocksonly setting is enabled, or this is a
+        // block-relay-only peer
+        bool reject_tx_invs{m_ignore_incoming_txs || (pfrom.m_tx_relay == nullptr)};
+
+        // Allow peers with relay permission to send data other than blocks in blocks only mode
+        if (pfrom.HasPermission(NetPermissionFlags::Relay)) {
+            reject_tx_invs = false;
+        }
+
+        LOCK(cs_main);
+
+        const auto current_time{GetTime<std::chrono::microseconds>()};
+        uint256* best_block{nullptr};
+
+        for (CInv& inv : vInv) {
+            if (interruptMsgProc) return;
+
+            // Ignore INVs that don't match wtxidrelay setting.
+            // Note that orphan parent fetching always uses MSG_TX GETDATAs regardless of the wtxidrelay setting.
+            // This is fine as no INV messages are involved in that process.
+            if (State(pfrom.GetId())->m_wtxid_relay) {
+                if (inv.IsMsgTx()) continue;
+            } else {
+                if (inv.IsMsgWtx()) continue;
+            }
+
+            if (inv.IsMsgBlk()) {
+                const bool fAlreadyHave = AlreadyHaveBlock(inv.hash);
+                LogPrint(BCLog::NET, "got inv: %s  %s peer=%d\n", inv.ToString(), fAlreadyHave ? "have" : "new", pfrom.GetId());
+
+                UpdateBlockAvailability(pfrom.GetId(), inv.hash);
+                if (!fAlreadyHave && !fImporting && !fReindex && !IsBlockRequested(inv.hash)) {
+                    // Headers-first is the primary method of announcement on
+                    // the network. If a node fell back to sending blocks by inv,
+                    // it's probably for a re-org. The final block hash
+                    // provided should be the highest, so send a getheaders and
+                    // then fetch the blocks we need to catch up.
+                    best_block = &inv.hash;
+                }
+            } else if (inv.IsGenTxMsg()) {
+                if (reject_tx_invs) {
+                    LogPrint(BCLog::NET, "transaction (%s) inv sent in violation of protocol, disconnecting peer=%d\n", inv.hash.ToString(), pfrom.GetId());
+                    pfrom.fDisconnect = true;
+                    return;
+                }
+                const GenTxid gtxid = ToGenTxid(inv);
+                const bool fAlreadyHave = AlreadyHaveTx(gtxid);
+                LogPrint(BCLog::NET, "got inv: %s  %s peer=%d\n", inv.ToString(), fAlreadyHave ? "have" : "new", pfrom.GetId());
+
+                pfrom.AddKnownTx(inv.hash);
+                if (!fAlreadyHave && !m_chainman.ActiveChainstate().IsInitialBlockDownload()) {
+                    AddTxAnnouncement(pfrom, gtxid, current_time);
+                }
+            } else {
+                LogPrint(BCLog::NET, "Unknown inv type \"%s\" received from peer=%d\n", inv.ToString(), pfrom.GetId());
+            }
+        }
+
+        if (best_block != nullptr) {
+            m_connman.PushMessage(&pfrom, msgMaker.Make(NetMsgType::GETHEADERS, m_chainman.ActiveChain().GetLocator(pindexBestHeader), *best_block));
+            LogPrint(BCLog::NET, "getheaders (%d) %s to peer=%d\n", pindexBestHeader->nHeight, best_block->ToString(), pfrom.GetId());
+        }
+
+        return;
+    }
+
+    if (msg_type == NetMsgType::GETDATA) {
+        std::vector<CInv> vInv;
+        vRecv >> vInv;
+        if (vInv.size() > MAX_INV_SZ)
+        {
+            Misbehaving(pfrom.GetId(), 20, strprintf("getdata message size = %u", vInv.size()));
+            return;
+        }
+
+        LogPrint(BCLog::NET, "received getdata (%u invsz) peer=%d\n", vInv.size(), pfrom.GetId());
+
+        if (vInv.size() > 0) {
+            LogPrint(BCLog::NET, "received getdata for: %s peer=%d\n", vInv[0].ToString(), pfrom.GetId());
+        }
+
+        {
+            LOCK(peer->m_getdata_requests_mutex);
+            peer->m_getdata_requests.insert(peer->m_getdata_requests.end(), vInv.begin(), vInv.end());
+            ProcessGetData(pfrom, *peer, interruptMsgProc);
+        }
+
+        return;
+    }
+
+    if (msg_type == NetMsgType::GETBLOCKS) {
+        CBlockLocator locator;
+        uint256 hashStop;
+        vRecv >> locator >> hashStop;
+
+        if (locator.vHave.size() > MAX_LOCATOR_SZ) {
+            LogPrint(BCLog::NET, "getblocks locator size %lld > %d, disconnect peer=%d\n", locator.vHave.size(), MAX_LOCATOR_SZ, pfrom.GetId());
+            pfrom.fDisconnect = true;
+            return;
+        }
+
+        // We might have announced the currently-being-connected tip using a
+        // compact block, which resulted in the peer sending a getblocks
+        // request, which we would otherwise respond to without the new block.
+        // To avoid this situation we simply verify that we are on our best
+        // known chain now. This is super overkill, but we handle it better
+        // for getheaders requests, and there are no known nodes which support
+        // compact blocks but still use getblocks to request blocks.
+        {
+            std::shared_ptr<const CBlock> a_recent_block;
+            {
+                LOCK(cs_most_recent_block);
+                a_recent_block = most_recent_block;
+            }
+            BlockValidationState state;
+            if (!m_chainman.ActiveChainstate().ActivateBestChain(state, a_recent_block)) {
+                LogPrint(BCLog::NET, "failed to activate chain (%s)\n", state.ToString());
+            }
+        }
+
+        LOCK(cs_main);
+
+        // Find the last block the caller has in the main chain
+        const CBlockIndex* pindex = m_chainman.ActiveChainstate().FindForkInGlobalIndex(locator);
+
+        // Send the rest of the chain
+        if (pindex)
+            pindex = m_chainman.ActiveChain().Next(pindex);
+        int nLimit = 500;
+        LogPrint(BCLog::NET, "getblocks %d to %s limit %d from peer=%d\n", (pindex ? pindex->nHeight : -1), hashStop.IsNull() ? "end" : hashStop.ToString(), nLimit, pfrom.GetId());
+        for (; pindex; pindex = m_chainman.ActiveChain().Next(pindex))
+        {
+            if (pindex->GetBlockHash() == hashStop)
+            {
+                LogPrint(BCLog::NET, "  getblocks stopping at %d %s\n", pindex->nHeight, pindex->GetBlockHash().ToString());
+                break;
+            }
+            // If pruning, don't inv blocks unless we have on disk and are likely to still have
+            // for some reasonable time window (1 hour) that block relay might require.
+            const int nPrunedBlocksLikelyToHave = MIN_BLOCKS_TO_KEEP - 3600 / m_chainparams.GetConsensus().nPowTargetSpacing;
+            if (fPruneMode && (!(pindex->nStatus & BLOCK_HAVE_DATA) || pindex->nHeight <= m_chainman.ActiveChain().Tip()->nHeight - nPrunedBlocksLikelyToHave))
+            {
+                LogPrint(BCLog::NET, " getblocks stopping, pruned or too old block at %d %s\n", pindex->nHeight, pindex->GetBlockHash().ToString());
+                break;
+            }
+            WITH_LOCK(peer->m_block_inv_mutex, peer->m_blocks_for_inv_relay.push_back(pindex->GetBlockHash()));
+            if (--nLimit <= 0) {
+                // When this block is requested, we'll send an inv that'll
+                // trigger the peer to getblocks the next batch of inventory.
+                LogPrint(BCLog::NET, "  getblocks stopping at limit %d %s\n", pindex->nHeight, pindex->GetBlockHash().ToString());
+                WITH_LOCK(peer->m_block_inv_mutex, {peer->m_continuation_block = pindex->GetBlockHash();});
+                break;
+            }
+        }
+        return;
+    }
+
+    if (msg_type == NetMsgType::GETBLOCKTXN) {
+        BlockTransactionsRequest req;
+        vRecv >> req;
+
+        std::shared_ptr<const CBlock> recent_block;
+        {
+            LOCK(cs_most_recent_block);
+            if (most_recent_block_hash == req.blockhash)
+                recent_block
