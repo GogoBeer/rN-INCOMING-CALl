@@ -3129,4 +3129,169 @@ void PeerManagerImpl::ProcessMessage(CNode& pfrom, const std::string& msg_type, 
         {
             LOCK(cs_most_recent_block);
             if (most_recent_block_hash == req.blockhash)
-                recent_block
+                recent_block = most_recent_block;
+            // Unlock cs_most_recent_block to avoid cs_main lock inversion
+        }
+        if (recent_block) {
+            SendBlockTransactions(pfrom, *recent_block, req);
+            return;
+        }
+
+        {
+            LOCK(cs_main);
+
+            const CBlockIndex* pindex = m_chainman.m_blockman.LookupBlockIndex(req.blockhash);
+            if (!pindex || !(pindex->nStatus & BLOCK_HAVE_DATA)) {
+                LogPrint(BCLog::NET, "Peer %d sent us a getblocktxn for a block we don't have\n", pfrom.GetId());
+                return;
+            }
+
+            if (pindex->nHeight >= m_chainman.ActiveChain().Height() - MAX_BLOCKTXN_DEPTH) {
+                CBlock block;
+                bool ret = ReadBlockFromDisk(block, pindex, m_chainparams.GetConsensus());
+                assert(ret);
+
+                SendBlockTransactions(pfrom, block, req);
+                return;
+            }
+        }
+
+        // If an older block is requested (should never happen in practice,
+        // but can happen in tests) send a block response instead of a
+        // blocktxn response. Sending a full block response instead of a
+        // small blocktxn response is preferable in the case where a peer
+        // might maliciously send lots of getblocktxn requests to trigger
+        // expensive disk reads, because it will require the peer to
+        // actually receive all the data read from disk over the network.
+        LogPrint(BCLog::NET, "Peer %d sent us a getblocktxn for a block > %i deep\n", pfrom.GetId(), MAX_BLOCKTXN_DEPTH);
+        CInv inv;
+        WITH_LOCK(cs_main, inv.type = State(pfrom.GetId())->fWantsCmpctWitness ? MSG_WITNESS_BLOCK : MSG_BLOCK);
+        inv.hash = req.blockhash;
+        WITH_LOCK(peer->m_getdata_requests_mutex, peer->m_getdata_requests.push_back(inv));
+        // The message processing loop will go around again (without pausing) and we'll respond then
+        return;
+    }
+
+    if (msg_type == NetMsgType::GETHEADERS) {
+        CBlockLocator locator;
+        uint256 hashStop;
+        vRecv >> locator >> hashStop;
+
+        if (locator.vHave.size() > MAX_LOCATOR_SZ) {
+            LogPrint(BCLog::NET, "getheaders locator size %lld > %d, disconnect peer=%d\n", locator.vHave.size(), MAX_LOCATOR_SZ, pfrom.GetId());
+            pfrom.fDisconnect = true;
+            return;
+        }
+
+        LOCK(cs_main);
+        if (m_chainman.ActiveChainstate().IsInitialBlockDownload() && !pfrom.HasPermission(NetPermissionFlags::Download)) {
+            LogPrint(BCLog::NET, "Ignoring getheaders from peer=%d because node is in initial block download\n", pfrom.GetId());
+            return;
+        }
+
+        CNodeState *nodestate = State(pfrom.GetId());
+        const CBlockIndex* pindex = nullptr;
+        if (locator.IsNull())
+        {
+            // If locator is null, return the hashStop block
+            pindex = m_chainman.m_blockman.LookupBlockIndex(hashStop);
+            if (!pindex) {
+                return;
+            }
+
+            if (!BlockRequestAllowed(pindex)) {
+                LogPrint(BCLog::NET, "%s: ignoring request from peer=%i for old block header that isn't in the main chain\n", __func__, pfrom.GetId());
+                return;
+            }
+        }
+        else
+        {
+            // Find the last block the caller has in the main chain
+            pindex = m_chainman.ActiveChainstate().FindForkInGlobalIndex(locator);
+            if (pindex)
+                pindex = m_chainman.ActiveChain().Next(pindex);
+        }
+
+        // we must use CBlocks, as CBlockHeaders won't include the 0x00 nTx count at the end
+        std::vector<CBlock> vHeaders;
+        int nLimit = MAX_HEADERS_RESULTS;
+        LogPrint(BCLog::NET, "getheaders %d to %s from peer=%d\n", (pindex ? pindex->nHeight : -1), hashStop.IsNull() ? "end" : hashStop.ToString(), pfrom.GetId());
+        for (; pindex; pindex = m_chainman.ActiveChain().Next(pindex))
+        {
+            vHeaders.push_back(pindex->GetBlockHeader());
+            if (--nLimit <= 0 || pindex->GetBlockHash() == hashStop)
+                break;
+        }
+        // pindex can be nullptr either if we sent m_chainman.ActiveChain().Tip() OR
+        // if our peer has m_chainman.ActiveChain().Tip() (and thus we are sending an empty
+        // headers message). In both cases it's safe to update
+        // pindexBestHeaderSent to be our tip.
+        //
+        // It is important that we simply reset the BestHeaderSent value here,
+        // and not max(BestHeaderSent, newHeaderSent). We might have announced
+        // the currently-being-connected tip using a compact block, which
+        // resulted in the peer sending a headers request, which we respond to
+        // without the new block. By resetting the BestHeaderSent, we ensure we
+        // will re-announce the new block via headers (or compact blocks again)
+        // in the SendMessages logic.
+        nodestate->pindexBestHeaderSent = pindex ? pindex : m_chainman.ActiveChain().Tip();
+        m_connman.PushMessage(&pfrom, msgMaker.Make(NetMsgType::HEADERS, vHeaders));
+        return;
+    }
+
+    if (msg_type == NetMsgType::TX) {
+        // Stop processing the transaction early if
+        // 1) We are in blocks only mode and peer has no relay permission
+        // 2) This peer is a block-relay-only peer
+        if ((m_ignore_incoming_txs && !pfrom.HasPermission(NetPermissionFlags::Relay)) || (pfrom.m_tx_relay == nullptr))
+        {
+            LogPrint(BCLog::NET, "transaction sent in violation of protocol peer=%d\n", pfrom.GetId());
+            pfrom.fDisconnect = true;
+            return;
+        }
+
+        // Stop processing the transaction early if we are still in IBD since we don't
+        // have enough information to validate it yet. Sending unsolicited transactions
+        // is not considered a protocol violation, so don't punish the peer.
+        if (m_chainman.ActiveChainstate().IsInitialBlockDownload()) return;
+
+        CTransactionRef ptx;
+        vRecv >> ptx;
+        const CTransaction& tx = *ptx;
+
+        const uint256& txid = ptx->GetHash();
+        const uint256& wtxid = ptx->GetWitnessHash();
+
+        LOCK2(cs_main, g_cs_orphans);
+
+        CNodeState* nodestate = State(pfrom.GetId());
+
+        const uint256& hash = nodestate->m_wtxid_relay ? wtxid : txid;
+        pfrom.AddKnownTx(hash);
+        if (nodestate->m_wtxid_relay && txid != wtxid) {
+            // Insert txid into filterInventoryKnown, even for
+            // wtxidrelay peers. This prevents re-adding of
+            // unconfirmed parents to the recently_announced
+            // filter, when a child tx is requested. See
+            // ProcessGetData().
+            pfrom.AddKnownTx(txid);
+        }
+
+        m_txrequest.ReceivedResponse(pfrom.GetId(), txid);
+        if (tx.HasWitness()) m_txrequest.ReceivedResponse(pfrom.GetId(), wtxid);
+
+        // We do the AlreadyHaveTx() check using wtxid, rather than txid - in the
+        // absence of witness malleation, this is strictly better, because the
+        // recent rejects filter may contain the wtxid but rarely contains
+        // the txid of a segwit transaction that has been rejected.
+        // In the presence of witness malleation, it's possible that by only
+        // doing the check with wtxid, we could overlook a transaction which
+        // was confirmed with a different witness, or exists in our mempool
+        // with a different witness, but this has limited downside:
+        // mempool validation does its own lookup of whether we have the txid
+        // already; and an adversary can already relay us old transactions
+        // (older than our recency filter) if trying to DoS us, without any need
+        // for witness malleation.
+        if (AlreadyHaveTx(GenTxid::Wtxid(wtxid))) {
+            if (pfrom.HasPermission(NetPermissionFlags::ForceRelay)) {
+                // Always relay transactions received
