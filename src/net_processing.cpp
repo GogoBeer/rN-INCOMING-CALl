@@ -3736,4 +3736,189 @@ void PeerManagerImpl::ProcessMessage(CNode& pfrom, const std::string& msg_type, 
         if (fBlockRead) {
             // Since we requested this block (it was in mapBlocksInFlight), force it to be processed,
             // even if it would not be a candidate for new tip (missing previous block, chain not long enough, etc)
-            // This bypasses some 
+            // This bypasses some anti-DoS logic in AcceptBlock (eg to prevent
+            // disk-space attacks), but this should be safe due to the
+            // protections in the compact block handler -- see related comment
+            // in compact block optimistic reconstruction handling.
+            ProcessBlock(pfrom, pblock, /*force_processing=*/true);
+        }
+        return;
+    }
+
+    if (msg_type == NetMsgType::HEADERS)
+    {
+        // Ignore headers received while importing
+        if (fImporting || fReindex) {
+            LogPrint(BCLog::NET, "Unexpected headers message received from peer %d\n", pfrom.GetId());
+            return;
+        }
+
+        std::vector<CBlockHeader> headers;
+
+        // Bypass the normal CBlock deserialization, as we don't want to risk deserializing 2000 full blocks.
+        unsigned int nCount = ReadCompactSize(vRecv);
+        if (nCount > MAX_HEADERS_RESULTS) {
+            Misbehaving(pfrom.GetId(), 20, strprintf("headers message size = %u", nCount));
+            return;
+        }
+        headers.resize(nCount);
+        for (unsigned int n = 0; n < nCount; n++) {
+            vRecv >> headers[n];
+            ReadCompactSize(vRecv); // ignore tx count; assume it is 0.
+        }
+
+        return ProcessHeadersMessage(pfrom, *peer, headers, /*via_compact_block=*/false);
+    }
+
+    if (msg_type == NetMsgType::BLOCK)
+    {
+        // Ignore block received while importing
+        if (fImporting || fReindex) {
+            LogPrint(BCLog::NET, "Unexpected block message received from peer %d\n", pfrom.GetId());
+            return;
+        }
+
+        std::shared_ptr<CBlock> pblock = std::make_shared<CBlock>();
+        vRecv >> *pblock;
+
+        LogPrint(BCLog::NET, "received block %s peer=%d\n", pblock->GetHash().ToString(), pfrom.GetId());
+
+        bool forceProcessing = false;
+        const uint256 hash(pblock->GetHash());
+        {
+            LOCK(cs_main);
+            // Always process the block if we requested it, since we may
+            // need it even when it's not a candidate for a new best tip.
+            forceProcessing = IsBlockRequested(hash);
+            RemoveBlockRequest(hash);
+            // mapBlockSource is only used for punishing peers and setting
+            // which peers send us compact blocks, so the race between here and
+            // cs_main in ProcessNewBlock is fine.
+            mapBlockSource.emplace(hash, std::make_pair(pfrom.GetId(), true));
+        }
+        ProcessBlock(pfrom, pblock, forceProcessing);
+        return;
+    }
+
+    if (msg_type == NetMsgType::GETADDR) {
+        // This asymmetric behavior for inbound and outbound connections was introduced
+        // to prevent a fingerprinting attack: an attacker can send specific fake addresses
+        // to users' AddrMan and later request them by sending getaddr messages.
+        // Making nodes which are behind NAT and can only make outgoing connections ignore
+        // the getaddr message mitigates the attack.
+        if (!pfrom.IsInboundConn()) {
+            LogPrint(BCLog::NET, "Ignoring \"getaddr\" from %s connection. peer=%d\n", pfrom.ConnectionTypeAsString(), pfrom.GetId());
+            return;
+        }
+
+        // Since this must be an inbound connection, SetupAddressRelay will
+        // never fail.
+        Assume(SetupAddressRelay(pfrom, *peer));
+
+        // Only send one GetAddr response per connection to reduce resource waste
+        // and discourage addr stamping of INV announcements.
+        if (peer->m_getaddr_recvd) {
+            LogPrint(BCLog::NET, "Ignoring repeated \"getaddr\". peer=%d\n", pfrom.GetId());
+            return;
+        }
+        peer->m_getaddr_recvd = true;
+
+        peer->m_addrs_to_send.clear();
+        std::vector<CAddress> vAddr;
+        if (pfrom.HasPermission(NetPermissionFlags::Addr)) {
+            vAddr = m_connman.GetAddresses(MAX_ADDR_TO_SEND, MAX_PCT_ADDR_TO_SEND, /* network */ std::nullopt);
+        } else {
+            vAddr = m_connman.GetAddresses(pfrom, MAX_ADDR_TO_SEND, MAX_PCT_ADDR_TO_SEND);
+        }
+        FastRandomContext insecure_rand;
+        for (const CAddress &addr : vAddr) {
+            PushAddress(*peer, addr, insecure_rand);
+        }
+        return;
+    }
+
+    if (msg_type == NetMsgType::MEMPOOL) {
+        if (!(pfrom.GetLocalServices() & NODE_BLOOM) && !pfrom.HasPermission(NetPermissionFlags::Mempool))
+        {
+            if (!pfrom.HasPermission(NetPermissionFlags::NoBan))
+            {
+                LogPrint(BCLog::NET, "mempool request with bloom filters disabled, disconnect peer=%d\n", pfrom.GetId());
+                pfrom.fDisconnect = true;
+            }
+            return;
+        }
+
+        if (m_connman.OutboundTargetReached(false) && !pfrom.HasPermission(NetPermissionFlags::Mempool))
+        {
+            if (!pfrom.HasPermission(NetPermissionFlags::NoBan))
+            {
+                LogPrint(BCLog::NET, "mempool request with bandwidth limit reached, disconnect peer=%d\n", pfrom.GetId());
+                pfrom.fDisconnect = true;
+            }
+            return;
+        }
+
+        if (pfrom.m_tx_relay != nullptr) {
+            LOCK(pfrom.m_tx_relay->cs_tx_inventory);
+            pfrom.m_tx_relay->fSendMempool = true;
+        }
+        return;
+    }
+
+    if (msg_type == NetMsgType::PING) {
+        if (pfrom.GetCommonVersion() > BIP0031_VERSION) {
+            uint64_t nonce = 0;
+            vRecv >> nonce;
+            // Echo the message back with the nonce. This allows for two useful features:
+            //
+            // 1) A remote node can quickly check if the connection is operational
+            // 2) Remote nodes can measure the latency of the network thread. If this node
+            //    is overloaded it won't respond to pings quickly and the remote node can
+            //    avoid sending us more work, like chain download requests.
+            //
+            // The nonce stops the remote getting confused between different pings: without
+            // it, if the remote node sends a ping once per second and this node takes 5
+            // seconds to respond to each, the 5th ping the remote sends would appear to
+            // return very quickly.
+            m_connman.PushMessage(&pfrom, msgMaker.Make(NetMsgType::PONG, nonce));
+        }
+        return;
+    }
+
+    if (msg_type == NetMsgType::PONG) {
+        const auto ping_end = time_received;
+        uint64_t nonce = 0;
+        size_t nAvail = vRecv.in_avail();
+        bool bPingFinished = false;
+        std::string sProblem;
+
+        if (nAvail >= sizeof(nonce)) {
+            vRecv >> nonce;
+
+            // Only process pong message if there is an outstanding ping (old ping without nonce should never pong)
+            if (peer->m_ping_nonce_sent != 0) {
+                if (nonce == peer->m_ping_nonce_sent) {
+                    // Matching pong received, this ping is no longer outstanding
+                    bPingFinished = true;
+                    const auto ping_time = ping_end - peer->m_ping_start.load();
+                    if (ping_time.count() >= 0) {
+                        // Let connman know about this successful ping-pong
+                        pfrom.PongReceived(ping_time);
+                    } else {
+                        // This should never happen
+                        sProblem = "Timing mishap";
+                    }
+                } else {
+                    // Nonce mismatches are normal when pings are overlapping
+                    sProblem = "Nonce mismatch";
+                    if (nonce == 0) {
+                        // This is most likely a bug in another implementation somewhere; cancel this ping
+                        bPingFinished = true;
+                        sProblem = "Nonce zero";
+                    }
+                }
+            } else {
+                sProblem = "Unsolicited pong without ping";
+            }
+        } else {
+            // This is most likely a bug in an
