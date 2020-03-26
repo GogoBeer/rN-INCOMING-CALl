@@ -3921,4 +3921,236 @@ void PeerManagerImpl::ProcessMessage(CNode& pfrom, const std::string& msg_type, 
                 sProblem = "Unsolicited pong without ping";
             }
         } else {
-            // This is most likely a bug in an
+            // This is most likely a bug in another implementation somewhere; cancel this ping
+            bPingFinished = true;
+            sProblem = "Short payload";
+        }
+
+        if (!(sProblem.empty())) {
+            LogPrint(BCLog::NET, "pong peer=%d: %s, %x expected, %x received, %u bytes\n",
+                pfrom.GetId(),
+                sProblem,
+                peer->m_ping_nonce_sent,
+                nonce,
+                nAvail);
+        }
+        if (bPingFinished) {
+            peer->m_ping_nonce_sent = 0;
+        }
+        return;
+    }
+
+    if (msg_type == NetMsgType::FILTERLOAD) {
+        if (!(pfrom.GetLocalServices() & NODE_BLOOM)) {
+            LogPrint(BCLog::NET, "filterload received despite not offering bloom services from peer=%d; disconnecting\n", pfrom.GetId());
+            pfrom.fDisconnect = true;
+            return;
+        }
+        CBloomFilter filter;
+        vRecv >> filter;
+
+        if (!filter.IsWithinSizeConstraints())
+        {
+            // There is no excuse for sending a too-large filter
+            Misbehaving(pfrom.GetId(), 100, "too-large bloom filter");
+        }
+        else if (pfrom.m_tx_relay != nullptr)
+        {
+            LOCK(pfrom.m_tx_relay->cs_filter);
+            pfrom.m_tx_relay->pfilter.reset(new CBloomFilter(filter));
+            pfrom.m_tx_relay->fRelayTxes = true;
+        }
+        return;
+    }
+
+    if (msg_type == NetMsgType::FILTERADD) {
+        if (!(pfrom.GetLocalServices() & NODE_BLOOM)) {
+            LogPrint(BCLog::NET, "filteradd received despite not offering bloom services from peer=%d; disconnecting\n", pfrom.GetId());
+            pfrom.fDisconnect = true;
+            return;
+        }
+        std::vector<unsigned char> vData;
+        vRecv >> vData;
+
+        // Nodes must NEVER send a data item > 520 bytes (the max size for a script data object,
+        // and thus, the maximum size any matched object can have) in a filteradd message
+        bool bad = false;
+        if (vData.size() > MAX_SCRIPT_ELEMENT_SIZE) {
+            bad = true;
+        } else if (pfrom.m_tx_relay != nullptr) {
+            LOCK(pfrom.m_tx_relay->cs_filter);
+            if (pfrom.m_tx_relay->pfilter) {
+                pfrom.m_tx_relay->pfilter->insert(vData);
+            } else {
+                bad = true;
+            }
+        }
+        if (bad) {
+            Misbehaving(pfrom.GetId(), 100, "bad filteradd message");
+        }
+        return;
+    }
+
+    if (msg_type == NetMsgType::FILTERCLEAR) {
+        if (!(pfrom.GetLocalServices() & NODE_BLOOM)) {
+            LogPrint(BCLog::NET, "filterclear received despite not offering bloom services from peer=%d; disconnecting\n", pfrom.GetId());
+            pfrom.fDisconnect = true;
+            return;
+        }
+        if (pfrom.m_tx_relay == nullptr) {
+            return;
+        }
+        LOCK(pfrom.m_tx_relay->cs_filter);
+        pfrom.m_tx_relay->pfilter = nullptr;
+        pfrom.m_tx_relay->fRelayTxes = true;
+        return;
+    }
+
+    if (msg_type == NetMsgType::FEEFILTER) {
+        CAmount newFeeFilter = 0;
+        vRecv >> newFeeFilter;
+        if (MoneyRange(newFeeFilter)) {
+            if (pfrom.m_tx_relay != nullptr) {
+                pfrom.m_tx_relay->minFeeFilter = newFeeFilter;
+            }
+            LogPrint(BCLog::NET, "received: feefilter of %s from peer=%d\n", CFeeRate(newFeeFilter).ToString(), pfrom.GetId());
+        }
+        return;
+    }
+
+    if (msg_type == NetMsgType::GETCFILTERS) {
+        ProcessGetCFilters(pfrom, vRecv);
+        return;
+    }
+
+    if (msg_type == NetMsgType::GETCFHEADERS) {
+        ProcessGetCFHeaders(pfrom, vRecv);
+        return;
+    }
+
+    if (msg_type == NetMsgType::GETCFCHECKPT) {
+        ProcessGetCFCheckPt(pfrom, vRecv);
+        return;
+    }
+
+    if (msg_type == NetMsgType::NOTFOUND) {
+        std::vector<CInv> vInv;
+        vRecv >> vInv;
+        if (vInv.size() <= MAX_PEER_TX_ANNOUNCEMENTS + MAX_BLOCKS_IN_TRANSIT_PER_PEER) {
+            LOCK(::cs_main);
+            for (CInv &inv : vInv) {
+                if (inv.IsGenTxMsg()) {
+                    // If we receive a NOTFOUND message for a tx we requested, mark the announcement for it as
+                    // completed in TxRequestTracker.
+                    m_txrequest.ReceivedResponse(pfrom.GetId(), inv.hash);
+                }
+            }
+        }
+        return;
+    }
+
+    // Ignore unknown commands for extensibility
+    LogPrint(BCLog::NET, "Unknown command \"%s\" from peer=%d\n", SanitizeString(msg_type), pfrom.GetId());
+    return;
+}
+
+bool PeerManagerImpl::MaybeDiscourageAndDisconnect(CNode& pnode, Peer& peer)
+{
+    {
+        LOCK(peer.m_misbehavior_mutex);
+
+        // There's nothing to do if the m_should_discourage flag isn't set
+        if (!peer.m_should_discourage) return false;
+
+        peer.m_should_discourage = false;
+    } // peer.m_misbehavior_mutex
+
+    if (pnode.HasPermission(NetPermissionFlags::NoBan)) {
+        // We never disconnect or discourage peers for bad behavior if they have NetPermissionFlags::NoBan permission
+        LogPrintf("Warning: not punishing noban peer %d!\n", peer.m_id);
+        return false;
+    }
+
+    if (pnode.IsManualConn()) {
+        // We never disconnect or discourage manual peers for bad behavior
+        LogPrintf("Warning: not punishing manually connected peer %d!\n", peer.m_id);
+        return false;
+    }
+
+    if (pnode.addr.IsLocal()) {
+        // We disconnect local peers for bad behavior but don't discourage (since that would discourage
+        // all peers on the same local address)
+        LogPrint(BCLog::NET, "Warning: disconnecting but not discouraging %s peer %d!\n",
+                 pnode.m_inbound_onion ? "inbound onion" : "local", peer.m_id);
+        pnode.fDisconnect = true;
+        return true;
+    }
+
+    // Normal case: Disconnect the peer and discourage all nodes sharing the address
+    LogPrint(BCLog::NET, "Disconnecting and discouraging peer %d!\n", peer.m_id);
+    if (m_banman) m_banman->Discourage(pnode.addr);
+    m_connman.DisconnectNode(pnode.addr);
+    return true;
+}
+
+bool PeerManagerImpl::ProcessMessages(CNode* pfrom, std::atomic<bool>& interruptMsgProc)
+{
+    bool fMoreWork = false;
+
+    PeerRef peer = GetPeerRef(pfrom->GetId());
+    if (peer == nullptr) return false;
+
+    {
+        LOCK(peer->m_getdata_requests_mutex);
+        if (!peer->m_getdata_requests.empty()) {
+            ProcessGetData(*pfrom, *peer, interruptMsgProc);
+        }
+    }
+
+    {
+        LOCK2(cs_main, g_cs_orphans);
+        if (!peer->m_orphan_work_set.empty()) {
+            ProcessOrphanTx(peer->m_orphan_work_set);
+        }
+    }
+
+    if (pfrom->fDisconnect)
+        return false;
+
+    // this maintains the order of responses
+    // and prevents m_getdata_requests to grow unbounded
+    {
+        LOCK(peer->m_getdata_requests_mutex);
+        if (!peer->m_getdata_requests.empty()) return true;
+    }
+
+    {
+        LOCK(g_cs_orphans);
+        if (!peer->m_orphan_work_set.empty()) return true;
+    }
+
+    // Don't bother if send buffer is too full to respond anyway
+    if (pfrom->fPauseSend) return false;
+
+    std::list<CNetMessage> msgs;
+    {
+        LOCK(pfrom->cs_vProcessMsg);
+        if (pfrom->vProcessMsg.empty()) return false;
+        // Just take one message
+        msgs.splice(msgs.begin(), pfrom->vProcessMsg, pfrom->vProcessMsg.begin());
+        pfrom->nProcessQueueSize -= msgs.front().m_raw_message_size;
+        pfrom->fPauseRecv = pfrom->nProcessQueueSize > m_connman.GetReceiveFloodSize();
+        fMoreWork = !pfrom->vProcessMsg.empty();
+    }
+    CNetMessage& msg(msgs.front());
+
+    TRACE6(net, inbound_message,
+        pfrom->GetId(),
+        pfrom->m_addr_name.c_str(),
+        pfrom->ConnectionTypeAsString().c_str(),
+        msg.m_command.c_str(),
+        msg.m_recv.size(),
+        msg.m_recv.data()
+    );
+
+    if (gArgs.GetBoolArg("-capturemessages", fa
