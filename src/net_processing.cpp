@@ -4286,4 +4286,182 @@ void PeerManagerImpl::EvictExtraOutboundPeers(std::chrono::seconds now)
         // us a new block, with ties broken by choosing the more recent
         // connection (higher node id)
         NodeId worst_peer = -1;
-        int64_t oldest_block_announcement = std::numeric_li
+        int64_t oldest_block_announcement = std::numeric_limits<int64_t>::max();
+
+        m_connman.ForEachNode([&](CNode* pnode) EXCLUSIVE_LOCKS_REQUIRED(::cs_main) {
+            AssertLockHeld(::cs_main);
+
+            // Only consider outbound-full-relay peers that are not already
+            // marked for disconnection
+            if (!pnode->IsFullOutboundConn() || pnode->fDisconnect) return;
+            CNodeState *state = State(pnode->GetId());
+            if (state == nullptr) return; // shouldn't be possible, but just in case
+            // Don't evict our protected peers
+            if (state->m_chain_sync.m_protect) return;
+            if (state->m_last_block_announcement < oldest_block_announcement || (state->m_last_block_announcement == oldest_block_announcement && pnode->GetId() > worst_peer)) {
+                worst_peer = pnode->GetId();
+                oldest_block_announcement = state->m_last_block_announcement;
+            }
+        });
+        if (worst_peer != -1) {
+            bool disconnected = m_connman.ForNode(worst_peer, [&](CNode* pnode) EXCLUSIVE_LOCKS_REQUIRED(::cs_main) {
+                AssertLockHeld(::cs_main);
+
+                // Only disconnect a peer that has been connected to us for
+                // some reasonable fraction of our check-frequency, to give
+                // it time for new information to have arrived.
+                // Also don't disconnect any peer we're trying to download a
+                // block from.
+                CNodeState &state = *State(pnode->GetId());
+                if (now - pnode->m_connected > MINIMUM_CONNECT_TIME && state.nBlocksInFlight == 0) {
+                    LogPrint(BCLog::NET, "disconnecting extra outbound peer=%d (last block announcement received at time %d)\n", pnode->GetId(), oldest_block_announcement);
+                    pnode->fDisconnect = true;
+                    return true;
+                } else {
+                    LogPrint(BCLog::NET, "keeping outbound peer=%d chosen for eviction (connect time: %d, blocks_in_flight: %d)\n",
+                             pnode->GetId(), count_seconds(pnode->m_connected), state.nBlocksInFlight);
+                    return false;
+                }
+            });
+            if (disconnected) {
+                // If we disconnected an extra peer, that means we successfully
+                // connected to at least one peer after the last time we
+                // detected a stale tip. Don't try any more extra peers until
+                // we next detect a stale tip, to limit the load we put on the
+                // network from these extra connections.
+                m_connman.SetTryNewOutboundPeer(false);
+            }
+        }
+    }
+}
+
+void PeerManagerImpl::CheckForStaleTipAndEvictPeers()
+{
+    LOCK(cs_main);
+
+    auto now{GetTime<std::chrono::seconds>()};
+
+    EvictExtraOutboundPeers(now);
+
+    if (now > m_stale_tip_check_time) {
+        // Check whether our tip is stale, and if so, allow using an extra
+        // outbound peer
+        if (!fImporting && !fReindex && m_connman.GetNetworkActive() && m_connman.GetUseAddrmanOutgoing() && TipMayBeStale()) {
+            LogPrintf("Potential stale tip detected, will try using extra outbound peer (last tip update: %d seconds ago)\n",
+                      count_seconds(now - m_last_tip_update.load()));
+            m_connman.SetTryNewOutboundPeer(true);
+        } else if (m_connman.GetTryNewOutboundPeer()) {
+            m_connman.SetTryNewOutboundPeer(false);
+        }
+        m_stale_tip_check_time = now + STALE_CHECK_INTERVAL;
+    }
+
+    if (!m_initial_sync_finished && CanDirectFetch()) {
+        m_connman.StartExtraBlockRelayPeers();
+        m_initial_sync_finished = true;
+    }
+}
+
+void PeerManagerImpl::MaybeSendPing(CNode& node_to, Peer& peer, std::chrono::microseconds now)
+{
+    if (m_connman.ShouldRunInactivityChecks(node_to, std::chrono::duration_cast<std::chrono::seconds>(now)) &&
+        peer.m_ping_nonce_sent &&
+        now > peer.m_ping_start.load() + TIMEOUT_INTERVAL)
+    {
+        // The ping timeout is using mocktime. To disable the check during
+        // testing, increase -peertimeout.
+        LogPrint(BCLog::NET, "ping timeout: %fs peer=%d\n", 0.000001 * count_microseconds(now - peer.m_ping_start.load()), peer.m_id);
+        node_to.fDisconnect = true;
+        return;
+    }
+
+    const CNetMsgMaker msgMaker(node_to.GetCommonVersion());
+    bool pingSend = false;
+
+    if (peer.m_ping_queued) {
+        // RPC ping request by user
+        pingSend = true;
+    }
+
+    if (peer.m_ping_nonce_sent == 0 && now > peer.m_ping_start.load() + PING_INTERVAL) {
+        // Ping automatically sent as a latency probe & keepalive.
+        pingSend = true;
+    }
+
+    if (pingSend) {
+        uint64_t nonce = 0;
+        while (nonce == 0) {
+            GetRandBytes((unsigned char*)&nonce, sizeof(nonce));
+        }
+        peer.m_ping_queued = false;
+        peer.m_ping_start = now;
+        if (node_to.GetCommonVersion() > BIP0031_VERSION) {
+            peer.m_ping_nonce_sent = nonce;
+            m_connman.PushMessage(&node_to, msgMaker.Make(NetMsgType::PING, nonce));
+        } else {
+            // Peer is too old to support ping command with nonce, pong will never arrive.
+            peer.m_ping_nonce_sent = 0;
+            m_connman.PushMessage(&node_to, msgMaker.Make(NetMsgType::PING));
+        }
+    }
+}
+
+void PeerManagerImpl::MaybeSendAddr(CNode& node, Peer& peer, std::chrono::microseconds current_time)
+{
+    // Nothing to do for non-address-relay peers
+    if (!peer.m_addr_relay_enabled) return;
+
+    LOCK(peer.m_addr_send_times_mutex);
+    // Periodically advertise our local address to the peer.
+    if (fListen && !m_chainman.ActiveChainstate().IsInitialBlockDownload() &&
+        peer.m_next_local_addr_send < current_time) {
+        // If we've sent before, clear the bloom filter for the peer, so that our
+        // self-announcement will actually go out.
+        // This might be unnecessary if the bloom filter has already rolled
+        // over since our last self-announcement, but there is only a small
+        // bandwidth cost that we can incur by doing this (which happens
+        // once a day on average).
+        if (peer.m_next_local_addr_send != 0us) {
+            peer.m_addr_known->reset();
+        }
+        if (std::optional<CAddress> local_addr = GetLocalAddrForPeer(&node)) {
+            FastRandomContext insecure_rand;
+            PushAddress(peer, *local_addr, insecure_rand);
+        }
+        peer.m_next_local_addr_send = PoissonNextSend(current_time, AVG_LOCAL_ADDRESS_BROADCAST_INTERVAL);
+    }
+
+    // We sent an `addr` message to this peer recently. Nothing more to do.
+    if (current_time <= peer.m_next_addr_send) return;
+
+    peer.m_next_addr_send = PoissonNextSend(current_time, AVG_ADDRESS_BROADCAST_INTERVAL);
+
+    if (!Assume(peer.m_addrs_to_send.size() <= MAX_ADDR_TO_SEND)) {
+        // Should be impossible since we always check size before adding to
+        // m_addrs_to_send. Recover by trimming the vector.
+        peer.m_addrs_to_send.resize(MAX_ADDR_TO_SEND);
+    }
+
+    // Remove addr records that the peer already knows about, and add new
+    // addrs to the m_addr_known filter on the same pass.
+    auto addr_already_known = [&peer](const CAddress& addr) {
+        bool ret = peer.m_addr_known->contains(addr.GetKey());
+        if (!ret) peer.m_addr_known->insert(addr.GetKey());
+        return ret;
+    };
+    peer.m_addrs_to_send.erase(std::remove_if(peer.m_addrs_to_send.begin(), peer.m_addrs_to_send.end(), addr_already_known),
+                           peer.m_addrs_to_send.end());
+
+    // No addr messages to send
+    if (peer.m_addrs_to_send.empty()) return;
+
+    const char* msg_type;
+    int make_flags;
+    if (peer.m_wants_addrv2) {
+        msg_type = NetMsgType::ADDRV2;
+        make_flags = ADDRV2_FORMAT;
+    } else {
+        msg_type = NetMsgType::ADDR;
+        make_flags = 0;
+    }
+    m_connman.PushMessage(
