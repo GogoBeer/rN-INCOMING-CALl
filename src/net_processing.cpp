@@ -4153,4 +4153,137 @@ bool PeerManagerImpl::ProcessMessages(CNode* pfrom, std::atomic<bool>& interrupt
         msg.m_recv.data()
     );
 
-    if (gArgs.GetBoolArg("-capturemessages", fa
+    if (gArgs.GetBoolArg("-capturemessages", false)) {
+        CaptureMessage(pfrom->addr, msg.m_command, MakeUCharSpan(msg.m_recv), /*is_incoming=*/true);
+    }
+
+    msg.SetVersion(pfrom->GetCommonVersion());
+    const std::string& msg_type = msg.m_command;
+
+    // Message size
+    unsigned int nMessageSize = msg.m_message_size;
+
+    try {
+        ProcessMessage(*pfrom, msg_type, msg.m_recv, msg.m_time, interruptMsgProc);
+        if (interruptMsgProc) return false;
+        {
+            LOCK(peer->m_getdata_requests_mutex);
+            if (!peer->m_getdata_requests.empty()) fMoreWork = true;
+        }
+    } catch (const std::exception& e) {
+        LogPrint(BCLog::NET, "%s(%s, %u bytes): Exception '%s' (%s) caught\n", __func__, SanitizeString(msg_type), nMessageSize, e.what(), typeid(e).name());
+    } catch (...) {
+        LogPrint(BCLog::NET, "%s(%s, %u bytes): Unknown exception caught\n", __func__, SanitizeString(msg_type), nMessageSize);
+    }
+
+    return fMoreWork;
+}
+
+void PeerManagerImpl::ConsiderEviction(CNode& pto, std::chrono::seconds time_in_seconds)
+{
+    AssertLockHeld(cs_main);
+
+    CNodeState &state = *State(pto.GetId());
+    const CNetMsgMaker msgMaker(pto.GetCommonVersion());
+
+    if (!state.m_chain_sync.m_protect && pto.IsOutboundOrBlockRelayConn() && state.fSyncStarted) {
+        // This is an outbound peer subject to disconnection if they don't
+        // announce a block with as much work as the current tip within
+        // CHAIN_SYNC_TIMEOUT + HEADERS_RESPONSE_TIME seconds (note: if
+        // their chain has more work than ours, we should sync to it,
+        // unless it's invalid, in which case we should find that out and
+        // disconnect from them elsewhere).
+        if (state.pindexBestKnownBlock != nullptr && state.pindexBestKnownBlock->nChainWork >= m_chainman.ActiveChain().Tip()->nChainWork) {
+            if (state.m_chain_sync.m_timeout != 0s) {
+                state.m_chain_sync.m_timeout = 0s;
+                state.m_chain_sync.m_work_header = nullptr;
+                state.m_chain_sync.m_sent_getheaders = false;
+            }
+        } else if (state.m_chain_sync.m_timeout == 0s || (state.m_chain_sync.m_work_header != nullptr && state.pindexBestKnownBlock != nullptr && state.pindexBestKnownBlock->nChainWork >= state.m_chain_sync.m_work_header->nChainWork)) {
+            // Our best block known by this peer is behind our tip, and we're either noticing
+            // that for the first time, OR this peer was able to catch up to some earlier point
+            // where we checked against our tip.
+            // Either way, set a new timeout based on current tip.
+            state.m_chain_sync.m_timeout = time_in_seconds + CHAIN_SYNC_TIMEOUT;
+            state.m_chain_sync.m_work_header = m_chainman.ActiveChain().Tip();
+            state.m_chain_sync.m_sent_getheaders = false;
+        } else if (state.m_chain_sync.m_timeout > 0s && time_in_seconds > state.m_chain_sync.m_timeout) {
+            // No evidence yet that our peer has synced to a chain with work equal to that
+            // of our tip, when we first detected it was behind. Send a single getheaders
+            // message to give the peer a chance to update us.
+            if (state.m_chain_sync.m_sent_getheaders) {
+                // They've run out of time to catch up!
+                LogPrintf("Disconnecting outbound peer %d for old chain, best known block = %s\n", pto.GetId(), state.pindexBestKnownBlock != nullptr ? state.pindexBestKnownBlock->GetBlockHash().ToString() : "<none>");
+                pto.fDisconnect = true;
+            } else {
+                assert(state.m_chain_sync.m_work_header);
+                LogPrint(BCLog::NET, "sending getheaders to outbound peer=%d to verify chain work (current best known block:%s, benchmark blockhash: %s)\n", pto.GetId(), state.pindexBestKnownBlock != nullptr ? state.pindexBestKnownBlock->GetBlockHash().ToString() : "<none>", state.m_chain_sync.m_work_header->GetBlockHash().ToString());
+                m_connman.PushMessage(&pto, msgMaker.Make(NetMsgType::GETHEADERS, m_chainman.ActiveChain().GetLocator(state.m_chain_sync.m_work_header->pprev), uint256()));
+                state.m_chain_sync.m_sent_getheaders = true;
+                constexpr auto HEADERS_RESPONSE_TIME{2min};
+                // Bump the timeout to allow a response, which could clear the timeout
+                // (if the response shows the peer has synced), reset the timeout (if
+                // the peer syncs to the required work but not to our tip), or result
+                // in disconnect (if we advance to the timeout and pindexBestKnownBlock
+                // has not sufficiently progressed)
+                state.m_chain_sync.m_timeout = time_in_seconds + HEADERS_RESPONSE_TIME;
+            }
+        }
+    }
+}
+
+void PeerManagerImpl::EvictExtraOutboundPeers(std::chrono::seconds now)
+{
+    // If we have any extra block-relay-only peers, disconnect the youngest unless
+    // it's given us a block -- in which case, compare with the second-youngest, and
+    // out of those two, disconnect the peer who least recently gave us a block.
+    // The youngest block-relay-only peer would be the extra peer we connected
+    // to temporarily in order to sync our tip; see net.cpp.
+    // Note that we use higher nodeid as a measure for most recent connection.
+    if (m_connman.GetExtraBlockRelayCount() > 0) {
+        std::pair<NodeId, std::chrono::seconds> youngest_peer{-1, 0}, next_youngest_peer{-1, 0};
+
+        m_connman.ForEachNode([&](CNode* pnode) {
+            if (!pnode->IsBlockOnlyConn() || pnode->fDisconnect) return;
+            if (pnode->GetId() > youngest_peer.first) {
+                next_youngest_peer = youngest_peer;
+                youngest_peer.first = pnode->GetId();
+                youngest_peer.second = pnode->m_last_block_time;
+            }
+        });
+        NodeId to_disconnect = youngest_peer.first;
+        if (youngest_peer.second > next_youngest_peer.second) {
+            // Our newest block-relay-only peer gave us a block more recently;
+            // disconnect our second youngest.
+            to_disconnect = next_youngest_peer.first;
+        }
+        m_connman.ForNode(to_disconnect, [&](CNode* pnode) EXCLUSIVE_LOCKS_REQUIRED(::cs_main) {
+            AssertLockHeld(::cs_main);
+            // Make sure we're not getting a block right now, and that
+            // we've been connected long enough for this eviction to happen
+            // at all.
+            // Note that we only request blocks from a peer if we learn of a
+            // valid headers chain with at least as much work as our tip.
+            CNodeState *node_state = State(pnode->GetId());
+            if (node_state == nullptr ||
+                (now - pnode->m_connected >= MINIMUM_CONNECT_TIME && node_state->nBlocksInFlight == 0)) {
+                pnode->fDisconnect = true;
+                LogPrint(BCLog::NET, "disconnecting extra block-relay-only peer=%d (last block received at time %d)\n",
+                         pnode->GetId(), count_seconds(pnode->m_last_block_time));
+                return true;
+            } else {
+                LogPrint(BCLog::NET, "keeping block-relay-only peer=%d chosen for eviction (connect time: %d, blocks_in_flight: %d)\n",
+                         pnode->GetId(), count_seconds(pnode->m_connected), node_state->nBlocksInFlight);
+            }
+            return false;
+        });
+    }
+
+    // Check whether we have too many outbound-full-relay peers
+    if (m_connman.GetExtraFullOutboundCount() > 0) {
+        // If we have more outbound-full-relay peers than we target, disconnect one.
+        // Pick the outbound-full-relay peer that least recently announced
+        // us a new block, with ties broken by choosing the more recent
+        // connection (higher node id)
+        NodeId worst_peer = -1;
+        int64_t oldest_block_announcement = std::numeric_li
