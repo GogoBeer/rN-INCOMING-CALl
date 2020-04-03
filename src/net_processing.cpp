@@ -4766,4 +4766,138 @@ bool PeerManagerImpl::SendMessages(CNode* pto)
         std::vector<CInv> vInv;
         {
             LOCK(peer->m_block_inv_mutex);
-            vIn
+            vInv.reserve(std::max<size_t>(peer->m_blocks_for_inv_relay.size(), INVENTORY_BROADCAST_MAX));
+
+            // Add blocks
+            for (const uint256& hash : peer->m_blocks_for_inv_relay) {
+                vInv.push_back(CInv(MSG_BLOCK, hash));
+                if (vInv.size() == MAX_INV_SZ) {
+                    m_connman.PushMessage(pto, msgMaker.Make(NetMsgType::INV, vInv));
+                    vInv.clear();
+                }
+            }
+            peer->m_blocks_for_inv_relay.clear();
+        }
+
+        if (pto->m_tx_relay != nullptr) {
+                LOCK(pto->m_tx_relay->cs_tx_inventory);
+                // Check whether periodic sends should happen
+                bool fSendTrickle = pto->HasPermission(NetPermissionFlags::NoBan);
+                if (pto->m_tx_relay->nNextInvSend < current_time) {
+                    fSendTrickle = true;
+                    if (pto->IsInboundConn()) {
+                        pto->m_tx_relay->nNextInvSend = m_connman.PoissonNextSendInbound(current_time, INBOUND_INVENTORY_BROADCAST_INTERVAL);
+                    } else {
+                        pto->m_tx_relay->nNextInvSend = PoissonNextSend(current_time, OUTBOUND_INVENTORY_BROADCAST_INTERVAL);
+                    }
+                }
+
+                // Time to send but the peer has requested we not relay transactions.
+                if (fSendTrickle) {
+                    LOCK(pto->m_tx_relay->cs_filter);
+                    if (!pto->m_tx_relay->fRelayTxes) pto->m_tx_relay->setInventoryTxToSend.clear();
+                }
+
+                // Respond to BIP35 mempool requests
+                if (fSendTrickle && pto->m_tx_relay->fSendMempool) {
+                    auto vtxinfo = m_mempool.infoAll();
+                    pto->m_tx_relay->fSendMempool = false;
+                    const CFeeRate filterrate{pto->m_tx_relay->minFeeFilter.load()};
+
+                    LOCK(pto->m_tx_relay->cs_filter);
+
+                    for (const auto& txinfo : vtxinfo) {
+                        const uint256& hash = state.m_wtxid_relay ? txinfo.tx->GetWitnessHash() : txinfo.tx->GetHash();
+                        CInv inv(state.m_wtxid_relay ? MSG_WTX : MSG_TX, hash);
+                        pto->m_tx_relay->setInventoryTxToSend.erase(hash);
+                        // Don't send transactions that peers will not put into their mempool
+                        if (txinfo.fee < filterrate.GetFee(txinfo.vsize)) {
+                            continue;
+                        }
+                        if (pto->m_tx_relay->pfilter) {
+                            if (!pto->m_tx_relay->pfilter->IsRelevantAndUpdate(*txinfo.tx)) continue;
+                        }
+                        pto->m_tx_relay->filterInventoryKnown.insert(hash);
+                        // Responses to MEMPOOL requests bypass the m_recently_announced_invs filter.
+                        vInv.push_back(inv);
+                        if (vInv.size() == MAX_INV_SZ) {
+                            m_connman.PushMessage(pto, msgMaker.Make(NetMsgType::INV, vInv));
+                            vInv.clear();
+                        }
+                    }
+                    pto->m_tx_relay->m_last_mempool_req = std::chrono::duration_cast<std::chrono::seconds>(current_time);
+                }
+
+                // Determine transactions to relay
+                if (fSendTrickle) {
+                    // Produce a vector with all candidates for sending
+                    std::vector<std::set<uint256>::iterator> vInvTx;
+                    vInvTx.reserve(pto->m_tx_relay->setInventoryTxToSend.size());
+                    for (std::set<uint256>::iterator it = pto->m_tx_relay->setInventoryTxToSend.begin(); it != pto->m_tx_relay->setInventoryTxToSend.end(); it++) {
+                        vInvTx.push_back(it);
+                    }
+                    const CFeeRate filterrate{pto->m_tx_relay->minFeeFilter.load()};
+                    // Topologically and fee-rate sort the inventory we send for privacy and priority reasons.
+                    // A heap is used so that not all items need sorting if only a few are being sent.
+                    CompareInvMempoolOrder compareInvMempoolOrder(&m_mempool, state.m_wtxid_relay);
+                    std::make_heap(vInvTx.begin(), vInvTx.end(), compareInvMempoolOrder);
+                    // No reason to drain out at many times the network's capacity,
+                    // especially since we have many peers and some will draw much shorter delays.
+                    unsigned int nRelayedTransactions = 0;
+                    LOCK(pto->m_tx_relay->cs_filter);
+                    while (!vInvTx.empty() && nRelayedTransactions < INVENTORY_BROADCAST_MAX) {
+                        // Fetch the top element from the heap
+                        std::pop_heap(vInvTx.begin(), vInvTx.end(), compareInvMempoolOrder);
+                        std::set<uint256>::iterator it = vInvTx.back();
+                        vInvTx.pop_back();
+                        uint256 hash = *it;
+                        CInv inv(state.m_wtxid_relay ? MSG_WTX : MSG_TX, hash);
+                        // Remove it from the to-be-sent set
+                        pto->m_tx_relay->setInventoryTxToSend.erase(it);
+                        // Check if not in the filter already
+                        if (pto->m_tx_relay->filterInventoryKnown.contains(hash)) {
+                            continue;
+                        }
+                        // Not in the mempool anymore? don't bother sending it.
+                        auto txinfo = m_mempool.info(ToGenTxid(inv));
+                        if (!txinfo.tx) {
+                            continue;
+                        }
+                        auto txid = txinfo.tx->GetHash();
+                        auto wtxid = txinfo.tx->GetWitnessHash();
+                        // Peer told you to not send transactions at that feerate? Don't bother sending it.
+                        if (txinfo.fee < filterrate.GetFee(txinfo.vsize)) {
+                            continue;
+                        }
+                        if (pto->m_tx_relay->pfilter && !pto->m_tx_relay->pfilter->IsRelevantAndUpdate(*txinfo.tx)) continue;
+                        // Send
+                        State(pto->GetId())->m_recently_announced_invs.insert(hash);
+                        vInv.push_back(inv);
+                        nRelayedTransactions++;
+                        {
+                            // Expire old relay messages
+                            while (!g_relay_expiration.empty() && g_relay_expiration.front().first < current_time)
+                            {
+                                mapRelay.erase(g_relay_expiration.front().second);
+                                g_relay_expiration.pop_front();
+                            }
+
+                            auto ret = mapRelay.emplace(txid, std::move(txinfo.tx));
+                            if (ret.second) {
+                                g_relay_expiration.emplace_back(current_time + RELAY_TX_CACHE_TIME, ret.first);
+                            }
+                            // Add wtxid-based lookup into mapRelay as well, so that peers can request by wtxid
+                            auto ret2 = mapRelay.emplace(wtxid, ret.first->second);
+                            if (ret2.second) {
+                                g_relay_expiration.emplace_back(current_time + RELAY_TX_CACHE_TIME, ret2.first);
+                            }
+                        }
+                        if (vInv.size() == MAX_INV_SZ) {
+                            m_connman.PushMessage(pto, msgMaker.Make(NetMsgType::INV, vInv));
+                            vInv.clear();
+                        }
+                        pto->m_tx_relay->filterInventoryKnown.insert(hash);
+                        if (hash != txid) {
+                            // Insert txid into filterInventoryKnown, even for
+                            // wtxidrelay peers. This prevents re-adding of
+                            // unconfirmed parents to the recent
