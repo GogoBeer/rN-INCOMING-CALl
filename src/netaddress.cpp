@@ -865,4 +865,274 @@ int CNetAddr::GetReachabilityFrom(const CNetAddr *paddrPartner) const
         REACH_IPV4,
         REACH_IPV6_STRONG,
         REACH_PRIVATE
-    
+    };
+
+    if (!IsRoutable() || IsInternal())
+        return REACH_UNREACHABLE;
+
+    int ourNet = GetExtNetwork(this);
+    int theirNet = GetExtNetwork(paddrPartner);
+    bool fTunnel = IsRFC3964() || IsRFC6052() || IsRFC6145();
+
+    switch(theirNet) {
+    case NET_IPV4:
+        switch(ourNet) {
+        default:       return REACH_DEFAULT;
+        case NET_IPV4: return REACH_IPV4;
+        }
+    case NET_IPV6:
+        switch(ourNet) {
+        default:         return REACH_DEFAULT;
+        case NET_TEREDO: return REACH_TEREDO;
+        case NET_IPV4:   return REACH_IPV4;
+        case NET_IPV6:   return fTunnel ? REACH_IPV6_WEAK : REACH_IPV6_STRONG; // only prefer giving our IPv6 address if it's not tunnelled
+        }
+    case NET_ONION:
+        switch(ourNet) {
+        default:         return REACH_DEFAULT;
+        case NET_IPV4:   return REACH_IPV4; // Tor users can connect to IPv4 as well
+        case NET_ONION:    return REACH_PRIVATE;
+        }
+    case NET_I2P:
+        switch (ourNet) {
+        case NET_I2P: return REACH_PRIVATE;
+        default: return REACH_DEFAULT;
+        }
+    case NET_CJDNS:
+        switch (ourNet) {
+        case NET_CJDNS: return REACH_PRIVATE;
+        default: return REACH_DEFAULT;
+        }
+    case NET_TEREDO:
+        switch(ourNet) {
+        default:          return REACH_DEFAULT;
+        case NET_TEREDO:  return REACH_TEREDO;
+        case NET_IPV6:    return REACH_IPV6_WEAK;
+        case NET_IPV4:    return REACH_IPV4;
+        }
+    case NET_UNKNOWN:
+    case NET_UNROUTABLE:
+    default:
+        switch(ourNet) {
+        default:          return REACH_DEFAULT;
+        case NET_TEREDO:  return REACH_TEREDO;
+        case NET_IPV6:    return REACH_IPV6_WEAK;
+        case NET_IPV4:    return REACH_IPV4;
+        case NET_ONION:     return REACH_PRIVATE; // either from Tor, or don't care about our address
+        }
+    }
+}
+
+CService::CService() : port(0)
+{
+}
+
+CService::CService(const CNetAddr& cip, uint16_t portIn) : CNetAddr(cip), port(portIn)
+{
+}
+
+CService::CService(const struct in_addr& ipv4Addr, uint16_t portIn) : CNetAddr(ipv4Addr), port(portIn)
+{
+}
+
+CService::CService(const struct in6_addr& ipv6Addr, uint16_t portIn) : CNetAddr(ipv6Addr), port(portIn)
+{
+}
+
+CService::CService(const struct sockaddr_in& addr) : CNetAddr(addr.sin_addr), port(ntohs(addr.sin_port))
+{
+    assert(addr.sin_family == AF_INET);
+}
+
+CService::CService(const struct sockaddr_in6 &addr) : CNetAddr(addr.sin6_addr, addr.sin6_scope_id), port(ntohs(addr.sin6_port))
+{
+   assert(addr.sin6_family == AF_INET6);
+}
+
+bool CService::SetSockAddr(const struct sockaddr *paddr)
+{
+    switch (paddr->sa_family) {
+    case AF_INET:
+        *this = CService(*(const struct sockaddr_in*)paddr);
+        return true;
+    case AF_INET6:
+        *this = CService(*(const struct sockaddr_in6*)paddr);
+        return true;
+    default:
+        return false;
+    }
+}
+
+uint16_t CService::GetPort() const
+{
+    return port;
+}
+
+bool operator==(const CService& a, const CService& b)
+{
+    return static_cast<CNetAddr>(a) == static_cast<CNetAddr>(b) && a.port == b.port;
+}
+
+bool operator<(const CService& a, const CService& b)
+{
+    return static_cast<CNetAddr>(a) < static_cast<CNetAddr>(b) || (static_cast<CNetAddr>(a) == static_cast<CNetAddr>(b) && a.port < b.port);
+}
+
+/**
+ * Obtain the IPv4/6 socket address this represents.
+ *
+ * @param[out] paddr The obtained socket address.
+ * @param[in,out] addrlen The size, in bytes, of the address structure pointed
+ *                        to by paddr. The value that's pointed to by this
+ *                        parameter might change after calling this function if
+ *                        the size of the corresponding address structure
+ *                        changed.
+ *
+ * @returns Whether or not the operation was successful.
+ */
+bool CService::GetSockAddr(struct sockaddr* paddr, socklen_t *addrlen) const
+{
+    if (IsIPv4()) {
+        if (*addrlen < (socklen_t)sizeof(struct sockaddr_in))
+            return false;
+        *addrlen = sizeof(struct sockaddr_in);
+        struct sockaddr_in *paddrin = (struct sockaddr_in*)paddr;
+        memset(paddrin, 0, *addrlen);
+        if (!GetInAddr(&paddrin->sin_addr))
+            return false;
+        paddrin->sin_family = AF_INET;
+        paddrin->sin_port = htons(port);
+        return true;
+    }
+    if (IsIPv6() || IsCJDNS()) {
+        if (*addrlen < (socklen_t)sizeof(struct sockaddr_in6))
+            return false;
+        *addrlen = sizeof(struct sockaddr_in6);
+        struct sockaddr_in6 *paddrin6 = (struct sockaddr_in6*)paddr;
+        memset(paddrin6, 0, *addrlen);
+        if (!GetIn6Addr(&paddrin6->sin6_addr))
+            return false;
+        paddrin6->sin6_scope_id = m_scope_id;
+        paddrin6->sin6_family = AF_INET6;
+        paddrin6->sin6_port = htons(port);
+        return true;
+    }
+    return false;
+}
+
+/**
+ * @returns An identifier unique to this service's address and port number.
+ */
+std::vector<unsigned char> CService::GetKey() const
+{
+    auto key = GetAddrBytes();
+    key.push_back(port / 0x100); // most significant byte of our port
+    key.push_back(port & 0x0FF); // least significant byte of our port
+    return key;
+}
+
+std::string CService::ToStringPort() const
+{
+    return strprintf("%u", port);
+}
+
+std::string CService::ToStringIPPort() const
+{
+    if (IsIPv4() || IsTor() || IsI2P() || IsInternal()) {
+        return ToStringIP() + ":" + ToStringPort();
+    } else {
+        return "[" + ToStringIP() + "]:" + ToStringPort();
+    }
+}
+
+std::string CService::ToString() const
+{
+    return ToStringIPPort();
+}
+
+CSubNet::CSubNet():
+    valid(false)
+{
+    memset(netmask, 0, sizeof(netmask));
+}
+
+CSubNet::CSubNet(const CNetAddr& addr, uint8_t mask) : CSubNet()
+{
+    valid = (addr.IsIPv4() && mask <= ADDR_IPV4_SIZE * 8) ||
+            (addr.IsIPv6() && mask <= ADDR_IPV6_SIZE * 8);
+    if (!valid) {
+        return;
+    }
+
+    assert(mask <= sizeof(netmask) * 8);
+
+    network = addr;
+
+    uint8_t n = mask;
+    for (size_t i = 0; i < network.m_addr.size(); ++i) {
+        const uint8_t bits = n < 8 ? n : 8;
+        netmask[i] = (uint8_t)((uint8_t)0xFF << (8 - bits)); // Set first bits.
+        network.m_addr[i] &= netmask[i]; // Normalize network according to netmask.
+        n -= bits;
+    }
+}
+
+/**
+ * @returns The number of 1-bits in the prefix of the specified subnet mask. If
+ *          the specified subnet mask is not a valid one, -1.
+ */
+static inline int NetmaskBits(uint8_t x)
+{
+    switch(x) {
+    case 0x00: return 0;
+    case 0x80: return 1;
+    case 0xc0: return 2;
+    case 0xe0: return 3;
+    case 0xf0: return 4;
+    case 0xf8: return 5;
+    case 0xfc: return 6;
+    case 0xfe: return 7;
+    case 0xff: return 8;
+    default: return -1;
+    }
+}
+
+CSubNet::CSubNet(const CNetAddr& addr, const CNetAddr& mask) : CSubNet()
+{
+    valid = (addr.IsIPv4() || addr.IsIPv6()) && addr.m_net == mask.m_net;
+    if (!valid) {
+        return;
+    }
+    // Check if `mask` contains 1-bits after 0-bits (which is an invalid netmask).
+    bool zeros_found = false;
+    for (auto b : mask.m_addr) {
+        const int num_bits = NetmaskBits(b);
+        if (num_bits == -1 || (zeros_found && num_bits != 0)) {
+            valid = false;
+            return;
+        }
+        if (num_bits < 8) {
+            zeros_found = true;
+        }
+    }
+
+    assert(mask.m_addr.size() <= sizeof(netmask));
+
+    memcpy(netmask, mask.m_addr.data(), mask.m_addr.size());
+
+    network = addr;
+
+    // Normalize network according to netmask
+    for (size_t x = 0; x < network.m_addr.size(); ++x) {
+        network.m_addr[x] &= netmask[x];
+    }
+}
+
+CSubNet::CSubNet(const CNetAddr& addr) : CSubNet()
+{
+    switch (addr.m_net) {
+    case NET_IPV4:
+    case NET_IPV6:
+        valid = true;
+        assert(addr.m_addr.size() <= sizeof(netmask));
+        memset(netmask, 0xFF, addr.m_add
