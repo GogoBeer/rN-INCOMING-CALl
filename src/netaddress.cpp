@@ -1135,4 +1135,121 @@ CSubNet::CSubNet(const CNetAddr& addr) : CSubNet()
     case NET_IPV6:
         valid = true;
         assert(addr.m_addr.size() <= sizeof(netmask));
-        memset(netmask, 0xFF, addr.m_add
+        memset(netmask, 0xFF, addr.m_addr.size());
+        break;
+    case NET_ONION:
+    case NET_I2P:
+    case NET_CJDNS:
+        valid = true;
+        break;
+    case NET_INTERNAL:
+    case NET_UNROUTABLE:
+    case NET_MAX:
+        return;
+    }
+
+    network = addr;
+}
+
+/**
+ * @returns True if this subnet is valid, the specified address is valid, and
+ *          the specified address belongs in this subnet.
+ */
+bool CSubNet::Match(const CNetAddr &addr) const
+{
+    if (!valid || !addr.IsValid() || network.m_net != addr.m_net)
+        return false;
+
+    switch (network.m_net) {
+    case NET_IPV4:
+    case NET_IPV6:
+        break;
+    case NET_ONION:
+    case NET_I2P:
+    case NET_CJDNS:
+    case NET_INTERNAL:
+        return addr == network;
+    case NET_UNROUTABLE:
+    case NET_MAX:
+        return false;
+    }
+
+    assert(network.m_addr.size() == addr.m_addr.size());
+    for (size_t x = 0; x < addr.m_addr.size(); ++x) {
+        if ((addr.m_addr[x] & netmask[x]) != network.m_addr[x]) {
+            return false;
+        }
+    }
+    return true;
+}
+
+std::string CSubNet::ToString() const
+{
+    std::string suffix;
+
+    switch (network.m_net) {
+    case NET_IPV4:
+    case NET_IPV6: {
+        assert(network.m_addr.size() <= sizeof(netmask));
+
+        uint8_t cidr = 0;
+
+        for (size_t i = 0; i < network.m_addr.size(); ++i) {
+            if (netmask[i] == 0x00) {
+                break;
+            }
+            cidr += NetmaskBits(netmask[i]);
+        }
+
+        suffix = strprintf("/%u", cidr);
+        break;
+    }
+    case NET_ONION:
+    case NET_I2P:
+    case NET_CJDNS:
+    case NET_INTERNAL:
+    case NET_UNROUTABLE:
+    case NET_MAX:
+        break;
+    }
+
+    return network.ToString() + suffix;
+}
+
+bool CSubNet::IsValid() const
+{
+    return valid;
+}
+
+bool CSubNet::SanityCheck() const
+{
+    switch (network.m_net) {
+    case NET_IPV4:
+    case NET_IPV6:
+        break;
+    case NET_ONION:
+    case NET_I2P:
+    case NET_CJDNS:
+        return true;
+    case NET_INTERNAL:
+    case NET_UNROUTABLE:
+    case NET_MAX:
+        return false;
+    }
+
+    for (size_t x = 0; x < network.m_addr.size(); ++x) {
+        if (network.m_addr[x] & ~netmask[x]) return false;
+    }
+
+    return true;
+}
+
+bool operator==(const CSubNet& a, const CSubNet& b)
+{
+    return a.valid == b.valid && a.network == b.network && !memcmp(a.netmask, b.netmask, 16);
+}
+
+bool operator<(const CSubNet& a, const CSubNet& b)
+{
+    return (a.network < b.network || (a.network == b.network && memcmp(a.netmask, b.netmask, 16) < 0));
+}
