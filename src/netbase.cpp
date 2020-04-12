@@ -552,4 +552,200 @@ bool ConnectSocketDirectly(const CService &addrConnect, const Sock& sock, int nT
         return false;
     }
 
-    // Connect to the addrConnect service on the hSo
+    // Connect to the addrConnect service on the hSocket socket.
+    if (sock.Connect(reinterpret_cast<struct sockaddr*>(&sockaddr), len) == SOCKET_ERROR) {
+        int nErr = WSAGetLastError();
+        // WSAEINVAL is here because some legacy version of winsock uses it
+        if (nErr == WSAEINPROGRESS || nErr == WSAEWOULDBLOCK || nErr == WSAEINVAL)
+        {
+            // Connection didn't actually fail, but is being established
+            // asynchronously. Thus, use async I/O api (select/poll)
+            // synchronously to check for successful connection with a timeout.
+            const Sock::Event requested = Sock::RECV | Sock::SEND;
+            Sock::Event occurred;
+            if (!sock.Wait(std::chrono::milliseconds{nTimeout}, requested, &occurred)) {
+                LogPrintf("wait for connect to %s failed: %s\n",
+                          addrConnect.ToString(),
+                          NetworkErrorString(WSAGetLastError()));
+                return false;
+            } else if (occurred == 0) {
+                LogPrint(BCLog::NET, "connection attempt to %s timed out\n", addrConnect.ToString());
+                return false;
+            }
+
+            // Even if the wait was successful, the connect might not
+            // have been successful. The reason for this failure is hidden away
+            // in the SO_ERROR for the socket in modern systems. We read it into
+            // sockerr here.
+            int sockerr;
+            socklen_t sockerr_len = sizeof(sockerr);
+            if (sock.GetSockOpt(SOL_SOCKET, SO_ERROR, (sockopt_arg_type)&sockerr, &sockerr_len) ==
+                SOCKET_ERROR) {
+                LogPrintf("getsockopt() for %s failed: %s\n", addrConnect.ToString(), NetworkErrorString(WSAGetLastError()));
+                return false;
+            }
+            if (sockerr != 0) {
+                LogConnectFailure(manual_connection,
+                                  "connect() to %s failed after wait: %s",
+                                  addrConnect.ToString(),
+                                  NetworkErrorString(sockerr));
+                return false;
+            }
+        }
+#ifdef WIN32
+        else if (WSAGetLastError() != WSAEISCONN)
+#else
+        else
+#endif
+        {
+            LogConnectFailure(manual_connection, "connect() to %s failed: %s", addrConnect.ToString(), NetworkErrorString(WSAGetLastError()));
+            return false;
+        }
+    }
+    return true;
+}
+
+bool SetProxy(enum Network net, const proxyType &addrProxy) {
+    assert(net >= 0 && net < NET_MAX);
+    if (!addrProxy.IsValid())
+        return false;
+    LOCK(g_proxyinfo_mutex);
+    proxyInfo[net] = addrProxy;
+    return true;
+}
+
+bool GetProxy(enum Network net, proxyType &proxyInfoOut) {
+    assert(net >= 0 && net < NET_MAX);
+    LOCK(g_proxyinfo_mutex);
+    if (!proxyInfo[net].IsValid())
+        return false;
+    proxyInfoOut = proxyInfo[net];
+    return true;
+}
+
+bool SetNameProxy(const proxyType &addrProxy) {
+    if (!addrProxy.IsValid())
+        return false;
+    LOCK(g_proxyinfo_mutex);
+    nameProxy = addrProxy;
+    return true;
+}
+
+bool GetNameProxy(proxyType &nameProxyOut) {
+    LOCK(g_proxyinfo_mutex);
+    if(!nameProxy.IsValid())
+        return false;
+    nameProxyOut = nameProxy;
+    return true;
+}
+
+bool HaveNameProxy() {
+    LOCK(g_proxyinfo_mutex);
+    return nameProxy.IsValid();
+}
+
+bool IsProxy(const CNetAddr &addr) {
+    LOCK(g_proxyinfo_mutex);
+    for (int i = 0; i < NET_MAX; i++) {
+        if (addr == static_cast<CNetAddr>(proxyInfo[i].proxy))
+            return true;
+    }
+    return false;
+}
+
+bool ConnectThroughProxy(const proxyType& proxy, const std::string& strDest, uint16_t port, const Sock& sock, int nTimeout, bool& outProxyConnectionFailed)
+{
+    // first connect to proxy server
+    if (!ConnectSocketDirectly(proxy.proxy, sock, nTimeout, true)) {
+        outProxyConnectionFailed = true;
+        return false;
+    }
+    // do socks negotiation
+    if (proxy.randomize_credentials) {
+        ProxyCredentials random_auth;
+        static std::atomic_int counter(0);
+        random_auth.username = random_auth.password = strprintf("%i", counter++);
+        if (!Socks5(strDest, port, &random_auth, sock)) {
+            return false;
+        }
+    } else {
+        if (!Socks5(strDest, port, 0, sock)) {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool LookupSubNet(const std::string& subnet_str, CSubNet& subnet_out)
+{
+    if (!ValidAsCString(subnet_str)) {
+        return false;
+    }
+
+    const size_t slash_pos{subnet_str.find_last_of('/')};
+    const std::string str_addr{subnet_str.substr(0, slash_pos)};
+    CNetAddr addr;
+
+    if (LookupHost(str_addr, addr, /*fAllowLookup=*/false)) {
+        if (slash_pos != subnet_str.npos) {
+            const std::string netmask_str{subnet_str.substr(slash_pos + 1)};
+            uint8_t netmask;
+            if (ParseUInt8(netmask_str, &netmask)) {
+                // Valid number; assume CIDR variable-length subnet masking.
+                subnet_out = CSubNet{addr, netmask};
+                return subnet_out.IsValid();
+            } else {
+                // Invalid number; try full netmask syntax. Never allow lookup for netmask.
+                CNetAddr full_netmask;
+                if (LookupHost(netmask_str, full_netmask, /*fAllowLookup=*/false)) {
+                    subnet_out = CSubNet{addr, full_netmask};
+                    return subnet_out.IsValid();
+                }
+            }
+        } else {
+            // Single IP subnet (<ipv4>/32 or <ipv6>/128).
+            subnet_out = CSubNet{addr};
+            return subnet_out.IsValid();
+        }
+    }
+    return false;
+}
+
+bool SetSocketNonBlocking(const SOCKET& hSocket, bool fNonBlocking)
+{
+    if (fNonBlocking) {
+#ifdef WIN32
+        u_long nOne = 1;
+        if (ioctlsocket(hSocket, FIONBIO, &nOne) == SOCKET_ERROR) {
+#else
+        int fFlags = fcntl(hSocket, F_GETFL, 0);
+        if (fcntl(hSocket, F_SETFL, fFlags | O_NONBLOCK) == SOCKET_ERROR) {
+#endif
+            return false;
+        }
+    } else {
+#ifdef WIN32
+        u_long nZero = 0;
+        if (ioctlsocket(hSocket, FIONBIO, &nZero) == SOCKET_ERROR) {
+#else
+        int fFlags = fcntl(hSocket, F_GETFL, 0);
+        if (fcntl(hSocket, F_SETFL, fFlags & ~O_NONBLOCK) == SOCKET_ERROR) {
+#endif
+            return false;
+        }
+    }
+
+    return true;
+}
+
+bool SetSocketNoDelay(const SOCKET& hSocket)
+{
+    int set = 1;
+    int rc = setsockopt(hSocket, IPPROTO_TCP, TCP_NODELAY, (const char*)&set, sizeof(int));
+    return rc == 0;
+}
+
+void InterruptSocks5(bool interrupt)
+{
+    interruptSocks5Recv = interrupt;
+}
