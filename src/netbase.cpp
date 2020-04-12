@@ -375,3 +375,181 @@ bool Socks5(const std::string& strDest, uint16_t port, const ProxyCredentials* a
     std::vector<uint8_t> vSocks5Init;
     vSocks5Init.push_back(SOCKSVersion::SOCKS5); // We want the SOCK5 protocol
     if (auth) {
+        vSocks5Init.push_back(0x02); // 2 method identifiers follow...
+        vSocks5Init.push_back(SOCKS5Method::NOAUTH);
+        vSocks5Init.push_back(SOCKS5Method::USER_PASS);
+    } else {
+        vSocks5Init.push_back(0x01); // 1 method identifier follows...
+        vSocks5Init.push_back(SOCKS5Method::NOAUTH);
+    }
+    ssize_t ret = sock.Send(vSocks5Init.data(), vSocks5Init.size(), MSG_NOSIGNAL);
+    if (ret != (ssize_t)vSocks5Init.size()) {
+        return error("Error sending to proxy");
+    }
+    uint8_t pchRet1[2];
+    if ((recvr = InterruptibleRecv(pchRet1, 2, g_socks5_recv_timeout, sock)) != IntrRecvError::OK) {
+        LogPrintf("Socks5() connect to %s:%d failed: InterruptibleRecv() timeout or other failure\n", strDest, port);
+        return false;
+    }
+    if (pchRet1[0] != SOCKSVersion::SOCKS5) {
+        return error("Proxy failed to initialize");
+    }
+    if (pchRet1[1] == SOCKS5Method::USER_PASS && auth) {
+        // Perform username/password authentication (as described in RFC1929)
+        std::vector<uint8_t> vAuth;
+        vAuth.push_back(0x01); // Current (and only) version of user/pass subnegotiation
+        if (auth->username.size() > 255 || auth->password.size() > 255)
+            return error("Proxy username or password too long");
+        vAuth.push_back(auth->username.size());
+        vAuth.insert(vAuth.end(), auth->username.begin(), auth->username.end());
+        vAuth.push_back(auth->password.size());
+        vAuth.insert(vAuth.end(), auth->password.begin(), auth->password.end());
+        ret = sock.Send(vAuth.data(), vAuth.size(), MSG_NOSIGNAL);
+        if (ret != (ssize_t)vAuth.size()) {
+            return error("Error sending authentication to proxy");
+        }
+        LogPrint(BCLog::PROXY, "SOCKS5 sending proxy authentication %s:%s\n", auth->username, auth->password);
+        uint8_t pchRetA[2];
+        if ((recvr = InterruptibleRecv(pchRetA, 2, g_socks5_recv_timeout, sock)) != IntrRecvError::OK) {
+            return error("Error reading proxy authentication response");
+        }
+        if (pchRetA[0] != 0x01 || pchRetA[1] != 0x00) {
+            return error("Proxy authentication unsuccessful");
+        }
+    } else if (pchRet1[1] == SOCKS5Method::NOAUTH) {
+        // Perform no authentication
+    } else {
+        return error("Proxy requested wrong authentication method %02x", pchRet1[1]);
+    }
+    std::vector<uint8_t> vSocks5;
+    vSocks5.push_back(SOCKSVersion::SOCKS5); // VER protocol version
+    vSocks5.push_back(SOCKS5Command::CONNECT); // CMD CONNECT
+    vSocks5.push_back(0x00); // RSV Reserved must be 0
+    vSocks5.push_back(SOCKS5Atyp::DOMAINNAME); // ATYP DOMAINNAME
+    vSocks5.push_back(strDest.size()); // Length<=255 is checked at beginning of function
+    vSocks5.insert(vSocks5.end(), strDest.begin(), strDest.end());
+    vSocks5.push_back((port >> 8) & 0xFF);
+    vSocks5.push_back((port >> 0) & 0xFF);
+    ret = sock.Send(vSocks5.data(), vSocks5.size(), MSG_NOSIGNAL);
+    if (ret != (ssize_t)vSocks5.size()) {
+        return error("Error sending to proxy");
+    }
+    uint8_t pchRet2[4];
+    if ((recvr = InterruptibleRecv(pchRet2, 4, g_socks5_recv_timeout, sock)) != IntrRecvError::OK) {
+        if (recvr == IntrRecvError::Timeout) {
+            /* If a timeout happens here, this effectively means we timed out while connecting
+             * to the remote node. This is very common for Tor, so do not print an
+             * error message. */
+            return false;
+        } else {
+            return error("Error while reading proxy response");
+        }
+    }
+    if (pchRet2[0] != SOCKSVersion::SOCKS5) {
+        return error("Proxy failed to accept request");
+    }
+    if (pchRet2[1] != SOCKS5Reply::SUCCEEDED) {
+        // Failures to connect to a peer that are not proxy errors
+        LogPrintf("Socks5() connect to %s:%d failed: %s\n", strDest, port, Socks5ErrorString(pchRet2[1]));
+        return false;
+    }
+    if (pchRet2[2] != 0x00) { // Reserved field must be 0
+        return error("Error: malformed proxy response");
+    }
+    uint8_t pchRet3[256];
+    switch (pchRet2[3])
+    {
+        case SOCKS5Atyp::IPV4: recvr = InterruptibleRecv(pchRet3, 4, g_socks5_recv_timeout, sock); break;
+        case SOCKS5Atyp::IPV6: recvr = InterruptibleRecv(pchRet3, 16, g_socks5_recv_timeout, sock); break;
+        case SOCKS5Atyp::DOMAINNAME:
+        {
+            recvr = InterruptibleRecv(pchRet3, 1, g_socks5_recv_timeout, sock);
+            if (recvr != IntrRecvError::OK) {
+                return error("Error reading from proxy");
+            }
+            int nRecv = pchRet3[0];
+            recvr = InterruptibleRecv(pchRet3, nRecv, g_socks5_recv_timeout, sock);
+            break;
+        }
+        default: return error("Error: malformed proxy response");
+    }
+    if (recvr != IntrRecvError::OK) {
+        return error("Error reading from proxy");
+    }
+    if ((recvr = InterruptibleRecv(pchRet3, 2, g_socks5_recv_timeout, sock)) != IntrRecvError::OK) {
+        return error("Error reading from proxy");
+    }
+    LogPrint(BCLog::NET, "SOCKS5 connected %s\n", strDest);
+    return true;
+}
+
+std::unique_ptr<Sock> CreateSockTCP(const CService& address_family)
+{
+    // Create a sockaddr from the specified service.
+    struct sockaddr_storage sockaddr;
+    socklen_t len = sizeof(sockaddr);
+    if (!address_family.GetSockAddr((struct sockaddr*)&sockaddr, &len)) {
+        LogPrintf("Cannot create socket for %s: unsupported network\n", address_family.ToString());
+        return nullptr;
+    }
+
+    // Create a TCP socket in the address family of the specified service.
+    SOCKET hSocket = socket(((struct sockaddr*)&sockaddr)->sa_family, SOCK_STREAM, IPPROTO_TCP);
+    if (hSocket == INVALID_SOCKET) {
+        return nullptr;
+    }
+
+    // Ensure that waiting for I/O on this socket won't result in undefined
+    // behavior.
+    if (!IsSelectableSocket(hSocket)) {
+        CloseSocket(hSocket);
+        LogPrintf("Cannot create connection: non-selectable socket created (fd >= FD_SETSIZE ?)\n");
+        return nullptr;
+    }
+
+#ifdef SO_NOSIGPIPE
+    int set = 1;
+    // Set the no-sigpipe option on the socket for BSD systems, other UNIXes
+    // should use the MSG_NOSIGNAL flag for every send.
+    setsockopt(hSocket, SOL_SOCKET, SO_NOSIGPIPE, (void*)&set, sizeof(int));
+#endif
+
+    // Set the no-delay option (disable Nagle's algorithm) on the TCP socket.
+    SetSocketNoDelay(hSocket);
+
+    // Set the non-blocking option on the socket.
+    if (!SetSocketNonBlocking(hSocket, true)) {
+        CloseSocket(hSocket);
+        LogPrintf("Error setting socket to non-blocking: %s\n", NetworkErrorString(WSAGetLastError()));
+        return nullptr;
+    }
+    return std::make_unique<Sock>(hSocket);
+}
+
+std::function<std::unique_ptr<Sock>(const CService&)> CreateSock = CreateSockTCP;
+
+template<typename... Args>
+static void LogConnectFailure(bool manual_connection, const char* fmt, const Args&... args) {
+    std::string error_message = tfm::format(fmt, args...);
+    if (manual_connection) {
+        LogPrintf("%s\n", error_message);
+    } else {
+        LogPrint(BCLog::NET, "%s\n", error_message);
+    }
+}
+
+bool ConnectSocketDirectly(const CService &addrConnect, const Sock& sock, int nTimeout, bool manual_connection)
+{
+    // Create a sockaddr from the specified service.
+    struct sockaddr_storage sockaddr;
+    socklen_t len = sizeof(sockaddr);
+    if (sock.Get() == INVALID_SOCKET) {
+        LogPrintf("Cannot connect to %s: invalid socket\n", addrConnect.ToString());
+        return false;
+    }
+    if (!addrConnect.GetSockAddr((struct sockaddr*)&sockaddr, &len)) {
+        LogPrintf("Cannot connect to %s: unsupported network\n", addrConnect.ToString());
+        return false;
+    }
+
+    // Connect to the addrConnect service on the hSo
