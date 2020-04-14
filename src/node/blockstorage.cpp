@@ -171,4 +171,187 @@ void BlockManager::FindFilesToPrune(std::set<int>& setFilesToPrune, uint64_t nPr
                 break;
             }
 
-            // don't prune files that could have a block within MIN_BLOCKS_TO_KEEP of the main 
+            // don't prune files that could have a block within MIN_BLOCKS_TO_KEEP of the main chain's tip but keep scanning
+            if (m_blockfile_info[fileNumber].nHeightLast > nLastBlockWeCanPrune) {
+                continue;
+            }
+
+            PruneOneBlockFile(fileNumber);
+            // Queue up the files for removal
+            setFilesToPrune.insert(fileNumber);
+            nCurrentUsage -= nBytesToPrune;
+            count++;
+        }
+    }
+
+    LogPrint(BCLog::PRUNE, "Prune: target=%dMiB actual=%dMiB diff=%dMiB max_prune_height=%d removed %d blk/rev pairs\n",
+           nPruneTarget/1024/1024, nCurrentUsage/1024/1024,
+           ((int64_t)nPruneTarget - (int64_t)nCurrentUsage)/1024/1024,
+           nLastBlockWeCanPrune, count);
+}
+
+CBlockIndex* BlockManager::InsertBlockIndex(const uint256& hash)
+{
+    AssertLockHeld(cs_main);
+
+    if (hash.IsNull()) {
+        return nullptr;
+    }
+
+    // Return existing
+    BlockMap::iterator mi = m_block_index.find(hash);
+    if (mi != m_block_index.end()) {
+        return (*mi).second;
+    }
+
+    // Create new
+    CBlockIndex* pindexNew = new CBlockIndex();
+    mi = m_block_index.insert(std::make_pair(hash, pindexNew)).first;
+    pindexNew->phashBlock = &((*mi).first);
+
+    return pindexNew;
+}
+
+bool BlockManager::LoadBlockIndex(
+    const Consensus::Params& consensus_params,
+    ChainstateManager& chainman)
+{
+    if (!m_block_tree_db->LoadBlockIndexGuts(consensus_params, [this](const uint256& hash) EXCLUSIVE_LOCKS_REQUIRED(cs_main) { return this->InsertBlockIndex(hash); })) {
+        return false;
+    }
+
+    // Calculate nChainWork
+    std::vector<std::pair<int, CBlockIndex*>> vSortedByHeight;
+    vSortedByHeight.reserve(m_block_index.size());
+    for (const std::pair<const uint256, CBlockIndex*>& item : m_block_index) {
+        CBlockIndex* pindex = item.second;
+        vSortedByHeight.push_back(std::make_pair(pindex->nHeight, pindex));
+    }
+    sort(vSortedByHeight.begin(), vSortedByHeight.end());
+
+    // Find start of assumed-valid region.
+    int first_assumed_valid_height = std::numeric_limits<int>::max();
+
+    for (const auto& [height, block] : vSortedByHeight) {
+        if (block->IsAssumedValid()) {
+            auto chainstates = chainman.GetAll();
+
+            // If we encounter an assumed-valid block index entry, ensure that we have
+            // one chainstate that tolerates assumed-valid entries and another that does
+            // not (i.e. the background validation chainstate), since assumed-valid
+            // entries should always be pending validation by a fully-validated chainstate.
+            auto any_chain = [&](auto fnc) { return std::any_of(chainstates.cbegin(), chainstates.cend(), fnc); };
+            assert(any_chain([](auto chainstate) { return chainstate->reliesOnAssumedValid(); }));
+            assert(any_chain([](auto chainstate) { return !chainstate->reliesOnAssumedValid(); }));
+
+            first_assumed_valid_height = height;
+            break;
+        }
+    }
+
+    for (const std::pair<int, CBlockIndex*>& item : vSortedByHeight) {
+        if (ShutdownRequested()) return false;
+        CBlockIndex* pindex = item.second;
+        pindex->nChainWork = (pindex->pprev ? pindex->pprev->nChainWork : 0) + GetBlockProof(*pindex);
+        pindex->nTimeMax = (pindex->pprev ? std::max(pindex->pprev->nTimeMax, pindex->nTime) : pindex->nTime);
+
+        // We can link the chain of blocks for which we've received transactions at some point, or
+        // blocks that are assumed-valid on the basis of snapshot load (see
+        // PopulateAndValidateSnapshot()).
+        // Pruned nodes may have deleted the block.
+        if (pindex->nTx > 0) {
+            if (pindex->pprev) {
+                if (pindex->pprev->nChainTx > 0) {
+                    pindex->nChainTx = pindex->pprev->nChainTx + pindex->nTx;
+                } else {
+                    pindex->nChainTx = 0;
+                    m_blocks_unlinked.insert(std::make_pair(pindex->pprev, pindex));
+                }
+            } else {
+                pindex->nChainTx = pindex->nTx;
+            }
+        }
+        if (!(pindex->nStatus & BLOCK_FAILED_MASK) && pindex->pprev && (pindex->pprev->nStatus & BLOCK_FAILED_MASK)) {
+            pindex->nStatus |= BLOCK_FAILED_CHILD;
+            m_dirty_blockindex.insert(pindex);
+        }
+        if (pindex->IsAssumedValid() ||
+                (pindex->IsValid(BLOCK_VALID_TRANSACTIONS) &&
+                 (pindex->HaveTxsDownloaded() || pindex->pprev == nullptr))) {
+
+            // Fill each chainstate's block candidate set. Only add assumed-valid
+            // blocks to the tip candidate set if the chainstate is allowed to rely on
+            // assumed-valid blocks.
+            //
+            // If all setBlockIndexCandidates contained the assumed-valid blocks, the
+            // background chainstate's ActivateBestChain() call would add assumed-valid
+            // blocks to the chain (based on how FindMostWorkChain() works). Obviously
+            // we don't want this since the purpose of the background validation chain
+            // is to validate assued-valid blocks.
+            //
+            // Note: This is considering all blocks whose height is greater or equal to
+            // the first assumed-valid block to be assumed-valid blocks, and excluding
+            // them from the background chainstate's setBlockIndexCandidates set. This
+            // does mean that some blocks which are not technically assumed-valid
+            // (later blocks on a fork beginning before the first assumed-valid block)
+            // might not get added to the the background chainstate, but this is ok,
+            // because they will still be attached to the active chainstate if they
+            // actually contain more work.
+            //
+            // Instead of this height-based approach, an earlier attempt was made at
+            // detecting "holistically" whether the block index under consideration
+            // relied on an assumed-valid ancestor, but this proved to be too slow to
+            // be practical.
+            for (CChainState* chainstate : chainman.GetAll()) {
+                if (chainstate->reliesOnAssumedValid() ||
+                        pindex->nHeight < first_assumed_valid_height) {
+                    chainstate->setBlockIndexCandidates.insert(pindex);
+                }
+            }
+        }
+        if (pindex->nStatus & BLOCK_FAILED_MASK && (!chainman.m_best_invalid || pindex->nChainWork > chainman.m_best_invalid->nChainWork)) {
+            chainman.m_best_invalid = pindex;
+        }
+        if (pindex->pprev) {
+            pindex->BuildSkip();
+        }
+        if (pindex->IsValid(BLOCK_VALID_TREE) && (pindexBestHeader == nullptr || CBlockIndexWorkComparator()(pindexBestHeader, pindex)))
+            pindexBestHeader = pindex;
+    }
+
+    return true;
+}
+
+void BlockManager::Unload()
+{
+    m_blocks_unlinked.clear();
+
+    for (const BlockMap::value_type& entry : m_block_index) {
+        delete entry.second;
+    }
+
+    m_block_index.clear();
+
+    m_blockfile_info.clear();
+    m_last_blockfile = 0;
+    m_dirty_blockindex.clear();
+    m_dirty_fileinfo.clear();
+}
+
+bool BlockManager::WriteBlockIndexDB()
+{
+    AssertLockHeld(::cs_main);
+    std::vector<std::pair<int, const CBlockFileInfo*>> vFiles;
+    vFiles.reserve(m_dirty_fileinfo.size());
+    for (std::set<int>::iterator it = m_dirty_fileinfo.begin(); it != m_dirty_fileinfo.end();) {
+        vFiles.push_back(std::make_pair(*it, &m_blockfile_info[*it]));
+        m_dirty_fileinfo.erase(it++);
+    }
+    std::vector<const CBlockIndex*> vBlocks;
+    vBlocks.reserve(m_dirty_blockindex.size());
+    for (std::set<CBlockIndex*>::iterator it = m_dirty_blockindex.begin(); it != m_dirty_blockindex.end();) {
+        vBlocks.push_back(*it);
+        m_dirty_blockindex.erase(it++);
+    }
+    if (!m_block_tree_db->WriteBatchSync(vFiles, m_last_blockfile, vBlocks)) {
+       
