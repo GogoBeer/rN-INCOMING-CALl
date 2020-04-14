@@ -23,4 +23,14 @@ public:
         return msg;
     }
 
-    template <typen
+    template <typename... Args>
+    CSerializedNetMsg Make(std::string msg_type, Args&&... args) const
+    {
+        return Make(0, std::move(msg_type), std::forward<Args>(args)...);
+    }
+
+private:
+    const int nVersion;
+};
+
+#endif // BITCOIN_NETMESSAGEMAKER_H
