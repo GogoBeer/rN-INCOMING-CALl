@@ -354,4 +354,219 @@ bool BlockManager::WriteBlockIndexDB()
         m_dirty_blockindex.erase(it++);
     }
     if (!m_block_tree_db->WriteBatchSync(vFiles, m_last_blockfile, vBlocks)) {
-       
+        return false;
+    }
+    return true;
+}
+
+bool BlockManager::LoadBlockIndexDB(ChainstateManager& chainman)
+{
+    if (!LoadBlockIndex(::Params().GetConsensus(), chainman)) {
+        return false;
+    }
+
+    // Load block file info
+    m_block_tree_db->ReadLastBlockFile(m_last_blockfile);
+    m_blockfile_info.resize(m_last_blockfile + 1);
+    LogPrintf("%s: last block file = %i\n", __func__, m_last_blockfile);
+    for (int nFile = 0; nFile <= m_last_blockfile; nFile++) {
+        m_block_tree_db->ReadBlockFileInfo(nFile, m_blockfile_info[nFile]);
+    }
+    LogPrintf("%s: last block file info: %s\n", __func__, m_blockfile_info[m_last_blockfile].ToString());
+    for (int nFile = m_last_blockfile + 1; true; nFile++) {
+        CBlockFileInfo info;
+        if (m_block_tree_db->ReadBlockFileInfo(nFile, info)) {
+            m_blockfile_info.push_back(info);
+        } else {
+            break;
+        }
+    }
+
+    // Check presence of blk files
+    LogPrintf("Checking all blk files are present...\n");
+    std::set<int> setBlkDataFiles;
+    for (const std::pair<const uint256, CBlockIndex*>& item : m_block_index) {
+        CBlockIndex* pindex = item.second;
+        if (pindex->nStatus & BLOCK_HAVE_DATA) {
+            setBlkDataFiles.insert(pindex->nFile);
+        }
+    }
+    for (std::set<int>::iterator it = setBlkDataFiles.begin(); it != setBlkDataFiles.end(); it++) {
+        FlatFilePos pos(*it, 0);
+        if (CAutoFile(OpenBlockFile(pos, true), SER_DISK, CLIENT_VERSION).IsNull()) {
+            return false;
+        }
+    }
+
+    // Check whether we have ever pruned block & undo files
+    m_block_tree_db->ReadFlag("prunedblockfiles", fHavePruned);
+    if (fHavePruned) {
+        LogPrintf("LoadBlockIndexDB(): Block files have previously been pruned\n");
+    }
+
+    // Check whether we need to continue reindexing
+    bool fReindexing = false;
+    m_block_tree_db->ReadReindexing(fReindexing);
+    if (fReindexing) fReindex = true;
+
+    return true;
+}
+
+CBlockIndex* BlockManager::GetLastCheckpoint(const CCheckpointData& data)
+{
+    const MapCheckpoints& checkpoints = data.mapCheckpoints;
+
+    for (const MapCheckpoints::value_type& i : reverse_iterate(checkpoints)) {
+        const uint256& hash = i.second;
+        CBlockIndex* pindex = LookupBlockIndex(hash);
+        if (pindex) {
+            return pindex;
+        }
+    }
+    return nullptr;
+}
+
+bool IsBlockPruned(const CBlockIndex* pblockindex)
+{
+    return (fHavePruned && !(pblockindex->nStatus & BLOCK_HAVE_DATA) && pblockindex->nTx > 0);
+}
+
+// If we're using -prune with -reindex, then delete block files that will be ignored by the
+// reindex.  Since reindexing works by starting at block file 0 and looping until a blockfile
+// is missing, do the same here to delete any later block files after a gap.  Also delete all
+// rev files since they'll be rewritten by the reindex anyway.  This ensures that m_blockfile_info
+// is in sync with what's actually on disk by the time we start downloading, so that pruning
+// works correctly.
+void CleanupBlockRevFiles()
+{
+    std::map<std::string, fs::path> mapBlockFiles;
+
+    // Glob all blk?????.dat and rev?????.dat files from the blocks directory.
+    // Remove the rev files immediately and insert the blk file paths into an
+    // ordered map keyed by block file index.
+    LogPrintf("Removing unusable blk?????.dat and rev?????.dat files for -reindex with -prune\n");
+    fs::path blocksdir = gArgs.GetBlocksDirPath();
+    for (fs::directory_iterator it(blocksdir); it != fs::directory_iterator(); it++) {
+        const std::string path = fs::PathToString(it->path().filename());
+        if (fs::is_regular_file(*it) &&
+            path.length() == 12 &&
+            path.substr(8,4) == ".dat")
+        {
+            if (path.substr(0, 3) == "blk") {
+                mapBlockFiles[path.substr(3, 5)] = it->path();
+            } else if (path.substr(0, 3) == "rev") {
+                remove(it->path());
+            }
+        }
+    }
+
+    // Remove all block files that aren't part of a contiguous set starting at
+    // zero by walking the ordered map (keys are block file indices) by
+    // keeping a separate counter.  Once we hit a gap (or if 0 doesn't exist)
+    // start removing block files.
+    int nContigCounter = 0;
+    for (const std::pair<const std::string, fs::path>& item : mapBlockFiles) {
+        if (LocaleIndependentAtoi<int>(item.first) == nContigCounter) {
+            nContigCounter++;
+            continue;
+        }
+        remove(item.second);
+    }
+}
+
+std::string CBlockFileInfo::ToString() const
+{
+    return strprintf("CBlockFileInfo(blocks=%u, size=%u, heights=%u...%u, time=%s...%s)", nBlocks, nSize, nHeightFirst, nHeightLast, FormatISO8601Date(nTimeFirst), FormatISO8601Date(nTimeLast));
+}
+
+CBlockFileInfo* BlockManager::GetBlockFileInfo(size_t n)
+{
+    LOCK(cs_LastBlockFile);
+
+    return &m_blockfile_info.at(n);
+}
+
+static bool UndoWriteToDisk(const CBlockUndo& blockundo, FlatFilePos& pos, const uint256& hashBlock, const CMessageHeader::MessageStartChars& messageStart)
+{
+    // Open history file to append
+    CAutoFile fileout(OpenUndoFile(pos), SER_DISK, CLIENT_VERSION);
+    if (fileout.IsNull()) {
+        return error("%s: OpenUndoFile failed", __func__);
+    }
+
+    // Write index header
+    unsigned int nSize = GetSerializeSize(blockundo, fileout.GetVersion());
+    fileout << messageStart << nSize;
+
+    // Write undo data
+    long fileOutPos = ftell(fileout.Get());
+    if (fileOutPos < 0) {
+        return error("%s: ftell failed", __func__);
+    }
+    pos.nPos = (unsigned int)fileOutPos;
+    fileout << blockundo;
+
+    // calculate & write checksum
+    CHashWriter hasher(SER_GETHASH, PROTOCOL_VERSION);
+    hasher << hashBlock;
+    hasher << blockundo;
+    fileout << hasher.GetHash();
+
+    return true;
+}
+
+bool UndoReadFromDisk(CBlockUndo& blockundo, const CBlockIndex* pindex)
+{
+    FlatFilePos pos = pindex->GetUndoPos();
+    if (pos.IsNull()) {
+        return error("%s: no undo data available", __func__);
+    }
+
+    // Open history file to read
+    CAutoFile filein(OpenUndoFile(pos, true), SER_DISK, CLIENT_VERSION);
+    if (filein.IsNull()) {
+        return error("%s: OpenUndoFile failed", __func__);
+    }
+
+    // Read block
+    uint256 hashChecksum;
+    CHashVerifier<CAutoFile> verifier(&filein); // We need a CHashVerifier as reserializing may lose data
+    try {
+        verifier << pindex->pprev->GetBlockHash();
+        verifier >> blockundo;
+        filein >> hashChecksum;
+    } catch (const std::exception& e) {
+        return error("%s: Deserialize or I/O error - %s", __func__, e.what());
+    }
+
+    // Verify checksum
+    if (hashChecksum != verifier.GetHash()) {
+        return error("%s: Checksum mismatch", __func__);
+    }
+
+    return true;
+}
+
+void BlockManager::FlushUndoFile(int block_file, bool finalize)
+{
+    FlatFilePos undo_pos_old(block_file, m_blockfile_info[block_file].nUndoSize);
+    if (!UndoFileSeq().Flush(undo_pos_old, finalize)) {
+        AbortNode("Flushing undo file to disk failed. This is likely the result of an I/O error.");
+    }
+}
+
+void BlockManager::FlushBlockFile(bool fFinalize, bool finalize_undo)
+{
+    LOCK(cs_LastBlockFile);
+    FlatFilePos block_pos_old(m_last_blockfile, m_blockfile_info[m_last_blockfile].nSize);
+    if (!BlockFileSeq().Flush(block_pos_old, fFinalize)) {
+        AbortNode("Flushing block file to disk failed. This is likely the result of an I/O error.");
+    }
+    // we do not always flush the undo file, as the chain tip may be lagging behind the incoming blocks,
+    // e.g. during IBD or a sync after a node going offline
+    if (!fFinalize || finalize_undo) FlushUndoFile(m_last_blockfile, finalize_undo);
+}
+
+uint64_t BlockManager::CalculateCurrentUsage()
+{
+    LOCK(cs_Last
