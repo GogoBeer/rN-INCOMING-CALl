@@ -70,4 +70,11 @@ struct CCoinsStats {
     CCoinsStats(CoinStatsHashType hash_type) : m_hash_type(hash_type) {}
 };
 
-//!
+//! Calculate statistics about the unspent transaction output set
+bool GetUTXOStats(CCoinsView* view, BlockManager& blockman, CCoinsStats& stats, const std::function<void()>& interruption_point = {}, const CBlockIndex* pindex = nullptr);
+
+uint64_t GetBogoSize(const CScript& script_pub_key);
+
+CDataStream TxOutSer(const COutPoint& outpoint, const Coin& coin);
+
+#endif // BITCOIN_NODE_COINSTATS_H
