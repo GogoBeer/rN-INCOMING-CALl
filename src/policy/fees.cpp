@@ -424,4 +424,183 @@ void TxConfirmStats::Read(CAutoFile& filein, int nFileVersion, size_t numBuckets
 
     filein >> Using<VectorFormatter<VectorFormatter<EncodedDoubleFormatter>>>(failAvg);
     if (maxPeriods != failAvg.size()) {
-        throw std::run
+        throw std::runtime_error("Corrupt estimates file. Mismatch in confirms tracked for failures");
+    }
+    for (unsigned int i = 0; i < maxPeriods; i++) {
+        if (failAvg[i].size() != numBuckets) {
+            throw std::runtime_error("Corrupt estimates file. Mismatch in one of failure average bucket counts");
+        }
+    }
+
+    // Resize the current block variables which aren't stored in the data file
+    // to match the number of confirms and buckets
+    resizeInMemoryCounters(numBuckets);
+
+    LogPrint(BCLog::ESTIMATEFEE, "Reading estimates: %u buckets counting confirms up to %u blocks\n",
+             numBuckets, maxConfirms);
+}
+
+unsigned int TxConfirmStats::NewTx(unsigned int nBlockHeight, double val)
+{
+    unsigned int bucketindex = bucketMap.lower_bound(val)->second;
+    unsigned int blockIndex = nBlockHeight % unconfTxs.size();
+    unconfTxs[blockIndex][bucketindex]++;
+    return bucketindex;
+}
+
+void TxConfirmStats::removeTx(unsigned int entryHeight, unsigned int nBestSeenHeight, unsigned int bucketindex, bool inBlock)
+{
+    //nBestSeenHeight is not updated yet for the new block
+    int blocksAgo = nBestSeenHeight - entryHeight;
+    if (nBestSeenHeight == 0)  // the BlockPolicyEstimator hasn't seen any blocks yet
+        blocksAgo = 0;
+    if (blocksAgo < 0) {
+        LogPrint(BCLog::ESTIMATEFEE, "Blockpolicy error, blocks ago is negative for mempool tx\n");
+        return;  //This can't happen because we call this with our best seen height, no entries can have higher
+    }
+
+    if (blocksAgo >= (int)unconfTxs.size()) {
+        if (oldUnconfTxs[bucketindex] > 0) {
+            oldUnconfTxs[bucketindex]--;
+        } else {
+            LogPrint(BCLog::ESTIMATEFEE, "Blockpolicy error, mempool tx removed from >25 blocks,bucketIndex=%u already\n",
+                     bucketindex);
+        }
+    }
+    else {
+        unsigned int blockIndex = entryHeight % unconfTxs.size();
+        if (unconfTxs[blockIndex][bucketindex] > 0) {
+            unconfTxs[blockIndex][bucketindex]--;
+        } else {
+            LogPrint(BCLog::ESTIMATEFEE, "Blockpolicy error, mempool tx removed from blockIndex=%u,bucketIndex=%u already\n",
+                     blockIndex, bucketindex);
+        }
+    }
+    if (!inBlock && (unsigned int)blocksAgo >= scale) { // Only counts as a failure if not confirmed for entire period
+        assert(scale != 0);
+        unsigned int periodsAgo = blocksAgo / scale;
+        for (size_t i = 0; i < periodsAgo && i < failAvg.size(); i++) {
+            failAvg[i][bucketindex]++;
+        }
+    }
+}
+
+// This function is called from CTxMemPool::removeUnchecked to ensure
+// txs removed from the mempool for any reason are no longer
+// tracked. Txs that were part of a block have already been removed in
+// processBlockTx to ensure they are never double tracked, but it is
+// of no harm to try to remove them again.
+bool CBlockPolicyEstimator::removeTx(uint256 hash, bool inBlock)
+{
+    LOCK(m_cs_fee_estimator);
+    return _removeTx(hash, inBlock);
+}
+
+bool CBlockPolicyEstimator::_removeTx(const uint256& hash, bool inBlock)
+{
+    AssertLockHeld(m_cs_fee_estimator);
+    std::map<uint256, TxStatsInfo>::iterator pos = mapMemPoolTxs.find(hash);
+    if (pos != mapMemPoolTxs.end()) {
+        feeStats->removeTx(pos->second.blockHeight, nBestSeenHeight, pos->second.bucketIndex, inBlock);
+        shortStats->removeTx(pos->second.blockHeight, nBestSeenHeight, pos->second.bucketIndex, inBlock);
+        longStats->removeTx(pos->second.blockHeight, nBestSeenHeight, pos->second.bucketIndex, inBlock);
+        mapMemPoolTxs.erase(hash);
+        return true;
+    } else {
+        return false;
+    }
+}
+
+CBlockPolicyEstimator::CBlockPolicyEstimator()
+    : nBestSeenHeight(0), firstRecordedHeight(0), historicalFirst(0), historicalBest(0), trackedTxs(0), untrackedTxs(0)
+{
+    static_assert(MIN_BUCKET_FEERATE > 0, "Min feerate must be nonzero");
+    size_t bucketIndex = 0;
+
+    for (double bucketBoundary = MIN_BUCKET_FEERATE; bucketBoundary <= MAX_BUCKET_FEERATE; bucketBoundary *= FEE_SPACING, bucketIndex++) {
+        buckets.push_back(bucketBoundary);
+        bucketMap[bucketBoundary] = bucketIndex;
+    }
+    buckets.push_back(INF_FEERATE);
+    bucketMap[INF_FEERATE] = bucketIndex;
+    assert(bucketMap.size() == buckets.size());
+
+    feeStats = std::unique_ptr<TxConfirmStats>(new TxConfirmStats(buckets, bucketMap, MED_BLOCK_PERIODS, MED_DECAY, MED_SCALE));
+    shortStats = std::unique_ptr<TxConfirmStats>(new TxConfirmStats(buckets, bucketMap, SHORT_BLOCK_PERIODS, SHORT_DECAY, SHORT_SCALE));
+    longStats = std::unique_ptr<TxConfirmStats>(new TxConfirmStats(buckets, bucketMap, LONG_BLOCK_PERIODS, LONG_DECAY, LONG_SCALE));
+
+    // If the fee estimation file is present, read recorded estimations
+    fs::path est_filepath = gArgs.GetDataDirNet() / FEE_ESTIMATES_FILENAME;
+    CAutoFile est_file(fsbridge::fopen(est_filepath, "rb"), SER_DISK, CLIENT_VERSION);
+    if (est_file.IsNull() || !Read(est_file)) {
+        LogPrintf("Failed to read fee estimates from %s. Continue anyway.\n", fs::PathToString(est_filepath));
+    }
+}
+
+CBlockPolicyEstimator::~CBlockPolicyEstimator()
+{
+}
+
+void CBlockPolicyEstimator::processTransaction(const CTxMemPoolEntry& entry, bool validFeeEstimate)
+{
+    LOCK(m_cs_fee_estimator);
+    unsigned int txHeight = entry.GetHeight();
+    uint256 hash = entry.GetTx().GetHash();
+    if (mapMemPoolTxs.count(hash)) {
+        LogPrint(BCLog::ESTIMATEFEE, "Blockpolicy error mempool tx %s already being tracked\n",
+                 hash.ToString());
+        return;
+    }
+
+    if (txHeight != nBestSeenHeight) {
+        // Ignore side chains and re-orgs; assuming they are random they don't
+        // affect the estimate.  We'll potentially double count transactions in 1-block reorgs.
+        // Ignore txs if BlockPolicyEstimator is not in sync with ActiveChain().Tip().
+        // It will be synced next time a block is processed.
+        return;
+    }
+
+    // Only want to be updating estimates when our blockchain is synced,
+    // otherwise we'll miscalculate how many blocks its taking to get included.
+    if (!validFeeEstimate) {
+        untrackedTxs++;
+        return;
+    }
+    trackedTxs++;
+
+    // Feerates are stored and reported as BTC-per-kb:
+    CFeeRate feeRate(entry.GetFee(), entry.GetTxSize());
+
+    mapMemPoolTxs[hash].blockHeight = txHeight;
+    unsigned int bucketIndex = feeStats->NewTx(txHeight, (double)feeRate.GetFeePerK());
+    mapMemPoolTxs[hash].bucketIndex = bucketIndex;
+    unsigned int bucketIndex2 = shortStats->NewTx(txHeight, (double)feeRate.GetFeePerK());
+    assert(bucketIndex == bucketIndex2);
+    unsigned int bucketIndex3 = longStats->NewTx(txHeight, (double)feeRate.GetFeePerK());
+    assert(bucketIndex == bucketIndex3);
+}
+
+bool CBlockPolicyEstimator::processBlockTx(unsigned int nBlockHeight, const CTxMemPoolEntry* entry)
+{
+    AssertLockHeld(m_cs_fee_estimator);
+    if (!_removeTx(entry->GetTx().GetHash(), true)) {
+        // This transaction wasn't being tracked for fee estimation
+        return false;
+    }
+
+    // How many blocks did it take for miners to include this transaction?
+    // blocksToConfirm is 1-based, so a transaction included in the earliest
+    // possible block has confirmation count of 1
+    int blocksToConfirm = nBlockHeight - entry->GetHeight();
+    if (blocksToConfirm <= 0) {
+        // This can't happen because we don't process transactions from a block with a height
+        // lower than our greatest seen height
+        LogPrint(BCLog::ESTIMATEFEE, "Blockpolicy error Transaction had negative blocksToConfirm\n");
+        return false;
+    }
+
+    // Feerates are stored and reported as BTC-per-kb:
+    CFeeRate feeRate(entry->GetFee(), entry->GetTxSize());
+
+    feeStats->Record(blocksToConfirm, (double)feeRate.GetFeePerK());
+    shortStats->Record(blocksToConfirm, (double)feeRate.GetFee
