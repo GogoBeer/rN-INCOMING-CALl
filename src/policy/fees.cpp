@@ -257,4 +257,171 @@ double TxConfirmStats::EstimateMedianVal(int confTarget, double sufficientTxVal,
             newBucketRange = false;
         }
         curFarBucket = bucket;
-        nConf += 
+        nConf += confAvg[periodTarget - 1][bucket];
+        totalNum += txCtAvg[bucket];
+        failNum += failAvg[periodTarget - 1][bucket];
+        for (unsigned int confct = confTarget; confct < GetMaxConfirms(); confct++)
+            extraNum += unconfTxs[(nBlockHeight - confct) % bins][bucket];
+        extraNum += oldUnconfTxs[bucket];
+        // If we have enough transaction data points in this range of buckets,
+        // we can test for success
+        // (Only count the confirmed data points, so that each confirmation count
+        // will be looking at the same amount of data and same bucket breaks)
+        if (totalNum >= sufficientTxVal / (1 - decay)) {
+            double curPct = nConf / (totalNum + failNum + extraNum);
+
+            // Check to see if we are no longer getting confirmed at the success rate
+            if (curPct < successBreakPoint) {
+                if (passing == true) {
+                    // First time we hit a failure record the failed bucket
+                    unsigned int failMinBucket = std::min(curNearBucket, curFarBucket);
+                    unsigned int failMaxBucket = std::max(curNearBucket, curFarBucket);
+                    failBucket.start = failMinBucket ? buckets[failMinBucket - 1] : 0;
+                    failBucket.end = buckets[failMaxBucket];
+                    failBucket.withinTarget = nConf;
+                    failBucket.totalConfirmed = totalNum;
+                    failBucket.inMempool = extraNum;
+                    failBucket.leftMempool = failNum;
+                    passing = false;
+                }
+                continue;
+            }
+            // Otherwise update the cumulative stats, and the bucket variables
+            // and reset the counters
+            else {
+                failBucket = EstimatorBucket(); // Reset any failed bucket, currently passing
+                foundAnswer = true;
+                passing = true;
+                passBucket.withinTarget = nConf;
+                nConf = 0;
+                passBucket.totalConfirmed = totalNum;
+                totalNum = 0;
+                passBucket.inMempool = extraNum;
+                passBucket.leftMempool = failNum;
+                failNum = 0;
+                extraNum = 0;
+                bestNearBucket = curNearBucket;
+                bestFarBucket = curFarBucket;
+                newBucketRange = true;
+            }
+        }
+    }
+
+    double median = -1;
+    double txSum = 0;
+
+    // Calculate the "average" feerate of the best bucket range that met success conditions
+    // Find the bucket with the median transaction and then report the average feerate from that bucket
+    // This is a compromise between finding the median which we can't since we don't save all tx's
+    // and reporting the average which is less accurate
+    unsigned int minBucket = std::min(bestNearBucket, bestFarBucket);
+    unsigned int maxBucket = std::max(bestNearBucket, bestFarBucket);
+    for (unsigned int j = minBucket; j <= maxBucket; j++) {
+        txSum += txCtAvg[j];
+    }
+    if (foundAnswer && txSum != 0) {
+        txSum = txSum / 2;
+        for (unsigned int j = minBucket; j <= maxBucket; j++) {
+            if (txCtAvg[j] < txSum)
+                txSum -= txCtAvg[j];
+            else { // we're in the right bucket
+                median = m_feerate_avg[j] / txCtAvg[j];
+                break;
+            }
+        }
+
+        passBucket.start = minBucket ? buckets[minBucket-1] : 0;
+        passBucket.end = buckets[maxBucket];
+    }
+
+    // If we were passing until we reached last few buckets with insufficient data, then report those as failed
+    if (passing && !newBucketRange) {
+        unsigned int failMinBucket = std::min(curNearBucket, curFarBucket);
+        unsigned int failMaxBucket = std::max(curNearBucket, curFarBucket);
+        failBucket.start = failMinBucket ? buckets[failMinBucket - 1] : 0;
+        failBucket.end = buckets[failMaxBucket];
+        failBucket.withinTarget = nConf;
+        failBucket.totalConfirmed = totalNum;
+        failBucket.inMempool = extraNum;
+        failBucket.leftMempool = failNum;
+    }
+
+    float passed_within_target_perc = 0.0;
+    float failed_within_target_perc = 0.0;
+    if ((passBucket.totalConfirmed + passBucket.inMempool + passBucket.leftMempool)) {
+        passed_within_target_perc = 100 * passBucket.withinTarget / (passBucket.totalConfirmed + passBucket.inMempool + passBucket.leftMempool);
+    }
+    if ((failBucket.totalConfirmed + failBucket.inMempool + failBucket.leftMempool)) {
+        failed_within_target_perc = 100 * failBucket.withinTarget / (failBucket.totalConfirmed + failBucket.inMempool + failBucket.leftMempool);
+    }
+
+    LogPrint(BCLog::ESTIMATEFEE, "FeeEst: %d > %.0f%% decay %.5f: feerate: %g from (%g - %g) %.2f%% %.1f/(%.1f %d mem %.1f out) Fail: (%g - %g) %.2f%% %.1f/(%.1f %d mem %.1f out)\n",
+             confTarget, 100.0 * successBreakPoint, decay,
+             median, passBucket.start, passBucket.end,
+             passed_within_target_perc,
+             passBucket.withinTarget, passBucket.totalConfirmed, passBucket.inMempool, passBucket.leftMempool,
+             failBucket.start, failBucket.end,
+             failed_within_target_perc,
+             failBucket.withinTarget, failBucket.totalConfirmed, failBucket.inMempool, failBucket.leftMempool);
+
+
+    if (result) {
+        result->pass = passBucket;
+        result->fail = failBucket;
+        result->decay = decay;
+        result->scale = scale;
+    }
+    return median;
+}
+
+void TxConfirmStats::Write(CAutoFile& fileout) const
+{
+    fileout << Using<EncodedDoubleFormatter>(decay);
+    fileout << scale;
+    fileout << Using<VectorFormatter<EncodedDoubleFormatter>>(m_feerate_avg);
+    fileout << Using<VectorFormatter<EncodedDoubleFormatter>>(txCtAvg);
+    fileout << Using<VectorFormatter<VectorFormatter<EncodedDoubleFormatter>>>(confAvg);
+    fileout << Using<VectorFormatter<VectorFormatter<EncodedDoubleFormatter>>>(failAvg);
+}
+
+void TxConfirmStats::Read(CAutoFile& filein, int nFileVersion, size_t numBuckets)
+{
+    // Read data file and do some very basic sanity checking
+    // buckets and bucketMap are not updated yet, so don't access them
+    // If there is a read failure, we'll just discard this entire object anyway
+    size_t maxConfirms, maxPeriods;
+
+    // The current version will store the decay with each individual TxConfirmStats and also keep a scale factor
+    filein >> Using<EncodedDoubleFormatter>(decay);
+    if (decay <= 0 || decay >= 1) {
+        throw std::runtime_error("Corrupt estimates file. Decay must be between 0 and 1 (non-inclusive)");
+    }
+    filein >> scale;
+    if (scale == 0) {
+        throw std::runtime_error("Corrupt estimates file. Scale must be non-zero");
+    }
+
+    filein >> Using<VectorFormatter<EncodedDoubleFormatter>>(m_feerate_avg);
+    if (m_feerate_avg.size() != numBuckets) {
+        throw std::runtime_error("Corrupt estimates file. Mismatch in feerate average bucket count");
+    }
+    filein >> Using<VectorFormatter<EncodedDoubleFormatter>>(txCtAvg);
+    if (txCtAvg.size() != numBuckets) {
+        throw std::runtime_error("Corrupt estimates file. Mismatch in tx count bucket count");
+    }
+    filein >> Using<VectorFormatter<VectorFormatter<EncodedDoubleFormatter>>>(confAvg);
+    maxPeriods = confAvg.size();
+    maxConfirms = scale * maxPeriods;
+
+    if (maxConfirms <= 0 || maxConfirms > 6 * 24 * 7) { // one week
+        throw std::runtime_error("Corrupt estimates file.  Must maintain estimates for between 1 and 1008 (one week) confirms");
+    }
+    for (unsigned int i = 0; i < maxPeriods; i++) {
+        if (confAvg[i].size() != numBuckets) {
+            throw std::runtime_error("Corrupt estimates file. Mismatch in feerate conf average bucket count");
+        }
+    }
+
+    filein >> Using<VectorFormatter<VectorFormatter<EncodedDoubleFormatter>>>(failAvg);
+    if (maxPeriods != failAvg.size()) {
+        throw std::run
