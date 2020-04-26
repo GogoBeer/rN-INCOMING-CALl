@@ -603,4 +603,197 @@ bool CBlockPolicyEstimator::processBlockTx(unsigned int nBlockHeight, const CTxM
     CFeeRate feeRate(entry->GetFee(), entry->GetTxSize());
 
     feeStats->Record(blocksToConfirm, (double)feeRate.GetFeePerK());
-    shortStats->Record(blocksToConfirm, (double)feeRate.GetFee
+    shortStats->Record(blocksToConfirm, (double)feeRate.GetFeePerK());
+    longStats->Record(blocksToConfirm, (double)feeRate.GetFeePerK());
+    return true;
+}
+
+void CBlockPolicyEstimator::processBlock(unsigned int nBlockHeight,
+                                         std::vector<const CTxMemPoolEntry*>& entries)
+{
+    LOCK(m_cs_fee_estimator);
+    if (nBlockHeight <= nBestSeenHeight) {
+        // Ignore side chains and re-orgs; assuming they are random
+        // they don't affect the estimate.
+        // And if an attacker can re-org the chain at will, then
+        // you've got much bigger problems than "attacker can influence
+        // transaction fees."
+        return;
+    }
+
+    // Must update nBestSeenHeight in sync with ClearCurrent so that
+    // calls to removeTx (via processBlockTx) correctly calculate age
+    // of unconfirmed txs to remove from tracking.
+    nBestSeenHeight = nBlockHeight;
+
+    // Update unconfirmed circular buffer
+    feeStats->ClearCurrent(nBlockHeight);
+    shortStats->ClearCurrent(nBlockHeight);
+    longStats->ClearCurrent(nBlockHeight);
+
+    // Decay all exponential averages
+    feeStats->UpdateMovingAverages();
+    shortStats->UpdateMovingAverages();
+    longStats->UpdateMovingAverages();
+
+    unsigned int countedTxs = 0;
+    // Update averages with data points from current block
+    for (const auto& entry : entries) {
+        if (processBlockTx(nBlockHeight, entry))
+            countedTxs++;
+    }
+
+    if (firstRecordedHeight == 0 && countedTxs > 0) {
+        firstRecordedHeight = nBestSeenHeight;
+        LogPrint(BCLog::ESTIMATEFEE, "Blockpolicy first recorded height %u\n", firstRecordedHeight);
+    }
+
+
+    LogPrint(BCLog::ESTIMATEFEE, "Blockpolicy estimates updated by %u of %u block txs, since last block %u of %u tracked, mempool map size %u, max target %u from %s\n",
+             countedTxs, entries.size(), trackedTxs, trackedTxs + untrackedTxs, mapMemPoolTxs.size(),
+             MaxUsableEstimate(), HistoricalBlockSpan() > BlockSpan() ? "historical" : "current");
+
+    trackedTxs = 0;
+    untrackedTxs = 0;
+}
+
+CFeeRate CBlockPolicyEstimator::estimateFee(int confTarget) const
+{
+    // It's not possible to get reasonable estimates for confTarget of 1
+    if (confTarget <= 1)
+        return CFeeRate(0);
+
+    return estimateRawFee(confTarget, DOUBLE_SUCCESS_PCT, FeeEstimateHorizon::MED_HALFLIFE);
+}
+
+CFeeRate CBlockPolicyEstimator::estimateRawFee(int confTarget, double successThreshold, FeeEstimateHorizon horizon, EstimationResult* result) const
+{
+    TxConfirmStats* stats = nullptr;
+    double sufficientTxs = SUFFICIENT_FEETXS;
+    switch (horizon) {
+    case FeeEstimateHorizon::SHORT_HALFLIFE: {
+        stats = shortStats.get();
+        sufficientTxs = SUFFICIENT_TXS_SHORT;
+        break;
+    }
+    case FeeEstimateHorizon::MED_HALFLIFE: {
+        stats = feeStats.get();
+        break;
+    }
+    case FeeEstimateHorizon::LONG_HALFLIFE: {
+        stats = longStats.get();
+        break;
+    }
+    } // no default case, so the compiler can warn about missing cases
+    assert(stats);
+
+    LOCK(m_cs_fee_estimator);
+    // Return failure if trying to analyze a target we're not tracking
+    if (confTarget <= 0 || (unsigned int)confTarget > stats->GetMaxConfirms())
+        return CFeeRate(0);
+    if (successThreshold > 1)
+        return CFeeRate(0);
+
+    double median = stats->EstimateMedianVal(confTarget, sufficientTxs, successThreshold, nBestSeenHeight, result);
+
+    if (median < 0)
+        return CFeeRate(0);
+
+    return CFeeRate(llround(median));
+}
+
+unsigned int CBlockPolicyEstimator::HighestTargetTracked(FeeEstimateHorizon horizon) const
+{
+    LOCK(m_cs_fee_estimator);
+    switch (horizon) {
+    case FeeEstimateHorizon::SHORT_HALFLIFE: {
+        return shortStats->GetMaxConfirms();
+    }
+    case FeeEstimateHorizon::MED_HALFLIFE: {
+        return feeStats->GetMaxConfirms();
+    }
+    case FeeEstimateHorizon::LONG_HALFLIFE: {
+        return longStats->GetMaxConfirms();
+    }
+    } // no default case, so the compiler can warn about missing cases
+    assert(false);
+}
+
+unsigned int CBlockPolicyEstimator::BlockSpan() const
+{
+    if (firstRecordedHeight == 0) return 0;
+    assert(nBestSeenHeight >= firstRecordedHeight);
+
+    return nBestSeenHeight - firstRecordedHeight;
+}
+
+unsigned int CBlockPolicyEstimator::HistoricalBlockSpan() const
+{
+    if (historicalFirst == 0) return 0;
+    assert(historicalBest >= historicalFirst);
+
+    if (nBestSeenHeight - historicalBest > OLDEST_ESTIMATE_HISTORY) return 0;
+
+    return historicalBest - historicalFirst;
+}
+
+unsigned int CBlockPolicyEstimator::MaxUsableEstimate() const
+{
+    // Block spans are divided by 2 to make sure there are enough potential failing data points for the estimate
+    return std::min(longStats->GetMaxConfirms(), std::max(BlockSpan(), HistoricalBlockSpan()) / 2);
+}
+
+/** Return a fee estimate at the required successThreshold from the shortest
+ * time horizon which tracks confirmations up to the desired target.  If
+ * checkShorterHorizon is requested, also allow short time horizon estimates
+ * for a lower target to reduce the given answer */
+double CBlockPolicyEstimator::estimateCombinedFee(unsigned int confTarget, double successThreshold, bool checkShorterHorizon, EstimationResult *result) const
+{
+    double estimate = -1;
+    if (confTarget >= 1 && confTarget <= longStats->GetMaxConfirms()) {
+        // Find estimate from shortest time horizon possible
+        if (confTarget <= shortStats->GetMaxConfirms()) { // short horizon
+            estimate = shortStats->EstimateMedianVal(confTarget, SUFFICIENT_TXS_SHORT, successThreshold, nBestSeenHeight, result);
+        }
+        else if (confTarget <= feeStats->GetMaxConfirms()) { // medium horizon
+            estimate = feeStats->EstimateMedianVal(confTarget, SUFFICIENT_FEETXS, successThreshold, nBestSeenHeight, result);
+        }
+        else { // long horizon
+            estimate = longStats->EstimateMedianVal(confTarget, SUFFICIENT_FEETXS, successThreshold, nBestSeenHeight, result);
+        }
+        if (checkShorterHorizon) {
+            EstimationResult tempResult;
+            // If a lower confTarget from a more recent horizon returns a lower answer use it.
+            if (confTarget > feeStats->GetMaxConfirms()) {
+                double medMax = feeStats->EstimateMedianVal(feeStats->GetMaxConfirms(), SUFFICIENT_FEETXS, successThreshold, nBestSeenHeight, &tempResult);
+                if (medMax > 0 && (estimate == -1 || medMax < estimate)) {
+                    estimate = medMax;
+                    if (result) *result = tempResult;
+                }
+            }
+            if (confTarget > shortStats->GetMaxConfirms()) {
+                double shortMax = shortStats->EstimateMedianVal(shortStats->GetMaxConfirms(), SUFFICIENT_TXS_SHORT, successThreshold, nBestSeenHeight, &tempResult);
+                if (shortMax > 0 && (estimate == -1 || shortMax < estimate)) {
+                    estimate = shortMax;
+                    if (result) *result = tempResult;
+                }
+            }
+        }
+    }
+    return estimate;
+}
+
+/** Ensure that for a conservative estimate, the DOUBLE_SUCCESS_PCT is also met
+ * at 2 * target for any longer time horizons.
+ */
+double CBlockPolicyEstimator::estimateConservativeFee(unsigned int doubleTarget, EstimationResult *result) const
+{
+    double estimate = -1;
+    EstimationResult tempResult;
+    if (doubleTarget <= shortStats->GetMaxConfirms()) {
+        estimate = feeStats->EstimateMedianVal(doubleTarget, SUFFICIENT_FEETXS, DOUBLE_SUCCESS_PCT, nBestSeenHeight, result);
+    }
+    if (doubleTarget <= feeStats->GetMaxConfirms()) {
+        double longEstimate = longStats->EstimateMedianVal(doubleTarget, SUFFICIENT_FEETXS, DOUBLE_SUCCESS_PCT, nBestSeenHeight, &tempResult);
+        if (longEstimate > estimate) {
+        
