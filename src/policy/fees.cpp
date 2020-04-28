@@ -979,4 +979,39 @@ bool CBlockPolicyEstimator::Read(CAutoFile& filein)
         }
     }
     catch (const std::exception& e) {
-        LogPrintf("CBlockPolicyEstimator::Read(
+        LogPrintf("CBlockPolicyEstimator::Read(): unable to read policy estimator data (non-fatal): %s\n",e.what());
+        return false;
+    }
+    return true;
+}
+
+void CBlockPolicyEstimator::FlushUnconfirmed() {
+    int64_t startclear = GetTimeMicros();
+    LOCK(m_cs_fee_estimator);
+    size_t num_entries = mapMemPoolTxs.size();
+    // Remove every entry in mapMemPoolTxs
+    while (!mapMemPoolTxs.empty()) {
+        auto mi = mapMemPoolTxs.begin();
+        _removeTx(mi->first, false); // this calls erase() on mapMemPoolTxs
+    }
+    int64_t endclear = GetTimeMicros();
+    LogPrint(BCLog::ESTIMATEFEE, "Recorded %u unconfirmed txs from mempool in %gs\n", num_entries, (endclear - startclear)*0.000001);
+}
+
+FeeFilterRounder::FeeFilterRounder(const CFeeRate& minIncrementalFee)
+{
+    CAmount minFeeLimit = std::max(CAmount(1), minIncrementalFee.GetFeePerK() / 2);
+    feeset.insert(0);
+    for (double bucketBoundary = minFeeLimit; bucketBoundary <= MAX_FILTER_FEERATE; bucketBoundary *= FEE_FILTER_SPACING) {
+        feeset.insert(bucketBoundary);
+    }
+}
+
+CAmount FeeFilterRounder::round(CAmount currentMinFee)
+{
+    std::set<double>::iterator it = feeset.lower_bound(currentMinFee);
+    if ((it != feeset.begin() && insecure_rand.rand32() % 3 != 0) || it == feeset.end()) {
+        it--;
+    }
+    return static_cast<CAmount>(*it);
+}
