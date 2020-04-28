@@ -154,4 +154,157 @@ private:
     static constexpr double HALF_SUCCESS_PCT = .6;
     /** Require greater than 85% of X feerate transactions to be confirmed within Y blocks*/
     static constexpr double SUCCESS_PCT = .85;
-    /** Requir
+    /** Require greater than 95% of X feerate transactions to be confirmed within 2 * Y blocks*/
+    static constexpr double DOUBLE_SUCCESS_PCT = .95;
+
+    /** Require an avg of 0.1 tx in the combined feerate bucket per block to have stat significance */
+    static constexpr double SUFFICIENT_FEETXS = 0.1;
+    /** Require an avg of 0.5 tx when using short decay since there are fewer blocks considered*/
+    static constexpr double SUFFICIENT_TXS_SHORT = 0.5;
+
+    /** Minimum and Maximum values for tracking feerates
+     * The MIN_BUCKET_FEERATE should just be set to the lowest reasonable feerate we
+     * might ever want to track.  Historically this has been 1000 since it was
+     * inheriting DEFAULT_MIN_RELAY_TX_FEE and changing it is disruptive as it
+     * invalidates old estimates files. So leave it at 1000 unless it becomes
+     * necessary to lower it, and then lower it substantially.
+     */
+    static constexpr double MIN_BUCKET_FEERATE = 1000;
+    static constexpr double MAX_BUCKET_FEERATE = 1e7;
+
+    /** Spacing of FeeRate buckets
+     * We have to lump transactions into buckets based on feerate, but we want to be able
+     * to give accurate estimates over a large range of potential feerates
+     * Therefore it makes sense to exponentially space the buckets
+     */
+    static constexpr double FEE_SPACING = 1.05;
+
+public:
+    /** Create new BlockPolicyEstimator and initialize stats tracking classes with default values */
+    CBlockPolicyEstimator();
+    ~CBlockPolicyEstimator();
+
+    /** Process all the transactions that have been included in a block */
+    void processBlock(unsigned int nBlockHeight,
+                      std::vector<const CTxMemPoolEntry*>& entries)
+        EXCLUSIVE_LOCKS_REQUIRED(!m_cs_fee_estimator);
+
+    /** Process a transaction accepted to the mempool*/
+    void processTransaction(const CTxMemPoolEntry& entry, bool validFeeEstimate)
+        EXCLUSIVE_LOCKS_REQUIRED(!m_cs_fee_estimator);
+
+    /** Remove a transaction from the mempool tracking stats*/
+    bool removeTx(uint256 hash, bool inBlock)
+        EXCLUSIVE_LOCKS_REQUIRED(!m_cs_fee_estimator);
+
+    /** DEPRECATED. Return a feerate estimate */
+    CFeeRate estimateFee(int confTarget) const
+        EXCLUSIVE_LOCKS_REQUIRED(!m_cs_fee_estimator);
+
+    /** Estimate feerate needed to get be included in a block within confTarget
+     *  blocks. If no answer can be given at confTarget, return an estimate at
+     *  the closest target where one can be given.  'conservative' estimates are
+     *  valid over longer time horizons also.
+     */
+    CFeeRate estimateSmartFee(int confTarget, FeeCalculation *feeCalc, bool conservative) const
+        EXCLUSIVE_LOCKS_REQUIRED(!m_cs_fee_estimator);
+
+    /** Return a specific fee estimate calculation with a given success
+     * threshold and time horizon, and optionally return detailed data about
+     * calculation
+     */
+    CFeeRate estimateRawFee(int confTarget, double successThreshold, FeeEstimateHorizon horizon,
+                            EstimationResult* result = nullptr) const
+        EXCLUSIVE_LOCKS_REQUIRED(!m_cs_fee_estimator);
+
+    /** Write estimation data to a file */
+    bool Write(CAutoFile& fileout) const
+        EXCLUSIVE_LOCKS_REQUIRED(!m_cs_fee_estimator);
+
+    /** Read estimation data from a file */
+    bool Read(CAutoFile& filein)
+        EXCLUSIVE_LOCKS_REQUIRED(!m_cs_fee_estimator);
+
+    /** Empty mempool transactions on shutdown to record failure to confirm for txs still in mempool */
+    void FlushUnconfirmed()
+        EXCLUSIVE_LOCKS_REQUIRED(!m_cs_fee_estimator);
+
+    /** Calculation of highest target that estimates are tracked for */
+    unsigned int HighestTargetTracked(FeeEstimateHorizon horizon) const
+        EXCLUSIVE_LOCKS_REQUIRED(!m_cs_fee_estimator);
+
+    /** Drop still unconfirmed transactions and record current estimations, if the fee estimation file is present. */
+    void Flush()
+        EXCLUSIVE_LOCKS_REQUIRED(!m_cs_fee_estimator);
+
+private:
+    mutable Mutex m_cs_fee_estimator;
+
+    unsigned int nBestSeenHeight GUARDED_BY(m_cs_fee_estimator);
+    unsigned int firstRecordedHeight GUARDED_BY(m_cs_fee_estimator);
+    unsigned int historicalFirst GUARDED_BY(m_cs_fee_estimator);
+    unsigned int historicalBest GUARDED_BY(m_cs_fee_estimator);
+
+    struct TxStatsInfo
+    {
+        unsigned int blockHeight;
+        unsigned int bucketIndex;
+        TxStatsInfo() : blockHeight(0), bucketIndex(0) {}
+    };
+
+    // map of txids to information about that transaction
+    std::map<uint256, TxStatsInfo> mapMemPoolTxs GUARDED_BY(m_cs_fee_estimator);
+
+    /** Classes to track historical data on transaction confirmations */
+    std::unique_ptr<TxConfirmStats> feeStats PT_GUARDED_BY(m_cs_fee_estimator);
+    std::unique_ptr<TxConfirmStats> shortStats PT_GUARDED_BY(m_cs_fee_estimator);
+    std::unique_ptr<TxConfirmStats> longStats PT_GUARDED_BY(m_cs_fee_estimator);
+
+    unsigned int trackedTxs GUARDED_BY(m_cs_fee_estimator);
+    unsigned int untrackedTxs GUARDED_BY(m_cs_fee_estimator);
+
+    std::vector<double> buckets GUARDED_BY(m_cs_fee_estimator); // The upper-bound of the range for the bucket (inclusive)
+    std::map<double, unsigned int> bucketMap GUARDED_BY(m_cs_fee_estimator); // Map of bucket upper-bound to index into all vectors by bucket
+
+    /** Process a transaction confirmed in a block*/
+    bool processBlockTx(unsigned int nBlockHeight, const CTxMemPoolEntry* entry) EXCLUSIVE_LOCKS_REQUIRED(m_cs_fee_estimator);
+
+    /** Helper for estimateSmartFee */
+    double estimateCombinedFee(unsigned int confTarget, double successThreshold, bool checkShorterHorizon, EstimationResult *result) const EXCLUSIVE_LOCKS_REQUIRED(m_cs_fee_estimator);
+    /** Helper for estimateSmartFee */
+    double estimateConservativeFee(unsigned int doubleTarget, EstimationResult *result) const EXCLUSIVE_LOCKS_REQUIRED(m_cs_fee_estimator);
+    /** Number of blocks of data recorded while fee estimates have been running */
+    unsigned int BlockSpan() const EXCLUSIVE_LOCKS_REQUIRED(m_cs_fee_estimator);
+    /** Number of blocks of recorded fee estimate data represented in saved data file */
+    unsigned int HistoricalBlockSpan() const EXCLUSIVE_LOCKS_REQUIRED(m_cs_fee_estimator);
+    /** Calculation of highest target that reasonable estimate can be provided for */
+    unsigned int MaxUsableEstimate() const EXCLUSIVE_LOCKS_REQUIRED(m_cs_fee_estimator);
+
+    /** A non-thread-safe helper for the removeTx function */
+    bool _removeTx(const uint256& hash, bool inBlock)
+        EXCLUSIVE_LOCKS_REQUIRED(m_cs_fee_estimator);
+};
+
+class FeeFilterRounder
+{
+private:
+    static constexpr double MAX_FILTER_FEERATE = 1e7;
+    /** FEE_FILTER_SPACING is just used to provide some quantization of fee
+     * filter results.  Historically it reused FEE_SPACING, but it is completely
+     * unrelated, and was made a separate constant so the two concepts are not
+     * tied together */
+    static constexpr double FEE_FILTER_SPACING = 1.1;
+
+public:
+    /** Create new FeeFilterRounder */
+    explicit FeeFilterRounder(const CFeeRate& minIncrementalFee);
+
+    /** Quantize a minimum fee for privacy purpose before broadcast. Not thread-safe due to use of FastRandomContext */
+    CAmount round(CAmount currentMinFee);
+
+private:
+    std::set<double> feeset;
+    FastRandomContext insecure_rand;
+};
+
+#endif // BITCOIN_POLICY_FEES_H
