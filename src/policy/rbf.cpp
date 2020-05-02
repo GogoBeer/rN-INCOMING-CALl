@@ -127,4 +127,50 @@ std::optional<std::string> PaysMoreThanConflicts(const CTxMemPool::setEntries& i
                                                  const uint256& txid)
 {
     for (const auto& mi : iters_conflicting) {
-        // Don't allo
+        // Don't allow the replacement to reduce the feerate of the mempool.
+        //
+        // We usually don't want to accept replacements with lower feerates than what they replaced
+        // as that would lower the feerate of the next block. Requiring that the feerate always be
+        // increased is also an easy-to-reason about way to prevent DoS attacks via replacements.
+        //
+        // We only consider the feerates of transactions being directly replaced, not their indirect
+        // descendants. While that does mean high feerate children are ignored when deciding whether
+        // or not to replace, we do require the replacement to pay more overall fees too, mitigating
+        // most cases.
+        CFeeRate original_feerate(mi->GetModifiedFee(), mi->GetTxSize());
+        if (replacement_feerate <= original_feerate) {
+            return strprintf("rejecting replacement %s; new feerate %s <= old feerate %s",
+                             txid.ToString(),
+                             replacement_feerate.ToString(),
+                             original_feerate.ToString());
+        }
+    }
+    return std::nullopt;
+}
+
+std::optional<std::string> PaysForRBF(CAmount original_fees,
+                                      CAmount replacement_fees,
+                                      size_t replacement_vsize,
+                                      CFeeRate relay_fee,
+                                      const uint256& txid)
+{
+    // BIP125 Rule #3: The replacement fees must be greater than or equal to fees of the
+    // transactions it replaces, otherwise the bandwidth used by those conflicting transactions
+    // would not be paid for.
+    if (replacement_fees < original_fees) {
+        return strprintf("rejecting replacement %s, less fees than conflicting txs; %s < %s",
+                         txid.ToString(), FormatMoney(replacement_fees), FormatMoney(original_fees));
+    }
+
+    // BIP125 Rule #4: The new transaction must pay for its own bandwidth. Otherwise, we have a DoS
+    // vector where attackers can cause a transaction to be replaced (and relayed) repeatedly by
+    // increasing the fee by tiny amounts.
+    CAmount additional_fees = replacement_fees - original_fees;
+    if (additional_fees < relay_fee.GetFee(replacement_vsize)) {
+        return strprintf("rejecting replacement %s, not enough additional fees to relay; %s < %s",
+                         txid.ToString(),
+                         FormatMoney(additional_fees),
+                         FormatMoney(relay_fee.GetFee(replacement_vsize)));
+    }
+    return std::nullopt;
+}
