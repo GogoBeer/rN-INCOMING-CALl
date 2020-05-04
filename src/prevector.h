@@ -237,3 +237,302 @@ public:
     }
 
     prevector() {}
+
+    explicit prevector(size_type n) {
+        resize(n);
+    }
+
+    explicit prevector(size_type n, const T& val) {
+        change_capacity(n);
+        _size += n;
+        fill(item_ptr(0), n, val);
+    }
+
+    template<typename InputIterator>
+    prevector(InputIterator first, InputIterator last) {
+        size_type n = last - first;
+        change_capacity(n);
+        _size += n;
+        fill(item_ptr(0), first, last);
+    }
+
+    prevector(const prevector<N, T, Size, Diff>& other) {
+        size_type n = other.size();
+        change_capacity(n);
+        _size += n;
+        fill(item_ptr(0), other.begin(),  other.end());
+    }
+
+    prevector(prevector<N, T, Size, Diff>&& other) {
+        swap(other);
+    }
+
+    prevector& operator=(const prevector<N, T, Size, Diff>& other) {
+        if (&other == this) {
+            return *this;
+        }
+        assign(other.begin(), other.end());
+        return *this;
+    }
+
+    prevector& operator=(prevector<N, T, Size, Diff>&& other) {
+        swap(other);
+        return *this;
+    }
+
+    size_type size() const {
+        return is_direct() ? _size : _size - N - 1;
+    }
+
+    bool empty() const {
+        return size() == 0;
+    }
+
+    iterator begin() { return iterator(item_ptr(0)); }
+    const_iterator begin() const { return const_iterator(item_ptr(0)); }
+    iterator end() { return iterator(item_ptr(size())); }
+    const_iterator end() const { return const_iterator(item_ptr(size())); }
+
+    reverse_iterator rbegin() { return reverse_iterator(item_ptr(size() - 1)); }
+    const_reverse_iterator rbegin() const { return const_reverse_iterator(item_ptr(size() - 1)); }
+    reverse_iterator rend() { return reverse_iterator(item_ptr(-1)); }
+    const_reverse_iterator rend() const { return const_reverse_iterator(item_ptr(-1)); }
+
+    size_t capacity() const {
+        if (is_direct()) {
+            return N;
+        } else {
+            return _union.indirect_contents.capacity;
+        }
+    }
+
+    T& operator[](size_type pos) {
+        return *item_ptr(pos);
+    }
+
+    const T& operator[](size_type pos) const {
+        return *item_ptr(pos);
+    }
+
+    void resize(size_type new_size) {
+        size_type cur_size = size();
+        if (cur_size == new_size) {
+            return;
+        }
+        if (cur_size > new_size) {
+            erase(item_ptr(new_size), end());
+            return;
+        }
+        if (new_size > capacity()) {
+            change_capacity(new_size);
+        }
+        ptrdiff_t increase = new_size - cur_size;
+        fill(item_ptr(cur_size), increase);
+        _size += increase;
+    }
+
+    void reserve(size_type new_capacity) {
+        if (new_capacity > capacity()) {
+            change_capacity(new_capacity);
+        }
+    }
+
+    void shrink_to_fit() {
+        change_capacity(size());
+    }
+
+    void clear() {
+        resize(0);
+    }
+
+    iterator insert(iterator pos, const T& value) {
+        size_type p = pos - begin();
+        size_type new_size = size() + 1;
+        if (capacity() < new_size) {
+            change_capacity(new_size + (new_size >> 1));
+        }
+        T* ptr = item_ptr(p);
+        memmove(ptr + 1, ptr, (size() - p) * sizeof(T));
+        _size++;
+        new(static_cast<void*>(ptr)) T(value);
+        return iterator(ptr);
+    }
+
+    void insert(iterator pos, size_type count, const T& value) {
+        size_type p = pos - begin();
+        size_type new_size = size() + count;
+        if (capacity() < new_size) {
+            change_capacity(new_size + (new_size >> 1));
+        }
+        T* ptr = item_ptr(p);
+        memmove(ptr + count, ptr, (size() - p) * sizeof(T));
+        _size += count;
+        fill(item_ptr(p), count, value);
+    }
+
+    template<typename InputIterator>
+    void insert(iterator pos, InputIterator first, InputIterator last) {
+        size_type p = pos - begin();
+        difference_type count = last - first;
+        size_type new_size = size() + count;
+        if (capacity() < new_size) {
+            change_capacity(new_size + (new_size >> 1));
+        }
+        T* ptr = item_ptr(p);
+        memmove(ptr + count, ptr, (size() - p) * sizeof(T));
+        _size += count;
+        fill(ptr, first, last);
+    }
+
+    inline void resize_uninitialized(size_type new_size) {
+        // resize_uninitialized changes the size of the prevector but does not initialize it.
+        // If size < new_size, the added elements must be initialized explicitly.
+        if (capacity() < new_size) {
+            change_capacity(new_size);
+            _size += new_size - size();
+            return;
+        }
+        if (new_size < size()) {
+            erase(item_ptr(new_size), end());
+        } else {
+            _size += new_size - size();
+        }
+    }
+
+    iterator erase(iterator pos) {
+        return erase(pos, pos + 1);
+    }
+
+    iterator erase(iterator first, iterator last) {
+        // Erase is not allowed to the change the object's capacity. That means
+        // that when starting with an indirectly allocated prevector with
+        // size and capacity > N, the result may be a still indirectly allocated
+        // prevector with size <= N and capacity > N. A shrink_to_fit() call is
+        // necessary to switch to the (more efficient) directly allocated
+        // representation (with capacity N and size <= N).
+        iterator p = first;
+        char* endp = (char*)&(*end());
+        if (!std::is_trivially_destructible<T>::value) {
+            while (p != last) {
+                (*p).~T();
+                _size--;
+                ++p;
+            }
+        } else {
+            _size -= last - p;
+        }
+        memmove(&(*first), &(*last), endp - ((char*)(&(*last))));
+        return first;
+    }
+
+    template<typename... Args>
+    void emplace_back(Args&&... args) {
+        size_type new_size = size() + 1;
+        if (capacity() < new_size) {
+            change_capacity(new_size + (new_size >> 1));
+        }
+        new(item_ptr(size())) T(std::forward<Args>(args)...);
+        _size++;
+    }
+
+    void push_back(const T& value) {
+        emplace_back(value);
+    }
+
+    void pop_back() {
+        erase(end() - 1, end());
+    }
+
+    T& front() {
+        return *item_ptr(0);
+    }
+
+    const T& front() const {
+        return *item_ptr(0);
+    }
+
+    T& back() {
+        return *item_ptr(size() - 1);
+    }
+
+    const T& back() const {
+        return *item_ptr(size() - 1);
+    }
+
+    void swap(prevector<N, T, Size, Diff>& other) {
+        std::swap(_union, other._union);
+        std::swap(_size, other._size);
+    }
+
+    ~prevector() {
+        if (!std::is_trivially_destructible<T>::value) {
+            clear();
+        }
+        if (!is_direct()) {
+            free(_union.indirect_contents.indirect);
+            _union.indirect_contents.indirect = nullptr;
+        }
+    }
+
+    bool operator==(const prevector<N, T, Size, Diff>& other) const {
+        if (other.size() != size()) {
+            return false;
+        }
+        const_iterator b1 = begin();
+        const_iterator b2 = other.begin();
+        const_iterator e1 = end();
+        while (b1 != e1) {
+            if ((*b1) != (*b2)) {
+                return false;
+            }
+            ++b1;
+            ++b2;
+        }
+        return true;
+    }
+
+    bool operator!=(const prevector<N, T, Size, Diff>& other) const {
+        return !(*this == other);
+    }
+
+    bool operator<(const prevector<N, T, Size, Diff>& other) const {
+        if (size() < other.size()) {
+            return true;
+        }
+        if (size() > other.size()) {
+            return false;
+        }
+        const_iterator b1 = begin();
+        const_iterator b2 = other.begin();
+        const_iterator e1 = end();
+        while (b1 != e1) {
+            if ((*b1) < (*b2)) {
+                return true;
+            }
+            if ((*b2) < (*b1)) {
+                return false;
+            }
+            ++b1;
+            ++b2;
+        }
+        return false;
+    }
+
+    size_t allocated_memory() const {
+        if (is_direct()) {
+            return 0;
+        } else {
+            return ((size_t)(sizeof(T))) * _union.indirect_contents.capacity;
+        }
+    }
+
+    value_type* data() {
+        return item_ptr(0);
+    }
+
+    const value_type* data() const {
+        return item_ptr(0);
+    }
+};
+
+#endif // BITCOIN_PREVECTOR_H
