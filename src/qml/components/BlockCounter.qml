@@ -16,4 +16,8 @@ Label {
     padding: 16
     horizontalAlignment: Text.AlignHCenter
     verticalAlignment: Text.AlignVCenter
-    fo
+    font.family: "Inter"
+    font.styleName: "Semi Bold"
+    font.pixelSize: 20
+    text: blockHeight
+}
