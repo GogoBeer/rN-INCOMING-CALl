@@ -174,4 +174,102 @@ void AskPassphraseDialog::accept()
                                      tr("Wallet passphrase was successfully changed."));
                 QDialog::accept(); // Success
             }
- 
+            else
+            {
+                QMessageBox::critical(this, tr("Wallet encryption failed"),
+                                     tr("The passphrase entered for the wallet decryption was incorrect."));
+            }
+        }
+        else
+        {
+            QMessageBox::critical(this, tr("Wallet encryption failed"),
+                                 tr("The supplied passphrases do not match."));
+        }
+        break;
+    }
+}
+
+void AskPassphraseDialog::textChanged()
+{
+    // Validate input, set Ok button to enabled when acceptable
+    bool acceptable = false;
+    switch(mode)
+    {
+    case Encrypt: // New passphrase x2
+        acceptable = !ui->passEdit2->text().isEmpty() && !ui->passEdit3->text().isEmpty();
+        break;
+    case Unlock: // Old passphrase x1
+        acceptable = !ui->passEdit1->text().isEmpty();
+        break;
+    case ChangePass: // Old passphrase x1, new passphrase x2
+        acceptable = !ui->passEdit1->text().isEmpty() && !ui->passEdit2->text().isEmpty() && !ui->passEdit3->text().isEmpty();
+        break;
+    }
+    ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(acceptable);
+}
+
+bool AskPassphraseDialog::event(QEvent *event)
+{
+    // Detect Caps Lock key press.
+    if (event->type() == QEvent::KeyPress) {
+        QKeyEvent *ke = static_cast<QKeyEvent *>(event);
+        if (ke->key() == Qt::Key_CapsLock) {
+            fCapsLock = !fCapsLock;
+        }
+        if (fCapsLock) {
+            ui->capsLabel->setText(tr("Warning: The Caps Lock key is on!"));
+        } else {
+            ui->capsLabel->clear();
+        }
+    }
+    return QWidget::event(event);
+}
+
+void AskPassphraseDialog::toggleShowPassword(bool show)
+{
+    ui->toggleShowPasswordButton->setDown(show);
+    const auto mode = show ? QLineEdit::Normal : QLineEdit::Password;
+    ui->passEdit1->setEchoMode(mode);
+    ui->passEdit2->setEchoMode(mode);
+    ui->passEdit3->setEchoMode(mode);
+}
+
+bool AskPassphraseDialog::eventFilter(QObject *object, QEvent *event)
+{
+    /* Detect Caps Lock.
+     * There is no good OS-independent way to check a key state in Qt, but we
+     * can detect Caps Lock by checking for the following condition:
+     * Shift key is down and the result is a lower case character, or
+     * Shift key is not down and the result is an upper case character.
+     */
+    if (event->type() == QEvent::KeyPress) {
+        QKeyEvent *ke = static_cast<QKeyEvent *>(event);
+        QString str = ke->text();
+        if (str.length() != 0) {
+            const QChar *psz = str.unicode();
+            bool fShift = (ke->modifiers() & Qt::ShiftModifier) != 0;
+            if ((fShift && *psz >= 'a' && *psz <= 'z') || (!fShift && *psz >= 'A' && *psz <= 'Z')) {
+                fCapsLock = true;
+                ui->capsLabel->setText(tr("Warning: The Caps Lock key is on!"));
+            } else if (psz->isLetter()) {
+                fCapsLock = false;
+                ui->capsLabel->clear();
+            }
+        }
+    }
+    return QDialog::eventFilter(object, event);
+}
+
+static void SecureClearQLineEdit(QLineEdit* edit)
+{
+    // Attempt to overwrite text so that they do not linger around in memory
+    edit->setText(QString(" ").repeated(edit->text().size()));
+    edit->clear();
+}
+
+void AskPassphraseDialog::secureClearPassFields()
+{
+    SecureClearQLineEdit(ui->passEdit1);
+    SecureClearQLineEdit(ui->passEdit2);
+    SecureClearQLineEdit(ui->passEdit3);
+}
