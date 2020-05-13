@@ -226,4 +226,220 @@ void BitcoinApplication::setupPlatformStyle()
     platformName = gArgs.GetArg("-uiplatform", BitcoinGUI::DEFAULT_UIPLATFORM);
     platformStyle = PlatformStyle::instantiate(QString::fromStdString(platformName));
     if (!platformStyle) // Fall back to "other" if specified name not found
-        platformStyle = PlatformStyle::
+        platformStyle = PlatformStyle::instantiate("other");
+    assert(platformStyle);
+}
+
+BitcoinApplication::~BitcoinApplication()
+{
+    m_executor.reset();
+
+    delete window;
+    window = nullptr;
+    delete platformStyle;
+    platformStyle = nullptr;
+}
+
+#ifdef ENABLE_WALLET
+void BitcoinApplication::createPaymentServer()
+{
+    paymentServer = new PaymentServer(this);
+}
+#endif
+
+void BitcoinApplication::createOptionsModel(bool resetSettings)
+{
+    optionsModel = new OptionsModel(this, resetSettings);
+}
+
+void BitcoinApplication::createWindow(const NetworkStyle *networkStyle)
+{
+    window = new BitcoinGUI(node(), platformStyle, networkStyle, nullptr);
+    connect(window, &BitcoinGUI::quitRequested, this, &BitcoinApplication::requestShutdown);
+
+    pollShutdownTimer = new QTimer(window);
+    connect(pollShutdownTimer, &QTimer::timeout, window, &BitcoinGUI::detectShutdown);
+}
+
+void BitcoinApplication::createSplashScreen(const NetworkStyle *networkStyle)
+{
+    assert(!m_splash);
+    m_splash = new SplashScreen(networkStyle);
+    // We don't hold a direct pointer to the splash screen after creation, but the splash
+    // screen will take care of deleting itself when finish() happens.
+    m_splash->show();
+    connect(this, &BitcoinApplication::splashFinished, m_splash, &SplashScreen::finish);
+    connect(this, &BitcoinApplication::requestedShutdown, m_splash, &QWidget::close);
+}
+
+void BitcoinApplication::createNode(interfaces::Init& init)
+{
+    assert(!m_node);
+    m_node = init.makeNode();
+    if (optionsModel) optionsModel->setNode(*m_node);
+    if (m_splash) m_splash->setNode(*m_node);
+}
+
+bool BitcoinApplication::baseInitialize()
+{
+    return node().baseInitialize();
+}
+
+void BitcoinApplication::startThread()
+{
+    assert(!m_executor);
+    m_executor.emplace(node());
+
+    /*  communication to and from thread */
+    connect(&m_executor.value(), &InitExecutor::initializeResult, this, &BitcoinApplication::initializeResult);
+    connect(&m_executor.value(), &InitExecutor::shutdownResult, this, &QCoreApplication::quit);
+    connect(&m_executor.value(), &InitExecutor::runawayException, this, &BitcoinApplication::handleRunawayException);
+    connect(this, &BitcoinApplication::requestedInitialize, &m_executor.value(), &InitExecutor::initialize);
+    connect(this, &BitcoinApplication::requestedShutdown, &m_executor.value(), &InitExecutor::shutdown);
+}
+
+void BitcoinApplication::parameterSetup()
+{
+    // Default printtoconsole to false for the GUI. GUI programs should not
+    // print to the console unnecessarily.
+    gArgs.SoftSetBoolArg("-printtoconsole", false);
+
+    InitLogging(gArgs);
+    InitParameterInteraction(gArgs);
+}
+
+void BitcoinApplication::InitPruneSetting(int64_t prune_MiB)
+{
+    optionsModel->SetPruneTargetGB(PruneMiBtoGB(prune_MiB), true);
+}
+
+void BitcoinApplication::requestInitialize()
+{
+    qDebug() << __func__ << ": Requesting initialize";
+    startThread();
+    Q_EMIT requestedInitialize();
+}
+
+void BitcoinApplication::requestShutdown()
+{
+    for (const auto w : QGuiApplication::topLevelWindows()) {
+        w->hide();
+    }
+
+    // Show a simple window indicating shutdown status
+    // Do this first as some of the steps may take some time below,
+    // for example the RPC console may still be executing a command.
+    shutdownWindow.reset(ShutdownWindow::showShutdownWindow(window));
+
+    qDebug() << __func__ << ": Requesting shutdown";
+
+    // Must disconnect node signals otherwise current thread can deadlock since
+    // no event loop is running.
+    window->unsubscribeFromCoreSignals();
+    // Request node shutdown, which can interrupt long operations, like
+    // rescanning a wallet.
+    node().startShutdown();
+    // Unsetting the client model can cause the current thread to wait for node
+    // to complete an operation, like wait for a RPC execution to complete.
+    window->setClientModel(nullptr);
+    pollShutdownTimer->stop();
+
+#ifdef ENABLE_WALLET
+    // Delete wallet controller here manually, instead of relying on Qt object
+    // tracking (https://doc.qt.io/qt-5/objecttrees.html). This makes sure
+    // walletmodel m_handle_* notification handlers are deleted before wallets
+    // are unloaded, which can simplify wallet implementations. It also avoids
+    // these notifications having to be handled while GUI objects are being
+    // destroyed, making GUI code less fragile as well.
+    delete m_wallet_controller;
+    m_wallet_controller = nullptr;
+#endif // ENABLE_WALLET
+
+    delete clientModel;
+    clientModel = nullptr;
+
+    // Request shutdown from core thread
+    Q_EMIT requestedShutdown();
+}
+
+void BitcoinApplication::initializeResult(bool success, interfaces::BlockAndHeaderTipInfo tip_info)
+{
+    qDebug() << __func__ << ": Initialization result: " << success;
+    // Set exit result.
+    returnValue = success ? EXIT_SUCCESS : EXIT_FAILURE;
+    if(success)
+    {
+        // Log this only after AppInitMain finishes, as then logging setup is guaranteed complete
+        qInfo() << "Platform customization:" << platformStyle->getName();
+        clientModel = new ClientModel(node(), optionsModel);
+        window->setClientModel(clientModel, &tip_info);
+#ifdef ENABLE_WALLET
+        if (WalletModel::isWalletEnabled()) {
+            m_wallet_controller = new WalletController(*clientModel, platformStyle, this);
+            window->setWalletController(m_wallet_controller);
+            if (paymentServer) {
+                paymentServer->setOptionsModel(optionsModel);
+            }
+        }
+#endif // ENABLE_WALLET
+
+        // If -min option passed, start window minimized (iconified) or minimized to tray
+        if (!gArgs.GetBoolArg("-min", false)) {
+            window->show();
+        } else if (clientModel->getOptionsModel()->getMinimizeToTray() && window->hasTrayIcon()) {
+            // do nothing as the window is managed by the tray icon
+        } else {
+            window->showMinimized();
+        }
+        Q_EMIT splashFinished();
+        Q_EMIT windowShown(window);
+
+#ifdef ENABLE_WALLET
+        // Now that initialization/startup is done, process any command-line
+        // bitcoin: URIs or payment requests:
+        if (paymentServer) {
+            connect(paymentServer, &PaymentServer::receivedPaymentRequest, window, &BitcoinGUI::handlePaymentRequest);
+            connect(window, &BitcoinGUI::receivedURI, paymentServer, &PaymentServer::handleURIOrFile);
+            connect(paymentServer, &PaymentServer::message, [this](const QString& title, const QString& message, unsigned int style) {
+                window->message(title, message, style);
+            });
+            QTimer::singleShot(100, paymentServer, &PaymentServer::uiReady);
+        }
+#endif
+        pollShutdownTimer->start(200);
+    } else {
+        Q_EMIT splashFinished(); // Make sure splash screen doesn't stick around during shutdown
+        requestShutdown();
+    }
+}
+
+void BitcoinApplication::handleRunawayException(const QString &message)
+{
+    QMessageBox::critical(
+        nullptr, tr("Runaway exception"),
+        tr("A fatal error occurred. %1 can no longer continue safely and will quit.").arg(PACKAGE_NAME) +
+        QLatin1String("<br><br>") + GUIUtil::MakeHtmlLink(message, PACKAGE_BUGREPORT));
+    ::exit(EXIT_FAILURE);
+}
+
+void BitcoinApplication::handleNonFatalException(const QString& message)
+{
+    assert(QThread::currentThread() == thread());
+    QMessageBox::warning(
+        nullptr, tr("Internal error"),
+        tr("An internal error occurred. %1 will attempt to continue safely. This is "
+           "an unexpected bug which can be reported as described below.").arg(PACKAGE_NAME) +
+        QLatin1String("<br><br>") + GUIUtil::MakeHtmlLink(message, PACKAGE_BUGREPORT));
+}
+
+WId BitcoinApplication::getMainWinId() const
+{
+    if (!window)
+        return 0;
+
+    return window->winId();
+}
+
+static void SetupUIArgs(ArgsManager& argsman)
+{
+    argsman.AddArg("-choosedatadir", strprintf("Choose data directory on startup (default: %u)", DEFAULT_CHOOSE_DATADIR), ArgsManager
