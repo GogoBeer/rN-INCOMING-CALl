@@ -598,4 +598,47 @@ int GuiMain(int argc, char* argv[])
     qApp->installNativeEventFilter(new WinShutdownMonitor());
 #endif
     // Install qDebug() message handler to route to debug.log
-    qInstallMessageHandler(DebugMessageHandler
+    qInstallMessageHandler(DebugMessageHandler);
+    // Allow parameter interaction before we create the options model
+    app.parameterSetup();
+    GUIUtil::LogQtInfo();
+    // Load GUI settings from QSettings
+    app.createOptionsModel(gArgs.GetBoolArg("-resetguisettings", false));
+
+    if (did_show_intro) {
+        // Store intro dialog settings other than datadir (network specific)
+        app.InitPruneSetting(prune_MiB);
+    }
+
+    if (gArgs.GetBoolArg("-splash", DEFAULT_SPLASHSCREEN) && !gArgs.GetBoolArg("-min", false))
+        app.createSplashScreen(networkStyle.data());
+
+    app.createNode(*init);
+
+    int rv = EXIT_SUCCESS;
+    try
+    {
+        app.createWindow(networkStyle.data());
+        // Perform base initialization before spinning up initialization/shutdown thread
+        // This is acceptable because this function only contains steps that are quick to execute,
+        // so the GUI thread won't be held up.
+        if (app.baseInitialize()) {
+            app.requestInitialize();
+#if defined(Q_OS_WIN)
+            WinShutdownMonitor::registerShutdownBlockReason(QObject::tr("%1 didn't yet exit safely…").arg(PACKAGE_NAME), (HWND)app.getMainWinId());
+#endif
+            app.exec();
+            rv = app.getReturnValue();
+        } else {
+            // A dialog with detailed error will have been shown by InitError()
+            rv = EXIT_FAILURE;
+        }
+    } catch (const std::exception& e) {
+        PrintExceptionContinue(&e, "Runaway exception");
+        app.handleRunawayException(QString::fromStdString(app.node().getWarnings().translated));
+    } catch (...) {
+        PrintExceptionContinue(nullptr, "Runaway exception");
+        app.handleRunawayException(QString::fromStdString(app.node().getWarnings().translated));
+    }
+    return rv;
+}
