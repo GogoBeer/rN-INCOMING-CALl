@@ -133,4 +133,272 @@
     </message>
     <message>
         <source>This operation needs your wallet passphrase to unlock the wallet.</source>
-        <translation>ይህ ክንዋኔ የቢትኮይን ቦርሳዎን ለመክፈት የቦርሳዎ ይለፍ-ሐረግ ያስፈልገዋል::</t
+        <translation>ይህ ክንዋኔ የቢትኮይን ቦርሳዎን ለመክፈት የቦርሳዎ ይለፍ-ሐረግ ያስፈልገዋል::</translation>
+    </message>
+    <message>
+        <source>Unlock wallet</source>
+        <translation>የቢትኮይን ቦርሳውን ክፈት</translation>
+    </message>
+    <message>
+        <source>This operation needs your wallet passphrase to decrypt the wallet.</source>
+        <translation>ይህ ክንዋኔ የቢትኮይን ቦርሳዎን ለመፍታት የቦርሳዎ ይለፍ-ሐረግ ያስፈልገዋል::</translation>
+    </message>
+    <message>
+        <source>Decrypt wallet</source>
+        <translation>የቢትኮይን ቦርሳውን ፍታ</translation>
+    </message>
+    <message>
+        <source>Change passphrase</source>
+        <translation>ይለፍ-ሐረግ ለውጥ</translation>
+    </message>
+    <message>
+        <source>Confirm wallet encryption</source>
+        <translation>የቢትኮይን ቦርሳዎን ማመስጠር ያረጋግጡ</translation>
+    </message>
+    <message>
+        <source>Warning: If you encrypt your wallet and lose your passphrase, you will &lt;b&gt;LOSE ALL OF YOUR BITCOINS&lt;/b&gt;!</source>
+        <translation>ማስጠንቀቂያ: የቢትኮይን ቦርሳዎን አመስጥረው የይለፍ-ሐረግዎን ካጡት&lt;b&gt;ቢትኮይኖቾን በሙሉ ያጣሉ&lt;/b&gt;!</translation>
+    </message>
+    <message>
+        <source>Are you sure you wish to encrypt your wallet?</source>
+        <translation>እርግጠኛ ነዎት ቦርሳዎን ማመስጠር ይፈልጋሉ?</translation>
+    </message>
+    <message>
+        <source>Wallet encrypted</source>
+        <translation>ቦርሳዎ ምስጢር ተደርጓል</translation>
+    </message>
+    <message>
+        <source>IMPORTANT: Any previous backups you have made of your wallet file should be replaced with the newly generated, encrypted wallet file. For security reasons, previous backups of the unencrypted wallet file will become useless as soon as you start using the new, encrypted wallet.</source>
+        <translation>አስፈላጊ: ከ ቦርሳ ፋይልዎ ያከናወኗቸው ቀደም ያሉ ምትኬዎች በአዲስ በተፈጠረ የማመስጠሪያ ፋይል ውስጥ መተካት አለባቸው. ለደህንነት ሲባል, አዲሱን የተመሰጠ የቦርሳ ፋይል መጠቀም ሲጀመሩ ወዲያውኑ ቀደም ሲል ያልተመሰጠሩ የቦርሳ ፋይል ቅጂዎች ዋጋ ቢስ ይሆናሉ::</translation>
+    </message>
+    <message>
+        <source>Wallet encryption failed</source>
+        <translation>የቦርሳ ማመስጠር አልተሳካም</translation>
+    </message>
+    <message>
+        <source>Wallet encryption failed due to an internal error. Your wallet was not encrypted.</source>
+        <translation>የቦርሳ ማመስጠር በውስጣዊ ስህተት ምክንያት አልተሳካም:: ቦርሳዎ አልተመሰጠረም::</translation>
+    </message>
+    <message>
+        <source>The supplied passphrases do not match.</source>
+        <translation>የተሰጡት የይለፍ-ሐረግዎች አይዛመዱም::</translation>
+    </message>
+    <message>
+        <source>Wallet unlock failed</source>
+        <translation>ቦርሳ መክፈት አልተሳካም</translation>
+    </message>
+    <message>
+        <source>The passphrase entered for the wallet decryption was incorrect.</source>
+        <translation>ቦርሳ ለመፍታት ያስገቡት የይለፍ-ሐረግ ትክክል አልነበረም::</translation>
+    </message>
+    <message>
+        <source>Wallet decryption failed</source>
+        <translation>ቦርሳ መፍታት አልተሳካም </translation>
+    </message>
+    <message>
+        <source>Wallet passphrase was successfully changed.</source>
+        <translation>የቦርሳ የይለፍ-ሐረግ በተሳካ ሁኔታ ተቀይሯል.</translation>
+    </message>
+    <message>
+        <source>Warning: The Caps Lock key is on!</source>
+        <translation>ማስጠንቀቂያ: የ "Caps Lock" ቁልፍ በርቷል!</translation>
+    </message>
+</context>
+<context>
+    <name>BanTableModel</name>
+    <message>
+        <source>IP/Netmask</source>
+        <translation>አይፒ/ኔትማስክ  IP/Netmask</translation>
+    </message>
+    <message>
+        <source>Banned Until</source>
+        <translation>ታግደዋል እስከ</translation>
+    </message>
+</context>
+<context>
+    <name>BitcoinGUI</name>
+    <message>
+        <source>Sign &amp;message...</source>
+        <translation>ምልክትና መልእክት...</translation>
+    </message>
+    <message>
+        <source>Synchronizing with network...</source>
+        <translation>ከኔትወርክ ጋራ በማመሳሰል ላይ ነው...</translation>
+    </message>
+    <message>
+        <source>&amp;Overview</source>
+        <translation>&amp;አጠቃላይ እይታ</translation>
+    </message>
+    <message>
+        <source>Show general overview of wallet</source>
+        <translation>የቦርሳ አጠቃላይ እይታ ኣሳይ</translation>
+    </message>
+    <message>
+        <source>&amp;Transactions</source>
+        <translation>&amp;ግብይቶች</translation>
+    </message>
+    <message>
+        <source>Browse transaction history</source>
+        <translation>የግብይት ታሪክ ያስሱ</translation>
+    </message>
+    <message>
+        <source>E&amp;xit</source>
+        <translation>ውጣ</translation>
+    </message>
+    <message>
+        <source>Quit application</source>
+        <translation>አፕሊኬሽኑን አቁም</translation>
+    </message>
+    <message>
+        <source>&amp;About %1</source>
+        <translation>&amp;ስለ %1</translation>
+    </message>
+    <message>
+        <source>Show information about %1</source>
+        <translation>ስለ %1 መረጃ አሳይ</translation>
+    </message>
+    <message>
+        <source>About &amp;Qt</source>
+        <translation>ስለ &amp;Qt</translation>
+    </message>
+    <message>
+        <source>Show information about Qt</source>
+        <translation>ስለ Qt መረጃ አሳይ</translation>
+    </message>
+    <message>
+        <source>&amp;Options...</source>
+        <translation>&amp;አማራጮች...</translation>
+    </message>
+    </context>
+<context>
+    <name>CoinControlDialog</name>
+    <message>
+        <source>(no label)</source>
+        <translation>(መለያ ስም የለም)</translation>
+    </message>
+    </context>
+<context>
+    <name>CreateWalletActivity</name>
+    </context>
+<context>
+    <name>CreateWalletDialog</name>
+    </context>
+<context>
+    <name>EditAddressDialog</name>
+    </context>
+<context>
+    <name>FreespaceChecker</name>
+    </context>
+<context>
+    <name>HelpMessageDialog</name>
+    </context>
+<context>
+    <name>Intro</name>
+    </context>
+<context>
+    <name>ModalOverlay</name>
+    </context>
+<context>
+    <name>OpenURIDialog</name>
+    </context>
+<context>
+    <name>OpenWalletActivity</name>
+    </context>
+<context>
+    <name>OptionsDialog</name>
+    </context>
+<context>
+    <name>OverviewPage</name>
+    </context>
+<context>
+    <name>PSBTOperationsDialog</name>
+    </context>
+<context>
+    <name>PaymentServer</name>
+    </context>
+<context>
+    <name>PeerTableModel</name>
+    </context>
+<context>
+    <name>QObject</name>
+    </context>
+<context>
+    <name>QRImageWidget</name>
+    </context>
+<context>
+    <name>RPCConsole</name>
+    </context>
+<context>
+    <name>ReceiveCoinsDialog</name>
+    </context>
+<context>
+    <name>ReceiveRequestDialog</name>
+    </context>
+<context>
+    <name>RecentRequestsTableModel</name>
+    <message>
+        <source>Label</source>
+        <translation>መለያ ስም</translation>
+    </message>
+    <message>
+        <source>(no label)</source>
+        <translation>(መለያ ስም የለም)</translation>
+    </message>
+    </context>
+<context>
+    <name>SendCoinsDialog</name>
+    <message>
+        <source>(no label)</source>
+        <translation>(መለያ ስም የለም)</translation>
+    </message>
+</context>
+<context>
+    <name>SendCoinsEntry</name>
+    </context>
+<context>
+    <name>ShutdownWindow</name>
+    </context>
+<context>
+    <name>SignVerifyMessageDialog</name>
+    </context>
+<context>
+    <name>TrafficGraphWidget</name>
+    </context>
+<context>
+    <name>TransactionDesc</name>
+    </context>
+<context>
+    <name>TransactionDescDialog</name>
+    </context>
+<context>
+    <name>TransactionTableModel</name>
+    <message>
+        <source>Label</source>
+        <translation>መለያ ስም</translation>
+    </message>
+    <message>
+        <source>(no label)</source>
+        <translation>(መለያ ስም የለም)</translation>
+    </message>
+    </context>
+<context>
+    <name>TransactionView</name>
+    <message>
+        <source>Comma separated file (*.csv)</source>
+        <translation>ኮማ ሴፓሬትድ ፋይል (*.csv)</translation>
+    </message>
+    <message>
+        <source>Label</source>
+        <translation>መለያ ስም</translation>
+    </message>
+    <message>
+        <source>Address</source>
+        <translation>አድራሻ</translation>
+    </message>
+    <message>
+        <source>Exporting Failed</source>
+        <translation>ወደ ውጪ መላክ አልተሳካም</translation>
+    </message>
+    </context>
+<context>
+ 
