@@ -566,4 +566,286 @@
     <message>
         <source>&amp;Address</source>
         <translation>Адрас</translation>
-    </messa
+    </message>
+    <message>
+        <source>New sending address</source>
+        <translation>Новы адрас для дасылання</translation>
+    </message>
+    <message>
+        <source>Edit receiving address</source>
+        <translation>Рэдагаваць адрас прымання</translation>
+    </message>
+    <message>
+        <source>Edit sending address</source>
+        <translation>Рэдагаваць адрас дасылання</translation>
+    </message>
+    <message>
+        <source>Could not unlock wallet.</source>
+        <translation>Немагчыма разблакаваць гаманец</translation>
+    </message>
+    <message>
+        <source>New key generation failed.</source>
+        <translation>Генерацыя новага ключа няўдалая</translation>
+    </message>
+</context>
+<context>
+    <name>FreespaceChecker</name>
+    <message>
+        <source>A new data directory will be created.</source>
+        <translation>Будзе створаны новы каталог з данымі.</translation>
+    </message>
+    <message>
+        <source>name</source>
+        <translation>імя</translation>
+    </message>
+    <message>
+        <source>Directory already exists. Add %1 if you intend to create a new directory here.</source>
+        <translation>Каталог ужо існуе. Дадайце %1 калі вы збіраецеся стварыць тут новы каталог.</translation>
+    </message>
+    </context>
+<context>
+    <name>HelpMessageDialog</name>
+    <message>
+        <source>Command-line options</source>
+        <translation>Опцыі каманднага радка</translation>
+    </message>
+</context>
+<context>
+    <name>Intro</name>
+    <message>
+        <source>Welcome</source>
+        <translation>Вітаем</translation>
+    </message>
+    <message>
+        <source>Bitcoin</source>
+        <translation>Біткойн</translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation>Памылка</translation>
+    </message>
+    </context>
+<context>
+    <name>ModalOverlay</name>
+    <message>
+        <source>Form</source>
+        <translation>Форма</translation>
+    </message>
+    </context>
+<context>
+    <name>OpenURIDialog</name>
+    </context>
+<context>
+    <name>OpenWalletActivity</name>
+    </context>
+<context>
+    <name>OptionsDialog</name>
+    <message>
+        <source>Options</source>
+        <translation>Опцыі</translation>
+    </message>
+    <message>
+        <source>W&amp;allet</source>
+        <translation>Гаманец</translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation>Памылка</translation>
+    </message>
+    </context>
+<context>
+    <name>OverviewPage</name>
+    <message>
+        <source>Form</source>
+        <translation>Форма</translation>
+    </message>
+    </context>
+<context>
+    <name>PSBTOperationsDialog</name>
+    </context>
+<context>
+    <name>PaymentServer</name>
+    </context>
+<context>
+    <name>PeerTableModel</name>
+    </context>
+<context>
+    <name>QObject</name>
+    <message>
+        <source>Amount</source>
+        <translation>Колькасць</translation>
+    </message>
+    <message>
+        <source>%1 and %2</source>
+        <translation>%1 і %2</translation>
+    </message>
+    <message>
+        <source>unknown</source>
+        <translation>невядома</translation>
+    </message>
+</context>
+<context>
+    <name>QRImageWidget</name>
+    </context>
+<context>
+    <name>RPCConsole</name>
+    <message>
+        <source>&amp;Information</source>
+        <translation>Інфармацыя</translation>
+    </message>
+    </context>
+<context>
+    <name>ReceiveCoinsDialog</name>
+    <message>
+        <source>&amp;Amount:</source>
+        <translation>&amp;Колькасць:</translation>
+    </message>
+    <message>
+        <source>&amp;Label:</source>
+        <translation>Метка:</translation>
+    </message>
+    <message>
+        <source>Copy label</source>
+        <translation>Капіяваць пазнаку</translation>
+    </message>
+    <message>
+        <source>Copy amount</source>
+        <translation>Капіяваць колькасць</translation>
+    </message>
+    <message>
+        <source>Could not unlock wallet.</source>
+        <translation>Немагчыма разблакаваць гаманец</translation>
+    </message>
+    </context>
+<context>
+    <name>ReceiveRequestDialog</name>
+    <message>
+        <source>Amount:</source>
+        <translation>Колькасць:</translation>
+    </message>
+    <message>
+        <source>Message:</source>
+        <translation>Паведамленне:</translation>
+    </message>
+    <message>
+        <source>Copy &amp;Address</source>
+        <translation>Капіяваць адрас</translation>
+    </message>
+    </context>
+<context>
+    <name>RecentRequestsTableModel</name>
+    <message>
+        <source>Date</source>
+        <translation>Дата</translation>
+    </message>
+    <message>
+        <source>Label</source>
+        <translation>Метка</translation>
+    </message>
+    <message>
+        <source>Message</source>
+        <translation>Паведамленне</translation>
+    </message>
+    <message>
+        <source>(no label)</source>
+        <translation>непазначаны</translation>
+    </message>
+    </context>
+<context>
+    <name>SendCoinsDialog</name>
+    <message>
+        <source>Send Coins</source>
+        <translation>Даслаць Манеты</translation>
+    </message>
+    <message>
+        <source>Insufficient funds!</source>
+        <translation>Недастаткова сродкаў</translation>
+    </message>
+    <message>
+        <source>Quantity:</source>
+        <translation>Колькасць:</translation>
+    </message>
+    <message>
+        <source>Bytes:</source>
+        <translation>Байтаў:</translation>
+    </message>
+    <message>
+        <source>Amount:</source>
+        <translation>Колькасць:</translation>
+    </message>
+    <message>
+        <source>Fee:</source>
+        <translation>Камісія:</translation>
+    </message>
+    <message>
+        <source>After Fee:</source>
+        <translation>Пасля камісіі:</translation>
+    </message>
+    <message>
+        <source>Send to multiple recipients at once</source>
+        <translation>Даслаць адразу некалькім атрымальнікам</translation>
+    </message>
+    <message>
+        <source>Dust:</source>
+        <translation>Пыл:</translation>
+    </message>
+    <message>
+        <source>Balance:</source>
+        <translation>Баланс:</translation>
+    </message>
+    <message>
+        <source>Confirm the send action</source>
+        <translation>Пацвердзіць дасыланне</translation>
+    </message>
+    <message>
+        <source>Copy quantity</source>
+        <translation>Капіяваць колькасць</translation>
+    </message>
+    <message>
+        <source>Copy amount</source>
+        <translation>Капіяваць колькасць</translation>
+    </message>
+    <message>
+        <source>Copy fee</source>
+        <translation>Капіяваць камісію</translation>
+    </message>
+    <message>
+        <source>Copy after fee</source>
+        <translation>Капіяваць з выняткам камісіі</translation>
+    </message>
+    <message>
+        <source>Copy bytes</source>
+        <translation>Капіяваць байты</translation>
+    </message>
+    <message>
+        <source>Copy dust</source>
+        <translation>Капіяваць пыл</translation>
+    </message>
+    <message>
+        <source>Confirm send coins</source>
+        <translation>Пацвердзіць дасыланне манет</translation>
+    </message>
+    <message>
+        <source>The amount to pay must be larger than 0.</source>
+        <translation>Велічыня плацяжу мае быць больш за 0.</translation>
+    </message>
+    <message>
+        <source>(no label)</source>
+        <translation>непазначаны</translation>
+    </message>
+</context>
+<context>
+    <name>SendCoinsEntry</name>
+    <message>
+        <source>A&amp;mount:</source>
+        <translation>Колькасць:</translation>
+    </message>
+    <message>
+        <source>Pay &amp;To:</source>
+        <translation>Заплаціць да:</translation>
+    </message>
+    <message>
+        <source>&amp;Label:</source>
+        <translation>Метка:</translation>
+    </message>
+   
