@@ -310,4 +310,260 @@
         <translation>Паказаць альбо схаваць галоўнае вакно</translation>
     </message>
     <message>
-        <source>Encrypt the private key
+        <source>Encrypt the private keys that belong to your wallet</source>
+        <translation>Зашыфраваць прыватныя ключы, якия належаць вашаму гаманцу</translation>
+    </message>
+    <message>
+        <source>Sign messages with your Bitcoin addresses to prove you own them</source>
+        <translation>Падпісаць паведамленне з дапамогай Біткойн-адраса каб даказаць, што яно належыць вам</translation>
+    </message>
+    <message>
+        <source>Verify messages to ensure they were signed with specified Bitcoin addresses</source>
+        <translation>Спраўдзіць паведамленне з дапамогай Біткойн-адраса каб даказаць, што яно належыць вам</translation>
+    </message>
+    <message>
+        <source>&amp;File</source>
+        <translation>Ф&amp;айл</translation>
+    </message>
+    <message>
+        <source>&amp;Settings</source>
+        <translation>Наладкі</translation>
+    </message>
+    <message>
+        <source>&amp;Help</source>
+        <translation>Дапамога</translation>
+    </message>
+    <message>
+        <source>Request payments (generates QR codes and bitcoin: URIs)</source>
+        <translation>Запатрабаваць плацёж (генеруецца QR-код для біткойн URI)</translation>
+    </message>
+    <message>
+        <source>Show the list of used sending addresses and labels</source>
+        <translation>Паказаць спіс адрасоў і метак для дасылання</translation>
+    </message>
+    <message>
+        <source>Show the list of used receiving addresses and labels</source>
+        <translation>Паказаць спіс адрасоў і метак для прымання</translation>
+    </message>
+    <message>
+        <source>&amp;Command-line options</source>
+        <translation>Опцыі каманднага радка</translation>
+    </message>
+    <message>
+        <source>%1 behind</source>
+        <translation>%1 таму</translation>
+    </message>
+    <message>
+        <source>Last received block was generated %1 ago.</source>
+        <translation>Апошні прыняты блок генераваны %1 таму.</translation>
+    </message>
+    <message>
+        <source>Transactions after this will not yet be visible.</source>
+        <translation>Транзакцыи пасля гэтай не будуць бачныя.</translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation>Памылка</translation>
+    </message>
+    <message>
+        <source>Warning</source>
+        <translation>Увага</translation>
+    </message>
+    <message>
+        <source>Information</source>
+        <translation>Інфармацыя</translation>
+    </message>
+    <message>
+        <source>Up to date</source>
+        <translation>Сінхранізавана</translation>
+    </message>
+    <message>
+        <source>Catching up...</source>
+        <translation>Наганяем...</translation>
+    </message>
+    <message>
+        <source>Date: %1
+</source>
+        <translation>Дата: %1
+</translation>
+    </message>
+    <message>
+        <source>Amount: %1
+</source>
+        <translation>Колькасць: %1
+</translation>
+    </message>
+    <message>
+        <source>Type: %1
+</source>
+        <translation>Тып: %1
+</translation>
+    </message>
+    <message>
+        <source>Label: %1
+</source>
+        <translation>Метка: %1
+</translation>
+    </message>
+    <message>
+        <source>Address: %1
+</source>
+        <translation>Адрас: %1
+</translation>
+    </message>
+    <message>
+        <source>Sent transaction</source>
+        <translation>Дасланыя транзакцыі</translation>
+    </message>
+    <message>
+        <source>Incoming transaction</source>
+        <translation>Прынятыя транзакцыі</translation>
+    </message>
+    <message>
+        <source>Wallet is &lt;b&gt;encrypted&lt;/b&gt; and currently &lt;b&gt;unlocked&lt;/b&gt;</source>
+        <translation>Гаманец &lt;b&gt;зашыфраваны&lt;/b&gt; і зараз &lt;b&gt;разблакаваны&lt;/b&gt;</translation>
+    </message>
+    <message>
+        <source>Wallet is &lt;b&gt;encrypted&lt;/b&gt; and currently &lt;b&gt;locked&lt;/b&gt;</source>
+        <translation>Гаманец &lt;b&gt;зашыфраваны&lt;/b&gt; і зараз &lt;b&gt;заблакаваны&lt;/b&gt;</translation>
+    </message>
+    </context>
+<context>
+    <name>CoinControlDialog</name>
+    <message>
+        <source>Quantity:</source>
+        <translation>Колькасць:</translation>
+    </message>
+    <message>
+        <source>Bytes:</source>
+        <translation>Байтаў:</translation>
+    </message>
+    <message>
+        <source>Amount:</source>
+        <translation>Колькасць:</translation>
+    </message>
+    <message>
+        <source>Fee:</source>
+        <translation>Камісія:</translation>
+    </message>
+    <message>
+        <source>Dust:</source>
+        <translation>Пыл:</translation>
+    </message>
+    <message>
+        <source>After Fee:</source>
+        <translation>Пасля камісіі:</translation>
+    </message>
+    <message>
+        <source>(un)select all</source>
+        <translation>(не)выбраць ўсё</translation>
+    </message>
+    <message>
+        <source>Tree mode</source>
+        <translation>Рэжым дрэва</translation>
+    </message>
+    <message>
+        <source>List mode</source>
+        <translation>Рэжым спіса</translation>
+    </message>
+    <message>
+        <source>Amount</source>
+        <translation>Колькасць</translation>
+    </message>
+    <message>
+        <source>Received with label</source>
+        <translation>Прыняць праз метку</translation>
+    </message>
+    <message>
+        <source>Received with address</source>
+        <translation>Прыняць праз адрас</translation>
+    </message>
+    <message>
+        <source>Date</source>
+        <translation>Дата</translation>
+    </message>
+    <message>
+        <source>Confirmations</source>
+        <translation>Пацверджанняў</translation>
+    </message>
+    <message>
+        <source>Confirmed</source>
+        <translation>Пацверджана</translation>
+    </message>
+    <message>
+        <source>Copy address</source>
+        <translation>Капіяваць адрас</translation>
+    </message>
+    <message>
+        <source>Copy label</source>
+        <translation>Капіяваць пазнаку</translation>
+    </message>
+    <message>
+        <source>Copy amount</source>
+        <translation>Капіяваць колькасць</translation>
+    </message>
+    <message>
+        <source>Copy transaction ID</source>
+        <translation>Капіяваць ID транзакцыі</translation>
+    </message>
+    <message>
+        <source>Lock unspent</source>
+        <translation>Замкнуць непатрачанае</translation>
+    </message>
+    <message>
+        <source>Unlock unspent</source>
+        <translation>Адамкнуць непатрачанае</translation>
+    </message>
+    <message>
+        <source>Copy quantity</source>
+        <translation>Капіяваць колькасць</translation>
+    </message>
+    <message>
+        <source>Copy fee</source>
+        <translation>Капіяваць камісію</translation>
+    </message>
+    <message>
+        <source>Copy after fee</source>
+        <translation>Капіяваць з выняткам камісіі</translation>
+    </message>
+    <message>
+        <source>Copy bytes</source>
+        <translation>Капіяваць байты</translation>
+    </message>
+    <message>
+        <source>Copy dust</source>
+        <translation>Капіяваць пыл</translation>
+    </message>
+    <message>
+        <source>yes</source>
+        <translation>так</translation>
+    </message>
+    <message>
+        <source>no</source>
+        <translation>не</translation>
+    </message>
+    <message>
+        <source>(no label)</source>
+        <translation>непазначаны</translation>
+    </message>
+    </context>
+<context>
+    <name>CreateWalletActivity</name>
+    </context>
+<context>
+    <name>CreateWalletDialog</name>
+    </context>
+<context>
+    <name>EditAddressDialog</name>
+    <message>
+        <source>Edit Address</source>
+        <translation>Рэдагаваць Адрас</translation>
+    </message>
+    <message>
+        <source>&amp;Label</source>
+        <translation>Метка</translation>
+    </message>
+    <message>
+        <source>&amp;Address</source>
+        <translation>Адрас</translation>
+    </messa
