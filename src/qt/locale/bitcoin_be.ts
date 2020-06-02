@@ -848,4 +848,277 @@
         <source>&amp;Label:</source>
         <translation>Метка:</translation>
     </message>
-   
+    <message>
+        <source>Alt+A</source>
+        <translation>Alt+A</translation>
+    </message>
+    <message>
+        <source>Paste address from clipboard</source>
+        <translation>Уставіць адрас з буферу абмена</translation>
+    </message>
+    <message>
+        <source>Alt+P</source>
+        <translation>Alt+P</translation>
+    </message>
+    <message>
+        <source>Message:</source>
+        <translation>Паведамленне:</translation>
+    </message>
+    <message>
+        <source>Pay To:</source>
+        <translation>Заплаціць да:</translation>
+    </message>
+    <message>
+        <source>Memo:</source>
+        <translation>Памятка:</translation>
+    </message>
+</context>
+<context>
+    <name>ShutdownWindow</name>
+    </context>
+<context>
+    <name>SignVerifyMessageDialog</name>
+    <message>
+        <source>Alt+A</source>
+        <translation>Alt+A</translation>
+    </message>
+    <message>
+        <source>Paste address from clipboard</source>
+        <translation>Уставіць адрас з буферу абмена</translation>
+    </message>
+    <message>
+        <source>Alt+P</source>
+        <translation>Alt+P</translation>
+    </message>
+    </context>
+<context>
+    <name>TrafficGraphWidget</name>
+    <message>
+        <source>KB/s</source>
+        <translation>Кб/с</translation>
+    </message>
+</context>
+<context>
+    <name>TransactionDesc</name>
+    <message>
+        <source>%1/unconfirmed</source>
+        <translation>%1/непацверджана</translation>
+    </message>
+    <message>
+        <source>%1 confirmations</source>
+        <translation>%1 пацверджанняў</translation>
+    </message>
+    <message>
+        <source>Status</source>
+        <translation>Статус</translation>
+    </message>
+    <message>
+        <source>Date</source>
+        <translation>Дата</translation>
+    </message>
+    <message>
+        <source>unknown</source>
+        <translation>невядома</translation>
+    </message>
+    <message>
+        <source>Message</source>
+        <translation>Паведамленне</translation>
+    </message>
+    <message>
+        <source>Comment</source>
+        <translation>Каментар</translation>
+    </message>
+    <message>
+        <source>Transaction ID</source>
+        <translation>ID</translation>
+    </message>
+    <message>
+        <source>Amount</source>
+        <translation>Колькасць</translation>
+    </message>
+    </context>
+<context>
+    <name>TransactionDescDialog</name>
+    <message>
+        <source>This pane shows a detailed description of the transaction</source>
+        <translation>Гэтая панэль паказвае дэтальнае апісанне транзакцыі</translation>
+    </message>
+    </context>
+<context>
+    <name>TransactionTableModel</name>
+    <message>
+        <source>Date</source>
+        <translation>Дата</translation>
+    </message>
+    <message>
+        <source>Type</source>
+        <translation>Тып</translation>
+    </message>
+    <message>
+        <source>Label</source>
+        <translation>Метка</translation>
+    </message>
+    <message>
+        <source>Confirmed (%1 confirmations)</source>
+        <translation>Пацверджана (%1 пацверджанняў)</translation>
+    </message>
+    <message>
+        <source>Generated but not accepted</source>
+        <translation>Згенеравана, але не прынята</translation>
+    </message>
+    <message>
+        <source>Received with</source>
+        <translation>Прынята з</translation>
+    </message>
+    <message>
+        <source>Received from</source>
+        <translation>Прынята ад</translation>
+    </message>
+    <message>
+        <source>Sent to</source>
+        <translation>Даслана да</translation>
+    </message>
+    <message>
+        <source>Payment to yourself</source>
+        <translation>Плацёж самому сабе</translation>
+    </message>
+    <message>
+        <source>Mined</source>
+        <translation>Здабыта</translation>
+    </message>
+    <message>
+        <source>(n/a)</source>
+        <translation>(n/a)</translation>
+    </message>
+    <message>
+        <source>(no label)</source>
+        <translation>непазначаны</translation>
+    </message>
+    <message>
+        <source>Transaction status. Hover over this field to show number of confirmations.</source>
+        <translation>Статус транзакцыі. Навядзіце курсар на гэтае поле, каб паказаць колькасць пацверджанняў.</translation>
+    </message>
+    <message>
+        <source>Date and time that the transaction was received.</source>
+        <translation>Дата і час, калі транзакцыя была прынята.</translation>
+    </message>
+    <message>
+        <source>Type of transaction.</source>
+        <translation>Тып транзакцыі</translation>
+    </message>
+    <message>
+        <source>Amount removed from or added to balance.</source>
+        <translation>Колькасць аднятая ці даданая да балансу.</translation>
+    </message>
+</context>
+<context>
+    <name>TransactionView</name>
+    <message>
+        <source>All</source>
+        <translation>Усё</translation>
+    </message>
+    <message>
+        <source>Today</source>
+        <translation>Сёння</translation>
+    </message>
+    <message>
+        <source>This week</source>
+        <translation>Гэты тыдзень</translation>
+    </message>
+    <message>
+        <source>This month</source>
+        <translation>Гэты месяц</translation>
+    </message>
+    <message>
+        <source>Last month</source>
+        <translation>Мінулы месяц</translation>
+    </message>
+    <message>
+        <source>This year</source>
+        <translation>Гэты год</translation>
+    </message>
+    <message>
+        <source>Range...</source>
+        <translation>Прамежак...</translation>
+    </message>
+    <message>
+        <source>Received with</source>
+        <translation>Прынята з</translation>
+    </message>
+    <message>
+        <source>Sent to</source>
+        <translation>Даслана да</translation>
+    </message>
+    <message>
+        <source>To yourself</source>
+        <translation>Да сябе</translation>
+    </message>
+    <message>
+        <source>Mined</source>
+        <translation>Здабыта</translation>
+    </message>
+    <message>
+        <source>Other</source>
+        <translation>Іншыя</translation>
+    </message>
+    <message>
+        <source>Min amount</source>
+        <translation>Мін. колькасць</translation>
+    </message>
+    <message>
+        <source>Copy address</source>
+        <translation>Капіяваць адрас</translation>
+    </message>
+    <message>
+        <source>Copy label</source>
+        <translation>Капіяваць пазнаку</translation>
+    </message>
+    <message>
+        <source>Copy amount</source>
+        <translation>Капіяваць колькасць</translation>
+    </message>
+    <message>
+        <source>Copy transaction ID</source>
+        <translation>Капіяваць ID транзакцыі</translation>
+    </message>
+    <message>
+        <source>Edit label</source>
+        <translation>Рэдагаваць пазнаку</translation>
+    </message>
+    <message>
+        <source>Comma separated file (*.csv)</source>
+        <translation>Коскамі падзелены файл (*.csv)</translation>
+    </message>
+    <message>
+        <source>Confirmed</source>
+        <translation>Пацверджана</translation>
+    </message>
+    <message>
+        <source>Date</source>
+        <translation>Дата</translation>
+    </message>
+    <message>
+        <source>Type</source>
+        <translation>Тып</translation>
+    </message>
+    <message>
+        <source>Label</source>
+        <translation>Метка</translation>
+    </message>
+    <message>
+        <source>Address</source>
+        <translation>Адрас</translation>
+    </message>
+    <message>
+        <source>ID</source>
+        <translation>ID</translation>
+    </message>
+    <message>
+        <source>Exporting Failed</source>
+        <translation>Экспартаванне няўдалае</translation>
+    </message>
+    <message>
+        <source>Range:</source>
+        <translation>Прамежак:</translation>
+    </message>
+    <message
