@@ -1121,4 +1121,115 @@
         <source>Range:</source>
         <translation>Прамежак:</translation>
     </message>
-    <message
+    <message>
+        <source>to</source>
+        <translation>да</translation>
+    </message>
+</context>
+<context>
+    <name>UnitDisplayStatusBarControl</name>
+    </context>
+<context>
+    <name>WalletController</name>
+    </context>
+<context>
+    <name>WalletFrame</name>
+    </context>
+<context>
+    <name>WalletModel</name>
+    <message>
+        <source>Send Coins</source>
+        <translation>Даслаць Манеты</translation>
+    </message>
+    </context>
+<context>
+    <name>WalletView</name>
+    <message>
+        <source>&amp;Export</source>
+        <translation>Экспарт</translation>
+    </message>
+    <message>
+        <source>Export the data in the current tab to a file</source>
+        <translation>Экспартаваць гэтыя звесткі у файл</translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation>Памылка</translation>
+    </message>
+    </context>
+<context>
+    <name>bitcoin-core</name>
+    <message>
+        <source>Do you want to rebuild the block database now?</source>
+        <translation>Ці жадаеце вы перабудаваць зараз базу звестак блокаў?</translation>
+    </message>
+    <message>
+        <source>Error initializing block database</source>
+        <translation>Памылка ініцыялізацыі базвы звестак блокаў</translation>
+    </message>
+    <message>
+        <source>Error initializing wallet database environment %s!</source>
+        <translation>Памалка ініцыялізацыі асяроддзя базы звестак гаманца %s!</translation>
+    </message>
+    <message>
+        <source>Error loading block database</source>
+        <translation>Памылка загрузкі базвы звестак блокаў</translation>
+    </message>
+    <message>
+        <source>Error opening block database</source>
+        <translation>Памылка адчынення базы звестак блокаў</translation>
+    </message>
+    <message>
+        <source>Importing...</source>
+        <translation>Імпартаванне...</translation>
+    </message>
+    <message>
+        <source>Not enough file descriptors available.</source>
+        <translation>Не хапае файлавых дэскрыптараў.</translation>
+    </message>
+    <message>
+        <source>Verifying blocks...</source>
+        <translation>Праверка блокаў...</translation>
+    </message>
+    <message>
+        <source>Signing transaction failed</source>
+        <translation>Памылка подпісу транзакцыі</translation>
+    </message>
+    <message>
+        <source>This is experimental software.</source>
+        <translation>Гэта эксперыментальная праграма.</translation>
+    </message>
+    <message>
+        <source>Transaction amount too small</source>
+        <translation>Транзакцыя занадта малая</translation>
+    </message>
+    <message>
+        <source>Transaction too large</source>
+        <translation>Транзакцыя занадта вялікая</translation>
+    </message>
+    <message>
+        <source>Insufficient funds</source>
+        <translation>Недастаткова сродкаў</translation>
+    </message>
+    <message>
+        <source>Loading block index...</source>
+        <translation>Загружаем індэкс блокаў...</translation>
+    </message>
+    <message>
+        <source>Loading wallet...</source>
+        <translation>Загружаем гаманец...</translation>
+    </message>
+    <message>
+        <source>Cannot downgrade wallet</source>
+        <translation>Немагчыма рэгрэсаваць гаманец</translation>
+    </message>
+    <message>
+        <source>Rescanning...</source>
+        <translation>Перасканаванне...</translation>
+    </message>
+    <message>
+        <source>Done loading</source>
+        <translation>Загрузка выканана</translation>
+    </message>
+</context>
+</TS>
