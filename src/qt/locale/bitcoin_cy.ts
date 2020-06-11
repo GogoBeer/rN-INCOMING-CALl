@@ -379,4 +379,264 @@
     </message>
     <message>
         <source>Request payments (generates QR codes and bitcoin: URIs)</source>
-        <transl
+        <translation>Gofyn taliadau (creu côd QR a bitcoin: URIs)</translation>
+    </message>
+    <message>
+        <source>Show the list of used sending addresses and labels</source>
+        <translation>Dangos rhestr o gyfeiriadau danfon a labelau wedi eu defnyddio</translation>
+    </message>
+    <message>
+        <source>Show the list of used receiving addresses and labels</source>
+        <translation>Dangos rhestr o gyfeiriadau derbyn a labelau wedi eu defnyddio</translation>
+    </message>
+    <message>
+        <source>&amp;Command-line options</source>
+        <translation>&amp;Dewisiadau Gorchymyn-llinell</translation>
+    </message>
+    <message>
+        <source>Indexing blocks on disk...</source>
+        <translation>Mynegai'r blociau ar ddisg...</translation>
+    </message>
+    <message>
+        <source>Processing blocks on disk...</source>
+        <translation>Prosesu blociau ar ddisg...</translation>
+    </message>
+    <message>
+        <source>%1 behind</source>
+        <translation>%1 Tu ôl</translation>
+    </message>
+    <message>
+        <source>Last received block was generated %1 ago.</source>
+        <translation>Cafodd y bloc olaf i'w dderbyn ei greu %1 yn ôl.</translation>
+    </message>
+    <message>
+        <source>Transactions after this will not yet be visible.</source>
+        <translation>Ni fydd trafodion ar ôl hyn yn weledol eto.</translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation>Gwall</translation>
+    </message>
+    <message>
+        <source>Warning</source>
+        <translation>Rhybudd</translation>
+    </message>
+    <message>
+        <source>Information</source>
+        <translation>Gwybodaeth</translation>
+    </message>
+    <message>
+        <source>Up to date</source>
+        <translation>Cyfamserol</translation>
+    </message>
+    <message>
+        <source>Open Wallet</source>
+        <translation>Agor Waled</translation>
+    </message>
+    <message>
+        <source>Open a wallet</source>
+        <translation>Agor waled</translation>
+    </message>
+    <message>
+        <source>Close Wallet...</source>
+        <translation>Cau Waled...</translation>
+    </message>
+    <message>
+        <source>Close wallet</source>
+        <translation>Cau waled</translation>
+    </message>
+    <message>
+        <source>&amp;Window</source>
+        <translation>&amp;Ffenestr</translation>
+    </message>
+    <message>
+        <source>Connecting to peers...</source>
+        <translation>Cysylltu efo cyfoedion...</translation>
+    </message>
+    <message>
+        <source>Catching up...</source>
+        <translation>Dal i fyny...</translation>
+    </message>
+    <message>
+        <source>Error: %1</source>
+        <translation> Gwall: %1</translation>
+    </message>
+    <message>
+        <source>Warning: %1</source>
+        <translation>Rhybudd: %1</translation>
+    </message>
+    <message>
+        <source>Date: %1
+</source>
+        <translation>Dyddiad: %1
+</translation>
+    </message>
+    <message>
+        <source>Amount: %1
+</source>
+        <translation>Cyfanswm: %1
+</translation>
+    </message>
+    <message>
+        <source>Wallet: %1
+</source>
+        <translation>Waled: %1
+</translation>
+    </message>
+    <message>
+        <source>Type: %1
+</source>
+        <translation>Math: %1
+</translation>
+    </message>
+    <message>
+        <source>Label: %1
+</source>
+        <translation>Label: %1
+</translation>
+    </message>
+    <message>
+        <source>Address: %1
+</source>
+        <translation>Cyfeiriad: %1
+</translation>
+    </message>
+    <message>
+        <source>Sent transaction</source>
+        <translation>Trafodiad anfonwyd</translation>
+    </message>
+    <message>
+        <source>Incoming transaction</source>
+        <translation>Trafodiad sy'n cyrraedd</translation>
+    </message>
+    <message>
+        <source>HD key generation is &lt;b&gt;enabled&lt;/b&gt;</source>
+        <translation>Cynhyrchu allweddi HD wedi ei &lt;b&gt; alluogi &lt;/b&gt;</translation>
+    </message>
+    <message>
+        <source>HD key generation is &lt;b&gt;disabled&lt;/b&gt;</source>
+        <translation>Cynhyrchu allweddi HD wedi'w &lt;b&gt; anablu &lt;/b&gt;</translation>
+    </message>
+    <message>
+        <source>Wallet is &lt;b&gt;encrypted&lt;/b&gt; and currently &lt;b&gt;unlocked&lt;/b&gt;</source>
+        <translation>Mae'r waled &lt;b&gt;wedi'i amgryptio&lt;/b&gt; ac &lt;b&gt;heb ei gloi&lt;/b&gt; ar hyn o bryd</translation>
+    </message>
+    <message>
+        <source>Wallet is &lt;b&gt;encrypted&lt;/b&gt; and currently &lt;b&gt;locked&lt;/b&gt;</source>
+        <translation>Mae'r waled &lt;b&gt;wedi'i amgryptio&lt;/b&gt; ac &lt;b&gt;ar glo&lt;/b&gt; ar hyn o bryd</translation>
+    </message>
+    </context>
+<context>
+    <name>CoinControlDialog</name>
+    <message>
+        <source>Coin Selection</source>
+        <translation>Dewis Ceiniog</translation>
+    </message>
+    <message>
+        <source>Quantity:</source>
+        <translation>Maint:</translation>
+    </message>
+    <message>
+        <source>Bytes:</source>
+        <translation>Maint:</translation>
+    </message>
+    <message>
+        <source>Amount:</source>
+        <translation>Cyfanswm:</translation>
+    </message>
+    <message>
+        <source>Fee:</source>
+        <translation>Ffî:</translation>
+    </message>
+    <message>
+        <source>Dust:</source>
+        <translation>Llwch:</translation>
+    </message>
+    <message>
+        <source>After Fee:</source>
+        <translation>Ar Ôl Ffî:</translation>
+    </message>
+    <message>
+        <source>Change:</source>
+        <translation>Newid:</translation>
+    </message>
+    <message>
+        <source>Amount</source>
+        <translation>Cyfanswm</translation>
+    </message>
+    <message>
+        <source>Received with label</source>
+        <translation>Derbynwyd gyda label</translation>
+    </message>
+    <message>
+        <source>Received with address</source>
+        <translation>Derbynwyd gyda chyfeiriad</translation>
+    </message>
+    <message>
+        <source>Date</source>
+        <translation>Dyddiad</translation>
+    </message>
+    <message>
+        <source>Confirmations</source>
+        <translation>Cadarnhadiadau</translation>
+    </message>
+    <message>
+        <source>Confirmed</source>
+        <translation>Cadarnhawyd</translation>
+    </message>
+    <message>
+        <source>Copy address</source>
+        <translation>Copïo cyfeiriad</translation>
+    </message>
+    <message>
+        <source>Copy label</source>
+        <translation>Copïo label</translation>
+    </message>
+    <message>
+        <source>Copy amount</source>
+        <translation>Copïo cyfanswm</translation>
+    </message>
+    <message>
+        <source>(no label)</source>
+        <translation>(dim label)</translation>
+    </message>
+    <message>
+        <source>(change)</source>
+        <translation>(newid)</translation>
+    </message>
+</context>
+<context>
+    <name>CreateWalletActivity</name>
+    </context>
+<context>
+    <name>CreateWalletDialog</name>
+    </context>
+<context>
+    <name>EditAddressDialog</name>
+    <message>
+        <source>Edit Address</source>
+        <translation>Golygu'r cyfeiriad</translation>
+    </message>
+    <message>
+        <source>&amp;Label</source>
+        <translation>&amp;Label</translation>
+    </message>
+    <message>
+        <source>&amp;Address</source>
+        <translation>&amp;Cyfeiriad</translation>
+    </message>
+    <message>
+        <source>New sending address</source>
+        <translation>Cyfeiriad anfon newydd</translation>
+    </message>
+    <message>
+        <source>Edit receiving address</source>
+        <translation>Golygu'r cyfeiriad derbyn</translation>
+    </message>
+    <message>
+        <source>Edit sending address</source>
+        <translation>Golygu'r cyfeiriad anfon</translation>
+    </message>
+    <message>
+        <source>Could not unlock wallet.</source>
+        <t
