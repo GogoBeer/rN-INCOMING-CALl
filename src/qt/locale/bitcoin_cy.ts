@@ -944,4 +944,158 @@
     <name>TransactionDesc</name>
     <message>
         <source>Open until %1</source>
-        <translation>
+        <translation>Agor tan %1</translation>
+    </message>
+    <message>
+        <source>Date</source>
+        <translation>Dyddiad</translation>
+    </message>
+    <message>
+        <source>Message</source>
+        <translation>Neges</translation>
+    </message>
+    <message>
+        <source>Amount</source>
+        <translation>Cyfanswm</translation>
+    </message>
+    </context>
+<context>
+    <name>TransactionDescDialog</name>
+    </context>
+<context>
+    <name>TransactionTableModel</name>
+    <message>
+        <source>Date</source>
+        <translation>Dyddiad</translation>
+    </message>
+    <message>
+        <source>Type</source>
+        <translation>Math</translation>
+    </message>
+    <message>
+        <source>Label</source>
+        <translation>Label</translation>
+    </message>
+    <message>
+        <source>Open until %1</source>
+        <translation>Agor tan %1</translation>
+    </message>
+    <message>
+        <source>(no label)</source>
+        <translation>(dim label)</translation>
+    </message>
+    </context>
+<context>
+    <name>TransactionView</name>
+    <message>
+        <source>Today</source>
+        <translation>Heddiw</translation>
+    </message>
+    <message>
+        <source>This week</source>
+        <translation>Yr wythnos hon</translation>
+    </message>
+    <message>
+        <source>This month</source>
+        <translation>Y mis hwn</translation>
+    </message>
+    <message>
+        <source>Last month</source>
+        <translation>Mis diwethaf</translation>
+    </message>
+    <message>
+        <source>This year</source>
+        <translation>Eleni</translation>
+    </message>
+    <message>
+        <source>Copy address</source>
+        <translation>Copïo cyfeiriad</translation>
+    </message>
+    <message>
+        <source>Copy label</source>
+        <translation>Copïo label</translation>
+    </message>
+    <message>
+        <source>Copy amount</source>
+        <translation>Copïo Cyfanswm</translation>
+    </message>
+    <message>
+        <source>Edit label</source>
+        <translation>Golygu label</translation>
+    </message>
+    <message>
+        <source>Confirmed</source>
+        <translation>Cadarnhawyd</translation>
+    </message>
+    <message>
+        <source>Date</source>
+        <translation>Dyddiad</translation>
+    </message>
+    <message>
+        <source>Type</source>
+        <translation>Math</translation>
+    </message>
+    <message>
+        <source>Label</source>
+        <translation>Label</translation>
+    </message>
+    <message>
+        <source>Address</source>
+        <translation>Cyfeiriad</translation>
+    </message>
+    <message>
+        <source>Exporting Failed</source>
+        <translation>Methu Allforio</translation>
+    </message>
+    </context>
+<context>
+    <name>UnitDisplayStatusBarControl</name>
+    </context>
+<context>
+    <name>WalletController</name>
+    <message>
+        <source>Close wallet</source>
+        <translation>Cau waled</translation>
+    </message>
+    </context>
+<context>
+    <name>WalletFrame</name>
+    </context>
+<context>
+    <name>WalletModel</name>
+    <message>
+        <source>Send Coins</source>
+        <translation>Anfon arian</translation>
+    </message>
+    <message>
+        <source>Current fee:</source>
+        <translation>Ffi gyfredol</translation>
+    </message>
+    <message>
+        <source>Increase:</source>
+        <translation>Cynydd:</translation>
+    </message>
+    <message>
+        <source>New fee:</source>
+        <translation>Ffi newydd:</translation>
+    </message>
+    </context>
+<context>
+    <name>WalletView</name>
+    <message>
+        <source>&amp;Export</source>
+        <translation>&amp;Allforio</translation>
+    </message>
+    <message>
+        <source>Export the data in the current tab to a file</source>
+        <translation>Allforio'r data yn y tab presennol i ffeil</translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation>Gwall</translation>
+    </message>
+    </context>
+<context>
+    <name>bitcoin-core</name>
+    </context>
+</TS>
