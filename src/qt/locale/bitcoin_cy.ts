@@ -639,4 +639,309 @@
     </message>
     <message>
         <source>Could not unlock wallet.</source>
-        <t
+        <translation>Methodd ddatgloi'r waled.</translation>
+    </message>
+    <message>
+        <source>New key generation failed.</source>
+        <translation>Methodd gynhyrchu allwedd newydd.</translation>
+    </message>
+</context>
+<context>
+    <name>FreespaceChecker</name>
+    <message>
+        <source>name</source>
+        <translation>enw</translation>
+    </message>
+    </context>
+<context>
+    <name>HelpMessageDialog</name>
+    </context>
+<context>
+    <name>Intro</name>
+    <message>
+        <source>Welcome</source>
+        <translation>Croeso</translation>
+    </message>
+    <message>
+        <source>Bitcoin</source>
+        <translation>Bitcoin</translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation>Gwall</translation>
+    </message>
+    </context>
+<context>
+    <name>ModalOverlay</name>
+    <message>
+        <source>Form</source>
+        <translation>Ffurflen</translation>
+    </message>
+    </context>
+<context>
+    <name>OpenURIDialog</name>
+    <message>
+        <source>URI:</source>
+        <translation>URI:</translation>
+    </message>
+</context>
+<context>
+    <name>OpenWalletActivity</name>
+    </context>
+<context>
+    <name>OptionsDialog</name>
+    <message>
+        <source>Options</source>
+        <translation>Opsiynau</translation>
+    </message>
+    <message>
+        <source>&amp;Network</source>
+        <translation>&amp;Rhwydwaith</translation>
+    </message>
+    <message>
+        <source>W&amp;allet</source>
+        <translation>W&amp;aled</translation>
+    </message>
+    <message>
+        <source>IPv4</source>
+        <translation>IPv4</translation>
+    </message>
+    <message>
+        <source>IPv6</source>
+        <translation>IPv6</translation>
+    </message>
+    <message>
+        <source>Tor</source>
+        <translation>Tor</translation>
+    </message>
+    <message>
+        <source>&amp;Window</source>
+        <translation>&amp;Ffenestr</translation>
+    </message>
+    <message>
+        <source>&amp;Display</source>
+        <translation>&amp;Dangos</translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation>Gwall</translation>
+    </message>
+    </context>
+<context>
+    <name>OverviewPage</name>
+    <message>
+        <source>Form</source>
+        <translation>Ffurflen</translation>
+    </message>
+    </context>
+<context>
+    <name>PSBTOperationsDialog</name>
+    </context>
+<context>
+    <name>PaymentServer</name>
+    </context>
+<context>
+    <name>PeerTableModel</name>
+    </context>
+<context>
+    <name>QObject</name>
+    <message>
+        <source>Amount</source>
+        <translation>Cyfanswm</translation>
+    </message>
+    <message>
+        <source>%1 and %2</source>
+        <translation>%1 a %2</translation>
+    </message>
+    <message>
+        <source>Error: %1</source>
+        <translation> Gwall: %1</translation>
+    </message>
+    </context>
+<context>
+    <name>QRImageWidget</name>
+    </context>
+<context>
+    <name>RPCConsole</name>
+    <message>
+        <source>&amp;Information</source>
+        <translation>Gwybodaeth</translation>
+    </message>
+    <message>
+        <source>Network</source>
+        <translation>Rhwydwaith</translation>
+    </message>
+    <message>
+        <source>&amp;Open</source>
+        <translation>&amp;Agor</translation>
+    </message>
+    </context>
+<context>
+    <name>ReceiveCoinsDialog</name>
+    <message>
+        <source>&amp;Label:</source>
+        <translation>&amp;Label:</translation>
+    </message>
+    <message>
+        <source>Copy label</source>
+        <translation>Copïo label</translation>
+    </message>
+    <message>
+        <source>Copy amount</source>
+        <translation>Copïo Cyfanswm</translation>
+    </message>
+    <message>
+        <source>Could not unlock wallet.</source>
+        <translation>Methodd ddatgloi'r waled.</translation>
+    </message>
+    </context>
+<context>
+    <name>ReceiveRequestDialog</name>
+    <message>
+        <source>Amount:</source>
+        <translation>Maint</translation>
+    </message>
+    <message>
+        <source>Message:</source>
+        <translation>Neges:</translation>
+    </message>
+    <message>
+        <source>Wallet:</source>
+        <translation>Waled:</translation>
+    </message>
+    <message>
+        <source>Copy &amp;Address</source>
+        <translation>&amp;Cyfeiriad Copi</translation>
+    </message>
+    </context>
+<context>
+    <name>RecentRequestsTableModel</name>
+    <message>
+        <source>Date</source>
+        <translation>Dyddiad</translation>
+    </message>
+    <message>
+        <source>Label</source>
+        <translation>Label</translation>
+    </message>
+    <message>
+        <source>Message</source>
+        <translation>Neges</translation>
+    </message>
+    <message>
+        <source>(no label)</source>
+        <translation>(dim label)</translation>
+    </message>
+    </context>
+<context>
+    <name>SendCoinsDialog</name>
+    <message>
+        <source>Send Coins</source>
+        <translation>Anfon arian</translation>
+    </message>
+    <message>
+        <source>Quantity:</source>
+        <translation>Maint:</translation>
+    </message>
+    <message>
+        <source>Bytes:</source>
+        <translation>Maint</translation>
+    </message>
+    <message>
+        <source>Amount:</source>
+        <translation>Maint</translation>
+    </message>
+    <message>
+        <source>Fee:</source>
+        <translation>Ffi</translation>
+    </message>
+    <message>
+        <source>After Fee:</source>
+        <translation>Ar Ôl Ffî</translation>
+    </message>
+    <message>
+        <source>Change:</source>
+        <translation>Newid:</translation>
+    </message>
+    <message>
+        <source>Send to multiple recipients at once</source>
+        <translation>Anfon at pobl lluosog ar yr un pryd</translation>
+    </message>
+    <message>
+        <source>Dust:</source>
+        <translation>Llwch</translation>
+    </message>
+    <message>
+        <source>Balance:</source>
+        <translation>Gweddill:</translation>
+    </message>
+    <message>
+        <source>Confirm the send action</source>
+        <translation>Cadarnhau'r gweithrediad anfon</translation>
+    </message>
+    <message>
+        <source>Copy amount</source>
+        <translation>Copïo Cyfanswm</translation>
+    </message>
+    <message>
+        <source>%1 to %2</source>
+        <translation>%1 i %2</translation>
+    </message>
+    <message>
+        <source>(no label)</source>
+        <translation>(dim label)</translation>
+    </message>
+</context>
+<context>
+    <name>SendCoinsEntry</name>
+    <message>
+        <source>A&amp;mount:</source>
+        <translation>&amp;Maint</translation>
+    </message>
+    <message>
+        <source>&amp;Label:</source>
+        <translation>&amp;Label:</translation>
+    </message>
+    <message>
+        <source>Alt+A</source>
+        <translation>Alt+A</translation>
+    </message>
+    <message>
+        <source>Paste address from clipboard</source>
+        <translation>Gludo cyfeiriad o'r glipfwrdd</translation>
+    </message>
+    <message>
+        <source>Alt+P</source>
+        <translation>Alt+P</translation>
+    </message>
+    <message>
+        <source>Message:</source>
+        <translation>Neges:</translation>
+    </message>
+    </context>
+<context>
+    <name>ShutdownWindow</name>
+    </context>
+<context>
+    <name>SignVerifyMessageDialog</name>
+    <message>
+        <source>Alt+A</source>
+        <translation>Alt+A</translation>
+    </message>
+    <message>
+        <source>Paste address from clipboard</source>
+        <translation>Gludo cyfeiriad o'r glipfwrdd</translation>
+    </message>
+    <message>
+        <source>Alt+P</source>
+        <translation>Alt+P</translation>
+    </message>
+    </context>
+<context>
+    <name>TrafficGraphWidget</name>
+    </context>
+<context>
+    <name>TransactionDesc</name>
+    <message>
+        <source>Open until %1</source>
+        <translation>
