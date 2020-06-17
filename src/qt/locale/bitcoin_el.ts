@@ -492,4 +492,256 @@
     <message>
         <source>&amp;Receiving addresses</source>
         <translation>&amp;Λήψη διευθύνσεων</translation>
-    </
+    </message>
+    <message>
+        <source>Open a bitcoin: URI</source>
+        <translation>Ανοίξτε ένα bitcoin: URI</translation>
+    </message>
+    <message>
+        <source>Open Wallet</source>
+        <translation>Άνοιγμα Πορτοφολιού</translation>
+    </message>
+    <message>
+        <source>Open a wallet</source>
+        <translation>Άνοιγμα ενός πορτοφολιού</translation>
+    </message>
+    <message>
+        <source>Close Wallet...</source>
+        <translation>Κλείσιμο Πορτοφολιού</translation>
+    </message>
+    <message>
+        <source>Close wallet</source>
+        <translation>Κλείσιμο πορτοφολιού</translation>
+    </message>
+    <message>
+        <source>Show the %1 help message to get a list with possible Bitcoin command-line options</source>
+        <translation>Εμφάνισε το %1 βοηθητικό μήνυμα για λήψη μιας λίστας με διαθέσιμες επιλογές για Bitcoin εντολές </translation>
+    </message>
+    <message>
+        <source>default wallet</source>
+        <translation>Προεπιλεγμένο πορτοφόλι</translation>
+    </message>
+    <message>
+        <source>No wallets available</source>
+        <translation>Κανένα πορτοφόλι διαθέσιμο</translation>
+    </message>
+    <message>
+        <source>&amp;Window</source>
+        <translation>&amp;Παράθυρο</translation>
+    </message>
+    <message>
+        <source>Minimize</source>
+        <translation>Ελαχιστοποίηση</translation>
+    </message>
+    <message>
+        <source>Zoom</source>
+        <translation>Μεγέθυνση</translation>
+    </message>
+    <message>
+        <source>Main Window</source>
+        <translation>Κυρίως Παράθυρο</translation>
+    </message>
+    <message>
+        <source>%1 client</source>
+        <translation>%1 πελάτης</translation>
+    </message>
+    <message>
+        <source>Connecting to peers...</source>
+        <translation>Σύνδεση στους σύντροφους...</translation>
+    </message>
+    <message>
+        <source>Catching up...</source>
+        <translation>Ενημέρωση...</translation>
+    </message>
+    <message>
+        <source>Error: %1</source>
+        <translation>Σφάλμα: %1</translation>
+    </message>
+    <message>
+        <source>Warning: %1</source>
+        <translation>Προειδοποίηση: %1</translation>
+    </message>
+    <message>
+        <source>Date: %1
+</source>
+        <translation>Ημερομηνία: %1
+</translation>
+    </message>
+    <message>
+        <source>Amount: %1
+</source>
+        <translation>Ποσό: %1
+</translation>
+    </message>
+    <message>
+        <source>Wallet: %1
+</source>
+        <translation>Πορτοφόλι: %1
+</translation>
+    </message>
+    <message>
+        <source>Type: %1
+</source>
+        <translation>Τύπος: %1
+</translation>
+    </message>
+    <message>
+        <source>Label: %1
+</source>
+        <translation>Ετικέτα: %1
+</translation>
+    </message>
+    <message>
+        <source>Address: %1
+</source>
+        <translation>Διεύθυνση: %1
+</translation>
+    </message>
+    <message>
+        <source>Sent transaction</source>
+        <translation>Η συναλλαγή απεστάλη</translation>
+    </message>
+    <message>
+        <source>Incoming transaction</source>
+        <translation>Εισερχόμενη συναλλαγή</translation>
+    </message>
+    <message>
+        <source>HD key generation is &lt;b&gt;enabled&lt;/b&gt;</source>
+        <translation>Δημιουργία πλήκτρων HD είναι &lt;b&gt;ενεργοποιημένη&lt;/b&gt;</translation>
+    </message>
+    <message>
+        <source>HD key generation is &lt;b&gt;disabled&lt;/b&gt;</source>
+        <translation>Δημιουργία πλήκτρων HD είναι &lt;b&gt;απενεργοποιημένη&lt;/b&gt;</translation>
+    </message>
+    <message>
+        <source>Private key &lt;b&gt;disabled&lt;/b&gt;</source>
+        <translation>Ιδιωτικό κλειδί &lt;b&gt;απενεργοποιημένο&lt;/b&gt;</translation>
+    </message>
+    <message>
+        <source>Wallet is &lt;b&gt;encrypted&lt;/b&gt; and currently &lt;b&gt;unlocked&lt;/b&gt;</source>
+        <translation>Το πορτοφόλι είναι &lt;b&gt;κρυπτογραφημένο&lt;/b&gt; και &lt;b&gt;ξεκλείδωτο&lt;/b&gt;</translation>
+    </message>
+    <message>
+        <source>Wallet is &lt;b&gt;encrypted&lt;/b&gt; and currently &lt;b&gt;locked&lt;/b&gt;</source>
+        <translation>Το πορτοφόλι είναι &lt;b&gt;κρυπτογραφημένο&lt;/b&gt; και &lt;b&gt;κλειδωμένο&lt;/b&gt;</translation>
+    </message>
+    </context>
+<context>
+    <name>CoinControlDialog</name>
+    <message>
+        <source>Coin Selection</source>
+        <translation>Επιλογή κερμάτων</translation>
+    </message>
+    <message>
+        <source>Quantity:</source>
+        <translation>Ποσότητα:</translation>
+    </message>
+    <message>
+        <source>Bytes:</source>
+        <translation>Bytes:</translation>
+    </message>
+    <message>
+        <source>Amount:</source>
+        <translation>Ποσό:</translation>
+    </message>
+    <message>
+        <source>Fee:</source>
+        <translation>Ταρίφα:</translation>
+    </message>
+    <message>
+        <source>Dust:</source>
+        <translation>Σκόνη:</translation>
+    </message>
+    <message>
+        <source>After Fee:</source>
+        <translation>Ταρίφα αλλαγής:</translation>
+    </message>
+    <message>
+        <source>Change:</source>
+        <translation>Ρέστα:</translation>
+    </message>
+    <message>
+        <source>(un)select all</source>
+        <translation>(από)επιλογή όλων</translation>
+    </message>
+    <message>
+        <source>Tree mode</source>
+        <translation>Εμφάνιση τύπου δέντρο</translation>
+    </message>
+    <message>
+        <source>List mode</source>
+        <translation>Λίστα εντολών</translation>
+    </message>
+    <message>
+        <source>Amount</source>
+        <translation>Ποσό</translation>
+    </message>
+    <message>
+        <source>Received with label</source>
+        <translation>Παραλήφθηκε με επιγραφή</translation>
+    </message>
+    <message>
+        <source>Received with address</source>
+        <translation>Παραλείφθηκε με την εξής διεύθυνση</translation>
+    </message>
+    <message>
+        <source>Date</source>
+        <translation>Ημερομηνία</translation>
+    </message>
+    <message>
+        <source>Confirmations</source>
+        <translation>Επικυρώσεις</translation>
+    </message>
+    <message>
+        <source>Confirmed</source>
+        <translation>Επικυρωμένες</translation>
+    </message>
+    <message>
+        <source>Copy address</source>
+        <translation>Αντιγραφή διεύθυνσης</translation>
+    </message>
+    <message>
+        <source>Copy label</source>
+        <translation>Αντιγραφή ετικέτας</translation>
+    </message>
+    <message>
+        <source>Copy amount</source>
+        <translation>Αντιγραφή ποσού</translation>
+    </message>
+    <message>
+        <source>Copy transaction ID</source>
+        <translation>Αντιγραφή ταυτότητας συναλλαγής</translation>
+    </message>
+    <message>
+        <source>Lock unspent</source>
+        <translation>Κλείδωμα μη δαπανημένου</translation>
+    </message>
+    <message>
+        <source>Unlock unspent</source>
+        <translation>Ξεκλείδωμα μη δαπανημένου</translation>
+    </message>
+    <message>
+        <source>Copy quantity</source>
+        <translation>Αντιγραφή ποσότητας</translation>
+    </message>
+    <message>
+        <source>Copy fee</source>
+        <translation>Αντιγραφή τελών</translation>
+    </message>
+    <message>
+        <source>Copy after fee</source>
+        <translation>Αντιγραφή μετά τα έξοδα</translation>
+    </message>
+    <message>
+        <source>Copy bytes</source>
+        <translation>Αντιγραφή των bytes</translation>
+    </message>
+    <message>
+        <source>Copy dust</source>
+        <translation>Αντιγραφή σκόνης</translation>
+    </message>
+    <message>
+        <source>Copy change</source>
+        <translation>Αντιγραφή αλλαγής</translation>
+    </message>
+    <messag
