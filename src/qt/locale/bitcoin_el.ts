@@ -744,4 +744,195 @@
         <source>Copy change</source>
         <translation>Αντιγραφή αλλαγής</translation>
     </message>
-    <messag
+    <message>
+        <source>(%1 locked)</source>
+        <translation>(%1 κλειδωμένο)</translation>
+    </message>
+    <message>
+        <source>yes</source>
+        <translation>ναι</translation>
+    </message>
+    <message>
+        <source>no</source>
+        <translation>όχι</translation>
+    </message>
+    <message>
+        <source>This label turns red if any recipient receives an amount smaller than the current dust threshold.</source>
+        <translation>Αυτή η ετικέτα γίνεται κόκκινη εάν οποιοσδήποτε παραλήπτης λάβει ένα ποσό μικρότερο από το τρέχον όριο σκόνης.</translation>
+    </message>
+    <message>
+        <source>Can vary +/- %1 satoshi(s) per input.</source>
+        <translation>Μπορεί να ποικίλει +/- %1 satoshi(s) ανά είσοδο.</translation>
+    </message>
+    <message>
+        <source>(no label)</source>
+        <translation>(χωρίς ετικέτα)</translation>
+    </message>
+    <message>
+        <source>change from %1 (%2)</source>
+        <translation>αλλαγή από %1(%2)</translation>
+    </message>
+    <message>
+        <source>(change)</source>
+        <translation>(αλλαγή)</translation>
+    </message>
+</context>
+<context>
+    <name>CreateWalletActivity</name>
+    <message>
+        <source>Creating Wallet &lt;b&gt;%1&lt;/b&gt;...</source>
+        <translation>Δημιουργία Πορτοφολιού &lt;b&gt;%1&lt;/b&gt;...</translation>
+    </message>
+    <message>
+        <source>Create wallet failed</source>
+        <translation>Δημιουργία πορτοφολιού απέτυχε</translation>
+    </message>
+    <message>
+        <source>Create wallet warning</source>
+        <translation>Προειδοποίηση δημιουργίας πορτοφολιού</translation>
+    </message>
+</context>
+<context>
+    <name>CreateWalletDialog</name>
+    <message>
+        <source>Create Wallet</source>
+        <translation>Δημιουργία Πορτοφολιού</translation>
+    </message>
+    <message>
+        <source>Wallet Name</source>
+        <translation>Όνομα Πορτοφολιού</translation>
+    </message>
+    <message>
+        <source>Encrypt the wallet. The wallet will be encrypted with a passphrase of your choice.</source>
+        <translation>Κρυπτογράφηση του πορτοφολιού. Το πορτοφόλι θα κρυπτογραφηθεί με μια φράση πρόσβασης της επιλογής σας.</translation>
+    </message>
+    <message>
+        <source>Encrypt Wallet</source>
+        <translation>Κρυπτογράφηση Πορτοφολιού</translation>
+    </message>
+    <message>
+        <source>Disable private keys for this wallet. Wallets with private keys disabled will have no private keys and cannot have an HD seed or imported private keys. This is ideal for watch-only wallets.</source>
+        <translation>Απενεργοποιήστε τα ιδιωτικά κλειδιά για αυτό το πορτοφόλι. Τα πορτοφόλια που έχουν απενεργοποιημένα ιδιωτικά κλειδιά δεν έχουν ιδιωτικά κλειδιά και δεν μπορούν να έχουν σπόρους HD ή εισαγόμενα ιδιωτικά κλειδιά. Αυτό είναι ιδανικό για πορτοφόλια μόνο για ρολόγια.</translation>
+    </message>
+    <message>
+        <source>Disable Private Keys</source>
+        <translation>Απενεργοποίηση Ιδιωτικών Κλειδιών</translation>
+    </message>
+    <message>
+        <source>Make a blank wallet. Blank wallets do not initially have private keys or scripts. Private keys and addresses can be imported, or an HD seed can be set, at a later time.</source>
+        <translation>Κάντε ένα κενό πορτοφόλι. Τα κενά πορτοφόλια δεν έχουν αρχικά ιδιωτικά κλειδιά ή σενάρια. Τα ιδιωτικά κλειδιά και οι διευθύνσεις μπορούν να εισαχθούν ή μπορεί να οριστεί ένας σπόρος HD αργότερα.</translation>
+    </message>
+    <message>
+        <source>Make Blank Wallet</source>
+        <translation>Δημιουργία Άδειου Πορτοφολιού</translation>
+    </message>
+    <message>
+        <source>Create</source>
+        <translation>Δημιουργία</translation>
+    </message>
+</context>
+<context>
+    <name>EditAddressDialog</name>
+    <message>
+        <source>Edit Address</source>
+        <translation>Επεξεργασία Διεύθυνσης</translation>
+    </message>
+    <message>
+        <source>&amp;Label</source>
+        <translation>&amp;Επιγραφή</translation>
+    </message>
+    <message>
+        <source>The label associated with this address list entry</source>
+        <translation>Η ετικέτα που συνδέεται με αυτήν την καταχώρηση στο βιβλίο διευθύνσεων</translation>
+    </message>
+    <message>
+        <source>The address associated with this address list entry. This can only be modified for sending addresses.</source>
+        <translation>Η διεύθυνση σχετίζεται με αυτή την καταχώρηση του βιβλίου διευθύνσεων. Μπορεί να τροποποιηθεί μόνο για τις διευθύνσεις αποστολής.</translation>
+    </message>
+    <message>
+        <source>&amp;Address</source>
+        <translation>&amp;Διεύθυνση</translation>
+    </message>
+    <message>
+        <source>New sending address</source>
+        <translation>Νέα Διεύθυνση Αποστολής</translation>
+    </message>
+    <message>
+        <source>Edit receiving address</source>
+        <translation>Διόρθωση Διεύθυνσης Λήψης</translation>
+    </message>
+    <message>
+        <source>Edit sending address</source>
+        <translation>Επεξεργασία διεύθυνσης αποστολής</translation>
+    </message>
+    <message>
+        <source>The entered address "%1" is not a valid Bitcoin address.</source>
+        <translation>Η διεύθυνση "%1" δεν είναι έγκυρη Bitcoin διεύθυνση.</translation>
+    </message>
+    <message>
+        <source>Address "%1" already exists as a receiving address with label "%2" and so cannot be added as a sending address.</source>
+        <translation>Η διεύθυνση "%1"  υπάρχει ήδη ως διεύθυνσης λήψης με ετικέτα "%2" και γιαυτό τον λόγο δεν μπορεί να προστεθεί ως διεύθυνση αποστολής.</translation>
+    </message>
+    <message>
+        <source>The entered address "%1" is already in the address book with label "%2".</source>
+        <translation>Η διεύθυνση "%1" βρίσκεται ήδη στο βιβλίο διευθύνσεων με ετικέτα "%2".</translation>
+    </message>
+    <message>
+        <source>Could not unlock wallet.</source>
+        <translation>Δεν είναι δυνατό το ξεκλείδωμα του πορτοφολιού.</translation>
+    </message>
+    <message>
+        <source>New key generation failed.</source>
+        <translation>Η δημιουργία νέου κλειδιού απέτυχε.</translation>
+    </message>
+</context>
+<context>
+    <name>FreespaceChecker</name>
+    <message>
+        <source>A new data directory will be created.</source>
+        <translation>Θα δημιουργηθεί ένας νέος φάκελος δεδομένων.</translation>
+    </message>
+    <message>
+        <source>name</source>
+        <translation>όνομα</translation>
+    </message>
+    <message>
+        <source>Directory already exists. Add %1 if you intend to create a new directory here.</source>
+        <translation>Κατάλογος ήδη υπάρχει. Προσθήκη %1, αν σκοπεύετε να δημιουργήσετε έναν νέο κατάλογο εδώ.</translation>
+    </message>
+    <message>
+        <source>Path already exists, and is not a directory.</source>
+        <translation>Η διαδρομή υπάρχει ήδη αλλά δεν είναι φάκελος</translation>
+    </message>
+    <message>
+        <source>Cannot create data directory here.</source>
+        <translation>Δεν μπορεί να δημιουργηθεί φάκελος δεδομένων εδώ.</translation>
+    </message>
+</context>
+<context>
+    <name>HelpMessageDialog</name>
+    <message>
+        <source>version</source>
+        <translation>έκδοση</translation>
+    </message>
+    <message>
+        <source>About %1</source>
+        <translation>Σχετικά %1</translation>
+    </message>
+    <message>
+        <source>Command-line options</source>
+        <translation>Επιλογές γραμμής εντολών</translation>
+    </message>
+</context>
+<context>
+    <name>Intro</name>
+    <message>
+        <source>Welcome</source>
+        <translation>Καλώς ήρθατε</translation>
+    </message>
+    <message>
+        <source>Welcome to %1.</source>
+        <translation>Καλωσήρθες στο %1.</translation>
+    </message>
+    <message>
+        <source>When you click OK, %1 will begin to download and process the full %4 block chain (%2GB) starting with the earliest transactions i
