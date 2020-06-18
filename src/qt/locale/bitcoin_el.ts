@@ -935,4 +935,154 @@
         <translation>Καλωσήρθες στο %1.</translation>
     </message>
     <message>
-        <source>When you click OK, %1 will begin to download and process the full %4 block chain (%2GB) starting with the earliest transactions i
+        <source>When you click OK, %1 will begin to download and process the full %4 block chain (%2GB) starting with the earliest transactions in %3 when %4 initially launched.</source>
+        <translation>Όταν κάνετε κλικ στο OK, το %1 θα ξεκινήσει τη λήψη και την επεξεργασία της πλήρους αλυσίδας μπλοκ% 4 (%2GB) αρχίζοντας από τις πρώτες συναλλαγές στο %3 όταν αρχικά ξεκίνησε το %4.</translation>
+    </message>
+    <message>
+        <source>Reverting this setting requires re-downloading the entire blockchain. It is faster to download the full chain first and prune it later. Disables some advanced features.</source>
+        <translation>Η επαναφορά αυτής της ρύθμισης απαιτεί εκ νέου λήψη ολόκληρου του μπλοκ αλυσίδας. Είναι πιο γρήγορο να κατεβάσετε πρώτα την πλήρη αλυσίδα και να την κλαδέψετε αργότερα. Απενεργοποιεί ορισμένες προηγμένες λειτουργίες.</translation>
+    </message>
+    <message>
+        <source>This initial synchronisation is very demanding, and may expose hardware problems with your computer that had previously gone unnoticed. Each time you run %1, it will continue downloading where it left off.</source>
+        <translation>Αυτός ο αρχικός συγχρονισμός είναι πολύ απαιτητικός και μπορεί να εκθέσει προβλήματα υλικού με τον υπολογιστή σας, τα οποία προηγουμένως είχαν περάσει απαρατήρητα. Κάθε φορά που θα εκτελέσετε το %1, θα συνεχίσει να κατεβαίνει εκεί όπου έχει σταματήσει.</translation>
+    </message>
+    <message>
+        <source>If you have chosen to limit block chain storage (pruning), the historical data must still be downloaded and processed, but will be deleted afterward to keep your disk usage low.</source>
+        <translation>Αν έχετε επιλέξει να περιορίσετε την αποθήκευση της αλυσίδας μπλοκ (κλάδεμα), τα ιστορικά δεδομένα θα πρέπει ακόμα να κατεβάσετε και να επεξεργαστείτε, αλλά θα διαγραφούν αργότερα για να διατηρήσετε τη χρήση του δίσκου σας χαμηλή.</translation>
+    </message>
+    <message>
+        <source>Use the default data directory</source>
+        <translation>Χρήση του προεπιλεγμένου φακέλου δεδομένων</translation>
+    </message>
+    <message>
+        <source>Use a custom data directory:</source>
+        <translation>Προσαρμογή του φακέλου δεδομένων:</translation>
+    </message>
+    <message>
+        <source>Bitcoin</source>
+        <translation>Bitcoin</translation>
+    </message>
+    <message>
+        <source>At least %1 GB of data will be stored in this directory, and it will grow over time.</source>
+        <translation>Τουλάχιστον %1 GB δεδομένων θα αποθηκευτούν σε αυτόν τον κατάλογο και θα αυξηθεί με την πάροδο του χρόνου.</translation>
+    </message>
+    <message>
+        <source>Approximately %1 GB of data will be stored in this directory.</source>
+        <translation>Περίπου %1 GB δεδομένων θα αποθηκεύονται σε αυτόν τον κατάλογο.</translation>
+    </message>
+    <message>
+        <source>%1 will download and store a copy of the Bitcoin block chain.</source>
+        <translation>Το %1 θα κατεβάσει και θα αποθηκεύσει ένα αντίγραφο της αλυσίδας μπλοκ Bitcoin.</translation>
+    </message>
+    <message>
+        <source>The wallet will also be stored in this directory.</source>
+        <translation>Το πορτοφόλι θα αποθηκευτεί επίσης σε αυτό το ευρετήριο</translation>
+    </message>
+    <message>
+        <source>Error: Specified data directory "%1" cannot be created.</source>
+        <translation>Σφάλμα: Ο καθορισμένος φάκελος δεδομένων "%1" δεν μπορεί να δημιουργηθεί.</translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation>Σφάλμα</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n GB of free space available</source>
+        <translation><numerusform>%n GB ελεύθερου χώρου διαθέσιμα</numerusform><numerusform>%n GB ελεύθερου χώρου διαθέσιμα</numerusform></translation>
+    </message>
+    <message numerus="yes">
+        <source>(of %n GB needed)</source>
+        <translation><numerusform>(από το %n GB που απαιτείται)</numerusform><numerusform>(από τα %n GB που απαιτούνται)</numerusform></translation>
+    </message>
+    <message numerus="yes">
+        <source>(%n GB needed for full chain)</source>
+        <translation><numerusform>(%n GB απαιτούνται για την πλήρη αλυσίδα)</numerusform><numerusform>(%n GB απαιτούνται για την πλήρη αλυσίδα)</numerusform></translation>
+    </message>
+</context>
+<context>
+    <name>ModalOverlay</name>
+    <message>
+        <source>Form</source>
+        <translation>Φόρμα</translation>
+    </message>
+    <message>
+        <source>Recent transactions may not yet be visible, and therefore your wallet's balance might be incorrect. This information will be correct once your wallet has finished synchronizing with the bitcoin network, as detailed below.</source>
+        <translation>Οι πρόσφατες συναλλαγές ενδέχεται να μην είναι ακόμα ορατές και επομένως η ισορροπία του πορτοφολιού σας μπορεί να είναι εσφαλμένη. Αυτές οι πληροφορίες θα είναι σωστές όταν ολοκληρωθεί το συγχρονισμό του πορτοφολιού σας με το δίκτυο Bitcoin, όπως περιγράφεται παρακάτω.</translation>
+    </message>
+    <message>
+        <source>Attempting to spend bitcoins that are affected by not-yet-displayed transactions will not be accepted by the network.</source>
+        <translation>Η προσπάθεια να δαπανήσετε bitcoins που επηρεάζονται από τις μη εμφανιζόμενες ακόμη συναλλαγές δεν θα γίνει αποδεκτή από το δίκτυο.</translation>
+    </message>
+    <message>
+        <source>Number of blocks left</source>
+        <translation>Αριθμός των εναπομείνων κομματιών</translation>
+    </message>
+    <message>
+        <source>Unknown...</source>
+        <translation>Άγνωστο...</translation>
+    </message>
+    <message>
+        <source>Last block time</source>
+        <translation>Χρόνος τελευταίου μπλοκ</translation>
+    </message>
+    <message>
+        <source>Progress</source>
+        <translation>Πρόοδος</translation>
+    </message>
+    <message>
+        <source>Progress increase per hour</source>
+        <translation>Αύξηση προόδου ανά ώρα</translation>
+    </message>
+    <message>
+        <source>calculating...</source>
+        <translation>Υπολογισμός...</translation>
+    </message>
+    <message>
+        <source>Estimated time left until synced</source>
+        <translation>Εκτιμώμενος χρόνος μέχρι να συγχρονιστεί</translation>
+    </message>
+    <message>
+        <source>Hide</source>
+        <translation>Απόκρυψη</translation>
+    </message>
+    <message>
+        <source>Esc</source>
+        <translation>Πλήκτρο Esc</translation>
+    </message>
+    <message>
+        <source>%1 is currently syncing.  It will download headers and blocks from peers and validate them until reaching the tip of the block chain.</source>
+        <translation>Το %1 συγχρονίζεται αυτήν τη στιγμή. Θα κατεβάσει κεφαλίδες και μπλοκ από τους συντρόφους και θα τους επικυρώσει μέχρι να φτάσουν στην άκρη της αλυσίδας μπλοκ.</translation>
+    </message>
+    <message>
+        <source>Unknown. Syncing Headers (%1, %2%)...</source>
+        <translation>Αγνωστος. Συγχρονισμός κεφαλίδων (%1, %2%)...</translation>
+    </message>
+</context>
+<context>
+    <name>OpenURIDialog</name>
+    <message>
+        <source>Open bitcoin URI</source>
+        <translation>Ανοίξτε το bitcoin URI</translation>
+    </message>
+    <message>
+        <source>URI:</source>
+        <translation>URI:</translation>
+    </message>
+</context>
+<context>
+    <name>OpenWalletActivity</name>
+    <message>
+        <source>Open wallet failed</source>
+        <translation>Άνοιγμα πορτοφολιού απέτυχε</translation>
+    </message>
+    <message>
+        <source>Open wallet warning</source>
+        <translation>Άνοιγμα πορτοφολιού προειδοποίηση</translation>
+    </message>
+    <message>
+        <source>default wallet</source>
+        <translation>Προεπιλεγμένο πορτοφόλι</translation>
+    </message>
+    <message>
+        <source>Opening Wallet &lt;b&gt;%1&lt;/b&gt;...</source>
+        <translation>Άνοιγ
