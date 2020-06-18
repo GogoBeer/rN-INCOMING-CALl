@@ -1085,4 +1085,172 @@
     </message>
     <message>
         <source>Opening Wallet &lt;b&gt;%1&lt;/b&gt;...</source>
-        <translation>Άνοιγ
+        <translation>Άνοιγμα Πορτοφολιού &lt;b&gt;%1&lt;/b&gt;...</translation>
+    </message>
+</context>
+<context>
+    <name>OptionsDialog</name>
+    <message>
+        <source>Options</source>
+        <translation>Ρυθμίσεις</translation>
+    </message>
+    <message>
+        <source>&amp;Main</source>
+        <translation>&amp;Κύριο</translation>
+    </message>
+    <message>
+        <source>Automatically start %1 after logging in to the system.</source>
+        <translation>Αυτόματη εκκίνηση του %1 μετά τη σύνδεση στο σύστημα.</translation>
+    </message>
+    <message>
+        <source>&amp;Start %1 on system login</source>
+        <translation>&amp;Έναρξη %1 στο σύστημα σύνδεσης</translation>
+    </message>
+    <message>
+        <source>Size of &amp;database cache</source>
+        <translation>Μέγεθος κρυφής μνήμης βάσης δεδομένων.</translation>
+    </message>
+    <message>
+        <source>Number of script &amp;verification threads</source>
+        <translation>Αριθμός script και γραμμές επαλήθευσης</translation>
+    </message>
+    <message>
+        <source>IP address of the proxy (e.g. IPv4: 127.0.0.1 / IPv6: ::1)</source>
+        <translation>Διεύθυνση IP του διαμεσολαβητή (π.χ. 127.0.0.1  / IPv6: ::1)</translation>
+    </message>
+    <message>
+        <source>Shows if the supplied default SOCKS5 proxy is used to reach peers via this network type.</source>
+        <translation>Εμφανίζει αν ο προεπιλεγμένος διακομιστής μεσολάβησης SOCKS5 χρησιμοποιείται για την προσέγγιση χρηστών μέσω αυτού του τύπου δικτύου.</translation>
+    </message>
+    <message>
+        <source>Hide the icon from the system tray.</source>
+        <translation>Απόκρυψη του εικονιδίου από το συρτάρι του συστήματος.</translation>
+    </message>
+    <message>
+        <source>&amp;Hide tray icon</source>
+        <translation>&amp; Απόκρυψη εικονιδίου δίσκου</translation>
+    </message>
+    <message>
+        <source>Minimize instead of exit the application when the window is closed. When this option is enabled, the application will be closed only after selecting Exit in the menu.</source>
+        <translation>Ελαχιστοποίηση αντί για έξοδο κατά το κλείσιμο του παραθύρου. Όταν αυτή η επιλογή είναι ενεργοποιημένη, η εφαρμογή θα κλείνει μόνο αν επιλεχθεί η Έξοδος στο μενού.</translation>
+    </message>
+    <message>
+        <source>Third party URLs (e.g. a block explorer) that appear in the transactions tab as context menu items. %s in the URL is replaced by transaction hash. Multiple URLs are separated by vertical bar |.</source>
+        <translation>URLs από τρίτους (π.χ. ένας εξερευνητής μπλοκ) τα οποία εμφανίζονται στην καρτέλα συναλλαγών ως στοιχεία μενού. Το %s στα URL αντικαθίσταται από την τιμή της κατατεμαχισμένης συναλλαγής.</translation>
+    </message>
+    <message>
+        <source>Open the %1 configuration file from the working directory.</source>
+        <translation>Ανοίξτε το %1 αρχείο διαμόρφωσης από τον κατάλογο εργασίας.</translation>
+    </message>
+    <message>
+        <source>Open Configuration File</source>
+        <translation>Άνοιγμα Αρχείου Ρυθμίσεων</translation>
+    </message>
+    <message>
+        <source>Reset all client options to default.</source>
+        <translation>Επαναφορά όλων των επιλογών του πελάτη στις αρχικές.</translation>
+    </message>
+    <message>
+        <source>&amp;Reset Options</source>
+        <translation>Επαναφορά ρυθμίσεων</translation>
+    </message>
+    <message>
+        <source>&amp;Network</source>
+        <translation>&amp;Δίκτυο</translation>
+    </message>
+    <message>
+        <source>Disables some advanced features but all blocks will still be fully validated. Reverting this setting requires re-downloading the entire blockchain. Actual disk usage may be somewhat higher.</source>
+        <translation>Απενεργοποιεί ορισμένες προηγμένες λειτουργίες, αλλά όλα τα μπλοκ θα εξακολουθούν να είναι πλήρως επικυρωμένα. Η επαναφορά αυτής της ρύθμισης απαιτεί εκ νέου λήψη ολόκληρου του μπλοκ αλυσίδας. Η πραγματική χρήση δίσκου μπορεί να είναι κάπως υψηλότερη.</translation>
+    </message>
+    <message>
+        <source>Prune &amp;block storage to</source>
+        <translation>Αποκοπή &amp;αποκλεισμός αποθήκευσης στο</translation>
+    </message>
+    <message>
+        <source>GB</source>
+        <translation>GB</translation>
+    </message>
+    <message>
+        <source>Reverting this setting requires re-downloading the entire blockchain.</source>
+        <translation>Η επαναφορά αυτής της ρύθμισης απαιτεί εκ νέου λήψη ολόκληρου του μπλοκ αλυσίδας.</translation>
+    </message>
+    <message>
+        <source>MiB</source>
+        <translation>MebiBytes</translation>
+    </message>
+    <message>
+        <source>(0 = auto, &lt;0 = leave that many cores free)</source>
+        <translation>(0 = αυτόματο, &lt;0 = ελεύθεροι πυρήνες)</translation>
+    </message>
+    <message>
+        <source>W&amp;allet</source>
+        <translation>Π&amp;ορτοφόλι</translation>
+    </message>
+    <message>
+        <source>Expert</source>
+        <translation>Έμπειρος</translation>
+    </message>
+    <message>
+        <source>Enable coin &amp;control features</source>
+        <translation>Ενεργοποίηση δυνατοτήτων ελέγχου κερμάτων</translation>
+    </message>
+    <message>
+        <source>If you disable the spending of unconfirmed change, the change from a transaction cannot be used until that transaction has at least one confirmation. This also affects how your balance is computed.</source>
+        <translation>Εάν απενεργοποιήσετε το ξόδεμα μη επικυρωμένων ρέστων, τα ρέστα από μια συναλλαγή δεν μπορούν να χρησιμοποιηθούν έως ότου αυτή η συναλλαγή έχει έστω μια επικύρωση. Αυτό επίσης επηρεάζει το πως υπολογίζεται το υπόλοιπό σας.</translation>
+    </message>
+    <message>
+        <source>&amp;Spend unconfirmed change</source>
+        <translation>&amp;Ξόδεμα μη επικυρωμένων ρέστων</translation>
+    </message>
+    <message>
+        <source>Automatically open the Bitcoin client port on the router. This only works when your router supports UPnP and it is enabled.</source>
+        <translation>Αυτόματο άνοιγμα των θυρών Bitcoin στον δρομολογητή. Λειτουργεί μόνο αν ο δρομολογητής σας υποστηρίζει τη λειτουργία UPnP.</translation>
+    </message>
+    <message>
+        <source>Map port using &amp;UPnP</source>
+        <translation>Απόδοση θυρών με χρήστη &amp;UPnP</translation>
+    </message>
+    <message>
+        <source>Accept connections from outside.</source>
+        <translation>Αποδοχή εξωτερικών συνδέσεων</translation>
+    </message>
+    <message>
+        <source>Allow incomin&amp;g connections</source>
+        <translation>Επιτρέπονται εισερχόμενες συνδέσεις</translation>
+    </message>
+    <message>
+        <source>Connect to the Bitcoin network through a SOCKS5 proxy.</source>
+        <translation>Σύνδεση στο δίκτυο Bitcoin μέσω διαμεσολαβητή SOCKS5 (π.χ. για σύνδεση μέσω Tor)</translation>
+    </message>
+    <message>
+        <source>&amp;Connect through SOCKS5 proxy (default proxy):</source>
+        <translation>&amp;Σύνδεση μέσω διαμεσολαβητή SOCKS5 (προεπιλεγμένος)</translation>
+    </message>
+    <message>
+        <source>Proxy &amp;IP:</source>
+        <translation>&amp;IP διαμεσολαβητή:</translation>
+    </message>
+    <message>
+        <source>&amp;Port:</source>
+        <translation>&amp;Θύρα:</translation>
+    </message>
+    <message>
+        <source>Port of the proxy (e.g. 9050)</source>
+        <translation>Θύρα διαμεσολαβητή</translation>
+    </message>
+    <message>
+        <source>Used for reaching peers via:</source>
+        <translation>Χρησιμοποιείται για να φτάσεις στους σύντροφους μέσω:</translation>
+    </message>
+    <message>
+        <source>IPv4</source>
+        <translation>IPv4</translation>
+    </message>
+    <message>
+        <source>IPv6</source>
+        <translation>IPv6</translation>
+    </message>
+    <message>
+        <source>Tor</source>
+        <translation>Tor</translation>
+    </message>
