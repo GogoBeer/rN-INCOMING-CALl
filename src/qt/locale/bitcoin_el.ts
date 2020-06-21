@@ -1254,3 +1254,189 @@
         <source>Tor</source>
         <translation>Tor</translation>
     </message>
+    <message>
+        <source>&amp;Window</source>
+        <translation>&amp;Παράθυρο</translation>
+    </message>
+    <message>
+        <source>Show only a tray icon after minimizing the window.</source>
+        <translation>Εμφάνιση μόνο εικονιδίου στην περιοχή ειδοποιήσεων κατά την ελαχιστοποίηση.</translation>
+    </message>
+    <message>
+        <source>&amp;Minimize to the tray instead of the taskbar</source>
+        <translation>&amp;Ελαχιστοποίηση στην περιοχή ειδοποιήσεων αντί της γραμμής εργασιών</translation>
+    </message>
+    <message>
+        <source>M&amp;inimize on close</source>
+        <translation>Ε&amp;λαχιστοποίηση κατά το κλείσιμο</translation>
+    </message>
+    <message>
+        <source>&amp;Display</source>
+        <translation>&amp;Απεικόνιση</translation>
+    </message>
+    <message>
+        <source>User Interface &amp;language:</source>
+        <translation>Γλώσσα περιβάλλοντος εργασίας:</translation>
+    </message>
+    <message>
+        <source>The user interface language can be set here. This setting will take effect after restarting %1.</source>
+        <translation>Η γλώσσα διεπαφής χρήστη μπορεί να οριστεί εδώ. Αυτή η ρύθμιση θα τεθεί σε ισχύ μετά την επανεκκίνηση του %1.</translation>
+    </message>
+    <message>
+        <source>&amp;Unit to show amounts in:</source>
+        <translation>&amp;Μονάδα μέτρησης:</translation>
+    </message>
+    <message>
+        <source>Choose the default subdivision unit to show in the interface and when sending coins.</source>
+        <translation>Διαλέξτε την προεπιλεγμένη υποδιαίρεση που θα εμφανίζεται όταν στέλνετε νομίσματα.</translation>
+    </message>
+    <message>
+        <source>Whether to show coin control features or not.</source>
+        <translation>Επιλογή κατά πόσο να αναδείχνονται οι δυνατότητες ελέγχου κερμάτων.</translation>
+    </message>
+    <message>
+        <source>Options set in this dialog are overridden by the command line or in the configuration file:</source>
+        <translation>Οι επιλογές που έχουν οριστεί σε αυτό το παράθυρο διαλόγου παραβλέπονται από τη γραμμή εντολών ή από το αρχείο διαμόρφωσης:</translation>
+    </message>
+    <message>
+        <source>&amp;OK</source>
+        <translation>&amp;ΟΚ</translation>
+    </message>
+    <message>
+        <source>&amp;Cancel</source>
+        <translation>&amp;Ακύρωση</translation>
+    </message>
+    <message>
+        <source>default</source>
+        <translation>προεπιλογή</translation>
+    </message>
+    <message>
+        <source>none</source>
+        <translation>κανένα</translation>
+    </message>
+    <message>
+        <source>Confirm options reset</source>
+        <translation>Επιβεβαίωση των επιλογών επαναφοράς</translation>
+    </message>
+    <message>
+        <source>Client restart required to activate changes.</source>
+        <translation>Χρειάζεται επανεκκίνηση του προγράμματος για να ενεργοποιηθούν οι αλλαγές.</translation>
+    </message>
+    <message>
+        <source>Client will be shut down. Do you want to proceed?</source>
+        <translation>Ο πελάτης θα τερματιστεί. Θέλετε να συνεχίσετε?</translation>
+    </message>
+    <message>
+        <source>Configuration options</source>
+        <translation> 
+Επιλογές διαμόρφωσης</translation>
+    </message>
+    <message>
+        <source>The configuration file is used to specify advanced user options which override GUI settings. Additionally, any command-line options will override this configuration file.</source>
+        <translation>Το αρχείο ρυθμίσεων χρησιμοποιείται για τον προσδιορισμό των προχωρημένων επιλογών χρηστών που παρακάμπτουν τις ρυθμίσεις GUI. Επιπλέον, όλες οι επιλογές γραμμής εντολών θα αντικαταστήσουν αυτό το αρχείο ρυθμίσεων.</translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation>Σφάλμα</translation>
+    </message>
+    <message>
+        <source>The configuration file could not be opened.</source>
+        <translation>Το αρχείο διαμόρφωσης δεν ήταν δυνατό να ανοιχτεί.</translation>
+    </message>
+    <message>
+        <source>This change would require a client restart.</source>
+        <translation>Η αλλαγή αυτή θα χρειαστεί επανεκκίνηση του προγράμματος</translation>
+    </message>
+    <message>
+        <source>The supplied proxy address is invalid.</source>
+        <translation>Δεν είναι έγκυρη η διεύθυνση διαμεσολαβητή</translation>
+    </message>
+</context>
+<context>
+    <name>OverviewPage</name>
+    <message>
+        <source>Form</source>
+        <translation>Φόρμα</translation>
+    </message>
+    <message>
+        <source>The displayed information may be out of date. Your wallet automatically synchronizes with the Bitcoin network after a connection is established, but this process has not completed yet.</source>
+        <translation>Οι πληροφορίες που εμφανίζονται μπορεί να είναι ξεπερασμένες. Το πορτοφόλι σας συγχρονίζεται αυτόματα με το δίκτυο Bitcoin μετά από μια σύνδεση, αλλά αυτή η διαδικασία δεν έχει ακόμη ολοκληρωθεί.</translation>
+    </message>
+    <message>
+        <source>Watch-only:</source>
+        <translation>Επίβλεψη μόνο:</translation>
+    </message>
+    <message>
+        <source>Available:</source>
+        <translation>Διαθέσιμο:</translation>
+    </message>
+    <message>
+        <source>Your current spendable balance</source>
+        <translation>Το τρέχον διαθέσιμο υπόλοιπο</translation>
+    </message>
+    <message>
+        <source>Pending:</source>
+        <translation>Εκκρεμούν:</translation>
+    </message>
+    <message>
+        <source>Total of transactions that have yet to be confirmed, and do not yet count toward the spendable balance</source>
+        <translation>Το άθροισμα των συναλλαγών που δεν έχουν ακόμα επιβεβαιωθεί και δεν προσμετρώνται στο τρέχον διαθέσιμο υπόλοιπό σας</translation>
+    </message>
+    <message>
+        <source>Immature:</source>
+        <translation>Ανώριμος</translation>
+    </message>
+    <message>
+        <source>Mined balance that has not yet matured</source>
+        <translation>Εξορυγμένο υπόλοιπο που δεν έχει ακόμα ωριμάσει</translation>
+    </message>
+    <message>
+        <source>Balances</source>
+        <translation>Υπόλοιπο:</translation>
+    </message>
+    <message>
+        <source>Total:</source>
+        <translation>Σύνολο:</translation>
+    </message>
+    <message>
+        <source>Your current total balance</source>
+        <translation>Το τρέχον συνολικό υπόλοιπο</translation>
+    </message>
+    <message>
+        <source>Your current balance in watch-only addresses</source>
+        <translation>Το τρέχον υπόλοιπο σας σε διευθύνσεις παρακολούθησης μόνο</translation>
+    </message>
+    <message>
+        <source>Spendable:</source>
+        <translation>Ξοδεμένα:</translation>
+    </message>
+    <message>
+        <source>Recent transactions</source>
+        <translation>Πρόσφατες συναλλαγές</translation>
+    </message>
+    <message>
+        <source>Unconfirmed transactions to watch-only addresses</source>
+        <translation>Μη επικυρωμένες συναλλαγές σε διευθύνσεις παρακολούθησης μόνο</translation>
+    </message>
+    <message>
+        <source>Mined balance in watch-only addresses that has not yet matured</source>
+        <translation>Εξορυγμένο υπόλοιπο σε διευθύνσεις παρακολούθησης μόνο που δεν έχει ωριμάσει ακόμα</translation>
+    </message>
+    <message>
+        <source>Current total balance in watch-only addresses</source>
+        <translation>Το τρέχον συνολικό υπόλοιπο σε διευθύνσεις παρακολούθησης μόνο</translation>
+    </message>
+    </context>
+<context>
+    <name>PSBTOperationsDialog</name>
+    <message>
+        <source>Dialog</source>
+        <translation>Διάλογος</translation>
+    </message>
+    <message>
+        <source>Copy to Clipboard</source>
+        <translation>Αντιγραφή στο Πρόχειρο</translation>
+    </message>
+    <message>
+        <source>Save...</source>
+        <translation>Αποθήκευση...</translation
