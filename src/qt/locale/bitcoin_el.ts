@@ -1654,4 +1654,250 @@
         <translation>Αποθήκευση κωδικού QR</translation>
     </message>
     <message>
-        <source>PNG 
+        <source>PNG Image (*.png)</source>
+        <translation>PNG Εικόνα (*.png)</translation>
+    </message>
+</context>
+<context>
+    <name>RPCConsole</name>
+    <message>
+        <source>N/A</source>
+        <translation>Μη διαθέσιμο</translation>
+    </message>
+    <message>
+        <source>Client version</source>
+        <translation>Έκδοση Πελάτη</translation>
+    </message>
+    <message>
+        <source>&amp;Information</source>
+        <translation>&amp;Πληροφορία</translation>
+    </message>
+    <message>
+        <source>General</source>
+        <translation>Γενικά</translation>
+    </message>
+    <message>
+        <source>Using BerkeleyDB version</source>
+        <translation>Χρήση BerkeleyDB έκδοσης</translation>
+    </message>
+    <message>
+        <source>Datadir</source>
+        <translation>Κατάλογος Δεδομένων</translation>
+    </message>
+    <message>
+        <source>Blocksdir</source>
+        <translation>Κατάλογος των Μπλοκς</translation>
+    </message>
+    <message>
+        <source>To specify a non-default location of the blocks directory use the '%1' option.</source>
+        <translation>Για να καθορίσετε μια μη προεπιλεγμένη θέση του καταλόγου μπλοκ, χρησιμοποιήστε την επιλογή '%1'.</translation>
+    </message>
+    <message>
+        <source>Startup time</source>
+        <translation>Χρόνος εκκίνησης</translation>
+    </message>
+    <message>
+        <source>Network</source>
+        <translation>Δίκτυο</translation>
+    </message>
+    <message>
+        <source>Name</source>
+        <translation>Όνομα</translation>
+    </message>
+    <message>
+        <source>Number of connections</source>
+        <translation>Αριθμός συνδέσεων</translation>
+    </message>
+    <message>
+        <source>Block chain</source>
+        <translation>Αλυσίδα μπλοκ</translation>
+    </message>
+    <message>
+        <source>Memory Pool</source>
+        <translation>Πισίνα μνήμης</translation>
+    </message>
+    <message>
+        <source>Current number of transactions</source>
+        <translation>Τρέχων αριθμός συναλλαγών</translation>
+    </message>
+    <message>
+        <source>Memory usage</source>
+        <translation>χρήση Μνήμης</translation>
+    </message>
+    <message>
+        <source>Wallet: </source>
+        <translation>Πορτοφόλι:</translation>
+    </message>
+    <message>
+        <source>(none)</source>
+        <translation>(κενό)</translation>
+    </message>
+    <message>
+        <source>&amp;Reset</source>
+        <translation>&amp;Επαναφορά</translation>
+    </message>
+    <message>
+        <source>Received</source>
+        <translation>Παραλήφθησαν</translation>
+    </message>
+    <message>
+        <source>Sent</source>
+        <translation>Αποστολή</translation>
+    </message>
+    <message>
+        <source>&amp;Peers</source>
+        <translation>&amp;Χρήστες</translation>
+    </message>
+    <message>
+        <source>Banned peers</source>
+        <translation>Αποκλεισμένοι σύντροφοι</translation>
+    </message>
+    <message>
+        <source>Select a peer to view detailed information.</source>
+        <translation>Επιλέξτε ένα χρήστη για να δείτε αναλυτικές πληροφορίες.</translation>
+    </message>
+    <message>
+        <source>Direction</source>
+        <translation>Κατεύθυνση</translation>
+    </message>
+    <message>
+        <source>Version</source>
+        <translation>Έκδοση</translation>
+    </message>
+    <message>
+        <source>Starting Block</source>
+        <translation>Αρχικό Μπλοκ</translation>
+    </message>
+    <message>
+        <source>Synced Headers</source>
+        <translation>Συγχρονισμένες Κεφαλίδες</translation>
+    </message>
+    <message>
+        <source>Synced Blocks</source>
+        <translation>Συγχρονισμένα Μπλοκς</translation>
+    </message>
+    <message>
+        <source>The mapped Autonomous System used for diversifying peer selection.</source>
+        <translation>Το χαρτογραφημένο Αυτόνομο Σύστημα που χρησιμοποιείται για τη διαφοροποίηση της επιλογής ομοτίμων.</translation>
+    </message>
+    <message>
+        <source>Mapped AS</source>
+        <translation>Χαρτογραφημένο ως</translation>
+    </message>
+    <message>
+        <source>User Agent</source>
+        <translation>Agent χρήστη</translation>
+    </message>
+    <message>
+        <source>Node window</source>
+        <translation>Κόμβος παράθυρο</translation>
+    </message>
+    <message>
+        <source>Open the %1 debug log file from the current data directory. This can take a few seconds for large log files.</source>
+        <translation>Ανοίξτε το αρχείο καταγραφής εντοπισμού σφαλμάτων %1 από τον τρέχοντα κατάλογο δεδομένων. Αυτό μπορεί να διαρκέσει μερικά δευτερόλεπτα για τα μεγάλα αρχεία καταγραφής.</translation>
+    </message>
+    <message>
+        <source>Decrease font size</source>
+        <translation>Μείωση μεγέθους γραμματοσειράς</translation>
+    </message>
+    <message>
+        <source>Increase font size</source>
+        <translation>Αύξηση μεγέθους γραμματοσειράς</translation>
+    </message>
+    <message>
+        <source>Services</source>
+        <translation>Υπηρεσίες</translation>
+    </message>
+    <message>
+        <source>Connection Time</source>
+        <translation>Χρόνος σύνδεσης</translation>
+    </message>
+    <message>
+        <source>Last Send</source>
+        <translation>Τελευταία αποστολή</translation>
+    </message>
+    <message>
+        <source>Last Receive</source>
+        <translation>Τελευταία λήψη</translation>
+    </message>
+    <message>
+        <source>Ping Time</source>
+        <translation>Χρόνος καθυστέρησης</translation>
+    </message>
+    <message>
+        <source>The duration of a currently outstanding ping.</source>
+        <translation>Η διάρκεια ενός τρέχοντος ping.</translation>
+    </message>
+    <message>
+        <source>Ping Wait</source>
+        <translation>Ping Αναμονή</translation>
+    </message>
+    <message>
+        <source>Min Ping</source>
+        <translation>Ελάχιστο Min</translation>
+    </message>
+    <message>
+        <source>Time Offset</source>
+        <translation>Χρονική αντιστάθμιση</translation>
+    </message>
+    <message>
+        <source>Last block time</source>
+        <translation>Χρόνος τελευταίου μπλοκ</translation>
+    </message>
+    <message>
+        <source>&amp;Open</source>
+        <translation>&amp;Άνοιγμα</translation>
+    </message>
+    <message>
+        <source>&amp;Console</source>
+        <translation>&amp;Κονσόλα</translation>
+    </message>
+    <message>
+        <source>&amp;Network Traffic</source>
+        <translation>&amp;Κίνηση δικτύου</translation>
+    </message>
+    <message>
+        <source>Totals</source>
+        <translation>Σύνολα</translation>
+    </message>
+    <message>
+        <source>In:</source>
+        <translation>Εισερχόμενα:</translation>
+    </message>
+    <message>
+        <source>Out:</source>
+        <translation>Εξερχόμενα:</translation>
+    </message>
+    <message>
+        <source>Debug log file</source>
+        <translation>Αρχείο καταγραφής εντοπισμού σφαλμάτων</translation>
+    </message>
+    <message>
+        <source>Clear console</source>
+        <translation>Καθαρισμός κονσόλας</translation>
+    </message>
+    <message>
+        <source>1 &amp;hour</source>
+        <translation>1 &amp;ώρα</translation>
+    </message>
+    <message>
+        <source>1 &amp;day</source>
+        <translation>1 &amp;μέρα</translation>
+    </message>
+    <message>
+        <source>1 &amp;week</source>
+        <translation>1 &amp;εβδομάδα</translation>
+    </message>
+    <message>
+        <source>1 &amp;year</source>
+        <translation>1 &amp;χρόνος</translation>
+    </message>
+    <message>
+        <source>&amp;Disconnect</source>
+        <translation>&amp;Αποσύνδεση</translation>
+    </message>
+    <message>
+        <source>Ban for</source>
+        <translation>Απαγόρευση για</translation>
+    </message>
+    <mes
