@@ -2069,4 +2069,194 @@
     </message>
     <message>
         <source>Message:</source>
-  
+        <translation>Μήνυμα:</translation>
+    </message>
+    <message>
+        <source>Wallet:</source>
+        <translation>Πορτοφόλι</translation>
+    </message>
+    <message>
+        <source>Copy &amp;URI</source>
+        <translation>Αντιγραφή της επιλεγμένης διεύθυνσης στο πρόχειρο του συστήματος</translation>
+    </message>
+    <message>
+        <source>Copy &amp;Address</source>
+        <translation>Αντιγραφή &amp;Διεύθυνσης</translation>
+    </message>
+    <message>
+        <source>&amp;Save Image...</source>
+        <translation>&amp;Αποθήκευση εικόνας...</translation>
+    </message>
+    <message>
+        <source>Request payment to %1</source>
+        <translation>Αίτημα πληρωμής στο %1</translation>
+    </message>
+    <message>
+        <source>Payment information</source>
+        <translation>Πληροφορίες πληρωμής</translation>
+    </message>
+</context>
+<context>
+    <name>RecentRequestsTableModel</name>
+    <message>
+        <source>Date</source>
+        <translation>Ημερομηνία</translation>
+    </message>
+    <message>
+        <source>Label</source>
+        <translation>Ετικέτα</translation>
+    </message>
+    <message>
+        <source>Message</source>
+        <translation>Μήνυμα</translation>
+    </message>
+    <message>
+        <source>(no label)</source>
+        <translation>(χωρίς ετικέτα)</translation>
+    </message>
+    <message>
+        <source>(no message)</source>
+        <translation>(κανένα μήνυμα)</translation>
+    </message>
+    <message>
+        <source>(no amount requested)</source>
+        <translation>(δεν ζητήθηκε ποσό)</translation>
+    </message>
+    <message>
+        <source>Requested</source>
+        <translation>Ζητείται</translation>
+    </message>
+</context>
+<context>
+    <name>SendCoinsDialog</name>
+    <message>
+        <source>Send Coins</source>
+        <translation>Αποστολή νομισμάτων</translation>
+    </message>
+    <message>
+        <source>Coin Control Features</source>
+        <translation>Χαρακτηριστικά επιλογής κερμάτων</translation>
+    </message>
+    <message>
+        <source>Inputs...</source>
+        <translation>Εισροές...</translation>
+    </message>
+    <message>
+        <source>automatically selected</source>
+        <translation>επιλεγμένο αυτόματα</translation>
+    </message>
+    <message>
+        <source>Insufficient funds!</source>
+        <translation>Ανεπαρκές κεφάλαιο!</translation>
+    </message>
+    <message>
+        <source>Quantity:</source>
+        <translation>Ποσότητα:</translation>
+    </message>
+    <message>
+        <source>Bytes:</source>
+        <translation>Bytes:</translation>
+    </message>
+    <message>
+        <source>Amount:</source>
+        <translation>Ποσό:</translation>
+    </message>
+    <message>
+        <source>Fee:</source>
+        <translation>Ταρίφα:</translation>
+    </message>
+    <message>
+        <source>After Fee:</source>
+        <translation>Ταρίφα αλλαγής:</translation>
+    </message>
+    <message>
+        <source>Change:</source>
+        <translation>Ρέστα:</translation>
+    </message>
+    <message>
+        <source>If this is activated, but the change address is empty or invalid, change will be sent to a newly generated address.</source>
+        <translation>Όταν ενεργό, αλλά η διεύθυνση ρέστων είναι κενή ή άκυρη, τα ρέστα θα σταλούν σε μία πρόσφατα δημιουργημένη διεύθυνση.</translation>
+    </message>
+    <message>
+        <source>Custom change address</source>
+        <translation>Προσαρμοσμένη διεύθυνση ρέστων</translation>
+    </message>
+    <message>
+        <source>Transaction Fee:</source>
+        <translation>Τέλος συναλλαγής:</translation>
+    </message>
+    <message>
+        <source>Choose...</source>
+        <translation>Επιλογή...</translation>
+    </message>
+    <message>
+        <source>Using the fallbackfee can result in sending a transaction that will take several hours or days (or never) to confirm. Consider choosing your fee manually or wait until you have validated the complete chain.</source>
+        <translation>Η χρήση του fallbackfee μπορεί να έχει ως αποτέλεσμα την αποστολή μιας συναλλαγής που θα χρειαστεί αρκετές ώρες ή ημέρες (ή ποτέ) για επιβεβαίωση. Εξετάστε το ενδεχόμενο να επιλέξετε τη χρέωση σας με μη αυτόματο τρόπο ή να περιμένετε έως ότου επικυρώσετε την πλήρη αλυσίδα.</translation>
+    </message>
+    <message>
+        <source>Warning: Fee estimation is currently not possible.</source>
+        <translation> 
+Προειδοποίηση: Προς το παρόν δεν είναι δυνατή η εκτίμηση των εξόδων..</translation>
+    </message>
+    <message>
+        <source>Specify a custom fee per kB (1,000 bytes) of the transaction's virtual size.
+
+Note:  Since the fee is calculated on a per-byte basis, a fee of "100 satoshis per kB" for a transaction size of 500 bytes (half of 1 kB) would ultimately yield a fee of only 50 satoshis.</source>
+        <translation>Καθορίστε μια προσαρμοσμένη χρέωση ανά kB (1.000 bytes) του εικονικού μεγέθους της συναλλαγής.
+
+Σημείωση: Δεδομένου ότι η χρέωση υπολογίζεται ανά βάση, η αμοιβή "100 satoshis ανά kB" για ένα μέγεθος συναλλαγής 500 bytes (το μισό του 1 kB) θα αποφέρει τέλος μόνο 50 satoshis.</translation>
+    </message>
+    <message>
+        <source>per kilobyte</source>
+        <translation>ανά kilobyte</translation>
+    </message>
+    <message>
+        <source>Hide</source>
+        <translation>Απόκρυψη</translation>
+    </message>
+    <message>
+        <source>Recommended:</source>
+        <translation>Προτεινόμενο:</translation>
+    </message>
+    <message>
+        <source>Custom:</source>
+        <translation>Προσαρμογή:</translation>
+    </message>
+    <message>
+        <source>(Smart fee not initialized yet. This usually takes a few blocks...)</source>
+        <translation>(Η έξυπνη αμοιβή δεν έχει αρχικοποιηθεί ακόμη, συνήθως χρειάζεται λίγα τετράγωνα...)</translation>
+    </message>
+    <message>
+        <source>Send to multiple recipients at once</source>
+        <translation>Αποστολή σε πολλούς αποδέκτες ταυτόχρονα</translation>
+    </message>
+    <message>
+        <source>Add &amp;Recipient</source>
+        <translation>&amp;Προσθήκη αποδέκτη</translation>
+    </message>
+    <message>
+        <source>Clear all fields of the form.</source>
+        <translation>Καθαρισμός όλων των πεδίων της φόρμας.</translation>
+    </message>
+    <message>
+        <source>Dust:</source>
+        <translation>Σκόνη:</translation>
+    </message>
+    <message>
+        <source>Hide transaction fee settings</source>
+        <translation>Απόκρυψη ρυθμίσεων αμοιβής συναλλαγής</translation>
+    </message>
+    <message>
+        <source>When there is less transaction volume than space in the blocks, miners as well as relaying nodes may enforce a minimum fee. Paying only this minimum fee is just fine, but be aware that this can result in a never confirming transaction once there is more demand for bitcoin transactions than the network can process.</source>
+        <translation>Όταν υπάρχει λιγότερος όγκος συναλλαγών από το χώρο στα μπλοκ, οι ανθρακωρύχοι καθώς και οι κόμβοι αναμετάδοσης μπορούν να επιβάλουν ένα ελάχιστο τέλος. Η πληρωμή μόνο αυτού του ελάχιστου τέλους είναι μια χαρά, αλλά γνωρίζετε ότι αυτό μπορεί να οδηγήσει σε μια συναλλαγή που δεν επιβεβαιώνει ποτέ τη στιγμή που υπάρχει μεγαλύτερη ζήτηση για συναλλαγές bitcoin από ό, τι μπορεί να επεξεργαστεί το δίκτυο.</translation>
+    </message>
+    <message>
+        <source>A too low fee might result in a never confirming transaction (read the tooltip)</source>
+        <translation>Μια πολύ χαμηλή χρέωση μπορεί να οδηγήσει σε μια συναλλαγή που δεν επιβεβαιώνει ποτέ (διαβάστε την επεξήγηση εργαλείου)</translation>
+    </message>
+    <message>
+        <source>Confirmation time target:</source>
+        <translation>Επιβεβαίωση χρονικού στόχου :</translation>
+    </message>
+    <message>
+        <s
