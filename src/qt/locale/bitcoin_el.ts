@@ -1900,4 +1900,173 @@
         <source>Ban for</source>
         <translation>Απαγόρευση για</translation>
     </message>
-    <mes
+    <message>
+        <source>&amp;Unban</source>
+        <translation>&amp;Ακύρωση Απαγόρευσης</translation>
+    </message>
+    <message>
+        <source>Welcome to the %1 RPC console.</source>
+        <translation>Καλώς ήρθατε στην κονσόλα %1 RPC.</translation>
+    </message>
+    <message>
+        <source>Use up and down arrows to navigate history, and %1 to clear screen.</source>
+        <translation>Χρησιμοποιήστε τα βέλη πάνω και κάτω για να περιηγηθείτε στο ιστορικό και το %1 για να καθαρίσετε την οθόνη.</translation>
+    </message>
+    <message>
+        <source>Type %1 for an overview of available commands.</source>
+        <translation>Πληκτρολογήστε %1 για μια επισκόπηση των διαθέσιμων εντολών.</translation>
+    </message>
+    <message>
+        <source>For more information on using this console type %1.</source>
+        <translation>Για περισσότερες πληροφορίες σχετικά με τη χρήση αυτού του τύπου κονσόλας %1.</translation>
+    </message>
+    <message>
+        <source>WARNING: Scammers have been active, telling users to type commands here, stealing their wallet contents. Do not use this console without fully understanding the ramifications of a command.</source>
+        <translation>ΠΡΟΕΙΔΟΠΟΙΗΣΗ: Οι απατεώνες είναι ενεργοί, λέγοντας στους χρήστες να πληκτρολογούν εντολές εδώ, κλέβοντας τα περιεχόμενα του πορτοφολιού τους. Μην χρησιμοποιείτε αυτήν την κονσόλα χωρίς να κατανοείτε πλήρως τις συνέπειες μιας εντολής.</translation>
+    </message>
+    <message>
+        <source>Network activity disabled</source>
+        <translation>Η δραστηριότητα δικτύου είναι απενεργοποιημένη</translation>
+    </message>
+    <message>
+        <source>Executing command without any wallet</source>
+        <translation>Εκτέλεση εντολής χωρίς πορτοφόλι</translation>
+    </message>
+    <message>
+        <source>Executing command using "%1" wallet</source>
+        <translation> 
+Εκτελέστε εντολή χρησιμοποιώντας το πορτοφόλι "%1"</translation>
+    </message>
+    <message>
+        <source>(node id: %1)</source>
+        <translation>(αναγνωριστικό κόμβου: %1)</translation>
+    </message>
+    <message>
+        <source>via %1</source>
+        <translation>μέσω %1</translation>
+    </message>
+    <message>
+        <source>never</source>
+        <translation>ποτέ</translation>
+    </message>
+    <message>
+        <source>Inbound</source>
+        <translation>Εισερχόμενα</translation>
+    </message>
+    <message>
+        <source>Outbound</source>
+        <translation>Εξερχόμενα</translation>
+    </message>
+    <message>
+        <source>Unknown</source>
+        <translation>Άγνωστο(α)</translation>
+    </message>
+</context>
+<context>
+    <name>ReceiveCoinsDialog</name>
+    <message>
+        <source>&amp;Amount:</source>
+        <translation>&amp;Ποσό:</translation>
+    </message>
+    <message>
+        <source>&amp;Label:</source>
+        <translation>&amp;Επιγραφή</translation>
+    </message>
+    <message>
+        <source>&amp;Message:</source>
+        <translation>&amp;Μήνυμα:</translation>
+    </message>
+    <message>
+        <source>An optional message to attach to the payment request, which will be displayed when the request is opened. Note: The message will not be sent with the payment over the Bitcoin network.</source>
+        <translation>Ένα προαιρετικό μήνυμα που επισυνάπτεται στο αίτημα πληρωμής, το οποίο θα εμφανιστεί όταν το αίτημα ανοίξει. Σημείωση: Το μήνυμα δεν θα αποσταλεί με την πληρωμή μέσω του δικτύου Bitcoin.</translation>
+    </message>
+    <message>
+        <source>An optional label to associate with the new receiving address.</source>
+        <translation>Μια προαιρετική ετικέτα για να συσχετιστεί με τη νέα διεύθυνση λήψης.</translation>
+    </message>
+    <message>
+        <source>Use this form to request payments. All fields are &lt;b&gt;optional&lt;/b&gt;.</source>
+        <translation>Χρησιμοποιήστε αυτήν τη φόρμα για να ζητήσετε πληρωμές. Όλα τα πεδία είναι &lt;b&gt;προαιρετικά&lt;/b&gt;.</translation>
+    </message>
+    <message>
+        <source>An optional amount to request. Leave this empty or zero to not request a specific amount.</source>
+        <translation>Ένα προαιρετικό ποσό για να ζητήσετε. Αφήστε αυτό το κενό ή το μηδέν για να μην ζητήσετε ένα συγκεκριμένο ποσό.</translation>
+    </message>
+    <message>
+        <source>An optional label to associate with the new receiving address (used by you to identify an invoice).  It is also attached to the payment request.</source>
+        <translation>Μια προαιρετική ετικέτα για σύνδεση με τη νέα διεύθυνση λήψης (που χρησιμοποιείται από εσάς για την αναγνώριση τιμολογίου). Επισυνάπτεται επίσης στην αίτηση πληρωμής.</translation>
+    </message>
+    <message>
+        <source>An optional message that is attached to the payment request and may be displayed to the sender.</source>
+        <translation>Ένα προαιρετικό μήνυμα που επισυνάπτεται στην αίτηση πληρωμής και μπορεί να εμφανιστεί στον αποστολέα.</translation>
+    </message>
+    <message>
+        <source>&amp;Create new receiving address</source>
+        <translation>&amp;Δημιουργία νέας διεύθυνσης λήψης</translation>
+    </message>
+    <message>
+        <source>Clear all fields of the form.</source>
+        <translation>Καθαρισμός όλων των πεδίων της φόρμας.</translation>
+    </message>
+    <message>
+        <source>Clear</source>
+        <translation>Καθαρισμός</translation>
+    </message>
+    <message>
+        <source>Native segwit addresses (aka Bech32 or BIP-173) reduce your transaction fees later on and offer better protection against typos, but old wallets don't support them. When unchecked, an address compatible with older wallets will be created instead.</source>
+        <translation>Οι εγγενείς διευθύνσεις αλληλογραφίας (aka Bech32 ή BIP-173) μειώνουν αργότερα τις αμοιβές συναλλαγών σας και προσφέρουν καλύτερη προστασία από τυπογραφικά λάθη, αλλά τα παλιά πορτοφόλια δεν τα υποστηρίζουν. Όταν δεν έχει επιλεγεί, θα δημιουργηθεί μια διεύθυνση συμβατή με παλιότερα πορτοφόλια.</translation>
+    </message>
+    <message>
+        <source>Generate native segwit (Bech32) address</source>
+        <translation>Δημιουργήστε τη διεύθυνση native segwit (Bech32)</translation>
+    </message>
+    <message>
+        <source>Requested payments history</source>
+        <translation> Ιστορικό πληρωμών που ζητήσατε</translation>
+    </message>
+    <message>
+        <source>Show the selected request (does the same as double clicking an entry)</source>
+        <translation> Εμφάνιση της επιλεγμένης αίτησης (κάνει το ίδιο με το διπλό κλικ σε μια καταχώρηση)</translation>
+    </message>
+    <message>
+        <source>Show</source>
+        <translation>Εμφάνιση</translation>
+    </message>
+    <message>
+        <source>Remove the selected entries from the list</source>
+        <translation>Αφαίρεση επιλεγμένων καταχωρίσεων από τη λίστα</translation>
+    </message>
+    <message>
+        <source>Remove</source>
+        <translation>Αφαίρεση</translation>
+    </message>
+    <message>
+        <source>Copy URI</source>
+        <translation>Αντιγραφή της επιλεγμένης διεύθυνσης στο πρόχειρο του συστήματος</translation>
+    </message>
+    <message>
+        <source>Copy label</source>
+        <translation>Αντιγραφή ετικέτας</translation>
+    </message>
+    <message>
+        <source>Copy message</source>
+        <translation>Αντιγραφή μηνύματος</translation>
+    </message>
+    <message>
+        <source>Copy amount</source>
+        <translation>Αντιγραφή ποσού</translation>
+    </message>
+    <message>
+        <source>Could not unlock wallet.</source>
+        <translation>Δεν είναι δυνατό το ξεκλείδωμα του πορτοφολιού.</translation>
+    </message>
+    </context>
+<context>
+    <name>ReceiveRequestDialog</name>
+    <message>
+        <source>Amount:</source>
+        <translation>Ποσό:</translation>
+    </message>
+    <message>
+        <source>Message:</source>
+  
