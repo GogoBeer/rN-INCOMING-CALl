@@ -2259,4 +2259,197 @@ Note:  Since the fee is calculated on a per-byte basis, a fee of "100 satoshis p
         <translation>Επιβεβαίωση χρονικού στόχου :</translation>
     </message>
     <message>
-        <s
+        <source>Enable Replace-By-Fee</source>
+        <translation>Ενεργοποίηση Αντικατάστασης-Aπό-Έξοδα</translation>
+    </message>
+    <message>
+        <source>With Replace-By-Fee (BIP-125) you can increase a transaction's fee after it is sent. Without this, a higher fee may be recommended to compensate for increased transaction delay risk.</source>
+        <translation>Με την υπηρεσία αντικατάστασης-πληρωμής (BIP-125) μπορείτε να αυξήσετε το τέλος μιας συναλλαγής μετά την αποστολή. Χωρίς αυτό, μπορεί να συνιστάται υψηλότερη αμοιβή για την αντιστάθμιση του αυξημένου κινδύνου καθυστέρησης της συναλλαγής.</translation>
+    </message>
+    <message>
+        <source>Clear &amp;All</source>
+        <translation>Καθαρισμός &amp;Όλων</translation>
+    </message>
+    <message>
+        <source>Balance:</source>
+        <translation>Υπόλοιπο:</translation>
+    </message>
+    <message>
+        <source>Confirm the send action</source>
+        <translation>Επιβεβαίωση αποστολής</translation>
+    </message>
+    <message>
+        <source>S&amp;end</source>
+        <translation>Αποστολή</translation>
+    </message>
+    <message>
+        <source>Copy quantity</source>
+        <translation>Αντιγραφή ποσότητας</translation>
+    </message>
+    <message>
+        <source>Copy amount</source>
+        <translation>Αντιγραφή ποσού</translation>
+    </message>
+    <message>
+        <source>Copy fee</source>
+        <translation>Αντιγραφή τελών</translation>
+    </message>
+    <message>
+        <source>Copy after fee</source>
+        <translation>Αντιγραφή μετά τα έξοδα</translation>
+    </message>
+    <message>
+        <source>Copy bytes</source>
+        <translation>Αντιγραφή των bytes</translation>
+    </message>
+    <message>
+        <source>Copy dust</source>
+        <translation>Αντιγραφή σκόνης</translation>
+    </message>
+    <message>
+        <source>Copy change</source>
+        <translation>Αντιγραφή αλλαγής</translation>
+    </message>
+    <message>
+        <source>%1 (%2 blocks)</source>
+        <translation>%1 (%2 μπλοκς)</translation>
+    </message>
+    <message>
+        <source>Cr&amp;eate Unsigned</source>
+        <translation>Δη&amp;μιουργία Ανυπόγραφου</translation>
+    </message>
+    <message>
+        <source> from wallet '%1'</source>
+        <translation>από πορτοφόλι '%1'</translation>
+    </message>
+    <message>
+        <source>%1 to '%2'</source>
+        <translation>%1 προς το '%2'</translation>
+    </message>
+    <message>
+        <source>%1 to %2</source>
+        <translation>%1 προς το %2</translation>
+    </message>
+    <message>
+        <source>Do you want to draft this transaction?</source>
+        <translation>Θέλετε να σχεδιάσετε αυτήν τη συναλλαγή;</translation>
+    </message>
+    <message>
+        <source>Are you sure you want to send?</source>
+        <translation>Είστε βέβαιοι ότι θέλετε να στείλετε;</translation>
+    </message>
+    <message>
+        <source>Save Transaction Data</source>
+        <translation>Αποθήκευση Δεδομένων Συναλλαγής</translation>
+    </message>
+    <message>
+        <source>or</source>
+        <translation>ή</translation>
+    </message>
+    <message>
+        <source>You can increase the fee later (signals Replace-By-Fee, BIP-125).</source>
+        <translation> Μπορείτε να αυξήσετε αργότερα την αμοιβή (σήματα Αντικατάσταση-By-Fee, BIP-125).</translation>
+    </message>
+    <message>
+        <source>Please, review your transaction.</source>
+        <translation>Παρακαλούμε, ελέγξτε τη συναλλαγή σας.</translation>
+    </message>
+    <message>
+        <source>Transaction fee</source>
+        <translation>Κόστος συναλλαγής</translation>
+    </message>
+    <message>
+        <source>Not signalling Replace-By-Fee, BIP-125.</source>
+        <translation> 
+Δεν σηματοδοτεί την Aντικατάσταση-Aπό-Έξοδο, BIP-125.</translation>
+    </message>
+    <message>
+        <source>Total Amount</source>
+        <translation>Συνολικό Ποσό</translation>
+    </message>
+    <message>
+        <source>To review recipient list click "Show Details..."</source>
+        <translation>Για να ελέγξετε τη λίστα παραληπτών, κάντε κλικ στην επιλογή "Εμφάνιση Λεπτομερειών..."</translation>
+    </message>
+    <message>
+        <source>Confirm send coins</source>
+        <translation> Επιβεβαιώστε την αποστολή νομισμάτων</translation>
+    </message>
+    <message>
+        <source>Confirm transaction proposal</source>
+        <translation> Επιβεβαιώστε την πρόταση συναλλαγής</translation>
+    </message>
+    <message>
+        <source>Send</source>
+        <translation>Αποστολή</translation>
+    </message>
+    <message>
+        <source>Watch-only balance:</source>
+        <translation>Παρακολούθηση μόνο ισορροπίας:</translation>
+    </message>
+    <message>
+        <source>The recipient address is not valid. Please recheck.</source>
+        <translation>Η διεύθυση παραλήπτη δεν είναι έγκυρη. Ελέγξτε ξανά.</translation>
+    </message>
+    <message>
+        <source>The amount to pay must be larger than 0.</source>
+        <translation>Το ποσό που πρέπει να πληρώσει πρέπει να είναι μεγαλύτερο από το 0.</translation>
+    </message>
+    <message>
+        <source>The amount exceeds your balance.</source>
+        <translation>Το ποσό υπερβαίνει το υπόλοιπό σας.</translation>
+    </message>
+    <message>
+        <source>The total exceeds your balance when the %1 transaction fee is included.</source>
+        <translation> Το σύνολο υπερβαίνει το υπόλοιπό σας όταν περιλαμβάνεται το τέλος συναλλαγής %1.</translation>
+    </message>
+    <message>
+        <source>Duplicate address found: addresses should only be used once each.</source>
+        <translation>Βρέθηκε διπλή διεύθυνση: οι διευθύνσεις θα πρέπει να χρησιμοποιούνται μόνο μία φορά.</translation>
+    </message>
+    <message>
+        <source>Transaction creation failed!</source>
+        <translation>Η δημιουργία της συναλλαγής απέτυχε!</translation>
+    </message>
+    <message>
+        <source>A fee higher than %1 is considered an absurdly high fee.</source>
+        <translation>Ένα τέλος υψηλότερο από το %1 θεωρείται ένα παράλογο υψηλό έξοδο.</translation>
+    </message>
+    <message>
+        <source>Payment request expired.</source>
+        <translation>Η αίτηση πληρωμής έληξε.</translation>
+    </message>
+    <message numerus="yes">
+        <source>Estimated to begin confirmation within %n block(s).</source>
+        <translation><numerusform>Εκτιμάται η έναρξη επιβεβαίωσης εντός %n μπλοκ.</numerusform><numerusform>Εκτιμάται η έναρξη επιβεβαίωσης εντός %n μπλοκ.</numerusform></translation>
+    </message>
+    <message>
+        <source>Warning: Invalid Bitcoin address</source>
+        <translation>Προειδοποίηση: Μη έγκυρη διεύθυνση Bitcoin</translation>
+    </message>
+    <message>
+        <source>Warning: Unknown change address</source>
+        <translation>Προειδοποίηση: Άγνωστη διεύθυνση αλλαγής</translation>
+    </message>
+    <message>
+        <source>Confirm custom change address</source>
+        <translation>Επιβεβαιώστε τη διεύθυνση προσαρμοσμένης αλλαγής</translation>
+    </message>
+    <message>
+        <source>The address you selected for change is not part of this wallet. Any or all funds in your wallet may be sent to this address. Are you sure?</source>
+        <translation>Η διεύθυνση που επιλέξατε για αλλαγή δεν αποτελεί μέρος αυτού του πορτοφολιού. Οποιαδήποτε ή όλα τα κεφάλαια στο πορτοφόλι σας μπορούν να σταλούν σε αυτή τη διεύθυνση. Είσαι σίγουρος?</translation>
+    </message>
+    <message>
+        <source>(no label)</source>
+        <translation>(χωρίς ετικέτα)</translation>
+    </message>
+</context>
+<context>
+    <name>SendCoinsEntry</name>
+    <message>
+        <source>A&amp;mount:</source>
+        <translation>&amp;Ποσό:</translation>
+    </message>
+    <message>
+        <source>Pay &amp;To:</source>
+    
