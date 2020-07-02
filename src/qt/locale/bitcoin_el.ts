@@ -2606,4 +2606,233 @@ Note:  Since the fee is calculated on a per-byte basis, a fee of "100 satoshis p
     </message>
     <message>
         <source>The Bitcoin address the message was signed with</source>
-        <translation>Διεύθυνση Bitcoin με την οποία έχει υπογρα
+        <translation>Διεύθυνση Bitcoin με την οποία έχει υπογραφεί το μήνυμα</translation>
+    </message>
+    <message>
+        <source>The signed message to verify</source>
+        <translation>The signed message to verify</translation>
+    </message>
+    <message>
+        <source>The signature given when the message was signed</source>
+        <translation>Η υπογραφή που δόθηκε όταν υπογράφηκε το μήνυμα</translation>
+    </message>
+    <message>
+        <source>Verify the message to ensure it was signed with the specified Bitcoin address</source>
+        <translation>Επαληθεύστε το μήνυμα για να αποδείξετε πως υπογράφθηκε από τη συγκεκριμένη διεύθυνση Bitcoin</translation>
+    </message>
+    <message>
+        <source>Verify &amp;Message</source>
+        <translation>Επιβεβαίωση Mηνύματος</translation>
+    </message>
+    <message>
+        <source>Reset all verify message fields</source>
+        <translation>Επαναφορά όλων των πεδίων επαλήθευσης μηνύματος</translation>
+    </message>
+    <message>
+        <source>Click "Sign Message" to generate signature</source>
+        <translation>Κάντε κλικ στην επιλογή "Υπογραφή μηνύματος" για να δημιουργήσετε υπογραφή</translation>
+    </message>
+    <message>
+        <source>The entered address is invalid.</source>
+        <translation>Η καταχωρημένη διεύθυνση δεν είναι έγκυρη.</translation>
+    </message>
+    <message>
+        <source>Please check the address and try again.</source>
+        <translation>Ελέγξτε τη διεύθυνση και δοκιμάστε ξανά.</translation>
+    </message>
+    <message>
+        <source>The entered address does not refer to a key.</source>
+        <translation>Η καταχωρημένη διεύθυνση δεν αναφέρεται σε ένα κλειδί.</translation>
+    </message>
+    <message>
+        <source>Wallet unlock was cancelled.</source>
+        <translation>Το ξεκλείδωμα του Πορτοφολιού ακυρώθηκε.</translation>
+    </message>
+    <message>
+        <source>No error</source>
+        <translation>Κανένα σφάλμα</translation>
+    </message>
+    <message>
+        <source>Private key for the entered address is not available.</source>
+        <translation>Το ιδιωτικό κλειδί για την καταχωρημένη διεύθυνση δεν είναι διαθέσιμο.</translation>
+    </message>
+    <message>
+        <source>Message signing failed.</source>
+        <translation>Η υπογραφή μηνυμάτων απέτυχε.</translation>
+    </message>
+    <message>
+        <source>Message signed.</source>
+        <translation>Το μήνυμα υπογράφτηκε. </translation>
+    </message>
+    <message>
+        <source>The signature could not be decoded.</source>
+        <translation>Δεν ήταν δυνατή η αποκωδικοποίηση της υπογραφής.</translation>
+    </message>
+    <message>
+        <source>Please check the signature and try again.</source>
+        <translation>Ελέγξτε την υπογραφή και δοκιμάστε ξανά.</translation>
+    </message>
+    <message>
+        <source>The signature did not match the message digest.</source>
+        <translation>Η υπογραφή δεν ταιριάζει με το μήνυμα digest.</translation>
+    </message>
+    <message>
+        <source>Message verification failed.</source>
+        <translation>Επαλήθευση μηνύματος απέτυχε</translation>
+    </message>
+    <message>
+        <source>Message verified.</source>
+        <translation>Το μήνυμα επαληθεύτηκε.</translation>
+    </message>
+</context>
+<context>
+    <name>TrafficGraphWidget</name>
+    <message>
+        <source>KB/s</source>
+        <translation>KB/s</translation>
+    </message>
+</context>
+<context>
+    <name>TransactionDesc</name>
+    <message numerus="yes">
+        <source>Open for %n more block(s)</source>
+        <translation><numerusform>Ανοίξτε για %n περισσότερα μπλοκ</numerusform><numerusform>Ανοίξτε για %n περισσότερα μπλοκ</numerusform></translation>
+    </message>
+    <message>
+        <source>Open until %1</source>
+        <translation>Ανοιχτό μέχρι %1</translation>
+    </message>
+    <message>
+        <source>conflicted with a transaction with %1 confirmations</source>
+        <translation>σε σύγκρουση με μια συναλλαγή με %1 επιβεβαιώσεις</translation>
+    </message>
+    <message>
+        <source>0/unconfirmed, %1</source>
+        <translation>0/ανεπιβεβαίωτο, %1</translation>
+    </message>
+    <message>
+        <source>in memory pool</source>
+        <translation>στην πισίνα μνήμης</translation>
+    </message>
+    <message>
+        <source>not in memory pool</source>
+        <translation>όχι στην πισίνα μνήμης</translation>
+    </message>
+    <message>
+        <source>abandoned</source>
+        <translation>εγκαταλελειμμένος</translation>
+    </message>
+    <message>
+        <source>%1/unconfirmed</source>
+        <translation>%1/μη επιβεβαιωμένο</translation>
+    </message>
+    <message>
+        <source>%1 confirmations</source>
+        <translation>%1 επιβεβαιώσεις</translation>
+    </message>
+    <message>
+        <source>Status</source>
+        <translation>Κατάσταση</translation>
+    </message>
+    <message>
+        <source>Date</source>
+        <translation>Ημερομηνία</translation>
+    </message>
+    <message>
+        <source>Source</source>
+        <translation>Πηγή</translation>
+    </message>
+    <message>
+        <source>Generated</source>
+        <translation>Παράχθηκε</translation>
+    </message>
+    <message>
+        <source>From</source>
+        <translation>Από</translation>
+    </message>
+    <message>
+        <source>unknown</source>
+        <translation>Άγνωστο</translation>
+    </message>
+    <message>
+        <source>To</source>
+        <translation>Προς</translation>
+    </message>
+    <message>
+        <source>own address</source>
+        <translation>δική σας διεύθυνση</translation>
+    </message>
+    <message>
+        <source>watch-only</source>
+        <translation>παρακολούθηση-μόνο</translation>
+    </message>
+    <message>
+        <source>label</source>
+        <translation>ετικέτα</translation>
+    </message>
+    <message>
+        <source>Credit</source>
+        <translation>Πίστωση</translation>
+    </message>
+    <message numerus="yes">
+        <source>matures in %n more block(s)</source>
+        <translation><numerusform>ωριμάζει σε %n περισσότερα μπλοκ</numerusform><numerusform>ωριμάζει σε %n περισσότερα κομμάτια</numerusform></translation>
+    </message>
+    <message>
+        <source>not accepted</source>
+        <translation>μη έγκυρο</translation>
+    </message>
+    <message>
+        <source>Debit</source>
+        <translation>Χρέωση</translation>
+    </message>
+    <message>
+        <source>Total debit</source>
+        <translation>Συνολική χρέωση</translation>
+    </message>
+    <message>
+        <source>Total credit</source>
+        <translation>Συνολική πίστωση</translation>
+    </message>
+    <message>
+        <source>Transaction fee</source>
+        <translation>Κόστος συναλλαγής</translation>
+    </message>
+    <message>
+        <source>Net amount</source>
+        <translation>Καθαρό ποσό</translation>
+    </message>
+    <message>
+        <source>Message</source>
+        <translation>Μήνυμα</translation>
+    </message>
+    <message>
+        <source>Comment</source>
+        <translation>Σχόλιο</translation>
+    </message>
+    <message>
+        <source>Transaction ID</source>
+        <translation>Ταυτότητα συναλλαγής</translation>
+    </message>
+    <message>
+        <source>Transaction total size</source>
+        <translation>Συνολικό μέγεθος συναλλαγής</translation>
+    </message>
+    <message>
+        <source>Transaction virtual size</source>
+        <translation>Εικονικό μέγεθος συναλλαγής</translation>
+    </message>
+    <message>
+        <source>Output index</source>
+        <translation>Δείκτης εξόδου</translation>
+    </message>
+    <message>
+        <source> (Certificate was not verified)</source>
+        <translation>(Το πιστοποιητικό δεν επαληθεύτηκε)</translation>
+    </message>
+    <message>
+        <source>Merchant</source>
+        <translation>Έμπορος</translation>
+    </message>
+    <message>
+        <source>Generated coins must mature %1 blocks before they can be spent. When you generated this block, it was broadca
