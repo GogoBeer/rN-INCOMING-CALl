@@ -2835,4 +2835,219 @@ Note:  Since the fee is calculated on a per-byte basis, a fee of "100 satoshis p
         <translation>Έμπορος</translation>
     </message>
     <message>
-        <source>Generated coins must mature %1 blocks before they can be spent. When you generated this block, it was broadca
+        <source>Generated coins must mature %1 blocks before they can be spent. When you generated this block, it was broadcast to the network to be added to the block chain. If it fails to get into the chain, its state will change to "not accepted" and it won't be spendable. This may occasionally happen if another node generates a block within a few seconds of yours.</source>
+        <translation>Τα δημιουργημένα κέρματα πρέπει να ωριμάσουν σε %1 μπλοκ πριν να ξοδευτούν. Όταν δημιουργήσατε αυτό το μπλοκ, μεταδόθηκε στο δίκτυο για να προστεθεί στην αλυσίδα μπλοκ. Εάν αποτύχει να εισέλθει στην αλυσίδα, η κατάσταση της θα αλλάξει σε "μη αποδεκτή" και δεν θα είναι δαπανηρή. Αυτό μπορεί περιστασιακά να συμβεί εάν ένας άλλος κόμβος παράγει ένα μπλοκ μέσα σε λίγα δευτερόλεπτα από το δικό σας.</translation>
+    </message>
+    <message>
+        <source>Debug information</source>
+        <translation>Πληροφορίες σφαλμάτων</translation>
+    </message>
+    <message>
+        <source>Transaction</source>
+        <translation>Συναλλαγή</translation>
+    </message>
+    <message>
+        <source>Inputs</source>
+        <translation>Είσοδοι</translation>
+    </message>
+    <message>
+        <source>Amount</source>
+        <translation>Ποσό</translation>
+    </message>
+    <message>
+        <source>true</source>
+        <translation>αληθής</translation>
+    </message>
+    <message>
+        <source>false</source>
+        <translation>ψευδής</translation>
+    </message>
+</context>
+<context>
+    <name>TransactionDescDialog</name>
+    <message>
+        <source>This pane shows a detailed description of the transaction</source>
+        <translation>Αυτό το παράθυρο δείχνει μια λεπτομερή περιγραφή της συναλλαγής</translation>
+    </message>
+    <message>
+        <source>Details for %1</source>
+        <translation>Λεπτομέρειες για %1</translation>
+    </message>
+</context>
+<context>
+    <name>TransactionTableModel</name>
+    <message>
+        <source>Date</source>
+        <translation>Ημερομηνία</translation>
+    </message>
+    <message>
+        <source>Type</source>
+        <translation>Τύπος</translation>
+    </message>
+    <message>
+        <source>Label</source>
+        <translation>Ετικέτα</translation>
+    </message>
+    <message numerus="yes">
+        <source>Open for %n more block(s)</source>
+        <translation><numerusform>Ανοίξτε για %n περισσότερα μπλοκ</numerusform><numerusform>Ανοίξτε για %n περισσότερα μπλοκ</numerusform></translation>
+    </message>
+    <message>
+        <source>Open until %1</source>
+        <translation>Ανοιχτό μέχρι %1</translation>
+    </message>
+    <message>
+        <source>Unconfirmed</source>
+        <translation>Ανεξακρίβωτος</translation>
+    </message>
+    <message>
+        <source>Abandoned</source>
+        <translation>εγκαταλελειμμένος</translation>
+    </message>
+    <message>
+        <source>Confirming (%1 of %2 recommended confirmations)</source>
+        <translation>Επιβεβαίωση (%1 από %2 συνιστώμενες επιβεβαιώσεις)</translation>
+    </message>
+    <message>
+        <source>Confirmed (%1 confirmations)</source>
+        <translation>Επιβεβαίωση (%1 επιβεβαιώσεις)</translation>
+    </message>
+    <message>
+        <source>Conflicted</source>
+        <translation>Συγκρούεται</translation>
+    </message>
+    <message>
+        <source>Immature (%1 confirmations, will be available after %2)</source>
+        <translation>Άτομο (%1 επιβεβαιώσεις, θα είναι διαθέσιμες μετά το %2)</translation>
+    </message>
+    <message>
+        <source>Generated but not accepted</source>
+        <translation>Δημιουργήθηκε αλλά δεν έγινε αποδεκτή</translation>
+    </message>
+    <message>
+        <source>Received with</source>
+        <translation>Λήψη με</translation>
+    </message>
+    <message>
+        <source>Received from</source>
+        <translation>Λήψη από</translation>
+    </message>
+    <message>
+        <source>Sent to</source>
+        <translation>Αποστέλλονται</translation>
+    </message>
+    <message>
+        <source>Payment to yourself</source>
+        <translation>Πληρωμή στον εαυτό σας</translation>
+    </message>
+    <message>
+        <source>Mined</source>
+        <translation>Εξόρυξη</translation>
+    </message>
+    <message>
+        <source>watch-only</source>
+        <translation>παρακολούθηση-μόνο</translation>
+    </message>
+    <message>
+        <source>(n/a)</source>
+        <translation>(μη διαθέσιμο)</translation>
+    </message>
+    <message>
+        <source>(no label)</source>
+        <translation>(χωρίς ετικέτα)</translation>
+    </message>
+    <message>
+        <source>Transaction status. Hover over this field to show number of confirmations.</source>
+        <translation>Κατάσταση συναλλαγής. Τοποθετήστε το δείκτη του ποντικιού πάνω από αυτό το πεδίο για να δείτε τον αριθμό των επιβεβαιώσεων.</translation>
+    </message>
+    <message>
+        <source>Date and time that the transaction was received.</source>
+        <translation>Ημερομηνία και ώρα λήψης της συναλλαγής.</translation>
+    </message>
+    <message>
+        <source>Type of transaction.</source>
+        <translation>Είδος συναλλαγής.</translation>
+    </message>
+    <message>
+        <source>Whether or not a watch-only address is involved in this transaction.</source>
+        <translation>Είτε πρόκειται για μια διεύθυνση μόνο για ρολόι, είτε όχι, σε αυτήν τη συναλλαγή.</translation>
+    </message>
+    <message>
+        <source>User-defined intent/purpose of the transaction.</source>
+        <translation>Καθορισμένος από τον χρήστη σκοπός / σκοπός της συναλλαγής.</translation>
+    </message>
+    <message>
+        <source>Amount removed from or added to balance.</source>
+        <translation>Ποσό που αφαιρέθηκε ή προστέθηκε στην ισορροπία.</translation>
+    </message>
+</context>
+<context>
+    <name>TransactionView</name>
+    <message>
+        <source>All</source>
+        <translation>Όλα</translation>
+    </message>
+    <message>
+        <source>Today</source>
+        <translation>Σήμερα</translation>
+    </message>
+    <message>
+        <source>This week</source>
+        <translation>Αυτή την εβδομάδα</translation>
+    </message>
+    <message>
+        <source>This month</source>
+        <translation>Αυτό τον μήνα</translation>
+    </message>
+    <message>
+        <source>Last month</source>
+        <translation>Τον προηγούμενο μήνα</translation>
+    </message>
+    <message>
+        <source>This year</source>
+        <translation>Αυτή την χρονιά</translation>
+    </message>
+    <message>
+        <source>Range...</source>
+        <translation>Πεδίο...</translation>
+    </message>
+    <message>
+        <source>Received with</source>
+        <translation>Λήψη με</translation>
+    </message>
+    <message>
+        <source>Sent to</source>
+        <translation>Αποστέλλονται προς</translation>
+    </message>
+    <message>
+        <source>To yourself</source>
+        <translation>Στον εαυτό σου</translation>
+    </message>
+    <message>
+        <source>Mined</source>
+        <translation>Εξόρυξη</translation>
+    </message>
+    <message>
+        <source>Other</source>
+        <translation>Άλλα</translation>
+    </message>
+    <message>
+        <source>Enter address, transaction id, or label to search</source>
+        <translation>Εισαγάγετε τη διεύθυνση, το αναγνωριστικό συναλλαγής ή την ετικέτα για αναζήτηση</translation>
+    </message>
+    <message>
+        <source>Min amount</source>
+        <translation>Ελάχιστο ποσό</translation>
+    </message>
+    <message>
+        <source>Abandon transaction</source>
+        <translation>Απαλλαγή συναλλαγής</translation>
+    </message>
+    <message>
+        <source>Increase transaction fee</source>
+        <translation>Αύξηση του τέλους συναλλαγής</translation>
+    </message>
+    <message>
+        <source>Copy address</source>
+        <translation>Αντιγραφή διεύθυνσης</translation>
+    </message>
