@@ -3051,3 +3051,227 @@ Note:  Since the fee is calculated on a per-byte basis, a fee of "100 satoshis p
         <source>Copy address</source>
         <translation>Αντιγραφή διεύθυνσης</translation>
     </message>
+    <message>
+        <source>Copy label</source>
+        <translation>Αντιγραφή ετικέτας</translation>
+    </message>
+    <message>
+        <source>Copy amount</source>
+        <translation>Αντιγραφή ποσού</translation>
+    </message>
+    <message>
+        <source>Copy transaction ID</source>
+        <translation>Αντιγραφή ταυτότητας συναλλαγής</translation>
+    </message>
+    <message>
+        <source>Copy raw transaction</source>
+        <translation>Αντιγραφή ανεπεξέργαστης συναλλαγής</translation>
+    </message>
+    <message>
+        <source>Copy full transaction details</source>
+        <translation>Αντιγράψτε τις πλήρεις λεπτομέρειες της συναλλαγής</translation>
+    </message>
+    <message>
+        <source>Edit label</source>
+        <translation>Επεξεργασία ετικέτας</translation>
+    </message>
+    <message>
+        <source>Show transaction details</source>
+        <translation>Εμφάνιση λεπτομερειών συναλλαγής</translation>
+    </message>
+    <message>
+        <source>Export Transaction History</source>
+        <translation>Εξαγωγή ιστορικού συναλλαγών</translation>
+    </message>
+    <message>
+        <source>Comma separated file (*.csv)</source>
+        <translation>Αρχείο οριοθετημένο με κόμματα (*.csv)</translation>
+    </message>
+    <message>
+        <source>Confirmed</source>
+        <translation>Επικυρωμένες</translation>
+    </message>
+    <message>
+        <source>Watch-only</source>
+        <translation>Παρακολουθήστε μόνο</translation>
+    </message>
+    <message>
+        <source>Date</source>
+        <translation>Ημερομηνία</translation>
+    </message>
+    <message>
+        <source>Type</source>
+        <translation>Τύπος</translation>
+    </message>
+    <message>
+        <source>Label</source>
+        <translation>Ετικέτα</translation>
+    </message>
+    <message>
+        <source>Address</source>
+        <translation>Διεύθυνση</translation>
+    </message>
+    <message>
+        <source>ID</source>
+        <translation>ταυτότητα</translation>
+    </message>
+    <message>
+        <source>Exporting Failed</source>
+        <translation>Αποτυχία Εξαγωγής</translation>
+    </message>
+    <message>
+        <source>There was an error trying to save the transaction history to %1.</source>
+        <translation>Παρουσιάστηκε σφάλμα κατά την προσπάθεια αποθήκευσης του ιστορικού συναλλαγών στο %1.</translation>
+    </message>
+    <message>
+        <source>Exporting Successful</source>
+        <translation>Η εξαγωγή ήταν επιτυχής</translation>
+    </message>
+    <message>
+        <source>The transaction history was successfully saved to %1.</source>
+        <translation>Το ιστορικό συναλλαγών αποθηκεύτηκε επιτυχώς στο %1.</translation>
+    </message>
+    <message>
+        <source>Range:</source>
+        <translation>Πεδίο:</translation>
+    </message>
+    <message>
+        <source>to</source>
+        <translation>προς</translation>
+    </message>
+</context>
+<context>
+    <name>UnitDisplayStatusBarControl</name>
+    <message>
+        <source>Unit to show amounts in. Click to select another unit.</source>
+        <translation>Μονάδα μέτρησης προβολής ποσών. Κάντε κλικ για επιλογή άλλης μονάδας.</translation>
+    </message>
+</context>
+<context>
+    <name>WalletController</name>
+    <message>
+        <source>Close wallet</source>
+        <translation>Κλείσιμο πορτοφολιού</translation>
+    </message>
+    <message>
+        <source>Are you sure you wish to close the wallet &lt;i&gt;%1&lt;/i&gt;?</source>
+        <translation>Είσαι σίγουρος/η ότι επιθυμείς να κλείσεις το πορτοφόλι &lt;i&gt;%1&lt;/i&gt;;</translation>
+    </message>
+    <message>
+        <source>Closing the wallet for too long can result in having to resync the entire chain if pruning is enabled.</source>
+        <translation>Το κλείσιμο του πορτοφολιού για πολύ μεγάλο χρονικό διάστημα μπορεί να οδηγήσει στην επανασύνδεση ολόκληρης της αλυσίδας αν είναι ενεργοποιημένη η περικοπή.</translation>
+    </message>
+    </context>
+<context>
+    <name>WalletFrame</name>
+    <message>
+        <source>Create a new wallet</source>
+        <translation>Δημιουργία νέου Πορτοφολιού</translation>
+    </message>
+</context>
+<context>
+    <name>WalletModel</name>
+    <message>
+        <source>Send Coins</source>
+        <translation>Αποστολή νομισμάτων</translation>
+    </message>
+    <message>
+        <source>Fee bump error</source>
+        <translation>Σφάλμα πρόσκρουσης τέλους</translation>
+    </message>
+    <message>
+        <source>Increasing transaction fee failed</source>
+        <translation>Η αύξηση του τέλους συναλλαγής απέτυχε</translation>
+    </message>
+    <message>
+        <source>Do you want to increase the fee?</source>
+        <translation>Θέλετε να αυξήσετε το τέλος;</translation>
+    </message>
+    <message>
+        <source>Do you want to draft a transaction with fee increase?</source>
+        <translation>Θέλετε να σχεδιάσετε μια συναλλαγή με αύξηση των τελών;</translation>
+    </message>
+    <message>
+        <source>Current fee:</source>
+        <translation>Τρέχουσα χρέωση:</translation>
+    </message>
+    <message>
+        <source>Increase:</source>
+        <translation>Αύξηση:</translation>
+    </message>
+    <message>
+        <source>New fee:</source>
+        <translation>Νέο έξοδο:</translation>
+    </message>
+    <message>
+        <source>Confirm fee bump</source>
+        <translation>Επιβεβαίωση χρέωσης εξόδων</translation>
+    </message>
+    <message>
+        <source>Can't draft transaction.</source>
+        <translation>Δεν είναι δυνατή η σύνταξη συναλλαγής.</translation>
+    </message>
+    <message>
+        <source>PSBT copied</source>
+        <translation>PSBT αντιγράφηκε</translation>
+    </message>
+    <message>
+        <source>Can't sign transaction.</source>
+        <translation>Δεν είναι δυνατή η υπογραφή συναλλαγής.</translation>
+    </message>
+    <message>
+        <source>Could not commit transaction</source>
+        <translation>Δεν ήταν δυνατή η ανάληψη συναλλαγής</translation>
+    </message>
+    <message>
+        <source>default wallet</source>
+        <translation>Προεπιλεγμένο πορτοφόλι</translation>
+    </message>
+</context>
+<context>
+    <name>WalletView</name>
+    <message>
+        <source>&amp;Export</source>
+        <translation>&amp;Εξαγωγή</translation>
+    </message>
+    <message>
+        <source>Export the data in the current tab to a file</source>
+        <translation>Εξαγωγή δεδομένων καρτέλας σε αρχείο</translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation>Σφάλμα</translation>
+    </message>
+    <message>
+        <source>Backup Wallet</source>
+        <translation>Αντίγραφο ασφαλείας Πορτοφολιού</translation>
+    </message>
+    <message>
+        <source>Wallet Data (*.dat)</source>
+        <translation> Στοιχεία πορτοφολιού (*.dat)</translation>
+    </message>
+    <message>
+        <source>Backup Failed</source>
+        <translation>Αποτυχία δημιουργίας αντίγραφου ασφαλείας</translation>
+    </message>
+    <message>
+        <source>There was an error trying to save the wallet data to %1.</source>
+        <translation>Παρουσιάστηκε σφάλμα κατά την προσπάθεια αποθήκευσης των δεδομένων πορτοφολιού στο %1.</translation>
+    </message>
+    <message>
+        <source>Backup Successful</source>
+        <translation>Η δημιουργία αντιγράφων ασφαλείας ήταν επιτυχής</translation>
+    </message>
+    <message>
+        <source>The wallet data was successfully saved to %1.</source>
+        <translation>Τα δεδομένα πορτοφολιού αποθηκεύτηκαν επιτυχώς στο %1.</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Ακύρωση</translation>
+    </message>
+</context>
+<context>
+    <name>bitcoin-core</name>
+    <message>
+        <source>Distributed
