@@ -3274,4 +3274,128 @@ Note:  Since the fee is calculated on a per-byte basis, a fee of "100 satoshis p
 <context>
     <name>bitcoin-core</name>
     <message>
-        <source>Distributed
+        <source>Distributed under the MIT software license, see the accompanying file %s or %s</source>
+        <translation>Διανέμεται υπό την άδεια χρήσης του λογισμικού MIT, δείτε το συνοδευτικό αρχείο %s ή %s</translation>
+    </message>
+    <message>
+        <source>Prune configured below the minimum of %d MiB.  Please use a higher number.</source>
+        <translation>Ο δακτύλιος έχει διαμορφωθεί κάτω από το ελάχιστο %d MiB. Χρησιμοποιήστε έναν υψηλότερο αριθμό.</translation>
+    </message>
+    <message>
+        <source>Prune: last wallet synchronisation goes beyond pruned data. You need to -reindex (download the whole blockchain again in case of pruned node)</source>
+        <translation>Κλάδεμα: ο τελευταίος συγχρονισμός πορτοφολιού ξεπερνά τα κλαδεμένα δεδομένα. Πρέπει να κάνετε -reindex (κατεβάστε ολόκληρο το blockchain και πάλι σε περίπτωση κλαδέματος κόμβου)</translation>
+    </message>
+    <message>
+        <source>Pruning blockstore...</source>
+        <translation>Κλάδεμα blockstore...</translation>
+    </message>
+    <message>
+        <source>Unable to start HTTP server. See debug log for details.</source>
+        <translation>Δεν είναι δυνατή η εκκίνηση του διακομιστή HTTP. Δείτε το αρχείο εντοπισμού σφαλμάτων για λεπτομέρειες.</translation>
+    </message>
+    <message>
+        <source>The %s developers</source>
+        <translation>Οι προγραμματιστές %s</translation>
+    </message>
+    <message>
+        <source>Cannot obtain a lock on data directory %s. %s is probably already running.</source>
+        <translation>Δεν είναι δυνατή η λήψη κλειδώματος στον κατάλογο δεδομένων %s. Το %s πιθανώς ήδη εκτελείται.</translation>
+    </message>
+    <message>
+        <source>Cannot provide specific connections and have addrman find outgoing connections at the same.</source>
+        <translation>Δεν είναι δυνατή η παροχή συγκεκριμένων συνδέσεων και η προσπέλαση των εξερχόμενων συνδέσεων στο ίδιο σημείο.</translation>
+    </message>
+    <message>
+        <source>Error reading %s! All keys read correctly, but transaction data or address book entries might be missing or incorrect.</source>
+        <translation>Σφάλμα κατά την ανάγνωση %s! Όλα τα κλειδιά διαβάζονται σωστά, αλλά τα δεδομένα των συναλλαγών ή οι καταχωρίσεις του βιβλίου διευθύνσεων ενδέχεται να λείπουν ή να είναι εσφαλμένα.</translation>
+    </message>
+    <message>
+        <source>Please check that your computer's date and time are correct! If your clock is wrong, %s will not work properly.</source>
+        <translation>Ελέγξτε ότι η ημερομηνία και η ώρα του υπολογιστή σας είναι σωστές! Αν το ρολόι σας είναι λάθος, το %s δεν θα λειτουργήσει σωστά.</translation>
+    </message>
+    <message>
+        <source>Please contribute if you find %s useful. Visit %s for further information about the software.</source>
+        <translation>Παρακαλώ συμβάλλετε αν βρείτε %s χρήσιμο. Επισκεφθείτε το %s για περισσότερες πληροφορίες σχετικά με το λογισμικό.</translation>
+    </message>
+    <message>
+        <source>The block database contains a block which appears to be from the future. This may be due to your computer's date and time being set incorrectly. Only rebuild the block database if you are sure that your computer's date and time are correct</source>
+        <translation>Η βάση δεδομένων μπλοκ περιέχει ένα μπλοκ που φαίνεται να είναι από το μέλλον. Αυτό μπορεί να οφείλεται στην εσφαλμένη ρύθμιση της ημερομηνίας και της ώρας του υπολογιστή σας. Αποκαταστήστε μόνο τη βάση δεδομένων μπλοκ αν είστε βέβαιοι ότι η ημερομηνία και η ώρα του υπολογιστή σας είναι σωστές</translation>
+    </message>
+    <message>
+        <source>This is a pre-release test build - use at your own risk - do not use for mining or merchant applications</source>
+        <translation>Πρόκειται για δοκιμή πριν από την αποδέσμευση - χρησιμοποιήστε με δική σας ευθύνη - μην χρησιμοποιείτε για εξόρυξη ή εμπορικές εφαρμογές</translation>
+    </message>
+    <message>
+        <source>This is the transaction fee you may discard if change is smaller than dust at this level</source>
+        <translation>Αυτή είναι η αμοιβή συναλλαγής που μπορείτε να απορρίψετε εάν η αλλαγή είναι μικρότερη από τη σκόνη σε αυτό το επίπεδο</translation>
+    </message>
+    <message>
+        <source>Unable to replay blocks. You will need to rebuild the database using -reindex-chainstate.</source>
+        <translation>Δεν είναι δυνατή η επανάληψη των μπλοκ. Θα χρειαστεί να ξαναφτιάξετε τη βάση δεδομένων χρησιμοποιώντας το -reindex-chainstate.</translation>
+    </message>
+    <message>
+        <source>Unable to rewind the database to a pre-fork state. You will need to redownload the blockchain</source>
+        <translation>Δεν είναι δυνατή η γρήγορη επαναφορά της βάσης δεδομένων σε κατάσταση προ-πιρουνιού. Θα χρειαστεί να επαναλάβετε την φόρτωση του blockchain</translation>
+    </message>
+    <message>
+        <source>Warning: The network does not appear to fully agree! Some miners appear to be experiencing issues.</source>
+        <translation>Προειδοποίηση: Το δίκτυο δεν φαίνεται να συμφωνεί απόλυτα! Ορισμένοι ανθρακωρύχοι φαίνεται να αντιμετωπίζουν προβλήματα.</translation>
+    </message>
+    <message>
+        <source>Warning: We do not appear to fully agree with our peers! You may need to upgrade, or other nodes may need to upgrade.</source>
+        <translation>Προειδοποίηση: Δεν φαίνεται να συμφωνούμε πλήρως με τους συμμαθητές μας! Ίσως χρειαστεί να κάνετε αναβάθμιση ή ίσως χρειαστεί να αναβαθμίσετε άλλους κόμβους.</translation>
+    </message>
+    <message>
+        <source>-maxmempool must be at least %d MB</source>
+        <translation>-maxmempool πρέπει να είναι τουλάχιστον %d MB</translation>
+    </message>
+    <message>
+        <source>Cannot resolve -%s address: '%s'</source>
+        <translation>Δεν είναι δυνατή η επίλυση -%s διεύθυνση: '%s'</translation>
+    </message>
+    <message>
+        <source>Change index out of range</source>
+        <translation>Αλλάξτε τον δείκτη εκτός εμβέλειας</translation>
+    </message>
+    <message>
+        <source>Config setting for %s only applied on %s network when in [%s] section.</source>
+        <translation>Η ρύθμιση Config για το %s εφαρμόστηκε μόνο στο δίκτυο %s όταν βρίσκεται στην ενότητα [%s].</translation>
+    </message>
+    <message>
+        <source>Copyright (C) %i-%i</source>
+        <translation>Πνευματικά δικαιώματα (C) %i-%i</translation>
+    </message>
+    <message>
+        <source>Corrupted block database detected</source>
+        <translation>Εντοπίσθηκε διεφθαρμένη βάση δεδομένων των μπλοκ</translation>
+    </message>
+    <message>
+        <source>Could not find asmap file %s</source>
+        <translation>Δεν ήταν δυνατή η εύρεση του αρχείου asmap %s</translation>
+    </message>
+    <message>
+        <source>Could not parse asmap file %s</source>
+        <translation>Δεν ήταν δυνατή η ανάλυση του αρχείου asmap %s</translation>
+    </message>
+    <message>
+        <source>Do you want to rebuild the block database now?</source>
+        <translation>Θέλετε να δημιουργηθεί τώρα η βάση δεδομένων των μπλοκ;</translation>
+    </message>
+    <message>
+        <source>Error initializing block database</source>
+        <translation>Σφάλμα κατά την ενεργοποίηση της βάσης δεδομένων των μπλοκ</translation>
+    </message>
+    <message>
+        <source>Error initializing wallet database environment %s!</source>
+        <translation>Σφάλμα κατά την ενεργοποίηση της βάσης δεδομένων πορτοφολιού %s!</translation>
+    </message>
+    <message>
+        <source>Error loading %s</source>
+        <translation>Σφάλμα κατά τη φόρτωση %s</translation>
+    </message>
+    <message>
+        <source>Error loading %s: Private keys can only be disabled during creation</source>
+        <translation>Σφάλμα κατά τη φόρτωση %s: Τα ιδιωτικά κλειδιά μπορούν να απενεργοποιηθούν μόνο κατά τη δημιουργία</translation>
+    </message>
+    <message>
+        <source>Error loading %s: Wallet corrupted</
