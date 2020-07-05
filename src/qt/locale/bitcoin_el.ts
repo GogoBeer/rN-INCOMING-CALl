@@ -3398,4 +3398,169 @@ Note:  Since the fee is calculated on a per-byte basis, a fee of "100 satoshis p
         <translation>Σφάλμα κατά τη φόρτωση %s: Τα ιδιωτικά κλειδιά μπορούν να απενεργοποιηθούν μόνο κατά τη δημιουργία</translation>
     </message>
     <message>
-        <source>Error loading %s: Wallet corrupted</
+        <source>Error loading %s: Wallet corrupted</source>
+        <translation>Σφάλμα κατά τη φόρτωση %s: Κατεστραμμένο Πορτοφόλι</translation>
+    </message>
+    <message>
+        <source>Error loading %s: Wallet requires newer version of %s</source>
+        <translation>Σφάλμα κατά τη φόρτωση %s: Το Πορτοφόλι απαιτεί νεότερη έκδοση του %s</translation>
+    </message>
+    <message>
+        <source>Error loading block database</source>
+        <translation>Σφάλμα φόρτωσης της βάσης δεδομένων των μπλοκ</translation>
+    </message>
+    <message>
+        <source>Error opening block database</source>
+        <translation>Σφάλμα φόρτωσης της βάσης δεδομένων των μπλοκ</translation>
+    </message>
+    <message>
+        <source>Failed to listen on any port. Use -listen=0 if you want this.</source>
+        <translation>Αποτυχία παρακολούθησης σε οποιαδήποτε θύρα. Χρησιμοποιήστε -listen=0 αν θέλετε αυτό.</translation>
+    </message>
+    <message>
+        <source>Failed to rescan the wallet during initialization</source>
+        <translation>Αποτυχία επανεγγραφής του πορτοφολιού κατά την αρχικοποίηση</translation>
+    </message>
+    <message>
+        <source>Importing...</source>
+        <translation>Εισαγωγή...</translation>
+    </message>
+    <message>
+        <source>Incorrect or no genesis block found. Wrong datadir for network?</source>
+        <translation>Ανακαλύφθηκε λάθος ή δεν βρέθηκε μπλοκ γενετικής. Λάθος δεδομένων για το δίκτυο;</translation>
+    </message>
+    <message>
+        <source>Initialization sanity check failed. %s is shutting down.</source>
+        <translation> Ο έλεγχος ευελιξίας εκκίνησης απέτυχε. Το %s τερματίζεται.</translation>
+    </message>
+    <message>
+        <source>Invalid P2P permission: '%s'</source>
+        <translation>Μη έγκυρη άδεια P2P: '%s'</translation>
+    </message>
+    <message>
+        <source>Invalid amount for -discardfee=&lt;amount&gt;: '%s'</source>
+        <translation>Μη έγκυρο ποσό για το -discardfee =&lt;amount&gt;: '%s'</translation>
+    </message>
+    <message>
+        <source>Invalid amount for -fallbackfee=&lt;amount&gt;: '%s'</source>
+        <translation>Μη έγκυρο ποσό για το -fallbackfee =&lt;amount&gt;: '%s'</translation>
+    </message>
+    <message>
+        <source>Specified blocks directory "%s" does not exist.</source>
+        <translation>Δεν υπάρχει κατάλογος καθορισμένων μπλοκ "%s".</translation>
+    </message>
+    <message>
+        <source>Unknown address type '%s'</source>
+        <translation>Άγνωστος τύπος διεύθυνσης '%s'</translation>
+    </message>
+    <message>
+        <source>Upgrading txindex database</source>
+        <translation>Αναβάθμιση της βάσης δεδομένων txindex</translation>
+    </message>
+    <message>
+        <source>Loading P2P addresses...</source>
+        <translation>Φόρτωση P2P διευθύνσεων...</translation>
+    </message>
+    <message>
+        <source>Loading banlist...</source>
+        <translation>Φόρτωση λίστα απαγόρευσης...</translation>
+    </message>
+    <message>
+        <source>Not enough file descriptors available.</source>
+        <translation>Δεν υπάρχουν αρκετοί περιγραφείς αρχείων διαθέσιμοι.</translation>
+    </message>
+    <message>
+        <source>Prune cannot be configured with a negative value.</source>
+        <translation>Ο δακτύλιος δεν μπορεί να ρυθμιστεί με αρνητική τιμή.</translation>
+    </message>
+    <message>
+        <source>Prune mode is incompatible with -txindex.</source>
+        <translation>Η λειτουργία κοπής δεν είναι συμβατή με το -txindex.</translation>
+    </message>
+    <message>
+        <source>Replaying blocks...</source>
+        <translation>Αναπαραγωγή μπλοκ...</translation>
+    </message>
+    <message>
+        <source>Rewinding blocks...</source>
+        <translation>Αναδίπλωση μπλοκ...</translation>
+    </message>
+    <message>
+        <source>The source code is available from %s.</source>
+        <translation> Ο πηγαίος κώδικας είναι διαθέσιμος από το %s.</translation>
+    </message>
+    <message>
+        <source>Transaction fee and change calculation failed</source>
+        <translation>Ο υπολογισμός των τελών συναλλαγής και της αλλαγής απέτυχε</translation>
+    </message>
+    <message>
+        <source>Unable to bind to %s on this computer. %s is probably already running.</source>
+        <translation>Δεν είναι δυνατή η δέσμευση του %s σε αυτόν τον υπολογιστή. Το %s πιθανώς ήδη εκτελείται.</translation>
+    </message>
+    <message>
+        <source>Unable to generate keys</source>
+        <translation>Δεν είναι δυνατή η δημιουργία κλειδιών</translation>
+    </message>
+    <message>
+        <source>Unsupported logging category %s=%s.</source>
+        <translation>Μη υποστηριζόμενη κατηγορία καταγραφής %s=%s.</translation>
+    </message>
+    <message>
+        <source>Upgrading UTXO database</source>
+        <translation>Αναβάθμιση της βάσης δεδομένων UTXO</translation>
+    </message>
+    <message>
+        <source>User Agent comment (%s) contains unsafe characters.</source>
+        <translation>Το σχόλιο του παράγοντα χρήστη (%s) περιέχει μη ασφαλείς χαρακτήρες.</translation>
+    </message>
+    <message>
+        <source>Verifying blocks...</source>
+        <translation>Επαλήθευση των μπλοκ...</translation>
+    </message>
+    <message>
+        <source>Wallet needed to be rewritten: restart %s to complete</source>
+        <translation>Το πορτοφόλι χρειάζεται να ξαναγραφεί: κάντε επανεκκίνηση του %s για να ολοκληρώσετε</translation>
+    </message>
+    <message>
+        <source>Error: Listening for incoming connections failed (listen returned error %s)</source>
+        <translation>Σφάλμα: Η ακρόαση για εισερχόμενες συνδέσεις απέτυχε (ακούστε επιστραμμένο σφάλμα %s)</translation>
+    </message>
+    <message>
+        <source>Invalid amount for -maxtxfee=&lt;amount&gt;: '%s' (must be at least the minrelay fee of %s to prevent stuck transactions)</source>
+        <translation>Μη έγκυρο ποσό για το -maxtxfee =: '%s' (πρέπει να είναι τουλάχιστον το minrelay έξοδο του %s για την αποφυγή κολλημένων συναλλαγών)</translation>
+    </message>
+    <message>
+        <source>The transaction amount is too small to send after the fee has been deducted</source>
+        <translation>Το ποσό της συναλλαγής είναι πολύ μικρό για να στείλει μετά την αφαίρεση του τέλους</translation>
+    </message>
+    <message>
+        <source>You need to rebuild the database using -reindex to go back to unpruned mode.  This will redownload the entire blockchain</source>
+        <translation>Πρέπει να ξαναφτιάξετε τη βάση δεδομένων χρησιμοποιώντας το -reindex για να επιστρέψετε στη λειτουργία χωρίς εκτύπωση. Αυτό θα ξαναφορτώσει ολόκληρο το blockchain</translation>
+    </message>
+    <message>
+        <source>Error reading from database, shutting down.</source>
+        <translation>Σφάλμα ανάγνωσης από τη βάση δεδομένων, γίνεται τερματισμός.</translation>
+    </message>
+    <message>
+        <source>Error upgrading chainstate database</source>
+        <translation>Σφάλμα κατά την αναβάθμιση της βάσης δεδομένων chainstate</translation>
+    </message>
+    <message>
+        <source>Error: Disk space is low for %s</source>
+        <translation>Σφάλμα: Ο χώρος στο δίσκο είναι χαμηλός για %s</translation>
+    </message>
+    <message>
+        <source>Invalid -onion address or hostname: '%s'</source>
+        <translation>Μη έγκυρη διεύθυνση μητρώου ή όνομα κεντρικού υπολογιστή: '%s'</translation>
+    </message>
+    <message>
+        <source>Invalid -proxy address or hostname: '%s'</source>
+        <translation>Μη έγκυρη διεύθυνση -proxy ή όνομα κεντρικού υπολογιστή: '%s'</translation>
+    </message>
+    <message>
+        <source>Invalid amount for -paytxfee=&lt;amount&gt;: '%s' (must be at least %s)</source>
+        <translation>Μη έγκυρο ποσό για το -paytxfee =&lt;amount&gt;: '%s' (πρέπει να είναι τουλάχιστον %s)</translation>
+    </message>
+    <message>
+        <source>Invalid netmask specified in -whitelist: '%s'</source>
+        <translation>Μη έγκυρη μάσκα δικτύου που καθορίζεται στο -whitelist: '%s'</translation
