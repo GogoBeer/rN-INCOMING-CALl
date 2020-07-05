@@ -3563,4 +3563,157 @@ Note:  Since the fee is calculated on a per-byte basis, a fee of "100 satoshis p
     </message>
     <message>
         <source>Invalid netmask specified in -whitelist: '%s'</source>
-        <translation>Μη έγκυρη μάσκα δικτύου που καθορίζεται στο -whitelist: '%s'</translation
+        <translation>Μη έγκυρη μάσκα δικτύου που καθορίζεται στο -whitelist: '%s'</translation>
+    </message>
+    <message>
+        <source>Need to specify a port with -whitebind: '%s'</source>
+        <translation>Πρέπει να καθορίσετε μια θύρα με -whitebind: '%s'</translation>
+    </message>
+    <message>
+        <source>Prune mode is incompatible with -blockfilterindex.</source>
+        <translation>Η λειτουργία Prune είναι ασύμβατη με το -blokfilterindex.</translation>
+    </message>
+    <message>
+        <source>Reducing -maxconnections from %d to %d, because of system limitations.</source>
+        <translation>Μείωση -maxconnections από %d σε %d, λόγω των περιορισμών του συστήματος.</translation>
+    </message>
+    <message>
+        <source>Section [%s] is not recognized.</source>
+        <translation>Το τμήμα [%s] δεν αναγνωρίζεται.</translation>
+    </message>
+    <message>
+        <source>Signing transaction failed</source>
+        <translation>Η υπογραφή συναλλαγής απέτυχε</translation>
+    </message>
+    <message>
+        <source>Specified -walletdir "%s" does not exist</source>
+        <translation>Δεν υπάρχει καθορισμένο "%s"</translation>
+    </message>
+    <message>
+        <source>Specified -walletdir "%s" is a relative path</source>
+        <translation>Το συγκεκριμένο -walletdir "%s" είναι μια σχετική διαδρομή</translation>
+    </message>
+    <message>
+        <source>Specified -walletdir "%s" is not a directory</source>
+        <translation>Το συγκεκριμένο -walletdir "%s" δεν είναι κατάλογος</translation>
+    </message>
+    <message>
+        <source>The specified config file %s does not exist
+</source>
+        <translation>Το καθορισμένο αρχείο ρυθμίσεων %s δεν υπάρχει
+</translation>
+    </message>
+    <message>
+        <source>The transaction amount is too small to pay the fee</source>
+        <translation>Το ποσό της συναλλαγής είναι πολύ μικρό για να πληρώσει το έξοδο</translation>
+    </message>
+    <message>
+        <source>This is experimental software.</source>
+        <translation>Η εφαρμογή είναι σε πειραματικό στάδιο.</translation>
+    </message>
+    <message>
+        <source>Transaction amount too small</source>
+        <translation>Το ποσό της συναλλαγής είναι πολύ μικρό</translation>
+    </message>
+    <message>
+        <source>Transaction too large</source>
+        <translation>Η συναλλαγή είναι πολύ μεγάλη</translation>
+    </message>
+    <message>
+        <source>Unable to bind to %s on this computer (bind returned error %s)</source>
+        <translation> Δεν είναι δυνατή η δέσμευση του %s σε αυτόν τον υπολογιστή (δεσμεύει το επιστρεφόμενο σφάλμα %s)</translation>
+    </message>
+    <message>
+        <source>Unable to create the PID file '%s': %s</source>
+        <translation>Δεν είναι δυνατή η δημιουργία του PID αρχείου '%s': %s</translation>
+    </message>
+    <message>
+        <source>Unable to generate initial keys</source>
+        <translation>Δεν είναι δυνατή η δημιουργία αρχικών κλειδιών</translation>
+    </message>
+    <message>
+        <source>Unknown -blockfilterindex value %s.</source>
+        <translation> Άγνωστη -blockfilterindex τιμή %s.</translation>
+    </message>
+    <message>
+        <source>Verifying wallet(s)...</source>
+        <translation>Επαλήθευση πορτοφολιού(ιών)...</translation>
+    </message>
+    <message>
+        <source>Warning: unknown new rules activated (versionbit %i)</source>
+        <translation>Προειδοποίηση: Άγνωστοι νέοι κανόνες ενεργοποιήθηκαν (έκδοσηbit %i)</translation>
+    </message>
+    <message>
+        <source>-maxtxfee is set very high! Fees this large could be paid on a single transaction.</source>
+        <translation> -maxtxfee είναι καταχωρημένο πολύ υψηλά! Έξοδα τόσο υψηλά μπορούν να πληρωθούν σε μια ενιαία συναλλαγή.</translation>
+    </message>
+    <message>
+        <source>This is the transaction fee you may pay when fee estimates are not available.</source>
+        <translation>Αυτό είναι το τέλος συναλλαγής που μπορείτε να πληρώσετε όταν δεν υπάρχουν εκτιμήσεις τελών.</translation>
+    </message>
+    <message>
+        <source>Starting network threads...</source>
+        <translation>Ξεκινώντας τα νήματα δικτύου ...</translation>
+    </message>
+    <message>
+        <source>The wallet will avoid paying less than the minimum relay fee.</source>
+        <translation>Το πορτοφόλι θα αποφύγει να πληρώσει λιγότερο από το ελάχιστο έξοδο αναμετάδοσης.</translation>
+    </message>
+    <message>
+        <source>This is the minimum transaction fee you pay on every transaction.</source>
+        <translation>Αυτή είναι η ελάχιστη χρέωση συναλλαγής που πληρώνετε για κάθε συναλλαγή.</translation>
+    </message>
+    <message>
+        <source>This is the transaction fee you will pay if you send a transaction.</source>
+        <translation>Αυτή είναι η χρέωση συναλλαγής που θα πληρώσετε εάν στείλετε μια συναλλαγή.</translation>
+    </message>
+    <message>
+        <source>Transaction amounts must not be negative</source>
+        <translation>Τα ποσά των συναλλαγών δεν πρέπει να είναι αρνητικά</translation>
+    </message>
+    <message>
+        <source>Transaction has too long of a mempool chain</source>
+        <translation>Η συναλλαγή έχει μια μακρά αλυσίδα mempool</translation>
+    </message>
+    <message>
+        <source>Transaction must have at least one recipient</source>
+        <translation>Η συναλλαγή πρέπει να έχει τουλάχιστον έναν παραλήπτη</translation>
+    </message>
+    <message>
+        <source>Unknown network specified in -onlynet: '%s'</source>
+        <translation>Έχει οριστεί άγνωστo δίκτυο στο -onlynet: '%s'</translation>
+    </message>
+    <message>
+        <source>Insufficient funds</source>
+        <translation>Ανεπαρκές κεφάλαιο</translation>
+    </message>
+    <message>
+        <source>Fee estimation failed. Fallbackfee is disabled. Wait a few blocks or enable -fallbackfee.</source>
+        <translation>Η αποτίμηση του τέλους απέτυχε. Το Fallbackfee είναι απενεργοποιημένο. Περιμένετε λίγα τετράγωνα ή ενεργοποιήστε το -fallbackfee.</translation>
+    </message>
+    <message>
+        <source>Cannot write to data directory '%s'; check permissions.</source>
+        <translation>Δεν είναι δυνατή η εγγραφή στον κατάλογο δεδομένων '%s'. ελέγξτε τα δικαιώματα.</translation>
+    </message>
+    <message>
+        <source>Loading block index...</source>
+        <translation>Φόρτωση ευρετηρίου μπλοκ...</translation>
+    </message>
+    <message>
+        <source>Loading wallet...</source>
+        <translation>Φόρτωση πορτοφολιού...</translation>
+    </message>
+    <message>
+        <source>Cannot downgrade wallet</source>
+        <translation>Δεν μπορώ να υποβαθμίσω το πορτοφόλι</translation>
+    </message>
+    <message>
+        <source>Rescanning...</source>
+        <translation>Ανίχνευση...</translation>
+    </message>
+    <message>
+        <source>Done loading</source>
+        <translation>Η φόρτωση ολοκληρώθηκε</translation>
+    </message>
+</context>
+</TS>
