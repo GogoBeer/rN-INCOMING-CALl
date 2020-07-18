@@ -1741,4 +1741,246 @@ Signing is only possible with addresses of the type 'legacy'.</translation>
     </message>
     <message numerus="yes">
         <source>%n minute(s)</source>
-        <translation><numerusform>%n minute</numerusform><numerusform>%n minutes</numerusform></translation
+        <translation><numerusform>%n minute</numerusform><numerusform>%n minutes</numerusform></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n hour(s)</source>
+        <translation><numerusform>%n hour</numerusform><numerusform>%n hours</numerusform></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n day(s)</source>
+        <translation><numerusform>%n day</numerusform><numerusform>%n days</numerusform></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n week(s)</source>
+        <translation><numerusform>%n week</numerusform><numerusform>%n weeks</numerusform></translation>
+    </message>
+    <message>
+        <source>%1 and %2</source>
+        <translation>%1 and %2</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n year(s)</source>
+        <translation><numerusform>%n year</numerusform><numerusform>%n years</numerusform></translation>
+    </message>
+    <message>
+        <source>%1 B</source>
+        <translation>%1 B</translation>
+    </message>
+    <message>
+        <source>%1 KB</source>
+        <translation>%1 KB</translation>
+    </message>
+    <message>
+        <source>%1 MB</source>
+        <translation>%1 MB</translation>
+    </message>
+    <message>
+        <source>%1 GB</source>
+        <translation>%1 GB</translation>
+    </message>
+    <message>
+        <source>Error: Specified data directory "%1" does not exist.</source>
+        <translation>Error: Specified data directory "%1" does not exist.</translation>
+    </message>
+    <message>
+        <source>Error: Cannot parse configuration file: %1.</source>
+        <translation>Error: Cannot parse configuration file: %1.</translation>
+    </message>
+    <message>
+        <source>Error: %1</source>
+        <translation>Error: %1</translation>
+    </message>
+    <message>
+        <source>Error initializing settings: %1</source>
+        <translation>Error initializing settings: %1</translation>
+    </message>
+    <message>
+        <source>%1 didn't yet exit safely...</source>
+        <translation>%1 didn't yet exit safely...</translation>
+    </message>
+    <message>
+        <source>unknown</source>
+        <translation>unknown</translation>
+    </message>
+</context>
+<context>
+    <name>QRImageWidget</name>
+    <message>
+        <source>&amp;Save Image...</source>
+        <translation>&amp;Save Image...</translation>
+    </message>
+    <message>
+        <source>&amp;Copy Image</source>
+        <translation>&amp;Copy Image</translation>
+    </message>
+    <message>
+        <source>Resulting URI too long, try to reduce the text for label / message.</source>
+        <translation>Resulting URI too long, try to reduce the text for label / message.</translation>
+    </message>
+    <message>
+        <source>Error encoding URI into QR Code.</source>
+        <translation>Error encoding URI into QR Code.</translation>
+    </message>
+    <message>
+        <source>QR code support not available.</source>
+        <translation>QR code support not available.</translation>
+    </message>
+    <message>
+        <source>Save QR Code</source>
+        <translation>Save QR Code</translation>
+    </message>
+    <message>
+        <source>PNG Image (*.png)</source>
+        <translation>PNG Image (*.png)</translation>
+    </message>
+</context>
+<context>
+    <name>RPCConsole</name>
+    <message>
+        <source>N/A</source>
+        <translation>N/A</translation>
+    </message>
+    <message>
+        <source>Client version</source>
+        <translation>Client version</translation>
+    </message>
+    <message>
+        <source>&amp;Information</source>
+        <translation>&amp;Information</translation>
+    </message>
+    <message>
+        <source>General</source>
+        <translation>General</translation>
+    </message>
+    <message>
+        <source>Using BerkeleyDB version</source>
+        <translation>Using BerkeleyDB version</translation>
+    </message>
+    <message>
+        <source>Datadir</source>
+        <translation>Datadir</translation>
+    </message>
+    <message>
+        <source>To specify a non-default location of the data directory use the '%1' option.</source>
+        <translation>To specify a non-default location of the data directory use the '%1' option.</translation>
+    </message>
+    <message>
+        <source>Blocksdir</source>
+        <translation>Blocksdir</translation>
+    </message>
+    <message>
+        <source>To specify a non-default location of the blocks directory use the '%1' option.</source>
+        <translation>To specify a non-default location of the blocks directory use the '%1' option.</translation>
+    </message>
+    <message>
+        <source>Startup time</source>
+        <translation>Startup time</translation>
+    </message>
+    <message>
+        <source>Network</source>
+        <translation>Network</translation>
+    </message>
+    <message>
+        <source>Name</source>
+        <translation>Name</translation>
+    </message>
+    <message>
+        <source>Number of connections</source>
+        <translation>Number of connections</translation>
+    </message>
+    <message>
+        <source>Block chain</source>
+        <translation>Block chain</translation>
+    </message>
+    <message>
+        <source>Memory Pool</source>
+        <translation>Memory Pool</translation>
+    </message>
+    <message>
+        <source>Current number of transactions</source>
+        <translation>Current number of transactions</translation>
+    </message>
+    <message>
+        <source>Memory usage</source>
+        <translation>Memory usage</translation>
+    </message>
+    <message>
+        <source>Wallet: </source>
+        <translation>Wallet: </translation>
+    </message>
+    <message>
+        <source>(none)</source>
+        <translation>(none)</translation>
+    </message>
+    <message>
+        <source>&amp;Reset</source>
+        <translation>&amp;Reset</translation>
+    </message>
+    <message>
+        <source>Received</source>
+        <translation>Received</translation>
+    </message>
+    <message>
+        <source>Sent</source>
+        <translation>Sent</translation>
+    </message>
+    <message>
+        <source>&amp;Peers</source>
+        <translation>&amp;Peers</translation>
+    </message>
+    <message>
+        <source>Banned peers</source>
+        <translation>Banned peers</translation>
+    </message>
+    <message>
+        <source>Select a peer to view detailed information.</source>
+        <translation>Select a peer to view detailed information.</translation>
+    </message>
+    <message>
+        <source>Direction</source>
+        <translation>Direction</translation>
+    </message>
+    <message>
+        <source>Version</source>
+        <translation>Version</translation>
+    </message>
+    <message>
+        <source>Starting Block</source>
+        <translation>Starting Block</translation>
+    </message>
+    <message>
+        <source>Synced Headers</source>
+        <translation>Synced Headers</translation>
+    </message>
+    <message>
+        <source>Synced Blocks</source>
+        <translation>Synced Blocks</translation>
+    </message>
+    <message>
+        <source>The mapped Autonomous System used for diversifying peer selection.</source>
+        <translation>The mapped Autonomous System used for diversifying peer selection.</translation>
+    </message>
+    <message>
+        <source>Mapped AS</source>
+        <translation>Mapped AS</translation>
+    </message>
+    <message>
+        <source>User Agent</source>
+        <translation>User Agent</translation>
+    </message>
+    <message>
+        <source>Node window</source>
+        <translation>Node window</translation>
+    </message>
+    <message>
+        <source>Current block height</source>
+        <translation>Current block height</translation>
+    </message>
+    <message>
+        <source>Open the %1 debug log file from the current data directory. This can take a few seconds for large log files.</source>
+        <translation>Open the %1 debug log file from the current data directory. This can take a few seconds for large log files.</translation>
+    </message>
+    <message>
+        <source>Decrease font size</source>
+        <translation>Decrease font size</translation
