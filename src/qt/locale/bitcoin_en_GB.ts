@@ -3946,4 +3946,104 @@ Go to File &gt; Open Wallet to load a wallet.
         <translation>Unable to generate initial keys</translation>
     </message>
     <message>
-        <source>Unknown -blockfilterindex value %s.<
+        <source>Unknown -blockfilterindex value %s.</source>
+        <translation>Unknown -blockfilterindex value %s.</translation>
+    </message>
+    <message>
+        <source>Verifying wallet(s)...</source>
+        <translation>Verifying wallet(s)...</translation>
+    </message>
+    <message>
+        <source>Warning: unknown new rules activated (versionbit %i)</source>
+        <translation>Warning: unknown new rules activated (versionbit %i)</translation>
+    </message>
+    <message>
+        <source>-maxtxfee is set very high! Fees this large could be paid on a single transaction.</source>
+        <translation>-maxtxfee is set very high! Fees this large could be paid on a single transaction.</translation>
+    </message>
+    <message>
+        <source>This is the transaction fee you may pay when fee estimates are not available.</source>
+        <translation>This is the transaction fee you may pay when fee estimates are not available.</translation>
+    </message>
+    <message>
+        <source>Total length of network version string (%i) exceeds maximum length (%i). Reduce the number or size of uacomments.</source>
+        <translation>Total length of network version string (%i) exceeds maximum length (%i). Reduce the number or size of uacomments.</translation>
+    </message>
+    <message>
+        <source>%s is set very high!</source>
+        <translation>%s is set very high!</translation>
+    </message>
+    <message>
+        <source>Error loading wallet %s. Duplicate -wallet filename specified.</source>
+        <translation>Error loading wallet %s. Duplicate -wallet filename specified.</translation>
+    </message>
+    <message>
+        <source>Starting network threads...</source>
+        <translation>Starting network threads...</translation>
+    </message>
+    <message>
+        <source>The wallet will avoid paying less than the minimum relay fee.</source>
+        <translation>The wallet will avoid paying less than the minimum relay fee.</translation>
+    </message>
+    <message>
+        <source>This is the minimum transaction fee you pay on every transaction.</source>
+        <translation>This is the minimum transaction fee you pay on every transaction.</translation>
+    </message>
+    <message>
+        <source>This is the transaction fee you will pay if you send a transaction.</source>
+        <translation>This is the transaction fee you will pay if you send a transaction.</translation>
+    </message>
+    <message>
+        <source>Transaction amounts must not be negative</source>
+        <translation>Transaction amounts must not be negative</translation>
+    </message>
+    <message>
+        <source>Transaction has too long of a mempool chain</source>
+        <translation>Transaction has too long of a mempool chain</translation>
+    </message>
+    <message>
+        <source>Transaction must have at least one recipient</source>
+        <translation>Transaction must have at least one recipient</translation>
+    </message>
+    <message>
+        <source>Unknown network specified in -onlynet: '%s'</source>
+        <translation>Unknown network specified in -onlynet: '%s'</translation>
+    </message>
+    <message>
+        <source>Insufficient funds</source>
+        <translation>Insufficient funds</translation>
+    </message>
+    <message>
+        <source>Fee estimation failed. Fallbackfee is disabled. Wait a few blocks or enable -fallbackfee.</source>
+        <translation>Fee estimation failed. Fallbackfee is disabled. Wait a few blocks or enable -fallbackfee.</translation>
+    </message>
+    <message>
+        <source>Warning: Private keys detected in wallet {%s} with disabled private keys</source>
+        <translation>Warning: Private keys detected in wallet {%s} with disabled private keys</translation>
+    </message>
+    <message>
+        <source>Cannot write to data directory '%s'; check permissions.</source>
+        <translation>Cannot write to data directory '%s'; check permissions.</translation>
+    </message>
+    <message>
+        <source>Loading block index...</source>
+        <translation>Loading block index...</translation>
+    </message>
+    <message>
+        <source>Loading wallet...</source>
+        <translation>Loading wallet...</translation>
+    </message>
+    <message>
+        <source>Cannot downgrade wallet</source>
+        <translation>Cannot downgrade wallet</translation>
+    </message>
+    <message>
+        <source>Rescanning...</source>
+        <translation>Rescanning...</translation>
+    </message>
+    <message>
+        <source>Done loading</source>
+        <translation>Done loading</translation>
+    </message>
+</context>
+</TS>
