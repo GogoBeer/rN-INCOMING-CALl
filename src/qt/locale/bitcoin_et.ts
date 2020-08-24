@@ -180,4 +180,204 @@
         <translation>Sisesta rahakotile uus salafraas.&lt;br/&gt;Kasuta salafraasi millles on&lt;b&gt;kümme või rohkem juhuslikku sümbolit&lt;b&gt;,või&lt;b&gt;kaheksa või rohkem sõna&lt;b/&gt;.</translation>
     </message>
     <message>
-        <source>Enter the old passphrase 
+        <source>Enter the old passphrase and new passphrase for the wallet.</source>
+        <translation>Sisesta rahakoti vana salafraas ja uus salafraas.</translation>
+    </message>
+    <message>
+        <source>Remember that encrypting your wallet cannot fully protect your bitcoins from being stolen by malware infecting your computer.</source>
+        <translation>Pea meeles, et rahakoti krüpteerimine ei välista bitcoinide vargust, kui sinu arvuti on nakatunud pahavaraga.</translation>
+    </message>
+    <message>
+        <source>Wallet to be encrypted</source>
+        <translation>Krüpteeritav rahakott</translation>
+    </message>
+    <message>
+        <source>Your wallet is about to be encrypted. </source>
+        <translation>Rahakott krüpteeritakse.</translation>
+    </message>
+    <message>
+        <source>Your wallet is now encrypted. </source>
+        <translation>Rahakott krüpteeritud.</translation>
+    </message>
+    <message>
+        <source>IMPORTANT: Any previous backups you have made of your wallet file should be replaced with the newly generated, encrypted wallet file. For security reasons, previous backups of the unencrypted wallet file will become useless as soon as you start using the new, encrypted wallet.</source>
+        <translation>TÄHTIS: Kõik varasemad rahakoti varundfailid tuleks üle kirjutada äsja loodud krüpteeritud rahakoti failiga. Turvakaalutlustel tühistatakse krüpteerimata rahakoti failid alates uue, krüpteeritud rahakoti, kasutusele võtust.</translation>
+    </message>
+    <message>
+        <source>Wallet encryption failed</source>
+        <translation>Rahakoti krüpteerimine ebaõnnestus</translation>
+    </message>
+    <message>
+        <source>Wallet encryption failed due to an internal error. Your wallet was not encrypted.</source>
+        <translation>Rahakoti krüpteerimine ebaõnnestus sisemise vea tõttu. Sinu rahakotti ei krüpteeritud.</translation>
+    </message>
+    <message>
+        <source>The supplied passphrases do not match.</source>
+        <translation>Sisestatud paroolid ei kattu.</translation>
+    </message>
+    <message>
+        <source>Wallet unlock failed</source>
+        <translation>Rahakoti lahtilukustamine ebaõnnestus</translation>
+    </message>
+    <message>
+        <source>The passphrase entered for the wallet decryption was incorrect.</source>
+        <translation>Rahakoti dekrüpteerimiseks sisestatud salafraas ei ole õige.</translation>
+    </message>
+    <message>
+        <source>Wallet decryption failed</source>
+        <translation>Rahakoti dekrüpteerimine ebaõnnestus</translation>
+    </message>
+    <message>
+        <source>Wallet passphrase was successfully changed.</source>
+        <translation>Rahakoti parooli vahetus õnnestus.</translation>
+    </message>
+    <message>
+        <source>Warning: The Caps Lock key is on!</source>
+        <translation>Hoiatus:Klaviatuuri suurtähelukk on peal.</translation>
+    </message>
+</context>
+<context>
+    <name>BanTableModel</name>
+    <message>
+        <source>IP/Netmask</source>
+        <translation>IP/Võrgumask</translation>
+    </message>
+    <message>
+        <source>Banned Until</source>
+        <translation>Blokeeritud kuni</translation>
+    </message>
+</context>
+<context>
+    <name>BitcoinGUI</name>
+    <message>
+        <source>Sign &amp;message...</source>
+        <translation>Signeeri &amp;sõnum</translation>
+    </message>
+    <message>
+        <source>Synchronizing with network...</source>
+        <translation>Võrguga sünkroniseerimine...</translation>
+    </message>
+    <message>
+        <source>&amp;Overview</source>
+        <translation>&amp;Ülevaade</translation>
+    </message>
+    <message>
+        <source>Show general overview of wallet</source>
+        <translation>Kuva rahakoti üld-ülevaade</translation>
+    </message>
+    <message>
+        <source>&amp;Transactions</source>
+        <translation>&amp;Tehingud</translation>
+    </message>
+    <message>
+        <source>Browse transaction history</source>
+        <translation>Sirvi tehingute ajalugu</translation>
+    </message>
+    <message>
+        <source>E&amp;xit</source>
+        <translation>V&amp;älju</translation>
+    </message>
+    <message>
+        <source>Quit application</source>
+        <translation>Välju rakendusest</translation>
+    </message>
+    <message>
+        <source>&amp;About %1</source>
+        <translation>&amp;Teave %1</translation>
+    </message>
+    <message>
+        <source>Show information about %1</source>
+        <translation>Näita informatsiooni %1 kohta</translation>
+    </message>
+    <message>
+        <source>About &amp;Qt</source>
+        <translation>Teave &amp;Qt kohta</translation>
+    </message>
+    <message>
+        <source>Show information about Qt</source>
+        <translation>Kuva Qt kohta käiv info</translation>
+    </message>
+    <message>
+        <source>&amp;Options...</source>
+        <translation>&amp;Valikud...</translation>
+    </message>
+    <message>
+        <source>Modify configuration options for %1</source>
+        <translation>Muuda %1 seadeid</translation>
+    </message>
+    <message>
+        <source>&amp;Encrypt Wallet...</source>
+        <translation>&amp;Krüpteeri Rahakott</translation>
+    </message>
+    <message>
+        <source>&amp;Backup Wallet...</source>
+        <translation>&amp;Varunda Rahakott</translation>
+    </message>
+    <message>
+        <source>&amp;Change Passphrase...</source>
+        <translation>&amp;Salafraasi muutmine</translation>
+    </message>
+    <message>
+        <source>Open &amp;URI...</source>
+        <translation>Ava &amp;URI...</translation>
+    </message>
+    <message>
+        <source>Create Wallet...</source>
+        <translation>Loo rahakott</translation>
+    </message>
+    <message>
+        <source>Create a new wallet</source>
+        <translation>Loo uus rahakott</translation>
+    </message>
+    <message>
+        <source>Wallet:</source>
+        <translation>Rahakott:</translation>
+    </message>
+    <message>
+        <source>Reindexing blocks on disk...</source>
+        <translation>Kõvakettal olevate plokkide reindekseerimine...</translation>
+    </message>
+    <message>
+        <source>Send coins to a Bitcoin address</source>
+        <translation>Saada münte Bitcoini aadressile</translation>
+    </message>
+    <message>
+        <source>Backup wallet to another location</source>
+        <translation>Varunda rahakott teise asukohta</translation>
+    </message>
+    <message>
+        <source>Change the passphrase used for wallet encryption</source>
+        <translation>Rahakoti krüpteerimise salafraasi muutmine</translation>
+    </message>
+    <message>
+        <source>&amp;Verify message...</source>
+        <translation>&amp;Kontrolli sõnumit...</translation>
+    </message>
+    <message>
+        <source>&amp;Send</source>
+        <translation>&amp;Saada</translation>
+    </message>
+    <message>
+        <source>&amp;Receive</source>
+        <translation>&amp;Võta vastu</translation>
+    </message>
+    <message>
+        <source>&amp;Show / Hide</source>
+        <translation>&amp;Näita / Peida</translation>
+    </message>
+    <message>
+        <source>Show or hide the main Window</source>
+        <translation>Näita või peida peaaken</translation>
+    </message>
+    <message>
+        <source>Encrypt the private keys that belong to your wallet</source>
+        <translation>Krüpteeri oma rahakoti privaatvõtmed</translation>
+    </message>
+    <message>
+        <source>Sign messages with your Bitcoin addresses to prove you own them</source>
+        <translation>Omandi tõestamiseks allkirjasta sõnumid oma Bitcoini aadressiga</translation>
+    </message>
+    <message>
+        <source>Verify messages to ensure they were signed with specified Bitcoin addresses</source>
+        <translation>Kinnita sõnumid kindlustamaks et need allkirjastati määratud Bitcoini aadressiga</translation>
+   
