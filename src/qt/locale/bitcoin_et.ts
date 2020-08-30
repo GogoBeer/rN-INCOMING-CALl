@@ -380,4 +380,258 @@
     <message>
         <source>Verify messages to ensure they were signed with specified Bitcoin addresses</source>
         <translation>Kinnita sõnumid kindlustamaks et need allkirjastati määratud Bitcoini aadressiga</translation>
-   
+    </message>
+    <message>
+        <source>&amp;File</source>
+        <translation>&amp;Fail</translation>
+    </message>
+    <message>
+        <source>&amp;Settings</source>
+        <translation>&amp;Seaded</translation>
+    </message>
+    <message>
+        <source>&amp;Help</source>
+        <translation>&amp;Abi</translation>
+    </message>
+    <message>
+        <source>Tabs toolbar</source>
+        <translation>Vahelehe tööriistariba</translation>
+    </message>
+    <message>
+        <source>Request payments (generates QR codes and bitcoin: URIs)</source>
+        <translation>Loo maksepäring (genereerib QR koodid ja bitcoini: URId)</translation>
+    </message>
+    <message>
+        <source>&amp;Command-line options</source>
+        <translation>&amp;Käsurea valikud</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n active connection(s) to Bitcoin network</source>
+        <translation><numerusform>%n aktiivne ühendus Bitcoini võrku</numerusform><numerusform>%n aktiivset ühendust Bitcoini võrku</numerusform></translation>
+    </message>
+    <message>
+        <source>Indexing blocks on disk...</source>
+        <translation>Kõvakettal olevate plokkide indekseerimine...</translation>
+    </message>
+    <message>
+        <source>Processing blocks on disk...</source>
+        <translation>Kõvakettal olevate plokkide töötlemine...</translation>
+    </message>
+    <message numerus="yes">
+        <source>Processed %n block(s) of transaction history.</source>
+        <translation><numerusform>Töödeldud %n plokk transaktsioonide ajaloost.</numerusform><numerusform>Töödeldud %n plokki transaktsioonide ajaloost.</numerusform></translation>
+    </message>
+    <message>
+        <source>%1 behind</source>
+        <translation>%1 ajast maas</translation>
+    </message>
+    <message>
+        <source>Last received block was generated %1 ago.</source>
+        <translation>Viimane saabunud blokk loodi %1 tagasi.</translation>
+    </message>
+    <message>
+        <source>Transactions after this will not yet be visible.</source>
+        <translation>Hilisemad transaktsioonid ei ole veel nähtavad.</translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation>Viga</translation>
+    </message>
+    <message>
+        <source>Warning</source>
+        <translation>Hoiatus</translation>
+    </message>
+    <message>
+        <source>Information</source>
+        <translation>Informatsioon</translation>
+    </message>
+    <message>
+        <source>Up to date</source>
+        <translation>Ajakohane</translation>
+    </message>
+    <message>
+        <source>&amp;Window</source>
+        <translation>&amp;Aken</translation>
+    </message>
+    <message>
+        <source>%1 client</source>
+        <translation>%1 klient</translation>
+    </message>
+    <message>
+        <source>Catching up...</source>
+        <translation>Jõuan järgi...</translation>
+    </message>
+    <message>
+        <source>Date: %1
+</source>
+        <translation>Kuupäev: %1
+</translation>
+    </message>
+    <message>
+        <source>Amount: %1
+</source>
+        <translation>Summa: %1
+</translation>
+    </message>
+    <message>
+        <source>Type: %1
+</source>
+        <translation>Tüüp: %1
+</translation>
+    </message>
+    <message>
+        <source>Label: %1
+</source>
+        <translation>&amp;Märgis: %1
+</translation>
+    </message>
+    <message>
+        <source>Address: %1
+</source>
+        <translation>Aadress: %1
+</translation>
+    </message>
+    <message>
+        <source>Sent transaction</source>
+        <translation>Saadetud tehing</translation>
+    </message>
+    <message>
+        <source>Incoming transaction</source>
+        <translation>Sisenev tehing</translation>
+    </message>
+    <message>
+        <source>Wallet is &lt;b&gt;encrypted&lt;/b&gt; and currently &lt;b&gt;unlocked&lt;/b&gt;</source>
+        <translation>Rahakott on &lt;b&gt;krüpteeritud&lt;/b&gt; ning hetkel &lt;b&gt;avatud&lt;/b&gt;</translation>
+    </message>
+    <message>
+        <source>Wallet is &lt;b&gt;encrypted&lt;/b&gt; and currently &lt;b&gt;locked&lt;/b&gt;</source>
+        <translation>Rahakott on &lt;b&gt;krüpteeritud&lt;/b&gt; ning hetkel &lt;b&gt;suletud&lt;/b&gt;</translation>
+    </message>
+    </context>
+<context>
+    <name>CoinControlDialog</name>
+    <message>
+        <source>Quantity:</source>
+        <translation>Kogus:</translation>
+    </message>
+    <message>
+        <source>Bytes:</source>
+        <translation>Baiti:</translation>
+    </message>
+    <message>
+        <source>Amount:</source>
+        <translation>Kogus</translation>
+    </message>
+    <message>
+        <source>Fee:</source>
+        <translation>Tasu:</translation>
+    </message>
+    <message>
+        <source>Dust:</source>
+        <translation>Puru:</translation>
+    </message>
+    <message>
+        <source>After Fee:</source>
+        <translation>Peale tehingutasu:</translation>
+    </message>
+    <message>
+        <source>Change:</source>
+        <translation>Vahetusraha:</translation>
+    </message>
+    <message>
+        <source>Tree mode</source>
+        <translation>Puu režiim</translation>
+    </message>
+    <message>
+        <source>List mode</source>
+        <translation>Loetelu režiim</translation>
+    </message>
+    <message>
+        <source>Amount</source>
+        <translation>Kogus</translation>
+    </message>
+    <message>
+        <source>Received with label</source>
+        <translation>Vastuvõetud märgisega</translation>
+    </message>
+    <message>
+        <source>Received with address</source>
+        <translation>Vastuvõetud aadressiga</translation>
+    </message>
+    <message>
+        <source>Date</source>
+        <translation>Kuupäev</translation>
+    </message>
+    <message>
+        <source>Confirmations</source>
+        <translation>Kinnitused</translation>
+    </message>
+    <message>
+        <source>Confirmed</source>
+        <translation>Kinnitatud</translation>
+    </message>
+    <message>
+        <source>Copy address</source>
+        <translation>Kopeeri aadress</translation>
+    </message>
+    <message>
+        <source>Copy label</source>
+        <translation>Kopeeri märgis</translation>
+    </message>
+    <message>
+        <source>Copy amount</source>
+        <translation>Kopeeri kogus</translation>
+    </message>
+    <message>
+        <source>Copy transaction ID</source>
+        <translation>Kopeeri transaktsiooni ID</translation>
+    </message>
+    <message>
+        <source>Copy quantity</source>
+        <translation>Kopeeri kogus</translation>
+    </message>
+    <message>
+        <source>Copy fee</source>
+        <translation>Kopeeri tehingutasu</translation>
+    </message>
+    <message>
+        <source>Copy bytes</source>
+        <translation>Kopeeri baidid</translation>
+    </message>
+    <message>
+        <source>Copy dust</source>
+        <translation>Kopeeri puru</translation>
+    </message>
+    <message>
+        <source>Copy change</source>
+        <translation>Kopeeri vahetusraha</translation>
+    </message>
+    <message>
+        <source>(%1 locked)</source>
+        <translation>(%1 lukustatud)</translation>
+    </message>
+    <message>
+        <source>yes</source>
+        <translation>jah</translation>
+    </message>
+    <message>
+        <source>no</source>
+        <translation>ei</translation>
+    </message>
+    <message>
+        <source>(no label)</source>
+        <translation>(silt puudub)</translation>
+    </message>
+    <message>
+        <source>(change)</source>
+        <translation>(vahetusraha)</translation>
+    </message>
+</context>
+<context>
+    <name>CreateWalletActivity</name>
+    </context>
+<context>
+    <name>CreateWalletDialog</name>
+    </context>
+<context>
+    <name>Edit
