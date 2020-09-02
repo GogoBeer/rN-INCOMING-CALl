@@ -634,4 +634,245 @@
     <name>CreateWalletDialog</name>
     </context>
 <context>
-    <name>Edit
+    <name>EditAddressDialog</name>
+    <message>
+        <source>Edit Address</source>
+        <translation>Muuda aadressi</translation>
+    </message>
+    <message>
+        <source>&amp;Label</source>
+        <translation>&amp;Märgis</translation>
+    </message>
+    <message>
+        <source>&amp;Address</source>
+        <translation>&amp;Aadress</translation>
+    </message>
+    <message>
+        <source>New sending address</source>
+        <translation>Uus saatev aadress</translation>
+    </message>
+    <message>
+        <source>Edit receiving address</source>
+        <translation>Muuda vastuvõtvat aadressi</translation>
+    </message>
+    <message>
+        <source>Edit sending address</source>
+        <translation>Muuda saatvat aadressi</translation>
+    </message>
+    <message>
+        <source>The entered address "%1" is not a valid Bitcoin address.</source>
+        <translation>Sisestatud aadress "%1" ei ole korrektne Bitcoin aadress.</translation>
+    </message>
+    <message>
+        <source>Could not unlock wallet.</source>
+        <translation>Rahakoti lahtilukustamine ebaõnnestus.</translation>
+    </message>
+    <message>
+        <source>New key generation failed.</source>
+        <translation>Uue võtme genereerimine ebaõnnestus.</translation>
+    </message>
+</context>
+<context>
+    <name>FreespaceChecker</name>
+    <message>
+        <source>name</source>
+        <translation>nimi</translation>
+    </message>
+    </context>
+<context>
+    <name>HelpMessageDialog</name>
+    <message>
+        <source>version</source>
+        <translation>versioon</translation>
+    </message>
+    <message>
+        <source>Command-line options</source>
+        <translation>Käsurea valikud</translation>
+    </message>
+</context>
+<context>
+    <name>Intro</name>
+    <message>
+        <source>Welcome</source>
+        <translation>Tere tulemast</translation>
+    </message>
+    <message>
+        <source>Bitcoin</source>
+        <translation>Bitcoin</translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation>Viga</translation>
+    </message>
+    </context>
+<context>
+    <name>ModalOverlay</name>
+    <message>
+        <source>Form</source>
+        <translation>Vorm</translation>
+    </message>
+    <message>
+        <source>Last block time</source>
+        <translation>Viimane ploki aeg</translation>
+    </message>
+    <message>
+        <source>Hide</source>
+        <translation>Peida</translation>
+    </message>
+    </context>
+<context>
+    <name>OpenURIDialog</name>
+    <message>
+        <source>URI:</source>
+        <translation>URI:</translation>
+    </message>
+</context>
+<context>
+    <name>OpenWalletActivity</name>
+    </context>
+<context>
+    <name>OptionsDialog</name>
+    <message>
+        <source>Options</source>
+        <translation>Valikud</translation>
+    </message>
+    <message>
+        <source>&amp;Main</source>
+        <translation>&amp;Peamine</translation>
+    </message>
+    <message>
+        <source>Reset all client options to default.</source>
+        <translation>Taasta kõik klientprogrammi seadete vaikeväärtused.</translation>
+    </message>
+    <message>
+        <source>&amp;Reset Options</source>
+        <translation>&amp;Lähtesta valikud</translation>
+    </message>
+    <message>
+        <source>&amp;Network</source>
+        <translation>&amp;Võrk</translation>
+    </message>
+    <message>
+        <source>W&amp;allet</source>
+        <translation>R&amp;ahakott</translation>
+    </message>
+    <message>
+        <source>Expert</source>
+        <translation>Ekspert</translation>
+    </message>
+    <message>
+        <source>Automatically open the Bitcoin client port on the router. This only works when your router supports UPnP and it is enabled.</source>
+        <translation>Bitcoini kliendi pordi automaatne avamine ruuteris. Toimib, kui sinu ruuter aktsepteerib UPnP ühendust.</translation>
+    </message>
+    <message>
+        <source>Map port using &amp;UPnP</source>
+        <translation>Suuna port &amp;UPnP kaudu</translation>
+    </message>
+    <message>
+        <source>Proxy &amp;IP:</source>
+        <translation>Proxi &amp;IP:</translation>
+    </message>
+    <message>
+        <source>&amp;Port:</source>
+        <translation>&amp;Port:</translation>
+    </message>
+    <message>
+        <source>Port of the proxy (e.g. 9050)</source>
+        <translation>Proxi port (nt 9050)</translation>
+    </message>
+    <message>
+        <source>IPv4</source>
+        <translation>IPv4</translation>
+    </message>
+    <message>
+        <source>IPv6</source>
+        <translation>IPv6</translation>
+    </message>
+    <message>
+        <source>Tor</source>
+        <translation>Tor</translation>
+    </message>
+    <message>
+        <source>&amp;Window</source>
+        <translation>&amp;Aken</translation>
+    </message>
+    <message>
+        <source>Show only a tray icon after minimizing the window.</source>
+        <translation>Minimeeri systray alale.</translation>
+    </message>
+    <message>
+        <source>&amp;Minimize to the tray instead of the taskbar</source>
+        <translation>&amp;Minimeeri systray alale</translation>
+    </message>
+    <message>
+        <source>M&amp;inimize on close</source>
+        <translation>M&amp;inimeeri sulgemisel</translation>
+    </message>
+    <message>
+        <source>&amp;Display</source>
+        <translation>&amp;Kuva</translation>
+    </message>
+    <message>
+        <source>User Interface &amp;language:</source>
+        <translation>Kasutajaliidese &amp;keel:</translation>
+    </message>
+    <message>
+        <source>&amp;Unit to show amounts in:</source>
+        <translation>Summade kuvamise &amp;Unit:</translation>
+    </message>
+    <message>
+        <source>Choose the default subdivision unit to show in the interface and when sending coins.</source>
+        <translation>Vali liideses ning müntide saatmisel kuvatav vaikimisi alajaotus.</translation>
+    </message>
+    <message>
+        <source>&amp;OK</source>
+        <translation>&amp;OK</translation>
+    </message>
+    <message>
+        <source>&amp;Cancel</source>
+        <translation>&amp;Katkesta</translation>
+    </message>
+    <message>
+        <source>default</source>
+        <translation>vaikeväärtus</translation>
+    </message>
+    <message>
+        <source>none</source>
+        <translation>puudub</translation>
+    </message>
+    <message>
+        <source>Confirm options reset</source>
+        <translation>Kinnita valikute algseadistamine</translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation>Viga</translation>
+    </message>
+    <message>
+        <source>The supplied proxy address is invalid.</source>
+        <translation>Sisestatud kehtetu proxy aadress.</translation>
+    </message>
+</context>
+<context>
+    <name>OverviewPage</name>
+    <message>
+        <source>Form</source>
+        <translation>Vorm</translation>
+    </message>
+    <message>
+        <source>The displayed information may be out of date. Your wallet automatically synchronizes with the Bitcoin network after a connection is established, but this process has not completed yet.</source>
+        <translation>Kuvatav info ei pruugi olla ajakohane. Ühenduse loomisel süngitakse sinu rahakott automaatselt Bitconi võrgustikuga, kuid see toiming on hetkel lõpetamata.</translation>
+    </message>
+    <message>
+        <source>Pending:</source>
+        <translation>Ootel:</translation>
+    </message>
+    <message>
+        <source>Immature:</source>
+        <translation>Ebaküps:</translation>
+    </message>
+    <message>
+        <source>Mined balance that has not yet matured</source>
+        <translation>Mitte aegunud mine'itud jääk</translation>
+    </message>
+    <
