@@ -1145,4 +1145,264 @@
         <translation>Näita</translation>
     </message>
     <message>
-        <source>Remov
+        <source>Remove</source>
+        <translation>Eemalda</translation>
+    </message>
+    <message>
+        <source>Copy label</source>
+        <translation>Kopeeri märgis</translation>
+    </message>
+    <message>
+        <source>Copy message</source>
+        <translation>Kopeeri sõnum</translation>
+    </message>
+    <message>
+        <source>Copy amount</source>
+        <translation>Kopeeri kogus</translation>
+    </message>
+    <message>
+        <source>Could not unlock wallet.</source>
+        <translation>Rahakoti lahtilukustamine ebaõnnestus.</translation>
+    </message>
+    </context>
+<context>
+    <name>ReceiveRequestDialog</name>
+    <message>
+        <source>Amount:</source>
+        <translation>Kogus</translation>
+    </message>
+    <message>
+        <source>Label:</source>
+        <translation>Märgis:</translation>
+    </message>
+    <message>
+        <source>Message:</source>
+        <translation>Sõnum:</translation>
+    </message>
+    <message>
+        <source>Wallet:</source>
+        <translation>Rahakott:</translation>
+    </message>
+    <message>
+        <source>Copy &amp;Address</source>
+        <translation>&amp;Kopeeri Aadress</translation>
+    </message>
+    <message>
+        <source>&amp;Save Image...</source>
+        <translation>&amp;Salvesta Pilt...</translation>
+    </message>
+    <message>
+        <source>Payment information</source>
+        <translation>Makse Informatsioon</translation>
+    </message>
+</context>
+<context>
+    <name>RecentRequestsTableModel</name>
+    <message>
+        <source>Date</source>
+        <translation>Kuupäev</translation>
+    </message>
+    <message>
+        <source>Label</source>
+        <translation>Silt</translation>
+    </message>
+    <message>
+        <source>Message</source>
+        <translation>Sõnum</translation>
+    </message>
+    <message>
+        <source>(no label)</source>
+        <translation>(silt puudub)</translation>
+    </message>
+    <message>
+        <source>(no message)</source>
+        <translation>(sõnum puudub)</translation>
+    </message>
+    </context>
+<context>
+    <name>SendCoinsDialog</name>
+    <message>
+        <source>Send Coins</source>
+        <translation>Müntide saatmine</translation>
+    </message>
+    <message>
+        <source>Inputs...</source>
+        <translation>Sisendid...</translation>
+    </message>
+    <message>
+        <source>automatically selected</source>
+        <translation>automaatselt valitud</translation>
+    </message>
+    <message>
+        <source>Insufficient funds!</source>
+        <translation>Liiga suur summa</translation>
+    </message>
+    <message>
+        <source>Quantity:</source>
+        <translation>Kogus:</translation>
+    </message>
+    <message>
+        <source>Bytes:</source>
+        <translation>Baiti:</translation>
+    </message>
+    <message>
+        <source>Amount:</source>
+        <translation>Kogus</translation>
+    </message>
+    <message>
+        <source>Fee:</source>
+        <translation>Tasu:</translation>
+    </message>
+    <message>
+        <source>After Fee:</source>
+        <translation>Peale tehingutasu:</translation>
+    </message>
+    <message>
+        <source>Change:</source>
+        <translation>Vahetusraha:</translation>
+    </message>
+    <message>
+        <source>Transaction Fee:</source>
+        <translation>Tehingu tasu:</translation>
+    </message>
+    <message>
+        <source>Choose...</source>
+        <translation>Vali...</translation>
+    </message>
+    <message>
+        <source>per kilobyte</source>
+        <translation>kilobaidi kohta</translation>
+    </message>
+    <message>
+        <source>Hide</source>
+        <translation>Peida</translation>
+    </message>
+    <message>
+        <source>Recommended:</source>
+        <translation>Soovitatud:</translation>
+    </message>
+    <message>
+        <source>Send to multiple recipients at once</source>
+        <translation>Saatmine mitmele korraga</translation>
+    </message>
+    <message>
+        <source>Add &amp;Recipient</source>
+        <translation>Lisa &amp;Saaja</translation>
+    </message>
+    <message>
+        <source>Clear all fields of the form.</source>
+        <translation>Puhasta kõik vormi väljad.</translation>
+    </message>
+    <message>
+        <source>Dust:</source>
+        <translation>Puru:</translation>
+    </message>
+    <message>
+        <source>Clear &amp;All</source>
+        <translation>Puhasta &amp;Kõik</translation>
+    </message>
+    <message>
+        <source>Balance:</source>
+        <translation>Jääk:</translation>
+    </message>
+    <message>
+        <source>Confirm the send action</source>
+        <translation>Saatmise kinnitamine</translation>
+    </message>
+    <message>
+        <source>S&amp;end</source>
+        <translation>S&amp;aada</translation>
+    </message>
+    <message>
+        <source>Copy quantity</source>
+        <translation>Kopeeri kogus</translation>
+    </message>
+    <message>
+        <source>Copy amount</source>
+        <translation>Kopeeri kogus</translation>
+    </message>
+    <message>
+        <source>Copy fee</source>
+        <translation>Kopeeri tehingutasu</translation>
+    </message>
+    <message>
+        <source>Copy bytes</source>
+        <translation>Kopeeri baidid</translation>
+    </message>
+    <message>
+        <source>Copy dust</source>
+        <translation>Kopeeri puru</translation>
+    </message>
+    <message>
+        <source>Copy change</source>
+        <translation>Kopeeri vahetusraha</translation>
+    </message>
+    <message>
+        <source>Are you sure you want to send?</source>
+        <translation>Oled kindel, et soovid saata?</translation>
+    </message>
+    <message>
+        <source>or</source>
+        <translation>või</translation>
+    </message>
+    <message>
+        <source>Transaction fee</source>
+        <translation>Tehingutasu</translation>
+    </message>
+    <message>
+        <source>Confirm send coins</source>
+        <translation>Müntide saatmise kinnitamine</translation>
+    </message>
+    <message>
+        <source>The recipient address is not valid. Please recheck.</source>
+        <translation>Saaja aadress ei ole korrektne. Palun kontrolli üle.</translation>
+    </message>
+    <message>
+        <source>The amount to pay must be larger than 0.</source>
+        <translation>Makstav summa peab olema suurem kui 0.</translation>
+    </message>
+    <message>
+        <source>The amount exceeds your balance.</source>
+        <translation>Summa ületab jäägi.</translation>
+    </message>
+    <message>
+        <source>The total exceeds your balance when the %1 transaction fee is included.</source>
+        <translation>Summa koos tehingu tasuga %1 ületab sinu jääki.</translation>
+    </message>
+    <message>
+        <source>Payment request expired.</source>
+        <translation>Maksepäring aegunud.</translation>
+    </message>
+    <message>
+        <source>Warning: Invalid Bitcoin address</source>
+        <translation>Hoiatus: Ebakorrektne Bitcoin aadress</translation>
+    </message>
+    <message>
+        <source>(no label)</source>
+        <translation>(silt puudub)</translation>
+    </message>
+</context>
+<context>
+    <name>SendCoinsEntry</name>
+    <message>
+        <source>A&amp;mount:</source>
+        <translation>S&amp;umma:</translation>
+    </message>
+    <message>
+        <source>Pay &amp;To:</source>
+        <translation>Maksa &amp;:</translation>
+    </message>
+    <message>
+        <source>&amp;Label:</source>
+        <translation>&amp;Märgis</translation>
+    </message>
+    <message>
+        <source>Choose previously used address</source>
+        <translation>Vali eelnevalt kasutatud aadress</translation>
+    </message>
+    <message>
+        <source>Alt+A</source>
+        <translation>Alt+A</translation>
+    </message>
+    <message>
+        <source>
