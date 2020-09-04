@@ -1630,4 +1630,284 @@
     </message>
     <message>
         <source>not accepted</source>
-        <tra
+        <translation>pole vastu võetud</translation>
+    </message>
+    <message>
+        <source>Debit</source>
+        <translation>Deebet</translation>
+    </message>
+    <message>
+        <source>Transaction fee</source>
+        <translation>Tehingutasu</translation>
+    </message>
+    <message>
+        <source>Net amount</source>
+        <translation>Neto summa</translation>
+    </message>
+    <message>
+        <source>Message</source>
+        <translation>Sõnum</translation>
+    </message>
+    <message>
+        <source>Comment</source>
+        <translation>Kommentaar</translation>
+    </message>
+    <message>
+        <source>Transaction ID</source>
+        <translation>Transaktsiooni ID</translation>
+    </message>
+    <message>
+        <source>Merchant</source>
+        <translation>Kaupleja</translation>
+    </message>
+    <message>
+        <source>Debug information</source>
+        <translation>Debug'imise info</translation>
+    </message>
+    <message>
+        <source>Transaction</source>
+        <translation>Tehing</translation>
+    </message>
+    <message>
+        <source>Inputs</source>
+        <translation>Sisendid</translation>
+    </message>
+    <message>
+        <source>Amount</source>
+        <translation>Kogus</translation>
+    </message>
+    <message>
+        <source>true</source>
+        <translation>tõene</translation>
+    </message>
+    <message>
+        <source>false</source>
+        <translation>väär</translation>
+    </message>
+</context>
+<context>
+    <name>TransactionDescDialog</name>
+    <message>
+        <source>This pane shows a detailed description of the transaction</source>
+        <translation>Paan kuvab tehingu detailid</translation>
+    </message>
+    </context>
+<context>
+    <name>TransactionTableModel</name>
+    <message>
+        <source>Date</source>
+        <translation>Kuupäev</translation>
+    </message>
+    <message>
+        <source>Type</source>
+        <translation>Tüüp</translation>
+    </message>
+    <message>
+        <source>Label</source>
+        <translation>Silt</translation>
+    </message>
+    <message>
+        <source>Open until %1</source>
+        <translation>Avatud kuni %1</translation>
+    </message>
+    <message>
+        <source>Unconfirmed</source>
+        <translation>Kinnitamata</translation>
+    </message>
+    <message>
+        <source>Confirmed (%1 confirmations)</source>
+        <translation>Kinnitatud (%1 kinnitust)</translation>
+    </message>
+    <message>
+        <source>Generated but not accepted</source>
+        <translation>Loodud, kuid aktsepteerimata</translation>
+    </message>
+    <message>
+        <source>Received with</source>
+        <translation>Saadud koos</translation>
+    </message>
+    <message>
+        <source>Received from</source>
+        <translation>Kellelt saadud</translation>
+    </message>
+    <message>
+        <source>Sent to</source>
+        <translation>Saadetud</translation>
+    </message>
+    <message>
+        <source>Payment to yourself</source>
+        <translation>Makse iseendale</translation>
+    </message>
+    <message>
+        <source>Mined</source>
+        <translation>Mine'itud</translation>
+    </message>
+    <message>
+        <source>(n/a)</source>
+        <translation>(n/a)</translation>
+    </message>
+    <message>
+        <source>(no label)</source>
+        <translation>(silt puudub)</translation>
+    </message>
+    <message>
+        <source>Transaction status. Hover over this field to show number of confirmations.</source>
+        <translation>Tehingu staatus. Kinnituste arvu kuvamiseks liigu hiire noolega selle peale.</translation>
+    </message>
+    <message>
+        <source>Date and time that the transaction was received.</source>
+        <translation>Tehingu saamise kuupäev ning kellaaeg.</translation>
+    </message>
+    <message>
+        <source>Type of transaction.</source>
+        <translation>Tehingu tüüp.</translation>
+    </message>
+    <message>
+        <source>Amount removed from or added to balance.</source>
+        <translation>Jäägile lisatud või eemaldatud summa.</translation>
+    </message>
+</context>
+<context>
+    <name>TransactionView</name>
+    <message>
+        <source>All</source>
+        <translation>Kõik</translation>
+    </message>
+    <message>
+        <source>Today</source>
+        <translation>Täna</translation>
+    </message>
+    <message>
+        <source>This week</source>
+        <translation>Käesolev nädal</translation>
+    </message>
+    <message>
+        <source>This month</source>
+        <translation>Käimasolev kuu</translation>
+    </message>
+    <message>
+        <source>Last month</source>
+        <translation>Eelmine kuu</translation>
+    </message>
+    <message>
+        <source>This year</source>
+        <translation>Käimasolev aasta</translation>
+    </message>
+    <message>
+        <source>Range...</source>
+        <translation>Vahemik...</translation>
+    </message>
+    <message>
+        <source>Received with</source>
+        <translation>Saadud koos</translation>
+    </message>
+    <message>
+        <source>Sent to</source>
+        <translation>Saadetud</translation>
+    </message>
+    <message>
+        <source>To yourself</source>
+        <translation>Iseendale</translation>
+    </message>
+    <message>
+        <source>Mined</source>
+        <translation>Mine'itud</translation>
+    </message>
+    <message>
+        <source>Other</source>
+        <translation>Muu</translation>
+    </message>
+    <message>
+        <source>Min amount</source>
+        <translation>Minimaalne summa</translation>
+    </message>
+    <message>
+        <source>Copy address</source>
+        <translation>Kopeeri aadress</translation>
+    </message>
+    <message>
+        <source>Copy label</source>
+        <translation>Kopeeri märgis</translation>
+    </message>
+    <message>
+        <source>Copy amount</source>
+        <translation>Kopeeri summa</translation>
+    </message>
+    <message>
+        <source>Copy transaction ID</source>
+        <translation>Kopeeri transaktsiooni ID</translation>
+    </message>
+    <message>
+        <source>Edit label</source>
+        <translation>Märgise muutmine</translation>
+    </message>
+    <message>
+        <source>Show transaction details</source>
+        <translation>Kuva tehingu detailid</translation>
+    </message>
+    <message>
+        <source>Comma separated file (*.csv)</source>
+        <translation>Komadega eraldatud väärtuste fail (*.csv)</translation>
+    </message>
+    <message>
+        <source>Confirmed</source>
+        <translation>Kinnitatud</translation>
+    </message>
+    <message>
+        <source>Date</source>
+        <translation>Kuupäev</translation>
+    </message>
+    <message>
+        <source>Type</source>
+        <translation>Tüüp</translation>
+    </message>
+    <message>
+        <source>Label</source>
+        <translation>Silt</translation>
+    </message>
+    <message>
+        <source>Address</source>
+        <translation>Aadress</translation>
+    </message>
+    <message>
+        <source>ID</source>
+        <translation>ID</translation>
+    </message>
+    <message>
+        <source>Exporting Failed</source>
+        <translation>Eksport ebaõnnestus.</translation>
+    </message>
+    <message>
+        <source>Range:</source>
+        <translation>Vahemik:</translation>
+    </message>
+    <message>
+        <source>to</source>
+        <translation>saaja</translation>
+    </message>
+</context>
+<context>
+    <name>UnitDisplayStatusBarControl</name>
+    </context>
+<context>
+    <name>WalletController</name>
+    </context>
+<context>
+    <name>WalletFrame</name>
+    <message>
+        <source>Create a new wallet</source>
+        <translation>Loo uus rahakott</translation>
+    </message>
+</context>
+<context>
+    <name>WalletModel</name>
+    <message>
+        <source>Send Coins</source>
+        <translation>Müntide saatmine</translation>
+    </message>
+    </context>
+<context>
+    <name>WalletView</name>
+    <message>
+        <source>&amp;Export</source>
+        <translation>&amp;Ekspordi</trans
