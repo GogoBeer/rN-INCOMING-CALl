@@ -294,4 +294,251 @@
         <translation>&amp;Qt-ri buruz</translation>
     </message>
     <message>
-        <s
+        <source>Show information about Qt</source>
+        <translation>Erakutsi Qt-ren buruzko informazioa</translation>
+    </message>
+    <message>
+        <source>&amp;Options...</source>
+        <translation>&amp;Aukerak...</translation>
+    </message>
+    <message>
+        <source>Modify configuration options for %1</source>
+        <translation>%1-ren konfiguraketa aukerak aldatu</translation>
+    </message>
+    <message>
+        <source>&amp;Encrypt Wallet...</source>
+        <translation>Diruzorroa &amp;enkriptatu...</translation>
+    </message>
+    <message>
+        <source>&amp;Backup Wallet...</source>
+        <translation>Diruzorroaren kopia bat gorde</translation>
+    </message>
+    <message>
+        <source>&amp;Change Passphrase...</source>
+        <translation>Pasahitza &amp;aldatu...</translation>
+    </message>
+    <message>
+        <source>Open &amp;URI...</source>
+        <translation>&amp;URLa zabaldu</translation>
+    </message>
+    <message>
+        <source>Create Wallet...</source>
+        <translation>Diruzorroa sortu...</translation>
+    </message>
+    <message>
+        <source>Create a new wallet</source>
+        <translation>Diruzorro berri bat sortu</translation>
+    </message>
+    <message>
+        <source>Wallet:</source>
+        <translation>Diruzorroa:</translation>
+    </message>
+    <message>
+        <source>Click to disable network activity.</source>
+        <translation>Sarea desaktibatzeko sakatu</translation>
+    </message>
+    <message>
+        <source>Network activity disabled.</source>
+        <translation>Sarea desaktibatua</translation>
+    </message>
+    <message>
+        <source>Click to enable network activity again.</source>
+        <translation>Sarea berriro aktibatzeko sakatu</translation>
+    </message>
+    <message>
+        <source>Syncing Headers (%1%)...</source>
+        <translation>Burukoak sinkronizatzen (%1)...</translation>
+    </message>
+    <message>
+        <source>Reindexing blocks on disk...</source>
+        <translation>Blokeak diskoan berriro zerrendatzen...</translation>
+    </message>
+    <message>
+        <source>Send coins to a Bitcoin address</source>
+        <translation>Bidali txanponak Bitcoin helbide batera</translation>
+    </message>
+    <message>
+        <source>Change the passphrase used for wallet encryption</source>
+        <translation>Diruzorroa enkriptatzeko erabilitako pasahitza aldatu</translation>
+    </message>
+    <message>
+        <source>&amp;Verify message...</source>
+        <translation>Mezua &amp;balioztatu...</translation>
+    </message>
+    <message>
+        <source>&amp;Send</source>
+        <translation>&amp;Bidali</translation>
+    </message>
+    <message>
+        <source>&amp;Receive</source>
+        <translation>&amp;Jaso</translation>
+    </message>
+    <message>
+        <source>&amp;Show / Hide</source>
+        <translation>&amp;Erakutsi / Izkutatu</translation>
+    </message>
+    <message>
+        <source>Show or hide the main Window</source>
+        <translation>Lehio nagusia erakutsi edo izkutatu</translation>
+    </message>
+    <message>
+        <source>Verify messages to ensure they were signed with specified Bitcoin addresses</source>
+        <translation>Egiaztatu mesua Bitcoin helbide espezifikoarekin erregistratu direla ziurtatzeko</translation>
+    </message>
+    <message>
+        <source>&amp;File</source>
+        <translation>&amp;Artxiboa</translation>
+    </message>
+    <message>
+        <source>&amp;Settings</source>
+        <translation>&amp;Ezarpenak</translation>
+    </message>
+    <message>
+        <source>&amp;Help</source>
+        <translation>&amp;Laguntza</translation>
+    </message>
+    <message>
+        <source>Tabs toolbar</source>
+        <translation>Fitxen tresna-barra</translation>
+    </message>
+    <message>
+        <source>%1 behind</source>
+        <translation>%1 atzetik</translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation>Akatsa</translation>
+    </message>
+    <message>
+        <source>Information</source>
+        <translation>Informazioa</translation>
+    </message>
+    <message>
+        <source>Up to date</source>
+        <translation>Eguneratua</translation>
+    </message>
+    <message>
+        <source>&amp;Sending addresses</source>
+        <translation>&amp;Helbideak bidaltzen</translation>
+    </message>
+    <message>
+        <source>&amp;Receiving addresses</source>
+        <translation>&amp;Helbideak jasotzen</translation>
+    </message>
+    <message>
+        <source>Open Wallet</source>
+        <translation>Diruzorroa zabaldu</translation>
+    </message>
+    <message>
+        <source>Open a wallet</source>
+        <translation>Diruzorro bat zabaldu</translation>
+    </message>
+    <message>
+        <source>Close Wallet...</source>
+        <translation>Diruzorroa itxi...</translation>
+    </message>
+    <message>
+        <source>Close wallet</source>
+        <translation>Diruzorroa itxi</translation>
+    </message>
+    <message>
+        <source>default wallet</source>
+        <translation>Diruzorro lehenetsia</translation>
+    </message>
+    <message>
+        <source>&amp;Window</source>
+        <translation>&amp;Lehioa</translation>
+    </message>
+    <message>
+        <source>Minimize</source>
+        <translation>Txikitu</translation>
+    </message>
+    <message>
+        <source>Zoom</source>
+        <translation>Gerturatu</translation>
+    </message>
+    <message>
+        <source>Main Window</source>
+        <translation>Lehio nagusia</translation>
+    </message>
+    <message>
+        <source>Catching up...</source>
+        <translation>Eguneratzen...</translation>
+    </message>
+    <message>
+        <source>Error: %1</source>
+        <translation>Akatsa: %1</translation>
+    </message>
+    <message>
+        <source>Warning: %1</source>
+        <translation>Abisua: %1</translation>
+    </message>
+    <message>
+        <source>Date: %1
+</source>
+        <translation>Data: %1
+</translation>
+    </message>
+    <message>
+        <source>Amount: %1
+</source>
+        <translation>Kopurua: %1
+</translation>
+    </message>
+    <message>
+        <source>Wallet: %1
+</source>
+        <translation>Diruzorroa: %1
+</translation>
+    </message>
+    <message>
+        <source>Label: %1
+</source>
+        <translation>Etiketa: %1
+</translation>
+    </message>
+    <message>
+        <source>Address: %1
+</source>
+        <translation>Helbidea: %1
+</translation>
+    </message>
+    <message>
+        <source>Sent transaction</source>
+        <translation>Bidalitako transakzioa</translation>
+    </message>
+    <message>
+        <source>Incoming transaction</source>
+        <translation>Sartutako transakzioa</translation>
+    </message>
+    <message>
+        <source>Wallet is &lt;b&gt;encrypted&lt;/b&gt; and currently &lt;b&gt;unlocked&lt;/b&gt;</source>
+        <translation>Zorroa &lt;b&gt;enkriptatuta&lt;/b&gt; eta &lt;b&gt;desblokeatuta&lt;/b&gt; dago une honetan</translation>
+    </message>
+    <message>
+        <source>Wallet is &lt;b&gt;encrypted&lt;/b&gt; and currently &lt;b&gt;locked&lt;/b&gt;</source>
+        <translation>Zorroa &lt;b&gt;enkriptatuta&lt;/b&gt; eta &lt;b&gt;blokeatuta&lt;/b&gt; dago une honetan</translation>
+    </message>
+    </context>
+<context>
+    <name>CoinControlDialog</name>
+    <message>
+        <source>Coin Selection</source>
+        <translation>Txanpon aukeraketa</translation>
+    </message>
+    <message>
+        <source>Quantity:</source>
+        <translation>Zenbat:</translation>
+    </message>
+    <message>
+        <source>Bytes:</source>
+        <translation>Byte kopurua:</translation>
+    </message>
+    <message>
+        <source>Amount:</source>
+        <translation>Kopurua:</translation>
+    </message>
+    <message>
+        <source>Dust:</source>
+        <translation>Hautsa:</translation>
+    </message
