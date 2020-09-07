@@ -541,4 +541,290 @@
     <message>
         <source>Dust:</source>
         <translation>Hautsa:</translation>
-    </message
+    </message>
+    <message>
+        <source>Change:</source>
+        <translation>Bueltak:</translation>
+    </message>
+    <message>
+        <source>Amount</source>
+        <translation>Kopurua</translation>
+    </message>
+    <message>
+        <source>Date</source>
+        <translation>Data</translation>
+    </message>
+    <message>
+        <source>Confirmations</source>
+        <translation>Konfirmazioak</translation>
+    </message>
+    <message>
+        <source>Confirmed</source>
+        <translation>Konfirmatuta</translation>
+    </message>
+    <message>
+        <source>Copy address</source>
+        <translation>Helbidea kopiatu</translation>
+    </message>
+    <message>
+        <source>Copy label</source>
+        <translation>Etiketa kopiatu</translation>
+    </message>
+    <message>
+        <source>yes</source>
+        <translation>bai</translation>
+    </message>
+    <message>
+        <source>no</source>
+        <translation>ez</translation>
+    </message>
+    <message>
+        <source>(no label)</source>
+        <translation>(izendapenik ez)</translation>
+    </message>
+    <message>
+        <source>(change)</source>
+        <translation>(bueltak)</translation>
+    </message>
+</context>
+<context>
+    <name>CreateWalletActivity</name>
+    <message>
+        <source>Creating Wallet &lt;b&gt;%1&lt;/b&gt;...</source>
+        <translation>Diruzorroa sortzen&lt;b&gt;%1&lt;/b&gt;...</translation>
+    </message>
+    <message>
+        <source>Create wallet failed</source>
+        <translation>Diruzorroa sortzen hutsegitea</translation>
+    </message>
+    </context>
+<context>
+    <name>CreateWalletDialog</name>
+    <message>
+        <source>Create Wallet</source>
+        <translation>Diruzorroa sortu</translation>
+    </message>
+    <message>
+        <source>Wallet Name</source>
+        <translation>Diruzorroaren izena</translation>
+    </message>
+    <message>
+        <source>Encrypt Wallet</source>
+        <translation>Diruzorroa enkriptatu</translation>
+    </message>
+    <message>
+        <source>Create</source>
+        <translation>Sortu</translation>
+    </message>
+</context>
+<context>
+    <name>EditAddressDialog</name>
+    <message>
+        <source>Edit Address</source>
+        <translation>Helbidea editatu</translation>
+    </message>
+    <message>
+        <source>&amp;Label</source>
+        <translation>&amp;Etiketa</translation>
+    </message>
+    <message>
+        <source>&amp;Address</source>
+        <translation>&amp;Helbidea</translation>
+    </message>
+    <message>
+        <source>New sending address</source>
+        <translation>Bidaltzeko helbide berria</translation>
+    </message>
+    <message>
+        <source>Edit receiving address</source>
+        <translation>Jasotzeko helbidea editatu</translation>
+    </message>
+    <message>
+        <source>Edit sending address</source>
+        <translation>Bidaltzeko helbidea editatu</translation>
+    </message>
+    <message>
+        <source>Could not unlock wallet.</source>
+        <translation>Ezin da diruzorroa desblokeatu.</translation>
+    </message>
+    <message>
+        <source>New key generation failed.</source>
+        <translation>Giltza berriaren sorrerak huts egin du.</translation>
+    </message>
+</context>
+<context>
+    <name>FreespaceChecker</name>
+    <message>
+        <source>name</source>
+        <translation>izena</translation>
+    </message>
+    </context>
+<context>
+    <name>HelpMessageDialog</name>
+    <message>
+        <source>version</source>
+        <translation>bertsioa</translation>
+    </message>
+    </context>
+<context>
+    <name>Intro</name>
+    <message>
+        <source>Welcome</source>
+        <translation>Ongietorri</translation>
+    </message>
+    <message>
+        <source>Welcome to %1.</source>
+        <translation>Ongietorri %1-ra</translation>
+    </message>
+    <message>
+        <source>Bitcoin</source>
+        <translation>Bitcoin</translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation>Akatsa</translation>
+    </message>
+    </context>
+<context>
+    <name>ModalOverlay</name>
+    <message>
+        <source>Form</source>
+        <translation>Inprimakia</translation>
+    </message>
+    <message>
+        <source>Unknown...</source>
+        <translation>Ezezaguna...</translation>
+    </message>
+    <message>
+        <source>Last block time</source>
+        <translation>Azken blokearen unea</translation>
+    </message>
+    <message>
+        <source>calculating...</source>
+        <translation>kalkulatzen...</translation>
+    </message>
+    <message>
+        <source>Hide</source>
+        <translation>Izkutatu</translation>
+    </message>
+    </context>
+<context>
+    <name>OpenURIDialog</name>
+    <message>
+        <source>URI:</source>
+        <translation>URI: </translation>
+    </message>
+</context>
+<context>
+    <name>OpenWalletActivity</name>
+    <message>
+        <source>Open wallet failed</source>
+        <translation>Diruzorroa irekitzen hutsegitea</translation>
+    </message>
+    <message>
+        <source>Open wallet warning</source>
+        <translation>Diruzorroa irekitzen abisua</translation>
+    </message>
+    <message>
+        <source>default wallet</source>
+        <translation>Diruzorro lehenetsia</translation>
+    </message>
+    </context>
+<context>
+    <name>OptionsDialog</name>
+    <message>
+        <source>Options</source>
+        <translation>Aukerak</translation>
+    </message>
+    <message>
+        <source>&amp;Main</source>
+        <translation>&amp;Nagusia</translation>
+    </message>
+    <message>
+        <source>Size of &amp;database cache</source>
+        <translation>Databasearen cache tamaina</translation>
+    </message>
+    <message>
+        <source>Tor</source>
+        <translation>Tor</translation>
+    </message>
+    <message>
+        <source>&amp;Window</source>
+        <translation>&amp;Lehioa</translation>
+    </message>
+    <message>
+        <source>&amp;Display</source>
+        <translation>&amp;Pantaila</translation>
+    </message>
+    <message>
+        <source>&amp;Unit to show amounts in:</source>
+        <translation>Zenbatekoa azaltzeko &amp;unitatea:</translation>
+    </message>
+    <message>
+        <source>&amp;OK</source>
+        <translation>&amp;Ados</translation>
+    </message>
+    <message>
+        <source>&amp;Cancel</source>
+        <translation>&amp;Ezeztatu</translation>
+    </message>
+    <message>
+        <source>none</source>
+        <translation>Bat ere ez</translation>
+    </message>
+    <message>
+        <source>Configuration options</source>
+        <translation>Konfiguraketa aukerak</translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation>Akatsa</translation>
+    </message>
+    <message>
+        <source>This change would require a client restart.</source>
+        <translation>Aldaketa honek clienta berriro piztea eskatzen du</translation>
+    </message>
+    </context>
+<context>
+    <name>OverviewPage</name>
+    <message>
+        <source>Form</source>
+        <translation>Inprimakia</translation>
+    </message>
+    <message>
+        <source>Pending:</source>
+        <translation>Zai:</translation>
+    </message>
+    <message>
+        <source>Total:</source>
+        <translation>Guztira:</translation>
+    </message>
+    </context>
+<context>
+    <name>PSBTOperationsDialog</name>
+    </context>
+<context>
+    <name>PaymentServer</name>
+    </context>
+<context>
+    <name>PeerTableModel</name>
+    </context>
+<context>
+    <name>QObject</name>
+    <message>
+        <source>Amount</source>
+        <translation>Kopurua</translation>
+    </message>
+    <message>
+        <source>Error: %1</source>
+        <translation>Akatsa: %1</translation>
+    </message>
+    <message>
+        <source>unknown</source>
+        <translation>ezezaguna</translation>
+    </message>
+</context>
+<context>
+    <name>QRImageWidget</name>
+    </context>
+<context
