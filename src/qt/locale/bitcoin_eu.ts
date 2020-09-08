@@ -827,4 +827,280 @@
 <context>
     <name>QRImageWidget</name>
     </context>
-<context
+<context>
+    <name>RPCConsole</name>
+    <message>
+        <source>Last block time</source>
+        <translation>Azken blokearen unea</translation>
+    </message>
+    </context>
+<context>
+    <name>ReceiveCoinsDialog</name>
+    <message>
+        <source>&amp;Amount:</source>
+        <translation>&amp;Kopurua:</translation>
+    </message>
+    <message>
+        <source>&amp;Label:</source>
+        <translation>&amp;Etiketa:</translation>
+    </message>
+    <message>
+        <source>&amp;Message:</source>
+        <translation>&amp;Mezua:</translation>
+    </message>
+    <message>
+        <source>Copy label</source>
+        <translation>Etiketa kopiatu</translation>
+    </message>
+    <message>
+        <source>Could not unlock wallet.</source>
+        <translation>Ezin da diruzorroa desblokeatu.</translation>
+    </message>
+    </context>
+<context>
+    <name>ReceiveRequestDialog</name>
+    <message>
+        <source>Amount:</source>
+        <translation>Kopurua:</translation>
+    </message>
+    <message>
+        <source>Message:</source>
+        <translation>Mezua:</translation>
+    </message>
+    <message>
+        <source>Wallet:</source>
+        <translation>Diruzorroa:</translation>
+    </message>
+    <message>
+        <source>Copy &amp;Address</source>
+        <translation>&amp;Helbidea kopiatu</translation>
+    </message>
+    </context>
+<context>
+    <name>RecentRequestsTableModel</name>
+    <message>
+        <source>Date</source>
+        <translation>Data</translation>
+    </message>
+    <message>
+        <source>Label</source>
+        <translation>Izendapen</translation>
+    </message>
+    <message>
+        <source>Message</source>
+        <translation>Mezua</translation>
+    </message>
+    <message>
+        <source>(no label)</source>
+        <translation>(izendapenik ez)</translation>
+    </message>
+    </context>
+<context>
+    <name>SendCoinsDialog</name>
+    <message>
+        <source>Send Coins</source>
+        <translation>Txanponak bidali</translation>
+    </message>
+    <message>
+        <source>Quantity:</source>
+        <translation>Zenbat:</translation>
+    </message>
+    <message>
+        <source>Bytes:</source>
+        <translation>Byte kopurua:</translation>
+    </message>
+    <message>
+        <source>Amount:</source>
+        <translation>Kopurua:</translation>
+    </message>
+    <message>
+        <source>Change:</source>
+        <translation>Bueltak:</translation>
+    </message>
+    <message>
+        <source>Hide</source>
+        <translation>Izkutatu</translation>
+    </message>
+    <message>
+        <source>Send to multiple recipients at once</source>
+        <translation>Hainbat jasotzaileri batera bidali</translation>
+    </message>
+    <message>
+        <source>Dust:</source>
+        <translation>Hautsa:</translation>
+    </message>
+    <message>
+        <source>Balance:</source>
+        <translation>Saldoa:</translation>
+    </message>
+    <message>
+        <source>Confirm the send action</source>
+        <translation>Bidalketa berretsi</translation>
+    </message>
+    <message>
+        <source>Confirm send coins</source>
+        <translation>Txanponen bidalketa berretsi</translation>
+    </message>
+    <message>
+        <source>The amount to pay must be larger than 0.</source>
+        <translation>Ordaintzeko kopurua, 0 baino handiagoa izan behar du.</translation>
+    </message>
+    <message>
+        <source>(no label)</source>
+        <translation>(izendapenik ez)</translation>
+    </message>
+</context>
+<context>
+    <name>SendCoinsEntry</name>
+    <message>
+        <source>A&amp;mount:</source>
+        <translation>K&amp;opurua:</translation>
+    </message>
+    <message>
+        <source>Pay &amp;To:</source>
+        <translation>Ordaindu &amp;honi:</translation>
+    </message>
+    <message>
+        <source>&amp;Label:</source>
+        <translation>&amp;Etiketa:</translation>
+    </message>
+    <message>
+        <source>Alt+A</source>
+        <translation>Alt+A</translation>
+    </message>
+    <message>
+        <source>Paste address from clipboard</source>
+        <translation>Arbeletik helbidea itsatsi</translation>
+    </message>
+    <message>
+        <source>Alt+P</source>
+        <translation>Alt+P</translation>
+    </message>
+    <message>
+        <source>Message:</source>
+        <translation>Mezua:</translation>
+    </message>
+    <message>
+        <source>Pay To:</source>
+        <translation>Honi ordaindu:</translation>
+    </message>
+    </context>
+<context>
+    <name>ShutdownWindow</name>
+    </context>
+<context>
+    <name>SignVerifyMessageDialog</name>
+    <message>
+        <source>Alt+A</source>
+        <translation>Alt+A</translation>
+    </message>
+    <message>
+        <source>Paste address from clipboard</source>
+        <translation>Arbeletik helbidea itsatsi</translation>
+    </message>
+    <message>
+        <source>Alt+P</source>
+        <translation>Alt+P</translation>
+    </message>
+    </context>
+<context>
+    <name>TrafficGraphWidget</name>
+    </context>
+<context>
+    <name>TransactionDesc</name>
+    <message>
+        <source>Open until %1</source>
+        <translation>Zabalik %1 arte</translation>
+    </message>
+    <message>
+        <source>%1/unconfirmed</source>
+        <translation>%1/konfirmatu gabe</translation>
+    </message>
+    <message>
+        <source>%1 confirmations</source>
+        <translation>%1 konfirmazio</translation>
+    </message>
+    <message>
+        <source>Date</source>
+        <translation>Data</translation>
+    </message>
+    <message>
+        <source>unknown</source>
+        <translation>ezezaguna</translation>
+    </message>
+    <message>
+        <source>Message</source>
+        <translation>Mezua</translation>
+    </message>
+    <message>
+        <source>Transaction</source>
+        <translation>Transakzioa</translation>
+    </message>
+    <message>
+        <source>Amount</source>
+        <translation>Kopurua</translation>
+    </message>
+    </context>
+<context>
+    <name>TransactionDescDialog</name>
+    <message>
+        <source>This pane shows a detailed description of the transaction</source>
+        <translation>Panel honek transakzien deskribapen xehea azaltzen du</translation>
+    </message>
+    </context>
+<context>
+    <name>TransactionTableModel</name>
+    <message>
+        <source>Date</source>
+        <translation>Data</translation>
+    </message>
+    <message>
+        <source>Type</source>
+        <translation>Mota</translation>
+    </message>
+    <message>
+        <source>Label</source>
+        <translation>Izendapen</translation>
+    </message>
+    <message>
+        <source>Open until %1</source>
+        <translation>Zabalik %1 arte</translation>
+    </message>
+    <message>
+        <source>Confirmed (%1 confirmations)</source>
+        <translation>Konfirmatuta (%1 konfirmazio)</translation>
+    </message>
+    <message>
+        <source>Generated but not accepted</source>
+        <translation>Sortua, baina ez onartua</translation>
+    </message>
+    <message>
+        <source>Received with</source>
+        <translation>Honekin jasoa</translation>
+    </message>
+    <message>
+        <source>Sent to</source>
+        <translation>Hona bidalia</translation>
+    </message>
+    <message>
+        <source>Payment to yourself</source>
+        <translation>Zure buruarentzat ordainketa</translation>
+    </message>
+    <message>
+        <source>Mined</source>
+        <translation>Meatua</translation>
+    </message>
+    <message>
+        <source>(n/a)</source>
+        <translation>(n/a)</translation>
+    </message>
+    <message>
+        <source>(no label)</source>
+        <translation>(izendapenik ez)</translation>
+    </message>
+    <message>
+        <source>Transaction status. Hover over this field to show number of confirmations.</source>
+        <translation>Transakzioaren egoera. Pasatu sagua gainetik konfirmazio kopurua ikusteko.</translation>
+    </message>
+    <message>
+        <source>Da
