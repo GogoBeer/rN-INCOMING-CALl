@@ -1103,4 +1103,165 @@
         <translation>Transakzioaren egoera. Pasatu sagua gainetik konfirmazio kopurua ikusteko.</translation>
     </message>
     <message>
-        <source>Da
+        <source>Date and time that the transaction was received.</source>
+        <translation>Transakzioa jasotako data eta ordua.</translation>
+    </message>
+    <message>
+        <source>Type of transaction.</source>
+        <translation>Transakzio mota.</translation>
+    </message>
+    <message>
+        <source>Amount removed from or added to balance.</source>
+        <translation>Saldoan kendu edo gehitutako kopurua.</translation>
+    </message>
+</context>
+<context>
+    <name>TransactionView</name>
+    <message>
+        <source>All</source>
+        <translation>Denak</translation>
+    </message>
+    <message>
+        <source>Today</source>
+        <translation>Gaurkoak</translation>
+    </message>
+    <message>
+        <source>This week</source>
+        <translation>Aste honetankoak</translation>
+    </message>
+    <message>
+        <source>This month</source>
+        <translation>Hil honetakoak</translation>
+    </message>
+    <message>
+        <source>Last month</source>
+        <translation>Azken hilekoak</translation>
+    </message>
+    <message>
+        <source>This year</source>
+        <translation>Aurtengoak</translation>
+    </message>
+    <message>
+        <source>Range...</source>
+        <translation>Muga...</translation>
+    </message>
+    <message>
+        <source>Received with</source>
+        <translation>Honekin jasoa</translation>
+    </message>
+    <message>
+        <source>Sent to</source>
+        <translation>Hona bidalia</translation>
+    </message>
+    <message>
+        <source>To yourself</source>
+        <translation>Zeure buruari</translation>
+    </message>
+    <message>
+        <source>Mined</source>
+        <translation>Meatua</translation>
+    </message>
+    <message>
+        <source>Other</source>
+        <translation>Beste</translation>
+    </message>
+    <message>
+        <source>Min amount</source>
+        <translation>Kopuru minimoa</translation>
+    </message>
+    <message>
+        <source>Copy address</source>
+        <translation>Helbidea kopiatu</translation>
+    </message>
+    <message>
+        <source>Copy label</source>
+        <translation>Etiketa kopiatu</translation>
+    </message>
+    <message>
+        <source>Comma separated file (*.csv)</source>
+        <translation>Komaz bereizitako artxiboa (*.csv)</translation>
+    </message>
+    <message>
+        <source>Confirmed</source>
+        <translation>Berretsia</translation>
+    </message>
+    <message>
+        <source>Date</source>
+        <translation>Data</translation>
+    </message>
+    <message>
+        <source>Type</source>
+        <translation>Mota</translation>
+    </message>
+    <message>
+        <source>Label</source>
+        <translation>Izendapen</translation>
+    </message>
+    <message>
+        <source>Address</source>
+        <translation>Helbidea</translation>
+    </message>
+    <message>
+        <source>Exporting Failed</source>
+        <translation>Esportazioak huts egin du</translation>
+    </message>
+    </context>
+<context>
+    <name>UnitDisplayStatusBarControl</name>
+    </context>
+<context>
+    <name>WalletController</name>
+    <message>
+        <source>Close wallet</source>
+        <translation>Diruzorroa itxi</translation>
+    </message>
+    </context>
+<context>
+    <name>WalletFrame</name>
+    <message>
+        <source>Create a new wallet</source>
+        <translation>Diruzorro berri bat sortu</translation>
+    </message>
+</context>
+<context>
+    <name>WalletModel</name>
+    <message>
+        <source>Send Coins</source>
+        <translation>Txanponak bidali</translation>
+    </message>
+    <message>
+        <source>default wallet</source>
+        <translation>Diruzorro lehenetsia</translation>
+    </message>
+</context>
+<context>
+    <name>WalletView</name>
+    <message>
+        <source>&amp;Export</source>
+        <translation>&amp;Esportatu</translation>
+    </message>
+    <message>
+        <source>Export the data in the current tab to a file</source>
+        <translation>Uneko fitxategian datuak esportatu</translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation>Akatsa</translation>
+    </message>
+    </context>
+<context>
+    <name>bitcoin-core</name>
+    <message>
+        <source>Loading wallet...</source>
+        <translation>Diru-zorroa kargatzen</translation>
+    </message>
+    <message>
+        <source>Rescanning...</source>
+        <translation>Birbilatzen...</translation>
+    </message>
+    <message>
+        <source>Done loading</source>
+        <translation>Zamaketa amaitua</translation>
+    </message>
+</context>
+</TS>
