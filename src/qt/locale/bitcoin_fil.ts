@@ -287,4 +287,215 @@
     </message>
     <message>
         <source>Show information about %1</source>
-        <translation>I
+        <translation>Ipakita ang impormasyon tungkol sa %1</translation>
+    </message>
+    <message>
+        <source>About &amp;Qt</source>
+        <translation>Tungkol &amp;QT</translation>
+    </message>
+    <message>
+        <source>Show information about Qt</source>
+        <translation>Ipakita ang impormasyon tungkol sa Qt</translation>
+    </message>
+    <message>
+        <source>&amp;Options...</source>
+        <translation>Opsyon...</translation>
+    </message>
+    <message>
+        <source>Modify configuration options for %1</source>
+        <translation>Baguhin ang mga pagpipilian ng konpigurasyon para sa %1</translation>
+    </message>
+    <message>
+        <source>&amp;Encrypt Wallet...</source>
+        <translation>I-encrypt ang Walet...</translation>
+    </message>
+    <message>
+        <source>&amp;Backup Wallet...</source>
+        <translation>I-backup ang Walet...</translation>
+    </message>
+    <message>
+        <source>&amp;Change Passphrase...</source>
+        <translation>Baguhin ang Passphrase...</translation>
+    </message>
+    <message>
+        <source>Open &amp;URI...</source>
+        <translation>Buksan ang URI...</translation>
+    </message>
+    <message>
+        <source>Create Wallet...</source>
+        <translation>Gumawa ng Pitaka</translation>
+    </message>
+    <message>
+        <source>Create a new wallet</source>
+        <translation>Gumawa ng Bagong Pitaka</translation>
+    </message>
+    <message>
+        <source>Wallet:</source>
+        <translation>Walet:</translation>
+    </message>
+    <message>
+        <source>Click to disable network activity.</source>
+        <translation>Mag-klik upang hindi paganahin ang aktibidad ng network.</translation>
+    </message>
+    <message>
+        <source>Network activity disabled.</source>
+        <translation>Ang aktibidad ng network ay hindi pinagana.</translation>
+    </message>
+    <message>
+        <source>Click to enable network activity again.</source>
+        <translation>Mag-klik upang muling paganahin ang aktibidad ng network.</translation>
+    </message>
+    <message>
+        <source>Syncing Headers (%1%)...</source>
+        <translation>Nag-sy-sync ng Header (%1%)...</translation>
+    </message>
+    <message>
+        <source>Reindexing blocks on disk...</source>
+        <translation>Nag-re-reindex ng blocks sa disk...</translation>
+    </message>
+    <message>
+        <source>Proxy is &lt;b&gt;enabled&lt;/b&gt;: %1</source>
+        <translation>Ang proxy ay &lt;b&gt;pinagana&lt;/b&gt;: %1</translation>
+    </message>
+    <message>
+        <source>Send coins to a Bitcoin address</source>
+        <translation>Magpadala ng coins sa Bitcoin address</translation>
+    </message>
+    <message>
+        <source>Backup wallet to another location</source>
+        <translation>I-backup ang walet sa isa pang lokasyon</translation>
+    </message>
+    <message>
+        <source>Change the passphrase used for wallet encryption</source>
+        <translation>Palitan ang passphrase na ginamit para sa pag-encrypt ng walet</translation>
+    </message>
+    <message>
+        <source>&amp;Verify message...</source>
+        <translation>I-verify ang mensahe...</translation>
+    </message>
+    <message>
+        <source>&amp;Send</source>
+        <translation>Magpadala</translation>
+    </message>
+    <message>
+        <source>&amp;Receive</source>
+        <translation>Tumanggap</translation>
+    </message>
+    <message>
+        <source>&amp;Show / Hide</source>
+        <translation>Ipakita / Itago</translation>
+    </message>
+    <message>
+        <source>Show or hide the main Window</source>
+        <translation>Ipakita o itago ang pangunahing Window</translation>
+    </message>
+    <message>
+        <source>Encrypt the private keys that belong to your wallet</source>
+        <translation>I-encrypt ang private keys na kabilang sa iyong walet</translation>
+    </message>
+    <message>
+        <source>Sign messages with your Bitcoin addresses to prove you own them</source>
+        <translation>Pumirma ng mga mensahe gamit ang iyong mga Bitcoin address upang mapatunayan na pagmamay-ari mo ang mga ito</translation>
+    </message>
+    <message>
+        <source>Verify messages to ensure they were signed with specified Bitcoin addresses</source>
+        <translation>I-verify ang mga mensahe upang matiyak na sila ay napirmahan ng tinukoy na mga Bitcoin address.</translation>
+    </message>
+    <message>
+        <source>&amp;File</source>
+        <translation>File</translation>
+    </message>
+    <message>
+        <source>&amp;Settings</source>
+        <translation>Setting</translation>
+    </message>
+    <message>
+        <source>&amp;Help</source>
+        <translation>Tulong</translation>
+    </message>
+    <message>
+        <source>Tabs toolbar</source>
+        <translation>Tabs toolbar</translation>
+    </message>
+    <message>
+        <source>Request payments (generates QR codes and bitcoin: URIs)</source>
+        <translation>Humiling ng bayad (lumilikha ng QR codes at bitcoin: URIs)</translation>
+    </message>
+    <message>
+        <source>Show the list of used sending addresses and labels</source>
+        <translation>Ipakita ang talaan ng mga gamit na address at label para sa pagpapadala</translation>
+    </message>
+    <message>
+        <source>Show the list of used receiving addresses and labels</source>
+        <translation>Ipakita ang talaan ng mga gamit na address at label para sa pagtanggap</translation>
+    </message>
+    <message>
+        <source>&amp;Command-line options</source>
+        <translation>Mga opsyon ng command-line</translation>
+    </message>
+    <message>
+        <source>Indexing blocks on disk...</source>
+        <translation>I-ni-index ang mga blocks sa disk...</translation>
+    </message>
+    <message>
+        <source>Processing blocks on disk...</source>
+        <translation>Pinoproseso ang mga blocks sa disk...</translation>
+    </message>
+    <message>
+        <source>%1 behind</source>
+        <translation>%1 sa likuran</translation>
+    </message>
+    <message>
+        <source>Last received block was generated %1 ago.</source>
+        <translation>Ang huling natanggap na block ay nalikha %1 na nakalipas.</translation>
+    </message>
+    <message>
+        <source>Transactions after this will not yet be visible.</source>
+        <translation>Ang mga susunod na transaksyon ay hindi pa makikita.</translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation>Kamalian</translation>
+    </message>
+    <message>
+        <source>Warning</source>
+        <translation>Babala</translation>
+    </message>
+    <message>
+        <source>Information</source>
+        <translation>Impormasyon</translation>
+    </message>
+    <message>
+        <source>Up to date</source>
+        <translation>Napapanahon</translation>
+    </message>
+    <message>
+        <source>Node window</source>
+        <translation>Bintana ng Node</translation>
+    </message>
+    <message>
+        <source>&amp;Sending addresses</source>
+        <translation>Mga address para sa pagpapadala</translation>
+    </message>
+    <message>
+        <source>&amp;Receiving addresses</source>
+        <translation>Mga address para sa pagtanggap</translation>
+    </message>
+    <message>
+        <source>Open Wallet</source>
+        <translation>Buksan ang Walet</translation>
+    </message>
+    <message>
+        <source>Open a wallet</source>
+        <translation>Buksan ang anumang walet</translation>
+    </message>
+    <message>
+        <source>Close Wallet...</source>
+        <translation>Isara ang Walet...</translation>
+    </message>
+    <message>
+        <source>Close wallet</source>
+        <translation>Isara ang walet</translation>
+    </message>
+    <message>
+        <source>Show the %1 help message to 
