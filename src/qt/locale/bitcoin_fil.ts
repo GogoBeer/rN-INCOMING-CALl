@@ -498,4 +498,256 @@
         <translation>Isara ang walet</translation>
     </message>
     <message>
-        <source>Show the %1 help message to 
+        <source>Show the %1 help message to get a list with possible Bitcoin command-line options</source>
+        <translation>Ipakita sa %1 ang tulong na mensahe upang makuha ang talaan ng mga posibleng opsyon ng Bitcoin command-line</translation>
+    </message>
+    <message>
+        <source>default wallet</source>
+        <translation>walet na default</translation>
+    </message>
+    <message>
+        <source>No wallets available</source>
+        <translation>Walang magagamit na mga walet</translation>
+    </message>
+    <message>
+        <source>&amp;Window</source>
+        <translation>Window</translation>
+    </message>
+    <message>
+        <source>Minimize</source>
+        <translation>Mag-minimize</translation>
+    </message>
+    <message>
+        <source>Zoom</source>
+        <translation>I-zoom</translation>
+    </message>
+    <message>
+        <source>Main Window</source>
+        <translation>Pangunahing Window</translation>
+    </message>
+    <message>
+        <source>%1 client</source>
+        <translation>%1 kliyente</translation>
+    </message>
+    <message>
+        <source>Connecting to peers...</source>
+        <translation>Kumukunekta sa mga peers...</translation>
+    </message>
+    <message>
+        <source>Catching up...</source>
+        <translation>Humahabol...</translation>
+    </message>
+    <message>
+        <source>Error: %1</source>
+        <translation>Kamalian: %1</translation>
+    </message>
+    <message>
+        <source>Date: %1
+</source>
+        <translation>Petsa: %1
+</translation>
+    </message>
+    <message>
+        <source>Amount: %1
+</source>
+        <translation>Halaga: %1
+</translation>
+    </message>
+    <message>
+        <source>Wallet: %1
+</source>
+        <translation>Walet: %1
+</translation>
+    </message>
+    <message>
+        <source>Type: %1
+</source>
+        <translation>Uri: %1
+</translation>
+    </message>
+    <message>
+        <source>Label: %1
+</source>
+        <translation>Label: %1
+</translation>
+    </message>
+    <message>
+        <source>Address: %1
+</source>
+        <translation>Address: %1
+</translation>
+    </message>
+    <message>
+        <source>Sent transaction</source>
+        <translation>Pinadalang transaksyon</translation>
+    </message>
+    <message>
+        <source>Incoming transaction</source>
+        <translation>Papasok na transaksyon</translation>
+    </message>
+    <message>
+        <source>HD key generation is &lt;b&gt;enabled&lt;/b&gt;</source>
+        <translation>Ang HD key generation ay &lt;b&gt;pinagana&lt;/b&gt;</translation>
+    </message>
+    <message>
+        <source>HD key generation is &lt;b&gt;disabled&lt;/b&gt;</source>
+        <translation>Ang HD key generation ay &lt;b&gt;hindi gumagana&lt;/b&gt;</translation>
+    </message>
+    <message>
+        <source>Private key &lt;b&gt;disabled&lt;/b&gt;</source>
+        <translation>Private key ay &lt;b&gt;hindi gumagana&lt;/b&gt;</translation>
+    </message>
+    <message>
+        <source>Wallet is &lt;b&gt;encrypted&lt;/b&gt; and currently &lt;b&gt;unlocked&lt;/b&gt;</source>
+        <translation>Walet ay &lt;b&gt;na-encrypt&lt;/b&gt; at kasalukuyang &lt;b&gt;naka-unlock&lt;/b&gt;</translation>
+    </message>
+    <message>
+        <source>Wallet is &lt;b&gt;encrypted&lt;/b&gt; and currently &lt;b&gt;locked&lt;/b&gt;</source>
+        <translation>Walet ay na-encrypt at kasalukuyang naka-lock.</translation>
+    </message>
+    </context>
+<context>
+    <name>CoinControlDialog</name>
+    <message>
+        <source>Coin Selection</source>
+        <translation>Pagpipilian ng Coin</translation>
+    </message>
+    <message>
+        <source>Quantity:</source>
+        <translation>Dami:</translation>
+    </message>
+    <message>
+        <source>Bytes:</source>
+        <translation>Bytes:</translation>
+    </message>
+    <message>
+        <source>Amount:</source>
+        <translation>Halaga:</translation>
+    </message>
+    <message>
+        <source>Fee:</source>
+        <translation>Bayad:</translation>
+    </message>
+    <message>
+        <source>Dust:</source>
+        <translation>Dust:</translation>
+    </message>
+    <message>
+        <source>After Fee:</source>
+        <translation>Pagkatapos ng Bayad:</translation>
+    </message>
+    <message>
+        <source>Change:</source>
+        <translation>Sukli:</translation>
+    </message>
+    <message>
+        <source>(un)select all</source>
+        <translation>(huwag)piliin lahat</translation>
+    </message>
+    <message>
+        <source>Tree mode</source>
+        <translation>Tree mode</translation>
+    </message>
+    <message>
+        <source>List mode</source>
+        <translation>List mode</translation>
+    </message>
+    <message>
+        <source>Amount</source>
+        <translation>Halaga</translation>
+    </message>
+    <message>
+        <source>Received with label</source>
+        <translation>Natanggap na may label</translation>
+    </message>
+    <message>
+        <source>Received with address</source>
+        <translation>Natanggap na may address</translation>
+    </message>
+    <message>
+        <source>Date</source>
+        <translation>Petsa</translation>
+    </message>
+    <message>
+        <source>Confirmations</source>
+        <translation>Mga kumpirmasyon</translation>
+    </message>
+    <message>
+        <source>Confirmed</source>
+        <translation>Nakumpirma</translation>
+    </message>
+    <message>
+        <source>Copy address</source>
+        <translation>Kopyahin ang address</translation>
+    </message>
+    <message>
+        <source>Copy label</source>
+        <translation>Kopyahin ang label</translation>
+    </message>
+    <message>
+        <source>Copy amount</source>
+        <translation>Kopyahin ang halaga</translation>
+    </message>
+    <message>
+        <source>Copy transaction ID</source>
+        <translation>Kopyahin ang ID ng transaksyon</translation>
+    </message>
+    <message>
+        <source>Lock unspent</source>
+        <translation>I-lock ang hindi pa nagastos</translation>
+    </message>
+    <message>
+        <source>Unlock unspent</source>
+        <translation>I-unlock ang hindi pa nagastos</translation>
+    </message>
+    <message>
+        <source>Copy quantity</source>
+        <translation>Kopyahin ang dami</translation>
+    </message>
+    <message>
+        <source>Copy fee</source>
+        <translation>Kopyahin ang halaga</translation>
+    </message>
+    <message>
+        <source>Copy after fee</source>
+        <translation>Kopyahin ang after fee</translation>
+    </message>
+    <message>
+        <source>Copy bytes</source>
+        <translation>Kopyahin ang bytes</translation>
+    </message>
+    <message>
+        <source>Copy dust</source>
+        <translation>Kopyahin ang dust</translation>
+    </message>
+    <message>
+        <source>Copy change</source>
+        <translation>Kopyahin ang sukli</translation>
+    </message>
+    <message>
+        <source>(%1 locked)</source>
+        <translation>(%1 ay naka-lock)</translation>
+    </message>
+    <message>
+        <source>yes</source>
+        <translation>oo</translation>
+    </message>
+    <message>
+        <source>no</source>
+        <translation>hindi</translation>
+    </message>
+    <message>
+        <source>This label turns red if any recipient receives an amount smaller than the current dust threshold.</source>
+        <translation>Ang label na ito ay magiging pula kung ang sinumang tatanggap ay tumanggap ng halagang mas mababa sa kasalukuyang dust threshold.</translation>
+    </message>
+    <message>
+        <source>Can vary +/- %1 satoshi(s) per input.</source>
+        <translation>Maaaring magbago ng +/- %1 satoshi(s) kada input.</translation>
+    </message>
+    <message>
+        <source>(no label)</source>
+        <translation>(walang label)</translation>
+    </message>
+    <message>
+        <source>change from %1 (%2)</source>
+        <translation>sukli mul
