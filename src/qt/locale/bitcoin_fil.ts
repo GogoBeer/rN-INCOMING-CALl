@@ -750,4 +750,182 @@
     </message>
     <message>
         <source>change from %1 (%2)</source>
-        <translation>sukli mul
+        <translation>sukli mula sa %1 (%2)</translation>
+    </message>
+    <message>
+        <source>(change)</source>
+        <translation>(sukli)</translation>
+    </message>
+</context>
+<context>
+    <name>CreateWalletActivity</name>
+    <message>
+        <source>Create wallet failed</source>
+        <translation>Nabigo ang Pag likha ng Pitaka</translation>
+    </message>
+    <message>
+        <source>Create wallet warning</source>
+        <translation>Gumawa ng Babala ng Pitaka</translation>
+    </message>
+</context>
+<context>
+    <name>CreateWalletDialog</name>
+    <message>
+        <source>Create Wallet</source>
+        <translation>Gumawa ng Pitaka</translation>
+    </message>
+    <message>
+        <source>Wallet Name</source>
+        <translation>Pangalan ng Pitaka</translation>
+    </message>
+    <message>
+        <source>Disable Private Keys</source>
+        <translation>Huwag paganahin ang Privbadong susi</translation>
+    </message>
+    <message>
+        <source>Make Blank Wallet</source>
+        <translation>Gumawa ng Blankong Pitaka</translation>
+    </message>
+    <message>
+        <source>Create</source>
+        <translation>Gumawa</translation>
+    </message>
+</context>
+<context>
+    <name>EditAddressDialog</name>
+    <message>
+        <source>Edit Address</source>
+        <translation>Baguhin ang Address</translation>
+    </message>
+    <message>
+        <source>&amp;Label</source>
+        <translation>Label</translation>
+    </message>
+    <message>
+        <source>The label associated with this address list entry</source>
+        <translation>Ang label na nauugnay sa entry list ng address na ito</translation>
+    </message>
+    <message>
+        <source>The address associated with this address list entry. This can only be modified for sending addresses.</source>
+        <translation>Ang address na nauugnay sa entry list ng address na ito. Maaari lamang itong mabago para sa pagpapadala ng mga address.</translation>
+    </message>
+    <message>
+        <source>&amp;Address</source>
+        <translation>Address</translation>
+    </message>
+    <message>
+        <source>New sending address</source>
+        <translation>Bagong address para sa pagpapadala</translation>
+    </message>
+    <message>
+        <source>Edit receiving address</source>
+        <translation>Baguhin ang address para sa pagtanggap</translation>
+    </message>
+    <message>
+        <source>Edit sending address</source>
+        <translation>Baguhin ang address para sa pagpapadala</translation>
+    </message>
+    <message>
+        <source>The entered address "%1" is not a valid Bitcoin address.</source>
+        <translation>Ang address na in-enter "%1" ay hindi isang wastong Bitcoin address.</translation>
+    </message>
+    <message>
+        <source>Address "%1" already exists as a receiving address with label "%2" and so cannot be added as a sending address.</source>
+        <translation>Ang address "%1" ay ginagamit bilang address na pagtanggap na may label "%2" kaya hindi ito maaaring gamitin bilang address na pagpapadala.</translation>
+    </message>
+    <message>
+        <source>The entered address "%1" is already in the address book with label "%2".</source>
+        <translation>Ang address na in-enter "%1" ay nasa address book na may label "%2".</translation>
+    </message>
+    <message>
+        <source>Could not unlock wallet.</source>
+        <translation>Hindi magawang ma-unlock ang walet.</translation>
+    </message>
+    <message>
+        <source>New key generation failed.</source>
+        <translation>Ang bagong key generation ay nabigo.</translation>
+    </message>
+</context>
+<context>
+    <name>FreespaceChecker</name>
+    <message>
+        <source>A new data directory will be created.</source>
+        <translation>Isang bagong direktoryo ng data ay malilikha.</translation>
+    </message>
+    <message>
+        <source>name</source>
+        <translation>pangalan</translation>
+    </message>
+    <message>
+        <source>Directory already exists. Add %1 if you intend to create a new directory here.</source>
+        <translation>Mayroon ng direktoryo. Magdagdag ng %1 kung nais mong gumawa ng bagong direktoyo dito.</translation>
+    </message>
+    <message>
+        <source>Path already exists, and is not a directory.</source>
+        <translation>Mayroon na ang path, at hindi ito direktoryo.</translation>
+    </message>
+    <message>
+        <source>Cannot create data directory here.</source>
+        <translation>Hindi maaaring gumawa ng direktoryo ng data dito.</translation>
+    </message>
+</context>
+<context>
+    <name>HelpMessageDialog</name>
+    <message>
+        <source>version</source>
+        <translation>salin</translation>
+    </message>
+    <message>
+        <source>About %1</source>
+        <translation>Tungkol sa %1</translation>
+    </message>
+    <message>
+        <source>Command-line options</source>
+        <translation>Mga opsyon ng command-line</translation>
+    </message>
+</context>
+<context>
+    <name>Intro</name>
+    <message>
+        <source>Welcome</source>
+        <translation>Masayang pagdating</translation>
+    </message>
+    <message>
+        <source>Welcome to %1.</source>
+        <translation>Masayang pagdating sa %1.</translation>
+    </message>
+    <message>
+        <source>As this is the first time the program is launched, you can choose where %1 will store its data.</source>
+        <translation>Dahil ngayon lang nilunsad ang programang ito, maaari mong piliin kung saan maiinbak ng %1 ang data nito.</translation>
+    </message>
+    <message>
+        <source>When you click OK, %1 will begin to download and process the full %4 block chain (%2GB) starting with the earliest transactions in %3 when %4 initially launched.</source>
+        <translation>Pagkatapos mong mag-click ng OK, %1 ay magsisimulang mag-download at mag-proseso ng buong blockchain (%2GB) magmula sa pinakaunang transaksyon sa %3 nuong ang %4 ay paunang nilunsad.</translation>
+    </message>
+    <message>
+        <source>This initial synchronisation is very demanding, and may expose hardware problems with your computer that had previously gone unnoticed. Each time you run %1, it will continue downloading where it left off.</source>
+        <translation>Maraming pangangailangan ang itong paunang sinkronisasyon at maaaring ilantad ang mga problema sa hardware ng iyong computer na hindi dating napansin. Tuwing pagaganahin mo ang %1, ito'y magpapatuloy mag-download kung saan ito tumigil.</translation>
+    </message>
+    <message>
+        <source>If you have chosen to limit block chain storage (pruning), the historical data must still be downloaded and processed, but will be deleted afterward to keep your disk usage low.</source>
+        <translation>Kung pinili mong takdaan ang imbakan ng blockchain (pruning), ang makasaysayang datos ay kailangan pa ring i-download at i-proseso, ngunit mabubura pagkatapos upang panatilihing mababa ang iyong paggamit ng disk.</translation>
+    </message>
+    <message>
+        <source>Use the default data directory</source>
+        <translation>Gamitin ang default data directory</translation>
+    </message>
+    <message>
+        <source>Use a custom data directory:</source>
+        <translation>Gamitin ang pasadyang data directory:</translation>
+    </message>
+    <message>
+        <source>Bitcoin</source>
+        <translation>Bitcoin</translation>
+    </message>
+    <message>
+        <source>At least %1 GB of data will be stored in this directory, and it will grow over time.</source>
+        <translation>Kahit na %1 GB na datos ay maiimbak sa direktoryong ito, ito ay lalaki sa pagtagal.</translation>
+    </message>
+    <message>
+        <source>Approximately %1 GB of data will be stored in this directory.</source>
+        <translation>Humigit-kumulang na %1 GB na data ay m
