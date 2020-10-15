@@ -928,4 +928,180 @@
     </message>
     <message>
         <source>Approximately %1 GB of data will be stored in this directory.</source>
-        <translation>Humigit-kumulang na %1 GB na data ay m
+        <translation>Humigit-kumulang na %1 GB na data ay maiimbak sa direktoryong ito.</translation>
+    </message>
+    <message>
+        <source>%1 will download and store a copy of the Bitcoin block chain.</source>
+        <translation>%1 ay mag-do-download at magiimbak ng kopya ng Bitcoin blockchain.</translation>
+    </message>
+    <message>
+        <source>The wallet will also be stored in this directory.</source>
+        <translation>Ang walet ay maiimbak din sa direktoryong ito.</translation>
+    </message>
+    <message>
+        <source>Error: Specified data directory "%1" cannot be created.</source>
+        <translation>Kamalian: Ang tinukoy na direktoyo ng datos "%1" ay hindi magawa.</translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation>Kamalian</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n GB of free space available</source>
+        <translation><numerusform>Mayroong %n GB na libreng lugar</numerusform><numerusform>Mayroong %n GB na libreng lugar</numerusform></translation>
+    </message>
+    </context>
+<context>
+    <name>ModalOverlay</name>
+    <message>
+        <source>Form</source>
+        <translation>Anyo</translation>
+    </message>
+    <message>
+        <source>Recent transactions may not yet be visible, and therefore your wallet's balance might be incorrect. This information will be correct once your wallet has finished synchronizing with the bitcoin network, as detailed below.</source>
+        <translation>Ang mga bagong transaksyon ay hindi pa makikita kaya ang balanse ng iyong walet ay maaaring hindi tama. Ang impormasyong ito ay maiitama pagkatapos ma-synchronize ng iyong walet sa bitcoin network, ayon sa ibaba.</translation>
+    </message>
+    <message>
+        <source>Attempting to spend bitcoins that are affected by not-yet-displayed transactions will not be accepted by the network.</source>
+        <translation>Ang pagtangkang gastusin ang mga bitcoin na apektado ng mga transaksyon na hindi pa naipapakita ay hindi tatanggapin ng network.</translation>
+    </message>
+    <message>
+        <source>Number of blocks left</source>
+        <translation>Dami ng blocks na natitira</translation>
+    </message>
+    <message>
+        <source>Unknown...</source>
+        <translation>Hindi alam...</translation>
+    </message>
+    <message>
+        <source>Last block time</source>
+        <translation>Huling oras ng block</translation>
+    </message>
+    <message>
+        <source>Progress</source>
+        <translation>Pagsulong</translation>
+    </message>
+    <message>
+        <source>Progress increase per hour</source>
+        <translation>Pagdagdag ng pagsulong kada oras</translation>
+    </message>
+    <message>
+        <source>calculating...</source>
+        <translation>nagkakalkula...</translation>
+    </message>
+    <message>
+        <source>Estimated time left until synced</source>
+        <translation>Tinatayang oras na natitira hanggang ma-sync</translation>
+    </message>
+    <message>
+        <source>Hide</source>
+        <translation>Itago</translation>
+    </message>
+    <message>
+        <source>Esc</source>
+        <translation>Esc</translation>
+    </message>
+    <message>
+        <source>Unknown. Syncing Headers (%1, %2%)...</source>
+        <translation>Hindi alam. S-in-i-sync ang mga Header (%1, %2%)...</translation>
+    </message>
+</context>
+<context>
+    <name>OpenURIDialog</name>
+    <message>
+        <source>URI:</source>
+        <translation>URI:</translation>
+    </message>
+</context>
+<context>
+    <name>OpenWalletActivity</name>
+    <message>
+        <source>Open wallet failed</source>
+        <translation>Nabigo ang bukas na pitaka</translation>
+    </message>
+    <message>
+        <source>Open wallet warning</source>
+        <translation>Buksan ang babala sa pitaka</translation>
+    </message>
+    <message>
+        <source>default wallet</source>
+        <translation>walet na default</translation>
+    </message>
+    <message>
+        <source>Opening Wallet &lt;b&gt;%1&lt;/b&gt;...</source>
+        <translation>Binubuksan ang walet &lt;b&gt;%1&lt;/b&gt;...</translation>
+    </message>
+</context>
+<context>
+    <name>OptionsDialog</name>
+    <message>
+        <source>Options</source>
+        <translation>Mga pagpipilian</translation>
+    </message>
+    <message>
+        <source>&amp;Main</source>
+        <translation>Pangunahin</translation>
+    </message>
+    <message>
+        <source>Automatically start %1 after logging in to the system.</source>
+        <translation>Kusang simulan ang %1 pagka-log-in sa sistema.</translation>
+    </message>
+    <message>
+        <source>&amp;Start %1 on system login</source>
+        <translation>Simulan ang %1 pag-login sa sistema</translation>
+    </message>
+    <message>
+        <source>Size of &amp;database cache</source>
+        <translation>Ang laki ng database cache</translation>
+    </message>
+    <message>
+        <source>Number of script &amp;verification threads</source>
+        <translation>Dami ng script verification threads</translation>
+    </message>
+    <message>
+        <source>IP address of the proxy (e.g. IPv4: 127.0.0.1 / IPv6: ::1)</source>
+        <translation>IP address ng proxy (e.g. IPv4: 127.0.0.1 / IPv6:::1)</translation>
+    </message>
+    <message>
+        <source>Shows if the supplied default SOCKS5 proxy is used to reach peers via this network type.</source>
+        <translation>Pinapakita kung ang ibinibigay na default SOCKS5 proxy ay ginagamit upang maabot ang mga peers sa pamamagitan nitong uri ng network.</translation>
+    </message>
+    <message>
+        <source>Hide the icon from the system tray.</source>
+        <translation>Itago ang icon mula sa trey ng sistema.</translation>
+    </message>
+    <message>
+        <source>&amp;Hide tray icon</source>
+        <translation>Itago ang icon ng trey</translation>
+    </message>
+    <message>
+        <source>Minimize instead of exit the application when the window is closed. When this option is enabled, the application will be closed only after selecting Exit in the menu.</source>
+        <translation>I-minimize ang application sa halip na mag-exit kapag nakasara ang window. Kapag gumagana ang opsyong ito, ang application ay magsasara lamang kapag pinili ang Exit sa menu.</translation>
+    </message>
+    <message>
+        <source>Third party URLs (e.g. a block explorer) that appear in the transactions tab as context menu items. %s in the URL is replaced by transaction hash. Multiple URLs are separated by vertical bar |.</source>
+        <translation>Mga third party URL (e.g. ang block explorer) na lumilitaw sa tab ng transaksyon bilang mga context menu item. Ang mga %sa URL ay mapapalitan ng hash ng transaksyon. Mga maramihang URL ay paghihiwalayin ng vertical bar |.</translation>
+    </message>
+    <message>
+        <source>Open the %1 configuration file from the working directory.</source>
+        <translation>Buksan ang %1 configuration file mula sa working directory.</translation>
+    </message>
+    <message>
+        <source>Open Configuration File</source>
+        <translation>Buksan ang Configuration File</translation>
+    </message>
+    <message>
+        <source>Reset all client options to default.</source>
+        <translation>I-reset lahat ng opsyon ng client sa default.</translation>
+    </message>
+    <message>
+        <source>&amp;Reset Options</source>
+        <translation>I-reset ang mga Opsyon</translation>
+    </message>
+    <message>
+        <source>&amp;Network</source>
+        <translation>Network</translation>
+    </message>
+    <message>
+        <source>Disables some advanced features but all blocks will still be fully validated. Reverting this setting requires re-downloading the entire blockchain. Actual disk usage may be somewhat higher.</source>
+        <translation>I-d-in-i-disable ang ilang mga advanced na tampok ngunit lahat ng blocks ay ganap na mapapatunayan pa rin. Ang pag-revert ng pagta
