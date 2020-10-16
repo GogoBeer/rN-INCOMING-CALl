@@ -1104,4 +1104,184 @@
     </message>
     <message>
         <source>Disables some advanced features but all blocks will still be fully validated. Reverting this setting requires re-downloading the entire blockchain. Actual disk usage may be somewhat higher.</source>
-        <translation>I-d-in-i-disable ang ilang mga advanced na tampok ngunit lahat ng blocks ay ganap na mapapatunayan pa rin. Ang pag-revert ng pagta
+        <translation>I-d-in-i-disable ang ilang mga advanced na tampok ngunit lahat ng blocks ay ganap na mapapatunayan pa rin. Ang pag-revert ng pagtatakdang ito ay nangangailangan ng muling pag-download ng buong blockchain. Ang aktwal na paggamit ng disk ay maaaring mas mataas.</translation>
+    </message>
+    <message>
+        <source>Prune &amp;block storage to</source>
+        <translation>I-prune and block storage sa</translation>
+    </message>
+    <message>
+        <source>GB</source>
+        <translation>GB</translation>
+    </message>
+    <message>
+        <source>Reverting this setting requires re-downloading the entire blockchain.</source>
+        <translation>Ang pag-revert ng pagtatampok na ito ay nangangailangan ng muling pag-download ng buong blockchain.</translation>
+    </message>
+    <message>
+        <source>MiB</source>
+        <translation>MiB</translation>
+    </message>
+    <message>
+        <source>W&amp;allet</source>
+        <translation>Walet</translation>
+    </message>
+    <message>
+        <source>Expert</source>
+        <translation>Dalubhasa</translation>
+    </message>
+    <message>
+        <source>Enable coin &amp;control features</source>
+        <translation>Paganahin ang tampok ng kontrol ng coin</translation>
+    </message>
+    <message>
+        <source>If you disable the spending of unconfirmed change, the change from a transaction cannot be used until that transaction has at least one confirmation. This also affects how your balance is computed.</source>
+        <translation>Kung i-disable mo ang paggastos ng sukli na hindi pa nakumpirma, ang sukli mula sa transaksyon ay hindi puedeng gamitin hanggang sa may kahit isang kumpirmasyon ng transaksyon. Maaapektuhan din kung paano kakalkulahin ang iyong balanse.</translation>
+    </message>
+    <message>
+        <source>&amp;Spend unconfirmed change</source>
+        <translation>Gastusin ang sukli na hindi pa nakumpirma</translation>
+    </message>
+    <message>
+        <source>Automatically open the Bitcoin client port on the router. This only works when your router supports UPnP and it is enabled.</source>
+        <translation>Kusang buksan ang Bitcoin client port sa router. Gumagana lamang ito kapag ang iyong router ay sumusuporta ng UPnP at ito ay pinagana.</translation>
+    </message>
+    <message>
+        <source>Map port using &amp;UPnP</source>
+        <translation>Isamapa ang port gamit ang UPnP</translation>
+    </message>
+    <message>
+        <source>Accept connections from outside.</source>
+        <translation>Tumanggap ng mga koneksyon galing sa labas.</translation>
+    </message>
+    <message>
+        <source>Allow incomin&amp;g connections</source>
+        <translation>Ipahintulot ang mga papasok na koneksyon</translation>
+    </message>
+    <message>
+        <source>Connect to the Bitcoin network through a SOCKS5 proxy.</source>
+        <translation>Kumunekta sa Bitcoin network sa pamamagitan ng SOCKS5 proxy.</translation>
+    </message>
+    <message>
+        <source>&amp;Connect through SOCKS5 proxy (default proxy):</source>
+        <translation>Kumunekta gamit ang SOCKS5 proxy (default na proxy):</translation>
+    </message>
+    <message>
+        <source>Proxy &amp;IP:</source>
+        <translation>Proxy IP:</translation>
+    </message>
+    <message>
+        <source>&amp;Port:</source>
+        <translation>Port</translation>
+    </message>
+    <message>
+        <source>Port of the proxy (e.g. 9050)</source>
+        <translation>Port ng proxy (e.g. 9050)</translation>
+    </message>
+    <message>
+        <source>Used for reaching peers via:</source>
+        <translation>Gamit para sa pagabot ng peers sa pamamagitan ng:</translation>
+    </message>
+    <message>
+        <source>IPv4</source>
+        <translation>IPv4</translation>
+    </message>
+    <message>
+        <source>IPv6</source>
+        <translation>IPv6</translation>
+    </message>
+    <message>
+        <source>Tor</source>
+        <translation>Tor</translation>
+    </message>
+    <message>
+        <source>&amp;Window</source>
+        <translation>Window</translation>
+    </message>
+    <message>
+        <source>Show only a tray icon after minimizing the window.</source>
+        <translation>Ipakita ang icon ng trey pagkatapos lang i-minimize and window.</translation>
+    </message>
+    <message>
+        <source>&amp;Minimize to the tray instead of the taskbar</source>
+        <translation>Mag-minimize sa trey sa halip na sa taskbar</translation>
+    </message>
+    <message>
+        <source>M&amp;inimize on close</source>
+        <translation>I-minimize pagsara</translation>
+    </message>
+    <message>
+        <source>&amp;Display</source>
+        <translation>Ipakita</translation>
+    </message>
+    <message>
+        <source>User Interface &amp;language:</source>
+        <translation>Wika ng user interface:</translation>
+    </message>
+    <message>
+        <source>The user interface language can be set here. This setting will take effect after restarting %1.</source>
+        <translation>Ang wika ng user interface ay puedeng itakda dito. Ang pagtatakdang ito ay magkakabisa pagkatapos mag-restart %1.</translation>
+    </message>
+    <message>
+        <source>&amp;Unit to show amounts in:</source>
+        <translation>Yunit para ipakita ang mga halaga:</translation>
+    </message>
+    <message>
+        <source>Choose the default subdivision unit to show in the interface and when sending coins.</source>
+        <translation>Piliin ang yunit ng default na subdivisyon na ipapakita sa interface at kapag nagpapadala ng coins.</translation>
+    </message>
+    <message>
+        <source>Whether to show coin control features or not.</source>
+        <translation>Kung magpapakita ng mga tampok ng kontrol ng coin o hindi</translation>
+    </message>
+    <message>
+        <source>&amp;Third party transaction URLs</source>
+        <translation>Mga URL ng transaksyon ng third party</translation>
+    </message>
+    <message>
+        <source>Options set in this dialog are overridden by the command line or in the configuration file:</source>
+        <translation>Ang mga nakatakdang opyson sa dialog na ito ay ma-o-override ng command line o sa configuration file:</translation>
+    </message>
+    <message>
+        <source>&amp;OK</source>
+        <translation>OK</translation>
+    </message>
+    <message>
+        <source>&amp;Cancel</source>
+        <translation>Kanselahin</translation>
+    </message>
+    <message>
+        <source>default</source>
+        <translation>default</translation>
+    </message>
+    <message>
+        <source>none</source>
+        <translation>wala</translation>
+    </message>
+    <message>
+        <source>Confirm options reset</source>
+        <translation>Kumpirmahin ang pag-reset ng mga opsyon</translation>
+    </message>
+    <message>
+        <source>Client restart required to activate changes.</source>
+        <translation>Kailangan i-restart ang kliyente upang ma-activate ang mga pagbabago.</translation>
+    </message>
+    <message>
+        <source>Client will be shut down. Do you want to proceed?</source>
+        <translation>Ang kliyente ay papatayin. Nais mo bang magpatuloy?</translation>
+    </message>
+    <message>
+        <source>Configuration options</source>
+        <translation>Mga opsyon ng konpigurasyon</translation>
+    </message>
+    <message>
+        <source>The configuration file is used to specify advanced user options which override GUI settings. Additionally, any command-line options will override this configuration file.</source>
+        <translation>Ang configuration file ay ginagamit para tukuyin ang mga advanced user options na nag-o-override ng GUI settings. Bukod pa rito, i-o-override ng anumang opsyon ng command-line itong configuration file.</translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation>Kamalian</translation>
+    </message>
+    <message>
+        <source>The configuration file could not be opened.</source>
+        <translation>Ang co
