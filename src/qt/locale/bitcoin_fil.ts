@@ -1498,4 +1498,239 @@
         <translation><numerusform>%n linggo</numerusform><numerusform>%n linggo</numerusform></translation>
     </message>
     <message>
-        <source>%1 and %2</sourc
+        <source>%1 and %2</source>
+        <translation>%1 at %2</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n year(s)</source>
+        <translation><numerusform>%n taon</numerusform><numerusform>%n taon</numerusform></translation>
+    </message>
+    <message>
+        <source>%1 B</source>
+        <translation>%1 B</translation>
+    </message>
+    <message>
+        <source>%1 KB</source>
+        <translation>%1 KB</translation>
+    </message>
+    <message>
+        <source>%1 MB</source>
+        <translation>%1 MB</translation>
+    </message>
+    <message>
+        <source>%1 GB</source>
+        <translation>%1 GB</translation>
+    </message>
+    <message>
+        <source>Error: Specified data directory "%1" does not exist.</source>
+        <translation>Kamalian: Wala ang tinukoy na direktoryo ng datos "%1".</translation>
+    </message>
+    <message>
+        <source>Error: Cannot parse configuration file: %1.</source>
+        <translation>Kamalian: Hindi ma-parse ang configuration file: %1.</translation>
+    </message>
+    <message>
+        <source>Error: %1</source>
+        <translation>Kamalian: %1</translation>
+    </message>
+    <message>
+        <source>%1 didn't yet exit safely...</source>
+        <translation>%1 ay hindi pa ligtas na nagsara...</translation>
+    </message>
+    <message>
+        <source>unknown</source>
+        <translation>hindi alam</translation>
+    </message>
+</context>
+<context>
+    <name>QRImageWidget</name>
+    <message>
+        <source>&amp;Save Image...</source>
+        <translation>I-save ang Larawan...</translation>
+    </message>
+    <message>
+        <source>&amp;Copy Image</source>
+        <translation>Kopyahin ang Larawan</translation>
+    </message>
+    <message>
+        <source>Resulting URI too long, try to reduce the text for label / message.</source>
+        <translation>Nagreresultang URI masyadong mahaba, subukang bawasan ang text para sa label / mensahe.</translation>
+    </message>
+    <message>
+        <source>Error encoding URI into QR Code.</source>
+        <translation>Kamalian sa pag-e-encode ng URI sa QR Code.</translation>
+    </message>
+    <message>
+        <source>QR code support not available.</source>
+        <translation>Hindi magagamit ang suporta ng QR code.</translation>
+    </message>
+    <message>
+        <source>Save QR Code</source>
+        <translation>I-save ang QR Code</translation>
+    </message>
+    <message>
+        <source>PNG Image (*.png)</source>
+        <translation>PNG Image (*.png)</translation>
+    </message>
+</context>
+<context>
+    <name>RPCConsole</name>
+    <message>
+        <source>N/A</source>
+        <translation>N/A</translation>
+    </message>
+    <message>
+        <source>Client version</source>
+        <translation>Bersyon ng kliyente</translation>
+    </message>
+    <message>
+        <source>&amp;Information</source>
+        <translation>Impormasyon</translation>
+    </message>
+    <message>
+        <source>General</source>
+        <translation>Pangkalahatan</translation>
+    </message>
+    <message>
+        <source>Using BerkeleyDB version</source>
+        <translation>Gumagamit ng bersyon ng BerkeleyDB</translation>
+    </message>
+    <message>
+        <source>Datadir</source>
+        <translation>Datadir</translation>
+    </message>
+    <message>
+        <source>To specify a non-default location of the data directory use the '%1' option.</source>
+        <translation>Upang tukuyin ang non-default na lokasyon ng direktoryo ng datos, gamitin ang '%1' na opsyon.</translation>
+    </message>
+    <message>
+        <source>Blocksdir</source>
+        <translation>Blocksdir</translation>
+    </message>
+    <message>
+        <source>To specify a non-default location of the blocks directory use the '%1' option.</source>
+        <translation>Upang tukuyin and non-default na lokasyon ng direktoryo ng mga block, gamitin ang '%1' na opsyon.</translation>
+    </message>
+    <message>
+        <source>Startup time</source>
+        <translation>Oras ng pagsisimula</translation>
+    </message>
+    <message>
+        <source>Network</source>
+        <translation>Network</translation>
+    </message>
+    <message>
+        <source>Name</source>
+        <translation>Pangalan</translation>
+    </message>
+    <message>
+        <source>Number of connections</source>
+        <translation>Dami ng mga koneksyon</translation>
+    </message>
+    <message>
+        <source>Block chain</source>
+        <translation>Block chain</translation>
+    </message>
+    <message>
+        <source>Memory Pool</source>
+        <translation>Memory Pool</translation>
+    </message>
+    <message>
+        <source>Current number of transactions</source>
+        <translation>Kasalukuyang dami ng mga transaksyon</translation>
+    </message>
+    <message>
+        <source>Memory usage</source>
+        <translation>Paggamit ng memory</translation>
+    </message>
+    <message>
+        <source>Wallet: </source>
+        <translation>Walet:</translation>
+    </message>
+    <message>
+        <source>(none)</source>
+        <translation>(wala)</translation>
+    </message>
+    <message>
+        <source>&amp;Reset</source>
+        <translation>I-reset</translation>
+    </message>
+    <message>
+        <source>Received</source>
+        <translation>Natanggap</translation>
+    </message>
+    <message>
+        <source>Sent</source>
+        <translation>Ipinadala</translation>
+    </message>
+    <message>
+        <source>&amp;Peers</source>
+        <translation>Peers</translation>
+    </message>
+    <message>
+        <source>Banned peers</source>
+        <translation>Mga pinagbawalan na peers</translation>
+    </message>
+    <message>
+        <source>Select a peer to view detailed information.</source>
+        <translation>Pumili ng peer upang tingnan ang detalyadong impormasyon.</translation>
+    </message>
+    <message>
+        <source>Direction</source>
+        <translation>Direksyon</translation>
+    </message>
+    <message>
+        <source>Version</source>
+        <translation>Bersyon</translation>
+    </message>
+    <message>
+        <source>Starting Block</source>
+        <translation>Pasimulang Block</translation>
+    </message>
+    <message>
+        <source>Synced Headers</source>
+        <translation>Mga header na na-sync</translation>
+    </message>
+    <message>
+        <source>Synced Blocks</source>
+        <translation>Mga block na na-sync</translation>
+    </message>
+    <message>
+        <source>The mapped Autonomous System used for diversifying peer selection.</source>
+        <translation>Ginamit ang na-map na Autonomous System para sa pag-iba-iba ng pagpipilian ng kapwa.</translation>
+    </message>
+    <message>
+        <source>Mapped AS</source>
+        <translation>Mapa sa AS
+</translation>
+    </message>
+    <message>
+        <source>User Agent</source>
+        <translation>Ahente ng User</translation>
+    </message>
+    <message>
+        <source>Node window</source>
+        <translation>Bintana ng Node</translation>
+    </message>
+    <message>
+        <source>Open the %1 debug log file from the current data directory. This can take a few seconds for large log files.</source>
+        <translation>Buksan ang %1 debug log file mula sa kasalukuyang directoryo ng datos. Maaari itong tumagal ng ilang segundo para sa mga malalaking log file.</translation>
+    </message>
+    <message>
+        <source>Decrease font size</source>
+        <translation>Bawasan ang laki ng font</translation>
+    </message>
+    <message>
+        <source>Increase font size</source>
+        <translation>Dagdagan ang laki ng font</translation>
+    </message>
+    <message>
+        <source>Services</source>
+        <translation>Mga serbisyo</translation>
+    </message>
+    <message>
+        <source>Connection Time</source>
+        <translation>Oras ng Koneksyon</translation>
+    </message>
+    <message>
+        
