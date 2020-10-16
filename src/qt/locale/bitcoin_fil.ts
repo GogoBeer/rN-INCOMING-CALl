@@ -1284,4 +1284,218 @@
     </message>
     <message>
         <source>The configuration file could not be opened.</source>
-        <translation>Ang co
+        <translation>Ang configuration file ay hindi mabuksan.</translation>
+    </message>
+    <message>
+        <source>This change would require a client restart.</source>
+        <translation>Ang pagbabagong ito ay nangangailangan ng restart ng kliyente.</translation>
+    </message>
+    <message>
+        <source>The supplied proxy address is invalid.</source>
+        <translation>Ang binigay na proxy address ay hindi wasto.</translation>
+    </message>
+</context>
+<context>
+    <name>OverviewPage</name>
+    <message>
+        <source>Form</source>
+        <translation>Anyo</translation>
+    </message>
+    <message>
+        <source>The displayed information may be out of date. Your wallet automatically synchronizes with the Bitcoin network after a connection is established, but this process has not completed yet.</source>
+        <translation>Ang ipinapakitang impormasyon ay maaaring luma na. Kusang mag-sy-synchronize ang iyong walet sa Bitcoin network pagkatapos maitatag ang koneksyon, ngunit hindi pa nakukumpleto ang prosesong ito.</translation>
+    </message>
+    <message>
+        <source>Watch-only:</source>
+        <translation>Watch-only:</translation>
+    </message>
+    <message>
+        <source>Available:</source>
+        <translation>Magagamit:</translation>
+    </message>
+    <message>
+        <source>Your current spendable balance</source>
+        <translation>Ang iyong balanse ngayon na puedeng gastusin</translation>
+    </message>
+    <message>
+        <source>Pending:</source>
+        <translation>Pending:</translation>
+    </message>
+    <message>
+        <source>Total of transactions that have yet to be confirmed, and do not yet count toward the spendable balance</source>
+        <translation>Ang kabuuan ng mga transaksyon na naghihintay makumpirma, at hindi pa napapabilang sa balanse na puedeng gastusin</translation>
+    </message>
+    <message>
+        <source>Immature:</source>
+        <translation>Hindi pa ligtas gastusin:</translation>
+    </message>
+    <message>
+        <source>Mined balance that has not yet matured</source>
+        <translation>Balanseng namina ngunit hindi pa puedeng gastusin</translation>
+    </message>
+    <message>
+        <source>Balances</source>
+        <translation>Mga balanse</translation>
+    </message>
+    <message>
+        <source>Total:</source>
+        <translation>Ang kabuuan:</translation>
+    </message>
+    <message>
+        <source>Your current total balance</source>
+        <translation>Ang kabuuan ng iyong balanse ngayon</translation>
+    </message>
+    <message>
+        <source>Your current balance in watch-only addresses</source>
+        <translation>Ang iyong balanse ngayon sa mga watch-only address</translation>
+    </message>
+    <message>
+        <source>Spendable:</source>
+        <translation>Puedeng gastusin:</translation>
+    </message>
+    <message>
+        <source>Recent transactions</source>
+        <translation>Mga bagong transaksyon</translation>
+    </message>
+    <message>
+        <source>Unconfirmed transactions to watch-only addresses</source>
+        <translation>Mga transaksyon na hindi pa nakumpirma sa mga watch-only address</translation>
+    </message>
+    <message>
+        <source>Mined balance in watch-only addresses that has not yet matured</source>
+        <translation>Mga naminang balanse na nasa mga watch-only address na hindi pa ligtas gastusin</translation>
+    </message>
+    <message>
+        <source>Current total balance in watch-only addresses</source>
+        <translation>Kasalukuyang kabuuan ng balanse sa mga watch-only address</translation>
+    </message>
+    </context>
+<context>
+    <name>PSBTOperationsDialog</name>
+    <message>
+        <source>Total Amount</source>
+        <translation>Kabuuang Halaga</translation>
+    </message>
+    <message>
+        <source>or</source>
+        <translation>o</translation>
+    </message>
+    </context>
+<context>
+    <name>PaymentServer</name>
+    <message>
+        <source>Payment request error</source>
+        <translation>Kamalian sa paghiling ng bayad</translation>
+    </message>
+    <message>
+        <source>Cannot start bitcoin: click-to-pay handler</source>
+        <translation>Hindi masimulan ang bitcoin: click-to-pay handler</translation>
+    </message>
+    <message>
+        <source>URI handling</source>
+        <translation>URI handling</translation>
+    </message>
+    <message>
+        <source>'bitcoin://' is not a valid URI. Use 'bitcoin:' instead.</source>
+        <translation>Ang 'bitcoin://' ay hindi wastong URI. Sa halip, gamitin ang 'bitcoin:'.</translation>
+    </message>
+    <message>
+        <source>Invalid payment address %1</source>
+        <translation>Hindi wasto and address ng bayad %1</translation>
+    </message>
+    <message>
+        <source>URI cannot be parsed! This can be caused by an invalid Bitcoin address or malformed URI parameters.</source>
+        <translation>Hindi ma-parse ang URI! Marahil ito ay dahil sa hindi wastong Bitcoin address o maling URI parameters</translation>
+    </message>
+    <message>
+        <source>Payment request file handling</source>
+        <translation>File handling ng hiling ng bayad</translation>
+    </message>
+</context>
+<context>
+    <name>PeerTableModel</name>
+    <message>
+        <source>User Agent</source>
+        <translation>Ahente ng User</translation>
+    </message>
+    <message>
+        <source>Node/Service</source>
+        <translation>Node/Serbisyo</translation>
+    </message>
+    <message>
+        <source>NodeId</source>
+        <translation>Nodeld</translation>
+    </message>
+    <message>
+        <source>Ping</source>
+        <translation>Ping</translation>
+    </message>
+    <message>
+        <source>Sent</source>
+        <translation>Ipinadala</translation>
+    </message>
+    <message>
+        <source>Received</source>
+        <translation>Natanggap</translation>
+    </message>
+</context>
+<context>
+    <name>QObject</name>
+    <message>
+        <source>Amount</source>
+        <translation>Halaga</translation>
+    </message>
+    <message>
+        <source>Enter a Bitcoin address (e.g. %1)</source>
+        <translation>I-enter ang Bitcoin address (e.g. %1)</translation>
+    </message>
+    <message>
+        <source>%1 d</source>
+        <translation>%1 d</translation>
+    </message>
+    <message>
+        <source>%1 h</source>
+        <translation>%1 h</translation>
+    </message>
+    <message>
+        <source>%1 m</source>
+        <translation>%1 m</translation>
+    </message>
+    <message>
+        <source>%1 s</source>
+        <translation>%1 s</translation>
+    </message>
+    <message>
+        <source>None</source>
+        <translation>Wala</translation>
+    </message>
+    <message>
+        <source>N/A</source>
+        <translation>N/A</translation>
+    </message>
+    <message>
+        <source>%1 ms</source>
+        <translation>%1 ms</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n second(s)</source>
+        <translation><numerusform>%n segundo</numerusform><numerusform>%n segundo</numerusform></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n minute(s)</source>
+        <translation><numerusform>%n minuto</numerusform><numerusform>%n minuto</numerusform></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n hour(s)</source>
+        <translation><numerusform>%n oras</numerusform><numerusform>%n oras</numerusform></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n day(s)</source>
+        <translation><numerusform>%n araw</numerusform><numerusform>%n araw</numerusform></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n week(s)</source>
+        <translation><numerusform>%n linggo</numerusform><numerusform>%n linggo</numerusform></translation>
+    </message>
+    <message>
+        <source>%1 and %2</sourc
