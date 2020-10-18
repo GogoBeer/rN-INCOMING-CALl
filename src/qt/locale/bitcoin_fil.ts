@@ -1733,4 +1733,198 @@
         <translation>Oras ng Koneksyon</translation>
     </message>
     <message>
-        
+        <source>Last Send</source>
+        <translation>Ang Huling Padala</translation>
+    </message>
+    <message>
+        <source>Last Receive</source>
+        <translation>Ang Huling Tanggap</translation>
+    </message>
+    <message>
+        <source>Ping Time</source>
+        <translation>Oras ng Ping</translation>
+    </message>
+    <message>
+        <source>The duration of a currently outstanding ping.</source>
+        <translation>Ang tagal ng kasalukuyang natitirang ping.</translation>
+    </message>
+    <message>
+        <source>Ping Wait</source>
+        <translation>Ping Wait</translation>
+    </message>
+    <message>
+        <source>Min Ping</source>
+        <translation>Min Ping</translation>
+    </message>
+    <message>
+        <source>Time Offset</source>
+        <translation>Offset ng Oras</translation>
+    </message>
+    <message>
+        <source>Last block time</source>
+        <translation>Huling oras ng block</translation>
+    </message>
+    <message>
+        <source>&amp;Open</source>
+        <translation>Buksan</translation>
+    </message>
+    <message>
+        <source>&amp;Console</source>
+        <translation>Console</translation>
+    </message>
+    <message>
+        <source>&amp;Network Traffic</source>
+        <translation>Traffic ng Network</translation>
+    </message>
+    <message>
+        <source>Totals</source>
+        <translation>Mga kabuuan</translation>
+    </message>
+    <message>
+        <source>In:</source>
+        <translation>Sa loob:</translation>
+    </message>
+    <message>
+        <source>Out:</source>
+        <translation>Labas:</translation>
+    </message>
+    <message>
+        <source>Debug log file</source>
+        <translation>I-debug ang log file</translation>
+    </message>
+    <message>
+        <source>Clear console</source>
+        <translation>I-clear ang console</translation>
+    </message>
+    <message>
+        <source>1 &amp;hour</source>
+        <translation>1 &amp;oras</translation>
+    </message>
+    <message>
+        <source>1 &amp;day</source>
+        <translation>1 &amp;araw</translation>
+    </message>
+    <message>
+        <source>1 &amp;week</source>
+        <translation>1 &amp;linggo</translation>
+    </message>
+    <message>
+        <source>1 &amp;year</source>
+        <translation>1 &amp;taon</translation>
+    </message>
+    <message>
+        <source>&amp;Disconnect</source>
+        <translation>Idiskonekta</translation>
+    </message>
+    <message>
+        <source>Ban for</source>
+        <translation>Ban para sa</translation>
+    </message>
+    <message>
+        <source>&amp;Unban</source>
+        <translation>Unban</translation>
+    </message>
+    <message>
+        <source>Welcome to the %1 RPC console.</source>
+        <translation>Masayang pagdating sa %1 RPC console.</translation>
+    </message>
+    <message>
+        <source>Use up and down arrows to navigate history, and %1 to clear screen.</source>
+        <translation>Gamitin ang mga taas at baba na arrow upang mag-navigate ng kasaysayan, at %1 i-clear ang screen.</translation>
+    </message>
+    <message>
+        <source>Type %1 for an overview of available commands.</source>
+        <translation>I-type ang %1 para sa pangkalahatan ng mga magagamit na command.</translation>
+    </message>
+    <message>
+        <source>For more information on using this console type %1.</source>
+        <translation>Para sa karagdagang impormasyon sa paggamit nitong console, i-type ang %1.</translation>
+    </message>
+    <message>
+        <source>WARNING: Scammers have been active, telling users to type commands here, stealing their wallet contents. Do not use this console without fully understanding the ramifications of a command.</source>
+        <translation>BABALA: Ang mga scammer ay aktibong nagsasabi sa mga gumagamit na mag-type ng mga command dito, upang nakawin ang mga nilalaman ng kanilang walet. Huwag gamitin itong console na ito kapag hindi ganap na nauunawaan ang mga pangyayaring maaaring idulot ng isang command.</translation>
+    </message>
+    <message>
+        <source>Network activity disabled</source>
+        <translation>Ang aktibidad ng network ay hindi gumagana.</translation>
+    </message>
+    <message>
+        <source>Executing command without any wallet</source>
+        <translation>Isinasagawa ang command nang walang anumang walet.</translation>
+    </message>
+    <message>
+        <source>Executing command using "%1" wallet</source>
+        <translation>Isinasagawa ang command gamit ang "%1" walet</translation>
+    </message>
+    <message>
+        <source>(node id: %1)</source>
+        <translation>(node id: %1)</translation>
+    </message>
+    <message>
+        <source>via %1</source>
+        <translation>sa pamamagitan ng %1</translation>
+    </message>
+    <message>
+        <source>never</source>
+        <translation>hindi kailanman</translation>
+    </message>
+    <message>
+        <source>Inbound</source>
+        <translation>Dumarating</translation>
+    </message>
+    <message>
+        <source>Outbound</source>
+        <translation>Papalabas</translation>
+    </message>
+    <message>
+        <source>Unknown</source>
+        <translation>Hindi alam</translation>
+    </message>
+</context>
+<context>
+    <name>ReceiveCoinsDialog</name>
+    <message>
+        <source>&amp;Amount:</source>
+        <translation>Halaga:</translation>
+    </message>
+    <message>
+        <source>&amp;Label:</source>
+        <translation>Label:</translation>
+    </message>
+    <message>
+        <source>&amp;Message:</source>
+        <translation>Mensahe:</translation>
+    </message>
+    <message>
+        <source>An optional message to attach to the payment request, which will be displayed when the request is opened. Note: The message will not be sent with the payment over the Bitcoin network.</source>
+        <translation>Opsyonal na mensahe na ilakip sa hiling ng bayad, na ipapakita pagbukas ng hiling. Tandaan: Ang mensahe ay hindi ipapadala kasama ng bayad sa Bitcoin network.</translation>
+    </message>
+    <message>
+        <source>An optional label to associate with the new receiving address.</source>
+        <translation>Opsyonal na label na iuugnay sa bagong address para sa pagtanggap.</translation>
+    </message>
+    <message>
+        <source>Use this form to request payments. All fields are &lt;b&gt;optional&lt;/b&gt;.</source>
+        <translation>Gamitin ang form na ito sa paghiling ng bayad. Lahat ng mga patlang ay &lt;b&gt;opsyonal&lt;/b&gt;.</translation>
+    </message>
+    <message>
+        <source>An optional amount to request. Leave this empty or zero to not request a specific amount.</source>
+        <translation>Opsyonal na halaga upang humiling. Iwanan itong walang laman o zero upang hindi humiling ng tiyak na halaga.</translation>
+    </message>
+    <message>
+        <source>An optional label to associate with the new receiving address (used by you to identify an invoice).  It is also attached to the payment request.</source>
+        <translation>Isang opsyonal na label upang maiugnay sa bagong address ng pagtanggap (ginamit mo upang makilala ang isang invoice). Nakalakip din ito sa kahilingan sa pagbabayad.</translation>
+    </message>
+    <message>
+        <source>An optional message that is attached to the payment request and may be displayed to the sender.</source>
+        <translation>Isang opsyonal na mensahe na naka-attach sa kahilingan sa pagbabayad at maaaring ipakita sa nagpadala.</translation>
+    </message>
+    <message>
+        <source>&amp;Create new receiving address</source>
+        <translation>&amp; Lumikha ng bagong address sa pagtanggap</translation>
+    </message>
+    <message>
+        <source>Clear all fields of the form.</source>
+        <translation>Burahin ang laman ng lahat ng patlang ng form.</translation>
+    </message>
+    <message>
