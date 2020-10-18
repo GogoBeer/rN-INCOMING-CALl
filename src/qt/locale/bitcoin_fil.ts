@@ -1928,3 +1928,210 @@
         <translation>Burahin ang laman ng lahat ng patlang ng form.</translation>
     </message>
     <message>
+        <source>Clear</source>
+        <translation>Burahin</translation>
+    </message>
+    <message>
+        <source>Native segwit addresses (aka Bech32 or BIP-173) reduce your transaction fees later on and offer better protection against typos, but old wallets don't support them. When unchecked, an address compatible with older wallets will be created instead.</source>
+        <translation>Ang mga native segwit address (aka Bech32 o BIP-173) ay makakabawas ng iyong mga bayad sa transaksyon at nagaalok ng mas mahusay na proteksyon laban sa mga typo, ngunit ang mga lumang walet ay hindi sumusuporta nito. Kapag hindi ch-in-eck, gagawa ng mga address na katugma sa mga lumang walet sa halip.</translation>
+    </message>
+    <message>
+        <source>Generate native segwit (Bech32) address</source>
+        <translation>Gumawa ng native segwit (Bech32) address</translation>
+    </message>
+    <message>
+        <source>Requested payments history</source>
+        <translation>Humiling ng kasaysayan ng kabayaran</translation>
+    </message>
+    <message>
+        <source>Show the selected request (does the same as double clicking an entry)</source>
+        <translation>Ipakita ang napiling hiling (ay kapareho ng pag-double-click ng isang entry)</translation>
+    </message>
+    <message>
+        <source>Show</source>
+        <translation>Ipakita</translation>
+    </message>
+    <message>
+        <source>Remove the selected entries from the list</source>
+        <translation>Alisin ang mga napiling entry sa listahan</translation>
+    </message>
+    <message>
+        <source>Remove</source>
+        <translation>Alisin</translation>
+    </message>
+    <message>
+        <source>Copy URI</source>
+        <translation>Kopyahin ang URI</translation>
+    </message>
+    <message>
+        <source>Copy label</source>
+        <translation>Kopyahin ang label</translation>
+    </message>
+    <message>
+        <source>Copy message</source>
+        <translation>Kopyahin ang mensahe</translation>
+    </message>
+    <message>
+        <source>Copy amount</source>
+        <translation>Kopyahin ang halaga</translation>
+    </message>
+    <message>
+        <source>Could not unlock wallet.</source>
+        <translation>Hindi magawang ma-unlock ang walet.</translation>
+    </message>
+    </context>
+<context>
+    <name>ReceiveRequestDialog</name>
+    <message>
+        <source>Amount:</source>
+        <translation>Halaga:</translation>
+    </message>
+    <message>
+        <source>Message:</source>
+        <translation>Mensahe:</translation>
+    </message>
+    <message>
+        <source>Wallet:</source>
+        <translation>Walet:</translation>
+    </message>
+    <message>
+        <source>Copy &amp;URI</source>
+        <translation>Kopyahin ang URI</translation>
+    </message>
+    <message>
+        <source>Copy &amp;Address</source>
+        <translation>Kopyahin ang Address</translation>
+    </message>
+    <message>
+        <source>&amp;Save Image...</source>
+        <translation>I-save and Larawan...</translation>
+    </message>
+    <message>
+        <source>Request payment to %1</source>
+        <translation>Humiling ng bayad sa %1</translation>
+    </message>
+    <message>
+        <source>Payment information</source>
+        <translation>Impormasyon sa pagbabayad</translation>
+    </message>
+</context>
+<context>
+    <name>RecentRequestsTableModel</name>
+    <message>
+        <source>Date</source>
+        <translation>Petsa</translation>
+    </message>
+    <message>
+        <source>Label</source>
+        <translation>Label</translation>
+    </message>
+    <message>
+        <source>Message</source>
+        <translation>Mensahe</translation>
+    </message>
+    <message>
+        <source>(no label)</source>
+        <translation>(walang label)</translation>
+    </message>
+    <message>
+        <source>(no message)</source>
+        <translation>(walang mensahe)</translation>
+    </message>
+    <message>
+        <source>(no amount requested)</source>
+        <translation>(walang halagang hiniling)</translation>
+    </message>
+    <message>
+        <source>Requested</source>
+        <translation>Hiniling</translation>
+    </message>
+</context>
+<context>
+    <name>SendCoinsDialog</name>
+    <message>
+        <source>Send Coins</source>
+        <translation>Magpadala ng Coins</translation>
+    </message>
+    <message>
+        <source>Coin Control Features</source>
+        <translation>Mga Tampok ng Kontrol ng Coin</translation>
+    </message>
+    <message>
+        <source>Inputs...</source>
+        <translation>Mga input...</translation>
+    </message>
+    <message>
+        <source>automatically selected</source>
+        <translation>awtomatikong pinili</translation>
+    </message>
+    <message>
+        <source>Insufficient funds!</source>
+        <translation>Hindi sapat na pondo!</translation>
+    </message>
+    <message>
+        <source>Quantity:</source>
+        <translation>Dami:</translation>
+    </message>
+    <message>
+        <source>Bytes:</source>
+        <translation>Bytes:</translation>
+    </message>
+    <message>
+        <source>Amount:</source>
+        <translation>Halaga:</translation>
+    </message>
+    <message>
+        <source>Fee:</source>
+        <translation>Bayad:</translation>
+    </message>
+    <message>
+        <source>After Fee:</source>
+        <translation>Pagkatapos ng Bayad:</translation>
+    </message>
+    <message>
+        <source>Change:</source>
+        <translation>Sukli:</translation>
+    </message>
+    <message>
+        <source>If this is activated, but the change address is empty or invalid, change will be sent to a newly generated address.</source>
+        <translation>Kung naka-activate na ito ngunit walang laman o di-wasto ang address ng sukli, ipapadala ang sukli sa isang bagong gawang address.</translation>
+    </message>
+    <message>
+        <source>Custom change address</source>
+        <translation>Pasadyang address ng sukli</translation>
+    </message>
+    <message>
+        <source>Transaction Fee:</source>
+        <translation>Bayad sa Transaksyon:</translation>
+    </message>
+    <message>
+        <source>Choose...</source>
+        <translation>Pumili...</translation>
+    </message>
+    <message>
+        <source>Using the fallbackfee can result in sending a transaction that will take several hours or days (or never) to confirm. Consider choosing your fee manually or wait until you have validated the complete chain.</source>
+        <translation>Ang paggamit ng fallbackfee ay maaaring magresulta sa pagpapadala ng transaksyon na tatagal ng ilang oras o araw (o hindi man) upang makumpirma. Isaalang-alang ang pagpili ng iyong bayad nang manu-mano o maghintay hanggang napatunayan mo ang kumpletong chain.</translation>
+    </message>
+    <message>
+        <source>Warning: Fee estimation is currently not possible.</source>
+        <translation>Babala: Kasalukuyang hindi posible ang pagtatantiya sa bayarin.</translation>
+    </message>
+    <message>
+        <source>Specify a custom fee per kB (1,000 bytes) of the transaction's virtual size.
+
+Note:  Since the fee is calculated on a per-byte basis, a fee of "100 satoshis per kB" for a transaction size of 500 bytes (half of 1 kB) would ultimately yield a fee of only 50 satoshis.</source>
+        <translation>Tumukoy ng custom fee kada kB (1,000 bytes) ng virtual size ng transaksyon.
+
+Tandaan: Dahil ang bayad  ay kinakalkula sa bawat-byte na batayan, ang bayad ng "100 satoshis kada kB" para sa transaksyon na 500 bytes (kalahati ng 1 kB) ay magkakaroon ng bayad na 50 lamang na satoshi.</translation>
+    </message>
+    <message>
+        <source>per kilobyte</source>
+        <translation>kada kilobyte</translation>
+    </message>
+    <message>
+        <source>Hide</source>
+        <translation>Itago</translation>
+    </message>
+    <message>
+        <source>Recommended:</source>
+        <
