@@ -2134,4 +2134,183 @@ Tandaan: Dahil ang bayad  ay kinakalkula sa bawat-byte na batayan, ang bayad ng 
     </message>
     <message>
         <source>Recommended:</source>
-        <
+        <translation>Inirekumenda:</translation>
+    </message>
+    <message>
+        <source>Custom:</source>
+        <translation>Custom:</translation>
+    </message>
+    <message>
+        <source>(Smart fee not initialized yet. This usually takes a few blocks...)</source>
+        <translation>(Ang smart fee ay hindi pa nasisimulan. Ito ay karaniwang tumatagal ng ilang mga block...)</translation>
+    </message>
+    <message>
+        <source>Send to multiple recipients at once</source>
+        <translation>Magpadala sa maraming tatanggap nang sabay-sabay</translation>
+    </message>
+    <message>
+        <source>Add &amp;Recipient</source>
+        <translation>Magdagdag ng Tatanggap</translation>
+    </message>
+    <message>
+        <source>Clear all fields of the form.</source>
+        <translation>Limasin ang lahat ng mga patlang ng form.</translation>
+    </message>
+    <message>
+        <source>Dust:</source>
+        <translation>Dust:</translation>
+    </message>
+    <message>
+        <source>Hide transaction fee settings</source>
+        <translation>Itago ang mga Setting ng bayad sa Transaksyon</translation>
+    </message>
+    <message>
+        <source>When there is less transaction volume than space in the blocks, miners as well as relaying nodes may enforce a minimum fee. Paying only this minimum fee is just fine, but be aware that this can result in a never confirming transaction once there is more demand for bitcoin transactions than the network can process.</source>
+        <translation>Kapag mas kaunti ang dami ng transaksyon kaysa sa puwang sa mga blocks, ang mga minero pati na rin ang mga relaying node ay maaaring magpatupad ng minimum na bayad. Ang pagbabayad lamang ng minimum na bayad na ito ay maayos, ngunit malaman na maaari itong magresulta sa hindi kailanmang nagkukumpirmang transaksyon sa sandaling magkaroon ng higit na pangangailangan para sa mga transaksyon ng bitcoin kaysa sa kayang i-proseso ng network.</translation>
+    </message>
+    <message>
+        <source>A too low fee might result in a never confirming transaction (read the tooltip)</source>
+        <translation>Ang isang masyadong mababang bayad ay maaaring magresulta sa isang hindi kailanmang nagkukumpirmang transaksyon (basahin ang tooltip)</translation>
+    </message>
+    <message>
+        <source>Confirmation time target:</source>
+        <translation>Target na oras ng pagkumpirma:</translation>
+    </message>
+    <message>
+        <source>Enable Replace-By-Fee</source>
+        <translation>Paganahin ang Replace-By-Fee</translation>
+    </message>
+    <message>
+        <source>With Replace-By-Fee (BIP-125) you can increase a transaction's fee after it is sent. Without this, a higher fee may be recommended to compensate for increased transaction delay risk.</source>
+        <translation>Sa Replace-By-Fee (BIP-125) maaari kang magpataas ng bayad sa transaksyon pagkatapos na maipadala ito. Nang wala ito, maaaring irekumenda ang mas mataas na bayad upang mabawi ang mas mataas na transaction delay risk.</translation>
+    </message>
+    <message>
+        <source>Clear &amp;All</source>
+        <translation>Burahin Lahat</translation>
+    </message>
+    <message>
+        <source>Balance:</source>
+        <translation>Balanse:</translation>
+    </message>
+    <message>
+        <source>Confirm the send action</source>
+        <translation>Kumpirmahin ang aksyon ng pagpapadala</translation>
+    </message>
+    <message>
+        <source>S&amp;end</source>
+        <translation>Magpadala</translation>
+    </message>
+    <message>
+        <source>Copy quantity</source>
+        <translation>Kopyahin ang dami</translation>
+    </message>
+    <message>
+        <source>Copy amount</source>
+        <translation>Kopyahin ang halaga</translation>
+    </message>
+    <message>
+        <source>Copy fee</source>
+        <translation>Kopyahin ang halaga</translation>
+    </message>
+    <message>
+        <source>Copy after fee</source>
+        <translation>Kopyahin ang after fee</translation>
+    </message>
+    <message>
+        <source>Copy bytes</source>
+        <translation>Kopyahin ang bytes</translation>
+    </message>
+    <message>
+        <source>Copy dust</source>
+        <translation>Kopyahin ang dust</translation>
+    </message>
+    <message>
+        <source>Copy change</source>
+        <translation>Kopyahin ang sukli</translation>
+    </message>
+    <message>
+        <source>%1 (%2 blocks)</source>
+        <translation>%1 (%2 mga block)</translation>
+    </message>
+    <message>
+        <source>Cr&amp;eate Unsigned</source>
+        <translation>Lumikha ng Unsigned</translation>
+    </message>
+    <message>
+        <source>%1 to %2</source>
+        <translation>%1 sa %2</translation>
+    </message>
+    <message>
+        <source>Do you want to draft this transaction?</source>
+        <translation>Nais mo bang i-draft ang transaksyong ito?</translation>
+    </message>
+    <message>
+        <source>Are you sure you want to send?</source>
+        <translation>Sigurado ka bang nais mong magpadala?</translation>
+    </message>
+    <message>
+        <source>or</source>
+        <translation>o</translation>
+    </message>
+    <message>
+        <source>You can increase the fee later (signals Replace-By-Fee, BIP-125).</source>
+        <translation>Maaari mong dagdagan ang bayad mamaya (sumesenyas ng Replace-By-Fee, BIP-125).</translation>
+    </message>
+    <message>
+        <source>Please, review your transaction.</source>
+        <translation>Pakiusap, suriin ang iyong transaksyon.</translation>
+    </message>
+    <message>
+        <source>Transaction fee</source>
+        <translation>Bayad sa transaksyon</translation>
+    </message>
+    <message>
+        <source>Not signalling Replace-By-Fee, BIP-125.</source>
+        <translation>Hindi sumesenyas ng Replace-By-Fee, BIP-125.</translation>
+    </message>
+    <message>
+        <source>Total Amount</source>
+        <translation>Kabuuang Halaga</translation>
+    </message>
+    <message>
+        <source>To review recipient list click "Show Details..."</source>
+        <translation>Upang suriin ang listahan ng tatanggap i-click ang "Ipakita ang Mga Detalye ..."</translation>
+    </message>
+    <message>
+        <source>Confirm send coins</source>
+        <translation>Kumpirmahin magpadala ng coins</translation>
+    </message>
+    <message>
+        <source>Confirm transaction proposal</source>
+        <translation>Kumpirmahin ang panukala sa transaksyon</translation>
+    </message>
+    <message>
+        <source>Send</source>
+        <translation>Ipadala</translation>
+    </message>
+    <message>
+        <source>Watch-only balance:</source>
+        <translation>Balanse lamang sa panonood:</translation>
+    </message>
+    <message>
+        <source>The recipient address is not valid. Please recheck.</source>
+        <translation>Ang address ng tatanggap ay hindi wasto. Mangyaring suriin muli.</translation>
+    </message>
+    <message>
+        <source>The amount to pay must be larger than 0.</source>
+        <translation>Ang halagang dapat bayaran ay dapat na mas malaki sa 0.</translation>
+    </message>
+    <message>
+        <source>The amount exceeds your balance.</source>
+        <translation>Ang halaga ay lumampas sa iyong balanse.</translation>
+    </message>
+    <message>
+        <source>The total exceeds your balance when the %1 transaction fee is included.</source>
+        <translation>Ang kabuuan ay lumampas sa iyong balanse kapag kasama ang %1 na bayad sa transaksyon.</translation>
+    </message>
+    <message>
+        <source>Duplicate address found: addresses should only be used once each.</source>
+        <translation>Natagpuan ang duplicate na address: ang mga address ay dapat isang beses lamang gamitin bawat isa.</translation>
+    </message>
+    <message>
+        <source>Transacti
