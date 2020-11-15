@@ -2313,4 +2313,174 @@ Tandaan: Dahil ang bayad  ay kinakalkula sa bawat-byte na batayan, ang bayad ng 
         <translation>Natagpuan ang duplicate na address: ang mga address ay dapat isang beses lamang gamitin bawat isa.</translation>
     </message>
     <message>
-        <source>Transacti
+        <source>Transaction creation failed!</source>
+        <translation>Nabigo ang paggawa ng transaksyon!</translation>
+    </message>
+    <message>
+        <source>A fee higher than %1 is considered an absurdly high fee.</source>
+        <translation>Ang bayad na mas mataas sa %1 ay itinuturing na napakataas na bayad.</translation>
+    </message>
+    <message>
+        <source>Payment request expired.</source>
+        <translation>Ang hiling ng bayad ay nag-expire na.</translation>
+    </message>
+    <message numerus="yes">
+        <source>Estimated to begin confirmation within %n block(s).</source>
+        <translation><numerusform>Tinatayang magsimula ng kumpirmasyon sa loob ng %n na mga block.</numerusform><numerusform>Tinatayang magsimula ng kumpirmasyon sa loob ng %n na mga block.</numerusform></translation>
+    </message>
+    <message>
+        <source>Warning: Invalid Bitcoin address</source>
+        <translation>Babala: Hindi wastong Bitcoin address</translation>
+    </message>
+    <message>
+        <source>Warning: Unknown change address</source>
+        <translation>Babala: Hindi alamang address ng sukli</translation>
+    </message>
+    <message>
+        <source>Confirm custom change address</source>
+        <translation>Kumpirmahin ang pasadyang address ng sukli</translation>
+    </message>
+    <message>
+        <source>The address you selected for change is not part of this wallet. Any or all funds in your wallet may be sent to this address. Are you sure?</source>
+        <translation>Ang address na pinili mo para sa sukli ay hindi bahagi ng walet na ito. Ang anumang o lahat ng pondo sa iyong walet ay maaaring ipadala sa address na ito. Sigurado ka ba?</translation>
+    </message>
+    <message>
+        <source>(no label)</source>
+        <translation>(walang label)</translation>
+    </message>
+</context>
+<context>
+    <name>SendCoinsEntry</name>
+    <message>
+        <source>A&amp;mount:</source>
+        <translation>Halaga:</translation>
+    </message>
+    <message>
+        <source>Pay &amp;To:</source>
+        <translation>Magbayad Sa:</translation>
+    </message>
+    <message>
+        <source>&amp;Label:</source>
+        <translation>Label:</translation>
+    </message>
+    <message>
+        <source>Choose previously used address</source>
+        <translation>Piliin ang dating ginamit na address</translation>
+    </message>
+    <message>
+        <source>The Bitcoin address to send the payment to</source>
+        <translation>Ang Bitcoin address kung saan ipapadala and bayad</translation>
+    </message>
+    <message>
+        <source>Alt+A</source>
+        <translation>Alt+A</translation>
+    </message>
+    <message>
+        <source>Paste address from clipboard</source>
+        <translation>I-paste ang address mula sa clipboard</translation>
+    </message>
+    <message>
+        <source>Alt+P</source>
+        <translation>Alt+P</translation>
+    </message>
+    <message>
+        <source>Remove this entry</source>
+        <translation>Alisin ang entry na ito</translation>
+    </message>
+    <message>
+        <source>The fee will be deducted from the amount being sent. The recipient will receive less bitcoins than you enter in the amount field. If multiple recipients are selected, the fee is split equally.</source>
+        <translation>Ibabawas ang bayad mula sa halagang ipapadala. Ang tatanggap ay makakatanggap ng mas kaunting mga bitcoin kaysa sa pinasok mo sa patlang ng halaga. Kung napili ang maraming tatanggap, ang bayad ay paghihiwalayin.</translation>
+    </message>
+    <message>
+        <source>S&amp;ubtract fee from amount</source>
+        <translation>Ibawas ang bayad mula sa halagaq</translation>
+    </message>
+    <message>
+        <source>Use available balance</source>
+        <translation>Gamitin ang magagamit na balanse</translation>
+    </message>
+    <message>
+        <source>Message:</source>
+        <translation>Mensahe:</translation>
+    </message>
+    <message>
+        <source>This is an unauthenticated payment request.</source>
+        <translation>Ito ay isang unauthenticated na hiling ng bayad.</translation>
+    </message>
+    <message>
+        <source>This is an authenticated payment request.</source>
+        <translation>Ito ay isang authenticated na hiling ng bayad.</translation>
+    </message>
+    <message>
+        <source>Enter a label for this address to add it to the list of used addresses</source>
+        <translation>Mag-enter ng label para sa address na ito upang idagdag ito sa listahan ng mga gamit na address.</translation>
+    </message>
+    <message>
+        <source>A message that was attached to the bitcoin: URI which will be stored with the transaction for your reference. Note: This message will not be sent over the Bitcoin network.</source>
+        <translation>Mensahe na nakalakip sa bitcoin: URI na kung saan maiimbak kasama ang transaksyon para sa iyong sanggunian. Tandaan: Ang mensaheng ito ay hindi ipapadala sa network ng Bitcoin.</translation>
+    </message>
+    <message>
+        <source>Pay To:</source>
+        <translation>Magbayad Sa:</translation>
+    </message>
+    <message>
+        <source>Memo:</source>
+        <translation>Memo:</translation>
+    </message>
+</context>
+<context>
+    <name>ShutdownWindow</name>
+    <message>
+        <source>%1 is shutting down...</source>
+        <translation>%1 ay nag-shu-shut down...</translation>
+    </message>
+    <message>
+        <source>Do not shut down the computer until this window disappears.</source>
+        <translation>Huwag i-shut down ang computer hanggang mawala ang window na ito.</translation>
+    </message>
+</context>
+<context>
+    <name>SignVerifyMessageDialog</name>
+    <message>
+        <source>Signatures - Sign / Verify a Message</source>
+        <translation>Pirma - Pumirma / Patunayan ang Mensahe</translation>
+    </message>
+    <message>
+        <source>&amp;Sign Message</source>
+        <translation>Pirmahan ang Mensahe</translation>
+    </message>
+    <message>
+        <source>You can sign messages/agreements with your addresses to prove you can receive bitcoins sent to them. Be careful not to sign anything vague or random, as phishing attacks may try to trick you into signing your identity over to them. Only sign fully-detailed statements you agree to.</source>
+        <translation>Maaari kang pumirma ng mga mensahe/kasunduan sa iyong mga address upang mapatunayan na maaari kang makatanggap ng mga bitcoin na ipinadala sa kanila. Mag-ingat na huwag pumirma ng anumang bagay na hindi malinaw o random, dahil ang mga phishing attack ay maaaring subukan na linlangin ka sa pagpirma ng iyong pagkakakilanlan sa kanila. Pumirma lamang ng kumpletong mga pahayag na sumasang-ayon ka.</translation>
+    </message>
+    <message>
+        <source>The Bitcoin address to sign the message with</source>
+        <translation>Ang Bitcoin address kung anong ipipirma sa mensahe</translation>
+    </message>
+    <message>
+        <source>Choose previously used address</source>
+        <translation>Piliin ang dating ginamit na address</translation>
+    </message>
+    <message>
+        <source>Alt+A</source>
+        <translation>Alt+A</translation>
+    </message>
+    <message>
+        <source>Paste address from clipboard</source>
+        <translation>I-paste ang address mula sa clipboard</translation>
+    </message>
+    <message>
+        <source>Alt+P</source>
+        <translation>Alt+P</translation>
+    </message>
+    <message>
+        <source>Enter the message you want to sign here</source>
+        <translation>I-enter ang mensahe na nais mong pirmahan dito</translation>
+    </message>
+    <message>
+        <source>Signature</source>
+        <translation>Pirma</translation>
+    </message>
+    <message>
+        <source>Copy the current signature to the system clipboard</source>
+        <translation>Kopyahin ang kasaluku
