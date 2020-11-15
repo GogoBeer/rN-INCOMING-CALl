@@ -2900,4 +2900,245 @@ Tandaan: Dahil ang bayad  ay kinakalkula sa bawat-byte na batayan, ang bayad ng 
         <source>This year</source>
         <translation>Ngayon taon</translation>
     </message>
-    <mess
+    <message>
+        <source>Range...</source>
+        <translation>Saklaw...</translation>
+    </message>
+    <message>
+        <source>Received with</source>
+        <translation>Natanggap kasama ang</translation>
+    </message>
+    <message>
+        <source>Sent to</source>
+        <translation>Ipinadala sa</translation>
+    </message>
+    <message>
+        <source>To yourself</source>
+        <translation>Sa iyong sarili</translation>
+    </message>
+    <message>
+        <source>Mined</source>
+        <translation>Namina</translation>
+    </message>
+    <message>
+        <source>Other</source>
+        <translation>Ang iba</translation>
+    </message>
+    <message>
+        <source>Enter address, transaction id, or label to search</source>
+        <translation>Ipasok ang address, ID ng transaksyon, o label upang maghanap</translation>
+    </message>
+    <message>
+        <source>Min amount</source>
+        <translation>Minimum na halaga</translation>
+    </message>
+    <message>
+        <source>Abandon transaction</source>
+        <translation>Iwanan ang transaksyon</translation>
+    </message>
+    <message>
+        <source>Increase transaction fee</source>
+        <translation>Dagdagan ang bayad sa transaksyon</translation>
+    </message>
+    <message>
+        <source>Copy address</source>
+        <translation>Kopyahin ang address</translation>
+    </message>
+    <message>
+        <source>Copy label</source>
+        <translation>Kopyahin ang label</translation>
+    </message>
+    <message>
+        <source>Copy amount</source>
+        <translation>Kopyahin ang halaga</translation>
+    </message>
+    <message>
+        <source>Copy transaction ID</source>
+        <translation>Kopyahin ang ID ng transaksyon</translation>
+    </message>
+    <message>
+        <source>Copy raw transaction</source>
+        <translation>Kopyahin ang raw na transaksyon</translation>
+    </message>
+    <message>
+        <source>Copy full transaction details</source>
+        <translation>Kopyahin ang buong detalye ng transaksyon</translation>
+    </message>
+    <message>
+        <source>Edit label</source>
+        <translation>I-edit ang label</translation>
+    </message>
+    <message>
+        <source>Show transaction details</source>
+        <translation>Ipakita ang mga detalye ng transaksyon</translation>
+    </message>
+    <message>
+        <source>Export Transaction History</source>
+        <translation>I-export ang Kasaysayan ng Transaksyon</translation>
+    </message>
+    <message>
+        <source>Comma separated file (*.csv)</source>
+        <translation>Comma separated file (*.csv)</translation>
+    </message>
+    <message>
+        <source>Confirmed</source>
+        <translation>Nakumpirma</translation>
+    </message>
+    <message>
+        <source>Watch-only</source>
+        <translation>Watch-only</translation>
+    </message>
+    <message>
+        <source>Date</source>
+        <translation>Petsa</translation>
+    </message>
+    <message>
+        <source>Type</source>
+        <translation>Uri</translation>
+    </message>
+    <message>
+        <source>Label</source>
+        <translation>Label</translation>
+    </message>
+    <message>
+        <source>Address</source>
+        <translation>Address</translation>
+    </message>
+    <message>
+        <source>ID</source>
+        <translation>ID</translation>
+    </message>
+    <message>
+        <source>Exporting Failed</source>
+        <translation>Nabigo and pag-export</translation>
+    </message>
+    <message>
+        <source>There was an error trying to save the transaction history to %1.</source>
+        <translation>May kamalian sa pag-impok ng kasaysayan ng transaksyon sa %1.</translation>
+    </message>
+    <message>
+        <source>Exporting Successful</source>
+        <translation>Matagumpay ang Pag-export</translation>
+    </message>
+    <message>
+        <source>The transaction history was successfully saved to %1.</source>
+        <translation>Matagumpay na naimpok ang kasaysayan ng transaksyon sa %1.</translation>
+    </message>
+    <message>
+        <source>Range:</source>
+        <translation>Saklaw:</translation>
+    </message>
+    <message>
+        <source>to</source>
+        <translation>sa</translation>
+    </message>
+</context>
+<context>
+    <name>UnitDisplayStatusBarControl</name>
+    <message>
+        <source>Unit to show amounts in. Click to select another unit.</source>
+        <translation>Unit na gamit upang ipakita ang mga halaga. I-klik upang pumili ng isa pang yunit.</translation>
+    </message>
+</context>
+<context>
+    <name>WalletController</name>
+    <message>
+        <source>Close wallet</source>
+        <translation>Isara ang walet</translation>
+    </message>
+    <message>
+        <source>Closing the wallet for too long can result in having to resync the entire chain if pruning is enabled.</source>
+        <translation>Ang pagsasara ng walet nang masyadong matagal ay maaaring magresulta sa pangangailangan ng pag-resync sa buong chain kung pinagana ang pruning.</translation>
+    </message>
+    </context>
+<context>
+    <name>WalletFrame</name>
+    <message>
+        <source>Create a new wallet</source>
+        <translation>Gumawa ng Bagong Pitaka</translation>
+    </message>
+</context>
+<context>
+    <name>WalletModel</name>
+    <message>
+        <source>Send Coins</source>
+        <translation>Magpadala ng Coins</translation>
+    </message>
+    <message>
+        <source>Fee bump error</source>
+        <translation>Kamalian sa fee bump</translation>
+    </message>
+    <message>
+        <source>Increasing transaction fee failed</source>
+        <translation>Nabigo ang pagtaas ng bayad sa transaksyon</translation>
+    </message>
+    <message>
+        <source>Do you want to increase the fee?</source>
+        <translation>Nais mo bang dagdagan ang bayad?</translation>
+    </message>
+    <message>
+        <source>Current fee:</source>
+        <translation>Kasalukuyang bayad:</translation>
+    </message>
+    <message>
+        <source>Increase:</source>
+        <translation>Pagtaas:</translation>
+    </message>
+    <message>
+        <source>New fee:</source>
+        <translation>Bagong bayad:</translation>
+    </message>
+    <message>
+        <source>Confirm fee bump</source>
+        <translation>Kumpirmahin ang fee bump</translation>
+    </message>
+    <message>
+        <source>Can't draft transaction.</source>
+        <translation>Hindi ma-draft ang transaksyon</translation>
+    </message>
+    <message>
+        <source>PSBT copied</source>
+        <translation>Kinopya ang PSBT</translation>
+    </message>
+    <message>
+        <source>Can't sign transaction.</source>
+        <translation>Hindi mapirmahan ang transaksyon.</translation>
+    </message>
+    <message>
+        <source>Could not commit transaction</source>
+        <translation>Hindi makagawa ng transaksyon</translation>
+    </message>
+    <message>
+        <source>default wallet</source>
+        <translation>walet na default</translation>
+    </message>
+</context>
+<context>
+    <name>WalletView</name>
+    <message>
+        <source>&amp;Export</source>
+        <translation>I-export</translation>
+    </message>
+    <message>
+        <source>Export the data in the current tab to a file</source>
+        <translation>Angkatin ang datos sa kasalukuyang tab sa talaksan</translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation>Kamalian</translation>
+    </message>
+    <message>
+        <source>Backup Wallet</source>
+        <translation>Backup na walet</translation>
+    </message>
+    <message>
+        <source>Wallet Data (*.dat)</source>
+        <translation>Data ng walet (*.dat)</translation>
+    </message>
+    <message>
+        <source>Backup Failed</source>
+        <translation>Nabigo ang Backup</translation>
+    </message>
+    <message>
+        <source>There was an error trying to save the wallet data to %1.</source>
+        <translation
