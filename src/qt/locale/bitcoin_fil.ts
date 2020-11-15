@@ -2483,4 +2483,198 @@ Tandaan: Dahil ang bayad  ay kinakalkula sa bawat-byte na batayan, ang bayad ng 
     </message>
     <message>
         <source>Copy the current signature to the system clipboard</source>
-        <translation>Kopyahin ang kasaluku
+        <translation>Kopyahin ang kasalukuyang address sa system clipboard</translation>
+    </message>
+    <message>
+        <source>Sign the message to prove you own this Bitcoin address</source>
+        <translation>Pirmahan ang mensahe upang mapatunayan na pagmamay-ari mo ang Bitcoin address na ito</translation>
+    </message>
+    <message>
+        <source>Sign &amp;Message</source>
+        <translation>Pirmahan ang Mensahe</translation>
+    </message>
+    <message>
+        <source>Reset all sign message fields</source>
+        <translation>I-reset ang lahat ng mga patlang ng pagpirma ng mensahe</translation>
+    </message>
+    <message>
+        <source>Clear &amp;All</source>
+        <translation>Burahin Lahat</translation>
+    </message>
+    <message>
+        <source>&amp;Verify Message</source>
+        <translation>Tiyakin ang Katotohanan ng Mensahe</translation>
+    </message>
+    <message>
+        <source>Enter the receiver's address, message (ensure you copy line breaks, spaces, tabs, etc. exactly) and signature below to verify the message. Be careful not to read more into the signature than what is in the signed message itself, to avoid being tricked by a man-in-the-middle attack. Note that this only proves the signing party receives with the address, it cannot prove sendership of any transaction!</source>
+        <translation>Ipasok ang address ng tatanggap, mensahe (tiyakin na kopyahin mo ang mga break ng linya, puwang, mga tab, atbp.) at pirma sa ibaba upang i-verify ang mensahe. Mag-ingat na huwag magbasa ng higit pa sa pirma kaysa sa kung ano ang nasa nakapirmang mensahe mismo, upang maiwasan na maloko ng man-in-the-middle attack. Tandaan na pinapatunayan lamang nito na nakakatanggap sa address na ito ang partido na pumirma, hindi nito napapatunayan ang pagpapadala ng anumang transaksyon!</translation>
+    </message>
+    <message>
+        <source>The Bitcoin address the message was signed with</source>
+        <translation>Ang Bitcoin address na pumirma sa mensahe</translation>
+    </message>
+    <message>
+        <source>Verify the message to ensure it was signed with the specified Bitcoin address</source>
+        <translation>Tiyakin ang katotohanan ng mensahe upang siguruhin na ito'y napirmahan ng tinukoy na Bitcoin address</translation>
+    </message>
+    <message>
+        <source>Verify &amp;Message</source>
+        <translation>Tiyakin ang Katotohanan ng Mensahe</translation>
+    </message>
+    <message>
+        <source>Reset all verify message fields</source>
+        <translation>I-reset ang lahat ng mga patlang ng pag-verify ng mensahe</translation>
+    </message>
+    <message>
+        <source>Click "Sign Message" to generate signature</source>
+        <translation>I-klik ang "Pirmahan ang Mensahe" upang gumawa ng pirma</translation>
+    </message>
+    <message>
+        <source>The entered address is invalid.</source>
+        <translation>Ang address na pinasok ay hindi wasto.</translation>
+    </message>
+    <message>
+        <source>Please check the address and try again.</source>
+        <translation>Mangyaring suriin ang address at subukang muli.</translation>
+    </message>
+    <message>
+        <source>The entered address does not refer to a key.</source>
+        <translation>Ang pinasok na address ay hindi tumutukoy sa isang key.</translation>
+    </message>
+    <message>
+        <source>Wallet unlock was cancelled.</source>
+        <translation>Kinansela ang pag-unlock ng walet.</translation>
+    </message>
+    <message>
+        <source>No error</source>
+        <translation>Walang Kamalian</translation>
+    </message>
+    <message>
+        <source>Private key for the entered address is not available.</source>
+        <translation>Hindi magagamit ang private key para sa pinasok na address.</translation>
+    </message>
+    <message>
+        <source>Message signing failed.</source>
+        <translation>Nabigo ang pagpirma ng mensahe.</translation>
+    </message>
+    <message>
+        <source>Message signed.</source>
+        <translation>Napirmahan ang mensahe.</translation>
+    </message>
+    <message>
+        <source>The signature could not be decoded.</source>
+        <translation>Ang pirma ay hindi maaaring ma-decode.</translation>
+    </message>
+    <message>
+        <source>Please check the signature and try again.</source>
+        <translation>Mangyaring suriin ang pirma at subukang muli.</translation>
+    </message>
+    <message>
+        <source>The signature did not match the message digest.</source>
+        <translation>Ang pirma ay hindi tumugma sa message digest.</translation>
+    </message>
+    <message>
+        <source>Message verification failed.</source>
+        <translation>Nabigo ang pagpapatunay ng mensahe.</translation>
+    </message>
+    <message>
+        <source>Message verified.</source>
+        <translation>Napatunayan ang mensahe.</translation>
+    </message>
+</context>
+<context>
+    <name>TrafficGraphWidget</name>
+    <message>
+        <source>KB/s</source>
+        <translation>KB/s</translation>
+    </message>
+</context>
+<context>
+    <name>TransactionDesc</name>
+    <message numerus="yes">
+        <source>Open for %n more block(s)</source>
+        <translation><numerusform>Bukas para sa %n pang mga blocks</numerusform><numerusform>Bukas para sa %n pang mga blocks</numerusform></translation>
+    </message>
+    <message>
+        <source>Open until %1</source>
+        <translation>Bukas hanggang %1</translation>
+    </message>
+    <message>
+        <source>conflicted with a transaction with %1 confirmations</source>
+        <translation>sumalungat sa isang transaksyon na may %1 pagkumpirma</translation>
+    </message>
+    <message>
+        <source>0/unconfirmed, %1</source>
+        <translation>0/hindi nakumpirma, %1</translation>
+    </message>
+    <message>
+        <source>in memory pool</source>
+        <translation>nasa memory pool</translation>
+    </message>
+    <message>
+        <source>not in memory pool</source>
+        <translation>wala sa memory pool</translation>
+    </message>
+    <message>
+        <source>abandoned</source>
+        <translation>inabandona</translation>
+    </message>
+    <message>
+        <source>%1/unconfirmed</source>
+        <translation>%1/hindi nakumpirma</translation>
+    </message>
+    <message>
+        <source>%1 confirmations</source>
+        <translation>%1 pagkumpirma</translation>
+    </message>
+    <message>
+        <source>Status</source>
+        <translation>Katayuan</translation>
+    </message>
+    <message>
+        <source>Date</source>
+        <translation>Petsa</translation>
+    </message>
+    <message>
+        <source>Source</source>
+        <translation>Pinagmulan</translation>
+    </message>
+    <message>
+        <source>Generated</source>
+        <translation>Nagawa</translation>
+    </message>
+    <message>
+        <source>From</source>
+        <translation>Mula sa</translation>
+    </message>
+    <message>
+        <source>unknown</source>
+        <translation>hindi alam</translation>
+    </message>
+    <message>
+        <source>To</source>
+        <translation>Sa</translation>
+    </message>
+    <message>
+        <source>own address</source>
+        <translation>sariling address</translation>
+    </message>
+    <message>
+        <source>watch-only</source>
+        <translation>watch-only</translation>
+    </message>
+    <message>
+        <source>label</source>
+        <translation>label</translation>
+    </message>
+    <message>
+        <source>Credit</source>
+        <translation>Pautang</translation>
+    </message>
+    <message numerus="yes">
+        <source>matures in %n more block(s)</source>
+        <translation><numerusform>siguradong maaaring gastusin pagkalikha ng %n pang mga block</numerusform><numerusform>siguradong maaaring gastusin pagkalikha ng %n pang mga blocks</numerusform></translation>
+    </message>
+    <message>
+        <source>not accepted</source>
+        <translation>
