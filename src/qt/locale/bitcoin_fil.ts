@@ -2677,4 +2677,227 @@ Tandaan: Dahil ang bayad  ay kinakalkula sa bawat-byte na batayan, ang bayad ng 
     </message>
     <message>
         <source>not accepted</source>
-        <translation>
+        <translation>hindi tinanggap</translation>
+    </message>
+    <message>
+        <source>Debit</source>
+        <translation>Debit</translation>
+    </message>
+    <message>
+        <source>Total debit</source>
+        <translation>Kabuuang debit</translation>
+    </message>
+    <message>
+        <source>Total credit</source>
+        <translation>Kabuuang credit</translation>
+    </message>
+    <message>
+        <source>Transaction fee</source>
+        <translation>Bayad sa transaksyon</translation>
+    </message>
+    <message>
+        <source>Net amount</source>
+        <translation>Halaga ng net</translation>
+    </message>
+    <message>
+        <source>Message</source>
+        <translation>Mensahe</translation>
+    </message>
+    <message>
+        <source>Comment</source>
+        <translation>Puna</translation>
+    </message>
+    <message>
+        <source>Transaction ID</source>
+        <translation>ID ng Transaksyon</translation>
+    </message>
+    <message>
+        <source>Transaction total size</source>
+        <translation>Kabuuang laki ng transaksyon</translation>
+    </message>
+    <message>
+        <source>Transaction virtual size</source>
+        <translation>Ang virtual size ng transaksyon</translation>
+    </message>
+    <message>
+        <source>Output index</source>
+        <translation>Output index</translation>
+    </message>
+    <message>
+        <source>Merchant</source>
+        <translation>Mangangalakal</translation>
+    </message>
+    <message>
+        <source>Generated coins must mature %1 blocks before they can be spent. When you generated this block, it was broadcast to the network to be added to the block chain. If it fails to get into the chain, its state will change to "not accepted" and it won't be spendable. This may occasionally happen if another node generates a block within a few seconds of yours.</source>
+        <translation>Ang mga nabuong coins ay dapat mayroong %1 blocks sa ibabaw bago sila gastusin. Kapag nabuo mo ang block na ito, nai-broadcast ito sa network na idadagdag sa block chain. Kung nabigo itong makapasok sa chain, magbabago ang katayuan nito sa "hindi tinanggap" at hindi it magagastos. Maaaring mangyari ito paminsan-minsan kung may isang node na bumuo ng isang block sa loob ng ilang segundo sa iyo.</translation>
+    </message>
+    <message>
+        <source>Debug information</source>
+        <translation>I-debug ang impormasyon</translation>
+    </message>
+    <message>
+        <source>Transaction</source>
+        <translation>Transaksyon</translation>
+    </message>
+    <message>
+        <source>Inputs</source>
+        <translation>Mga input</translation>
+    </message>
+    <message>
+        <source>Amount</source>
+        <translation>Halaga</translation>
+    </message>
+    <message>
+        <source>true</source>
+        <translation>totoo</translation>
+    </message>
+    <message>
+        <source>false</source>
+        <translation>mali</translation>
+    </message>
+</context>
+<context>
+    <name>TransactionDescDialog</name>
+    <message>
+        <source>This pane shows a detailed description of the transaction</source>
+        <translation>Ang pane na ito ay nagpapakita ng detalyadong paglalarawan ng transaksyon</translation>
+    </message>
+    <message>
+        <source>Details for %1</source>
+        <translation>Detalye para sa %1</translation>
+    </message>
+</context>
+<context>
+    <name>TransactionTableModel</name>
+    <message>
+        <source>Date</source>
+        <translation>Petsa</translation>
+    </message>
+    <message>
+        <source>Type</source>
+        <translation>Uri</translation>
+    </message>
+    <message>
+        <source>Label</source>
+        <translation>Label</translation>
+    </message>
+    <message numerus="yes">
+        <source>Open for %n more block(s)</source>
+        <translation><numerusform>Bukas para sa %n pang mga block</numerusform><numerusform>Bukas para sa %n pang mga blocks</numerusform></translation>
+    </message>
+    <message>
+        <source>Open until %1</source>
+        <translation>Bukas hanggang %1</translation>
+    </message>
+    <message>
+        <source>Unconfirmed</source>
+        <translation>Hindi nakumpirma</translation>
+    </message>
+    <message>
+        <source>Abandoned</source>
+        <translation>Inabandona</translation>
+    </message>
+    <message>
+        <source>Confirming (%1 of %2 recommended confirmations)</source>
+        <translation>Ikinukumpirma (%1 ng %2 inirerekumendang kompirmasyon)</translation>
+    </message>
+    <message>
+        <source>Confirmed (%1 confirmations)</source>
+        <translation>Nakumpirma (%1 pagkumpirma)</translation>
+    </message>
+    <message>
+        <source>Conflicted</source>
+        <translation>Nagkasalungat</translation>
+    </message>
+    <message>
+        <source>Immature (%1 confirmations, will be available after %2)</source>
+        <translation>Hindi pa ligtas gastusin (%1 pagkumpirma, magagamit pagkatapos ng %2)</translation>
+    </message>
+    <message>
+        <source>Generated but not accepted</source>
+        <translation>Nabuo ngunit hindi tinanggap</translation>
+    </message>
+    <message>
+        <source>Received with</source>
+        <translation>Natanggap kasama ang</translation>
+    </message>
+    <message>
+        <source>Received from</source>
+        <translation>Natanggap mula kay</translation>
+    </message>
+    <message>
+        <source>Sent to</source>
+        <translation>Ipinadala sa</translation>
+    </message>
+    <message>
+        <source>Payment to yourself</source>
+        <translation>Pagbabayad sa iyong sarili</translation>
+    </message>
+    <message>
+        <source>Mined</source>
+        <translation>Namina</translation>
+    </message>
+    <message>
+        <source>watch-only</source>
+        <translation>watch-only</translation>
+    </message>
+    <message>
+        <source>(n/a)</source>
+        <translation>(n/a)</translation>
+    </message>
+    <message>
+        <source>(no label)</source>
+        <translation>(walang label)</translation>
+    </message>
+    <message>
+        <source>Transaction status. Hover over this field to show number of confirmations.</source>
+        <translation>Katayuan ng transaksyon. Mag-hover sa patlang na ito upang ipakita ang bilang ng mga pagkumpirma.</translation>
+    </message>
+    <message>
+        <source>Date and time that the transaction was received.</source>
+        <translation>Petsa at oras na natanggap ang transaksyon.</translation>
+    </message>
+    <message>
+        <source>Type of transaction.</source>
+        <translation>Uri ng transaksyon.</translation>
+    </message>
+    <message>
+        <source>Whether or not a watch-only address is involved in this transaction.</source>
+        <translation>Kasangkot man o hindi ang isang watch-only address sa transaksyon na ito.</translation>
+    </message>
+    <message>
+        <source>User-defined intent/purpose of the transaction.</source>
+        <translation>User-defined na hangarin/layunin ng transaksyon.</translation>
+    </message>
+    <message>
+        <source>Amount removed from or added to balance.</source>
+        <translation>Halaga na tinanggal o idinagdag sa balanse.</translation>
+    </message>
+</context>
+<context>
+    <name>TransactionView</name>
+    <message>
+        <source>All</source>
+        <translation>Lahat</translation>
+    </message>
+    <message>
+        <source>Today</source>
+        <translation>Ngayon</translation>
+    </message>
+    <message>
+        <source>This week</source>
+        <translation>Ngayong linggo</translation>
+    </message>
+    <message>
+        <source>This month</source>
+        <translation>Ngayong buwan</translation>
+    </message>
+    <message>
+        <source>Last month</source>
+        <translation>Noong nakaraang buwan</translation>
+    </message>
+    <message>
+        <source>This year</source>
+        <translation>Ngayon taon</translation>
+    </message>
+    <mess
