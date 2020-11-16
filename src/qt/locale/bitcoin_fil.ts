@@ -3276,4 +3276,168 @@ Tandaan: Dahil ang bayad  ay kinakalkula sa bawat-byte na batayan, ang bayad ng 
     </message>
     <message>
         <source>Error loading %s: Wallet requires newer version of %s</source>
-        <translation>Kamalian sa pag-lo-load %s: Ang walet ay nangangailangan 
+        <translation>Kamalian sa pag-lo-load %s: Ang walet ay nangangailangan ng mas bagong bersyon ng %s</translation>
+    </message>
+    <message>
+        <source>Error loading block database</source>
+        <translation>Kamalian sa pag-lo-load ng block database</translation>
+    </message>
+    <message>
+        <source>Error opening block database</source>
+        <translation>Kamalian sa pagbukas ng block database</translation>
+    </message>
+    <message>
+        <source>Failed to listen on any port. Use -listen=0 if you want this.</source>
+        <translation>Nabigong makinig sa anumang port. Gamitin ang -listen=0 kung nais mo ito.</translation>
+    </message>
+    <message>
+        <source>Failed to rescan the wallet during initialization</source>
+        <translation>Nabigong i-rescan ang walet sa initialization</translation>
+    </message>
+    <message>
+        <source>Importing...</source>
+        <translation>Nag-i-import...</translation>
+    </message>
+    <message>
+        <source>Incorrect or no genesis block found. Wrong datadir for network?</source>
+        <translation>Hindi tamang o walang nahanap na genesis block. Maling datadir para sa network?</translation>
+    </message>
+    <message>
+        <source>Invalid amount for -%s=&lt;amount&gt;: '%s'</source>
+        <translation>Hindi wastong halaga para sa -%s=&lt;amount&gt;: '%s'</translation>
+    </message>
+    <message>
+        <source>Invalid amount for -discardfee=&lt;amount&gt;: '%s'</source>
+        <translation>Hindi wastong halaga para sa -discardfee=&lt;amount&gt;:'%s'</translation>
+    </message>
+    <message>
+        <source>Invalid amount for -fallbackfee=&lt;amount&gt;: '%s'</source>
+        <translation>Hindi wastong halaga para sa -fallbackfee=&lt;amount&gt;: '%s'</translation>
+    </message>
+    <message>
+        <source>Specified blocks directory "%s" does not exist.</source>
+        <translation>Ang tinukoy na direktoryo ng mga block "%s" ay hindi umiiral.</translation>
+    </message>
+    <message>
+        <source>Upgrading txindex database</source>
+        <translation>Nag-u-upgrade ng txindex database</translation>
+    </message>
+    <message>
+        <source>Loading P2P addresses...</source>
+        <translation>Nag-lo-load ng mga P2P address...</translation>
+    </message>
+    <message>
+        <source>Loading banlist...</source>
+        <translation>Nag-lo-load ng banlist...</translation>
+    </message>
+    <message>
+        <source>Not enough file descriptors available.</source>
+        <translation>Hindi sapat ang mga file descriptors na magagamit.</translation>
+    </message>
+    <message>
+        <source>Prune cannot be configured with a negative value.</source>
+        <translation>Hindi ma-configure ang prune na may negatibong halaga.</translation>
+    </message>
+    <message>
+        <source>Prune mode is incompatible with -txindex.</source>
+        <translation>Ang prune mode ay hindi katugma sa -txindex.</translation>
+    </message>
+    <message>
+        <source>Replaying blocks...</source>
+        <translation>Ni-re-replay ang blocks...</translation>
+    </message>
+    <message>
+        <source>Rewinding blocks...</source>
+        <translation>Ni-re-rewind ang blocks...</translation>
+    </message>
+    <message>
+        <source>The source code is available from %s.</source>
+        <translation>Ang source code ay magagamit mula sa %s.</translation>
+    </message>
+    <message>
+        <source>Transaction fee and change calculation failed</source>
+        <translation>Nabigo ang bayad sa transaksyon at pagkalkula ng sukli</translation>
+    </message>
+    <message>
+        <source>Unable to bind to %s on this computer. %s is probably already running.</source>
+        <translation>Hindi ma-bind sa %s sa computer na ito. Malamang na tumatakbo na ang %s.</translation>
+    </message>
+    <message>
+        <source>Unable to generate keys</source>
+        <translation>Hindi makagawa ng keys</translation>
+    </message>
+    <message>
+        <source>Unsupported logging category %s=%s.</source>
+        <translation>Hindi suportadong logging category %s=%s.</translation>
+    </message>
+    <message>
+        <source>Upgrading UTXO database</source>
+        <translation>Nag-u-upgrade ng UTXO database</translation>
+    </message>
+    <message>
+        <source>User Agent comment (%s) contains unsafe characters.</source>
+        <translation>Ang komento ng User Agent (%s) ay naglalaman ng hindi ligtas na mga character.</translation>
+    </message>
+    <message>
+        <source>Verifying blocks...</source>
+        <translation>Nag-ve-verify ng blocks...</translation>
+    </message>
+    <message>
+        <source>Wallet needed to be rewritten: restart %s to complete</source>
+        <translation>Kinakailangan na muling maisulat ang walet: i-restart ang %s upang makumpleto</translation>
+    </message>
+    <message>
+        <source>Error: Listening for incoming connections failed (listen returned error %s)</source>
+        <translation>Kamalian: Nabigo ang pakikinig sa mga papasok na koneksyon (ang listen ay nagbalik ng error %s)</translation>
+    </message>
+    <message>
+        <source>Invalid amount for -maxtxfee=&lt;amount&gt;: '%s' (must be at least the minrelay fee of %s to prevent stuck transactions)</source>
+        <translation>Hindi wastong halaga para sa -maxtxfee=&lt;amount&gt;: '%s' (dapat hindi bababa sa minrelay fee na %s upang maiwasan ang mga natigil na mga transaksyon)</translation>
+    </message>
+    <message>
+        <source>The transaction amount is too small to send after the fee has been deducted</source>
+        <translation>Ang halaga ng transaksyon ay masyadong maliit na maipadala matapos na maibawas ang bayad</translation>
+    </message>
+    <message>
+        <source>You need to rebuild the database using -reindex to go back to unpruned mode.  This will redownload the entire blockchain</source>
+        <translation>Kailangan mong muling itayo ang database gamit ang -reindex upang bumalik sa unpruned mode. I-do-download muli nito ang buong blockchain</translation>
+    </message>
+    <message>
+        <source>Error reading from database, shutting down.</source>
+        <translation>Kamalian sa pagbabasa mula sa database, nag-shu-shut down.</translation>
+    </message>
+    <message>
+        <source>Error upgrading chainstate database</source>
+        <translation>Kamalian sa pag-u-upgrade ng chainstate database</translation>
+    </message>
+    <message>
+        <source>Error: Disk space is low for %s</source>
+        <translation>Kamalian: Ang disk space ay mababa para sa %s</translation>
+    </message>
+    <message>
+        <source>Invalid -onion address or hostname: '%s'</source>
+        <translation>Hindi wastong -onion address o hostname: '%s'</translation>
+    </message>
+    <message>
+        <source>Invalid -proxy address or hostname: '%s'</source>
+        <translation>Hindi wastong -proxy address o hostname: '%s'</translation>
+    </message>
+    <message>
+        <source>Invalid amount for -paytxfee=&lt;amount&gt;: '%s' (must be at least %s)</source>
+        <translation>Hindi wastong halaga para sa -paytxfee=&lt;amount&gt;:'%s' (dapat hindi mas mababa sa %s)</translation>
+    </message>
+    <message>
+        <source>Invalid netmask specified in -whitelist: '%s'</source>
+        <translation>Hindi wastong netmask na tinukoy sa -whitelist: '%s'</translation>
+    </message>
+    <message>
+        <source>Need to specify a port with -whitebind: '%s'</source>
+        <translation>Kailangang tukuyin ang port na may -whitebind: '%s'</translation>
+    </message>
+    <message>
+        <source>Reducing -maxconnections from %d to %d, because of system limitations.</source>
+        <translation>Pagbabawas ng -maxconnections mula sa %d hanggang %d, dahil sa mga limitasyon ng systema.</translation>
+    </message>
+    <message>
+        <source>Section [%s] is not recognized.</source>
+        <translation>Ang seksyon [%s] ay hindi kinikilala.</tran
