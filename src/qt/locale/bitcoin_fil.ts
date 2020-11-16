@@ -3141,4 +3141,139 @@ Tandaan: Dahil ang bayad  ay kinakalkula sa bawat-byte na batayan, ang bayad ng 
     </message>
     <message>
         <source>There was an error trying to save the wallet data to %1.</source>
-        <translation
+        <translation>May kamalian sa pag-impok ng datos ng walet sa %1.</translation>
+    </message>
+    <message>
+        <source>Backup Successful</source>
+        <translation>Matagumpay ang Pag-Backup</translation>
+    </message>
+    <message>
+        <source>The wallet data was successfully saved to %1.</source>
+        <translation>Matagumpay na naimpok ang datos ng walet sa %1.</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Kanselahin</translation>
+    </message>
+</context>
+<context>
+    <name>bitcoin-core</name>
+    <message>
+        <source>Distributed under the MIT software license, see the accompanying file %s or %s</source>
+        <translation>Naipamahagi sa ilalim ng lisensya ng MIT software, tingnan ang kasamang file %s o %s</translation>
+    </message>
+    <message>
+        <source>Prune configured below the minimum of %d MiB.  Please use a higher number.</source>
+        <translation>Na-configure ang prune mas mababa sa minimum na %d MiB. Mangyaring gumamit ng mas mataas na numero.</translation>
+    </message>
+    <message>
+        <source>Prune: last wallet synchronisation goes beyond pruned data. You need to -reindex (download the whole blockchain again in case of pruned node)</source>
+        <translation>Prune: ang huling pag-synchronize ng walet ay lampas sa pruned data. Kailangan mong mag-reindex (i-download muli ang buong blockchain sa kaso ng pruned node)</translation>
+    </message>
+    <message>
+        <source>Pruning blockstore...</source>
+        <translation>Pruning blockstore...</translation>
+    </message>
+    <message>
+        <source>Unable to start HTTP server. See debug log for details.</source>
+        <translation>Hindi masimulan ang HTTP server. Tingnan ang debug log para sa detalye.</translation>
+    </message>
+    <message>
+        <source>The %s developers</source>
+        <translation>Ang mga %s developers</translation>
+    </message>
+    <message>
+        <source>Cannot obtain a lock on data directory %s. %s is probably already running.</source>
+        <translation>Hindi makakuha ng lock sa direktoryo ng data %s. Malamang na tumatakbo ang %s.</translation>
+    </message>
+    <message>
+        <source>Error reading %s! All keys read correctly, but transaction data or address book entries might be missing or incorrect.</source>
+        <translation>Error sa pagbabasa %s! Nabasa nang tama ang lahat ng mga key, ngunit ang data ng transaksyon o mga entry sa address book ay maaaring nawawala o hindi tama.</translation>
+    </message>
+    <message>
+        <source>Please check that your computer's date and time are correct! If your clock is wrong, %s will not work properly.</source>
+        <translation>Mangyaring suriin na ang petsa at oras ng iyong computer ay tama! Kung mali ang iyong orasan, ang %s ay hindi gagana nang maayos.</translation>
+    </message>
+    <message>
+        <source>Please contribute if you find %s useful. Visit %s for further information about the software.</source>
+        <translation>Mangyaring tumulong kung natagpuan mo ang %s kapaki-pakinabang. Bisitahin ang %s para sa karagdagang impormasyon tungkol sa software.</translation>
+    </message>
+    <message>
+        <source>The block database contains a block which appears to be from the future. This may be due to your computer's date and time being set incorrectly. Only rebuild the block database if you are sure that your computer's date and time are correct</source>
+        <translation>Ang block database ay naglalaman ng isang block na tila nagmula sa hinaharap. Maaaring ito ay dahil sa petsa at oras ng iyong computer na nakatakda nang hindi wasto. Muling itayo ang database ng block kung sigurado ka na tama ang petsa at oras ng iyong computer</translation>
+    </message>
+    <message>
+        <source>This is a pre-release test build - use at your own risk - do not use for mining or merchant applications</source>
+        <translation>Ito ay isang pre-release test build - gamitin sa iyong sariling peligro - huwag gumamit para sa mga aplikasyon ng pagmimina o pangangalakal</translation>
+    </message>
+    <message>
+        <source>This is the transaction fee you may discard if change is smaller than dust at this level</source>
+        <translation>Ito ang bayad sa transaksyon na maaari mong iwaksi kung ang sukli ay mas maliit kaysa sa dust sa antas na ito</translation>
+    </message>
+    <message>
+        <source>Unable to replay blocks. You will need to rebuild the database using -reindex-chainstate.</source>
+        <translation>Hindi ma-replay ang mga blocks. Kailangan mong muling itayo ang database gamit ang -reindex-chainstate.</translation>
+    </message>
+    <message>
+        <source>Unable to rewind the database to a pre-fork state. You will need to redownload the blockchain</source>
+        <translation>Hindi ma-rewind ang database sa pre-fork state. Kailangan mong i-download muli ang blockchain</translation>
+    </message>
+    <message>
+        <source>Warning: The network does not appear to fully agree! Some miners appear to be experiencing issues.</source>
+        <translation>Babala: Ang network ay mukhang hindi ganap na sumang-ayon! Ang ilang mga minero ay mukhang nakakaranas ng mga isyu.</translation>
+    </message>
+    <message>
+        <source>Warning: We do not appear to fully agree with our peers! You may need to upgrade, or other nodes may need to upgrade.</source>
+        <translation>Babala: Mukhang hindi kami ganap na sumasang-ayon sa aming mga peers! Maaaring kailanganin mong mag-upgrade, o ang ibang mga node ay maaaring kailanganing mag-upgrade.</translation>
+    </message>
+    <message>
+        <source>-maxmempool must be at least %d MB</source>
+        <translation>ang -maxmempool ay dapat hindi bababa sa %d MB</translation>
+    </message>
+    <message>
+        <source>Cannot resolve -%s address: '%s'</source>
+        <translation>Hindi malutas - %s address: ' %s'</translation>
+    </message>
+    <message>
+        <source>Change index out of range</source>
+        <translation>Ang change index nasa labas ng saklaw</translation>
+    </message>
+    <message>
+        <source>Config setting for %s only applied on %s network when in [%s] section.</source>
+        <translation>Ang config setting para sa %s ay inilalapat lamang sa %s network kapag sa [%s] na seksyon.</translation>
+    </message>
+    <message>
+        <source>Copyright (C) %i-%i</source>
+        <translation>Copyright (C) %i-%i</translation>
+    </message>
+    <message>
+        <source>Corrupted block database detected</source>
+        <translation>Sirang block database ay napansin</translation>
+    </message>
+    <message>
+        <source>Do you want to rebuild the block database now?</source>
+        <translation>Nais mo bang muling itayo ang block database?</translation>
+    </message>
+    <message>
+        <source>Error initializing block database</source>
+        <translation>Kamalian sa pagsisimula ng block database</translation>
+    </message>
+    <message>
+        <source>Error initializing wallet database environment %s!</source>
+        <translation>Kamalian sa pagsisimula ng wallet database environment %s!</translation>
+    </message>
+    <message>
+        <source>Error loading %s</source>
+        <translation>Kamalian sa pag-lo-load %s</translation>
+    </message>
+    <message>
+        <source>Error loading %s: Private keys can only be disabled during creation</source>
+        <translation>Kamalian sa pag-lo-load %s: Ang private key ay maaaring hindi paganahin sa panahon ng paglikha lamang</translation>
+    </message>
+    <message>
+        <source>Error loading %s: Wallet corrupted</source>
+        <translation>Kamalian sa pag-lo-load %s: Nasira ang walet</translation>
+    </message>
+    <message>
+        <source>Error loading %s: Wallet requires newer version of %s</source>
+        <translation>Kamalian sa pag-lo-load %s: Ang walet ay nangangailangan 
