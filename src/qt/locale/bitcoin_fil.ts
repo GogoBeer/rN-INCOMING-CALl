@@ -3440,4 +3440,153 @@ Tandaan: Dahil ang bayad  ay kinakalkula sa bawat-byte na batayan, ang bayad ng 
     </message>
     <message>
         <source>Section [%s] is not recognized.</source>
-        <translation>Ang seksyon [%s] ay hindi kinikilala.</tran
+        <translation>Ang seksyon [%s] ay hindi kinikilala.</translation>
+    </message>
+    <message>
+        <source>Signing transaction failed</source>
+        <translation>Nabigo ang pagpirma ng transaksyon</translation>
+    </message>
+    <message>
+        <source>Specified -walletdir "%s" does not exist</source>
+        <translation>Ang tinukoy na -walletdir "%s" ay hindi umiiral</translation>
+    </message>
+    <message>
+        <source>Specified -walletdir "%s" is a relative path</source>
+        <translation>Ang tinukoy na -walletdir "%s" ay isang relative path</translation>
+    </message>
+    <message>
+        <source>Specified -walletdir "%s" is not a directory</source>
+        <translation>Ang tinukoy na -walletdir "%s" ay hindi isang direktoryo</translation>
+    </message>
+    <message>
+        <source>The specified config file %s does not exist
+</source>
+        <translation>Ang tinukoy na config file %s ay hindi umiiral
+</translation>
+    </message>
+    <message>
+        <source>The transaction amount is too small to pay the fee</source>
+        <translation>Ang halaga ng transaksyon ay masyadong maliit upang mabayaran ang bayad</translation>
+    </message>
+    <message>
+        <source>This is experimental software.</source>
+        <translation>Ito ay pang-eksperimentong software.</translation>
+    </message>
+    <message>
+        <source>Transaction amount too small</source>
+        <translation>Masyadong maliit ang halaga ng transaksyon</translation>
+    </message>
+    <message>
+        <source>Transaction too large</source>
+        <translation>Masyadong malaki ang transaksyon</translation>
+    </message>
+    <message>
+        <source>Unable to bind to %s on this computer (bind returned error %s)</source>
+        <translation>Hindi ma-bind sa %s sa computer na ito (ang bind ay nagbalik ng error %s)</translation>
+    </message>
+    <message>
+        <source>Unable to create the PID file '%s': %s</source>
+        <translation>Hindi makagawa ng PID file '%s': %s</translation>
+    </message>
+    <message>
+        <source>Unable to generate initial keys</source>
+        <translation>Hindi makagawa ng paunang mga key</translation>
+    </message>
+    <message>
+        <source>Verifying wallet(s)...</source>
+        <translation>Nag-ve-verify ng mga walet...</translation>
+    </message>
+    <message>
+        <source>Warning: unknown new rules activated (versionbit %i)</source>
+        <translation>Babala: na-activate ang mga hindi kilalang bagong patakaran (versionbit %i)</translation>
+    </message>
+    <message>
+        <source>-maxtxfee is set very high! Fees this large could be paid on a single transaction.</source>
+        <translation>-maxtxfee ay nakatakda nang napakataas! Ang mga bayad na ganito kalaki ay maaaring bayaran sa isang solong transaksyon.</translation>
+    </message>
+    <message>
+        <source>This is the transaction fee you may pay when fee estimates are not available.</source>
+        <translation>Ito ang bayad sa transaksyon na maaari mong bayaran kapag hindi magagamit ang pagtantya sa bayad.</translation>
+    </message>
+    <message>
+        <source>Total length of network version string (%i) exceeds maximum length (%i). Reduce the number or size of uacomments.</source>
+        <translation>Ang kabuuang haba ng string ng bersyon ng network (%i) ay lumampas sa maximum na haba (%i). Bawasan ang bilang o laki ng mga uacomment.</translation>
+    </message>
+    <message>
+        <source>%s is set very high!</source>
+        <translation>Ang %s ay nakatakda ng napakataas!</translation>
+    </message>
+    <message>
+        <source>Error loading wallet %s. Duplicate -wallet filename specified.</source>
+        <translation>Kamalian sa paglo-load ng walet %s. Duplicate -wallet filename na tinukoy.</translation>
+    </message>
+    <message>
+        <source>Starting network threads...</source>
+        <translation>Pagsisimula ng mga thread ng network...</translation>
+    </message>
+    <message>
+        <source>The wallet will avoid paying less than the minimum relay fee.</source>
+        <translation>Iiwasan ng walet na magbayad ng mas mababa kaysa sa minimum na bayad sa relay.</translation>
+    </message>
+    <message>
+        <source>This is the minimum transaction fee you pay on every transaction.</source>
+        <translation>Ito ang pinakamababang bayad sa transaksyon na babayaran mo sa bawat transaksyon.</translation>
+    </message>
+    <message>
+        <source>This is the transaction fee you will pay if you send a transaction.</source>
+        <translation>Ito ang bayad sa transaksyon na babayaran mo kung magpapadala ka ng transaksyon.</translation>
+    </message>
+    <message>
+        <source>Transaction amounts must not be negative</source>
+        <translation>Ang mga halaga ng transaksyon ay hindi dapat negative</translation>
+    </message>
+    <message>
+        <source>Transaction has too long of a mempool chain</source>
+        <translation>Ang transaksyon ay may masyadong mahabang chain ng mempool</translation>
+    </message>
+    <message>
+        <source>Transaction must have at least one recipient</source>
+        <translation>Ang transaksyon ay dapat mayroong kahit isang tatanggap</translation>
+    </message>
+    <message>
+        <source>Unknown network specified in -onlynet: '%s'</source>
+        <translation>Hindi kilalang network na tinukoy sa -onlynet: '%s'</translation>
+    </message>
+    <message>
+        <source>Insufficient funds</source>
+        <translation>Hindi sapat na pondo</translation>
+    </message>
+    <message>
+        <source>Fee estimation failed. Fallbackfee is disabled. Wait a few blocks or enable -fallbackfee.</source>
+        <translation>Nabigo ang pagtatantya ng bayad. Hindi pinagana ang Fallbackfee. Maghintay ng ilang mga block o paganahin -fallbackfee.</translation>
+    </message>
+    <message>
+        <source>Warning: Private keys detected in wallet {%s} with disabled private keys</source>
+        <translation>Babala: Napansin ang mga private key sa walet { %s} na may mga hindi pinaganang private key</translation>
+    </message>
+    <message>
+        <source>Cannot write to data directory '%s'; check permissions.</source>
+        <translation>Hindi makapagsulat sa direktoryo ng data '%s'; suriin ang mga pahintulot.</translation>
+    </message>
+    <message>
+        <source>Loading block index...</source>
+        <translation>Ni-lo-load ang block index...</translation>
+    </message>
+    <message>
+        <source>Loading wallet...</source>
+        <translation>Ni-lo-load ang walet...</translation>
+    </message>
+    <message>
+        <source>Cannot downgrade wallet</source>
+        <translation>Hindi ma-downgrade ang walet</translation>
+    </message>
+    <message>
+        <source>Rescanning...</source>
+        <translation>Rescanning...</translation>
+    </message>
+    <message>
+        <source>Done loading</source>
+        <translation>Tapos na ang pag-lo-load</translation>
+    </message>
+</context>
+</TS>
