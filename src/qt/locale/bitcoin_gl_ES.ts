@@ -135,4 +135,184 @@
         <source>Show passphrase</source>
         <translation>Mostra frase contrasinal</translation>
     </message>
-    <m
+    <message>
+        <source>Encrypt wallet</source>
+        <translation>Encriptar carteira</translation>
+    </message>
+    <message>
+        <source>This operation needs your wallet passphrase to unlock the wallet.</source>
+        <translation>Esta operación necesita da túa frase contrasinal para desbloqueares a carteira.</translation>
+    </message>
+    <message>
+        <source>Unlock wallet</source>
+        <translation>Desbloquear carteira</translation>
+    </message>
+    <message>
+        <source>This operation needs your wallet passphrase to decrypt the wallet.</source>
+        <translation>Esta operación necesita da túa frase contrasinal para desbloquea a carteira.</translation>
+    </message>
+    <message>
+        <source>Decrypt wallet</source>
+        <translation>Desencriptar carteira</translation>
+    </message>
+    <message>
+        <source>Change passphrase</source>
+        <translation>Cambiar frase contrasinal</translation>
+    </message>
+    <message>
+        <source>Confirm wallet encryption</source>
+        <translation>Confirmar encriptación da carteira</translation>
+    </message>
+    <message>
+        <source>Warning: If you encrypt your wallet and lose your passphrase, you will &lt;b&gt;LOSE ALL OF YOUR BITCOINS&lt;/b&gt;!</source>
+        <translation>Aviso: Si encriptas a túa carteira e perdes a túa frase contrasinal, &lt;b&gt;PERDERÁS TODOS OS TEUS BITCOINS&lt;/b&gt;!</translation>
+    </message>
+    <message>
+        <source>Are you sure you wish to encrypt your wallet?</source>
+        <translation>¿Seguro que queres encriptar a túa carteira?</translation>
+    </message>
+    <message>
+        <source>Wallet encrypted</source>
+        <translation>Carteira encriptada</translation>
+    </message>
+    <message>
+        <source>Enter the new passphrase for the wallet.&lt;br/&gt;Please use a passphrase of &lt;b&gt;ten or more random characters&lt;/b&gt;, or &lt;b&gt;eight or more words&lt;/b&gt;.</source>
+        <translation>Introduce unha nova frase contrasinal para a carteira.&lt;br/&gt;Por favor utiliza una frase contrasinal que &lt;b&gt;teña dez ou máis caracteres aleatorios&lt;/b&gt;, ou &lt;b&gt;oito ou máis palabras&lt;/b&gt;.</translation>
+    </message>
+    <message>
+        <source>Enter the old passphrase and new passphrase for the wallet.</source>
+        <translation>Introduce a frase contrasinal anterior mais a nova frase contrasinal para a carteira.</translation>
+    </message>
+    <message>
+        <source>Remember that encrypting your wallet cannot fully protect your bitcoins from being stolen by malware infecting your computer.</source>
+        <translation>Recorda que encriptar a tua carteira non protexe completamente que os teus bitcoins poidan ser roubados por malware que afecte ó teu computador.</translation>
+    </message>
+    <message>
+        <source>Wallet to be encrypted</source>
+        <translation>Carteira para ser encriptada</translation>
+    </message>
+    <message>
+        <source>Your wallet is about to be encrypted. </source>
+        <translation>A túa carteira vai a ser encriptada.</translation>
+    </message>
+    <message>
+        <source>Your wallet is now encrypted. </source>
+        <translation>A túa carteira está agora encriptada.</translation>
+    </message>
+    <message>
+        <source>IMPORTANT: Any previous backups you have made of your wallet file should be replaced with the newly generated, encrypted wallet file. For security reasons, previous backups of the unencrypted wallet file will become useless as soon as you start using the new, encrypted wallet.</source>
+        <translation>IMPORTANTE: Calquera copia de respaldo que tiveras feita da túa carteira debería ser sustituída por unha nova copia xerada a partires da túa nova carteira encriptada. Por razóns de seguridade, as copias de respaldo da túa carteira sin encriptar non se poderán usar unha vez que empeces a utilizar a túa nova carteira encriptada.</translation>
+    </message>
+    <message>
+        <source>Wallet encryption failed</source>
+        <translation>Error na Encriptación da carteira </translation>
+    </message>
+    <message>
+        <source>Wallet encryption failed due to an internal error. Your wallet was not encrypted.</source>
+        <translation>A encriptación da carteira fallou debido a un erro interno. A túa carteira no foi encriptada.</translation>
+    </message>
+    <message>
+        <source>The supplied passphrases do not match.</source>
+        <translation>As frases contrasinal introducidas non coinciden.</translation>
+    </message>
+    <message>
+        <source>Wallet unlock failed</source>
+        <translation>Desbloqueo de carteira fallido</translation>
+    </message>
+    <message>
+        <source>The passphrase entered for the wallet decryption was incorrect.</source>
+        <translation>A frase contrasinal introducida para o desencriptamento da carteira é incorrecto.</translation>
+    </message>
+    <message>
+        <source>Wallet decryption failed</source>
+        <translation>Fallou o desencriptado da carteira</translation>
+    </message>
+    <message>
+        <source>Wallet passphrase was successfully changed.</source>
+        <translation>A frase contrasinal da carteira mudouse correctamente.</translation>
+    </message>
+    <message>
+        <source>Warning: The Caps Lock key is on!</source>
+        <translation>Aviso: ¡A tecla Bloq. Mayús está activada!</translation>
+    </message>
+</context>
+<context>
+    <name>BanTableModel</name>
+    <message>
+        <source>IP/Netmask</source>
+        <translation>IP/Máscara de rede</translation>
+    </message>
+    <message>
+        <source>Banned Until</source>
+        <translation>Vedado ata</translation>
+    </message>
+</context>
+<context>
+    <name>BitcoinGUI</name>
+    <message>
+        <source>Sign &amp;message...</source>
+        <translation>Firma &amp;a mensaxe...</translation>
+    </message>
+    <message>
+        <source>Synchronizing with network...</source>
+        <translation>Sincronizando ca rede...</translation>
+    </message>
+    <message>
+        <source>&amp;Overview</source>
+        <translation>&amp;visión xeral</translation>
+    </message>
+    <message>
+        <source>Show general overview of wallet</source>
+        <translation>Mostra una visión xeral da carteira</translation>
+    </message>
+    <message>
+        <source>&amp;Transactions</source>
+        <translation>&amp;Transaccións</translation>
+    </message>
+    <message>
+        <source>Browse transaction history</source>
+        <translation>Busca no historial de transaccións</translation>
+    </message>
+    <message>
+        <source>E&amp;xit</source>
+        <translation>S&amp;aír</translation>
+    </message>
+    <message>
+        <source>Quit application</source>
+        <translation>Saír da aplicación</translation>
+    </message>
+    <message>
+        <source>&amp;About %1</source>
+        <translation>&amp;A cerca de %1</translation>
+    </message>
+    <message>
+        <source>Show information about %1</source>
+        <translation>Mostra información acerca de %1</translation>
+    </message>
+    <message>
+        <source>About &amp;Qt</source>
+        <translation>Acerca de &amp;Qt</translation>
+    </message>
+    <message>
+        <source>Show information about Qt</source>
+        <translation>Mostra información acerca de Qt</translation>
+    </message>
+    <message>
+        <source>&amp;Options...</source>
+        <translation>&amp;Opcións...</translation>
+    </message>
+    <message>
+        <source>Modify configuration options for %1</source>
+        <translation>Modifica as opcións de configuración de %1</translation>
+    </message>
+    <message>
+        <source>&amp;Encrypt Wallet...</source>
+        <translation>&amp;Encriptar Carteira...</translation>
+    </message>
+    <message>
+        <source>&amp;Backup Wallet...</source>
+        <translation>&amp;Respaldar Carteira...</translation>
+    </message>
+    <message>
+        <source>&amp;Change Passphrase...</source>
+        <translation>&amp;Mudar frase contra
