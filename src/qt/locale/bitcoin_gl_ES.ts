@@ -1299,4 +1299,193 @@
         <translation>Choose the default subdivision unit to show in the interface and when sending coins.</translation>
     </message>
     <message>
-        <source>Whether to sh
+        <source>Whether to show coin control features or not.</source>
+        <translation>Whether to show coin control features or not.</translation>
+    </message>
+    <message>
+        <source>&amp;Third party transaction URLs</source>
+        <translation>&amp;Third party transaction URLs</translation>
+    </message>
+    <message>
+        <source>Options set in this dialog are overridden by the command line or in the configuration file:</source>
+        <translation>Options set in this dialog are overridden by the command line or in the configuration file:</translation>
+    </message>
+    <message>
+        <source>&amp;OK</source>
+        <translation>&amp;OK</translation>
+    </message>
+    <message>
+        <source>&amp;Cancel</source>
+        <translation>&amp;Cancel</translation>
+    </message>
+    <message>
+        <source>default</source>
+        <translation>default</translation>
+    </message>
+    <message>
+        <source>none</source>
+        <translation>none</translation>
+    </message>
+    <message>
+        <source>Confirm options reset</source>
+        <translation>Confirm options reset</translation>
+    </message>
+    <message>
+        <source>Client restart required to activate changes.</source>
+        <translation>Client restart required to activate changes.</translation>
+    </message>
+    <message>
+        <source>Client will be shut down. Do you want to proceed?</source>
+        <translation>Client will be shut down. Do you want to proceed?</translation>
+    </message>
+    <message>
+        <source>Configuration options</source>
+        <translation>Configuration options</translation>
+    </message>
+    <message>
+        <source>The configuration file is used to specify advanced user options which override GUI settings. Additionally, any command-line options will override this configuration file.</source>
+        <translation>The configuration file is used to specify advanced user options which override GUI settings. Additionally, any command-line options will override this configuration file.</translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation>Error</translation>
+    </message>
+    <message>
+        <source>The configuration file could not be opened.</source>
+        <translation>The configuration file could not be opened.</translation>
+    </message>
+    <message>
+        <source>This change would require a client restart.</source>
+        <translation>This change would require a client restart.</translation>
+    </message>
+    <message>
+        <source>The supplied proxy address is invalid.</source>
+        <translation>The supplied proxy address is invalid.</translation>
+    </message>
+</context>
+<context>
+    <name>OverviewPage</name>
+    <message>
+        <source>Form</source>
+        <translation>Form</translation>
+    </message>
+    <message>
+        <source>The displayed information may be out of date. Your wallet automatically synchronizes with the Bitcoin network after a connection is established, but this process has not completed yet.</source>
+        <translation>The displayed information may be out of date. Your wallet automatically synchronizes with the Bitcoin network after a connection is established, but this process has not completed yet.</translation>
+    </message>
+    <message>
+        <source>Watch-only:</source>
+        <translation>Watch-only:</translation>
+    </message>
+    <message>
+        <source>Available:</source>
+        <translation>Available:</translation>
+    </message>
+    <message>
+        <source>Your current spendable balance</source>
+        <translation>Your current spendable balance</translation>
+    </message>
+    <message>
+        <source>Pending:</source>
+        <translation>Pending:</translation>
+    </message>
+    <message>
+        <source>Total of transactions that have yet to be confirmed, and do not yet count toward the spendable balance</source>
+        <translation>Total of transactions that have yet to be confirmed, and do not yet count toward the spendable balance</translation>
+    </message>
+    <message>
+        <source>Immature:</source>
+        <translation>Immature:</translation>
+    </message>
+    <message>
+        <source>Mined balance that has not yet matured</source>
+        <translation>Mined balance that has not yet matured</translation>
+    </message>
+    <message>
+        <source>Balances</source>
+        <translation>Balances</translation>
+    </message>
+    <message>
+        <source>Total:</source>
+        <translation>Total:</translation>
+    </message>
+    <message>
+        <source>Your current total balance</source>
+        <translation>Your current total balance</translation>
+    </message>
+    <message>
+        <source>Your current balance in watch-only addresses</source>
+        <translation>Your current balance in watch-only addresses</translation>
+    </message>
+    <message>
+        <source>Spendable:</source>
+        <translation>Spendable:</translation>
+    </message>
+    <message>
+        <source>Recent transactions</source>
+        <translation>Recent transactions</translation>
+    </message>
+    <message>
+        <source>Unconfirmed transactions to watch-only addresses</source>
+        <translation>Unconfirmed transactions to watch-only addresses</translation>
+    </message>
+    <message>
+        <source>Mined balance in watch-only addresses that has not yet matured</source>
+        <translation>Mined balance in watch-only addresses that has not yet matured</translation>
+    </message>
+    <message>
+        <source>Current total balance in watch-only addresses</source>
+        <translation>Current total balance in watch-only addresses</translation>
+    </message>
+    </context>
+<context>
+    <name>PSBTOperationsDialog</name>
+    <message>
+        <source>Total Amount</source>
+        <translation>Total Amount</translation>
+    </message>
+    <message>
+        <source>or</source>
+        <translation>or</translation>
+    </message>
+    </context>
+<context>
+    <name>PaymentServer</name>
+    <message>
+        <source>Payment request error</source>
+        <translation>Payment request error</translation>
+    </message>
+    <message>
+        <source>Cannot start bitcoin: click-to-pay handler</source>
+        <translation>Cannot start bitcoin: click-to-pay handler</translation>
+    </message>
+    <message>
+        <source>URI handling</source>
+        <translation>URI handling</translation>
+    </message>
+    <message>
+        <source>'bitcoin://' is not a valid URI. Use 'bitcoin:' instead.</source>
+        <translation>'bitcoin://' is not a valid URI. Use 'bitcoin:' instead.</translation>
+    </message>
+    <message>
+        <source>Cannot process payment request because BIP70 is not supported.</source>
+        <translation>Cannot process payment request because BIP70 is not supported.</translation>
+    </message>
+    <message>
+        <source>Due to widespread security flaws in BIP70 it's strongly recommended that any merchant instructions to switch wallets be ignored.</source>
+        <translation>Due to widespread security flaws in BIP70 it's strongly recommended that any merchant instructions to switch wallets be ignored.</translation>
+    </message>
+    <message>
+        <source>If you are receiving this error you should request the merchant provide a BIP21 compatible URI.</source>
+        <translation>If you are receiving this error you should request the merchant provide a BIP21 compatible URI.</translation>
+    </message>
+    <message>
+        <source>Invalid payment address %1</source>
+        <translation>Invalid payment address %1</translation>
+    </message>
+    <message>
+        <source>URI cannot be parsed! This can be caused by an invalid Bitcoin address or malformed URI parameters.</source>
+        <translation>URI cannot be parsed! This can be caused by an invalid Bitcoin address or malformed URI parameters.</translation>
+    </message>
+    <message>
+    
