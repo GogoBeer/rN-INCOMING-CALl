@@ -2545,4 +2545,183 @@ Note:  Since the fee is calculated on a per-byte basis, a fee of "100 satoshis p
         <translation>&amp;Sign Message</translation>
     </message>
     <message>
-        <source>You can sign messages/agreements with your addresses to prove you c
+        <source>You can sign messages/agreements with your addresses to prove you can receive bitcoins sent to them. Be careful not to sign anything vague or random, as phishing attacks may try to trick you into signing your identity over to them. Only sign fully-detailed statements you agree to.</source>
+        <translation>You can sign messages/agreements with your addresses to prove you can receive bitcoins sent to them. Be careful not to sign anything vague or random, as phishing attacks may try to trick you into signing your identity over to them. Only sign fully-detailed statements you agree to.</translation>
+    </message>
+    <message>
+        <source>The Bitcoin address to sign the message with</source>
+        <translation>The Bitcoin address to sign the message with</translation>
+    </message>
+    <message>
+        <source>Choose previously used address</source>
+        <translation>Choose previously used address</translation>
+    </message>
+    <message>
+        <source>Alt+A</source>
+        <translation>Alt+A</translation>
+    </message>
+    <message>
+        <source>Paste address from clipboard</source>
+        <translation>Paste address from clipboard</translation>
+    </message>
+    <message>
+        <source>Alt+P</source>
+        <translation>Alt+P</translation>
+    </message>
+    <message>
+        <source>Enter the message you want to sign here</source>
+        <translation>Enter the message you want to sign here</translation>
+    </message>
+    <message>
+        <source>Signature</source>
+        <translation>Signature</translation>
+    </message>
+    <message>
+        <source>Copy the current signature to the system clipboard</source>
+        <translation>Copy the current signature to the system clipboard</translation>
+    </message>
+    <message>
+        <source>Sign the message to prove you own this Bitcoin address</source>
+        <translation>Sign the message to prove you own this Bitcoin address</translation>
+    </message>
+    <message>
+        <source>Sign &amp;Message</source>
+        <translation>Sign &amp;Message</translation>
+    </message>
+    <message>
+        <source>Reset all sign message fields</source>
+        <translation>Reset all sign message fields</translation>
+    </message>
+    <message>
+        <source>Clear &amp;All</source>
+        <translation>Clear &amp;All</translation>
+    </message>
+    <message>
+        <source>&amp;Verify Message</source>
+        <translation>&amp;Verify Message</translation>
+    </message>
+    <message>
+        <source>Enter the receiver's address, message (ensure you copy line breaks, spaces, tabs, etc. exactly) and signature below to verify the message. Be careful not to read more into the signature than what is in the signed message itself, to avoid being tricked by a man-in-the-middle attack. Note that this only proves the signing party receives with the address, it cannot prove sendership of any transaction!</source>
+        <translation>Enter the receiver's address, message (ensure you copy line breaks, spaces, tabs, etc. exactly) and signature below to verify the message. Be careful not to read more into the signature than what is in the signed message itself, to avoid being tricked by a man-in-the-middle attack. Note that this only proves the signing party receives with the address, it cannot prove sendership of any transaction!</translation>
+    </message>
+    <message>
+        <source>The Bitcoin address the message was signed with</source>
+        <translation>The Bitcoin address the message was signed with</translation>
+    </message>
+    <message>
+        <source>The signed message to verify</source>
+        <translation>The signed message to verify</translation>
+    </message>
+    <message>
+        <source>The signature given when the message was signed</source>
+        <translation>The signature given when the message was signed</translation>
+    </message>
+    <message>
+        <source>Verify the message to ensure it was signed with the specified Bitcoin address</source>
+        <translation>Verify the message to ensure it was signed with the specified Bitcoin address</translation>
+    </message>
+    <message>
+        <source>Verify &amp;Message</source>
+        <translation>Verify &amp;Message</translation>
+    </message>
+    <message>
+        <source>Reset all verify message fields</source>
+        <translation>Reset all verify message fields</translation>
+    </message>
+    <message>
+        <source>Click "Sign Message" to generate signature</source>
+        <translation>Click "Sign Message" to generate signature</translation>
+    </message>
+    <message>
+        <source>The entered address is invalid.</source>
+        <translation>The entered address is invalid.</translation>
+    </message>
+    <message>
+        <source>Please check the address and try again.</source>
+        <translation>Please check the address and try again.</translation>
+    </message>
+    <message>
+        <source>The entered address does not refer to a key.</source>
+        <translation>The entered address does not refer to a key.</translation>
+    </message>
+    <message>
+        <source>Wallet unlock was cancelled.</source>
+        <translation>Wallet unlock was cancelled.</translation>
+    </message>
+    <message>
+        <source>No error</source>
+        <translation>No error</translation>
+    </message>
+    <message>
+        <source>Private key for the entered address is not available.</source>
+        <translation>Private key for the entered address is not available.</translation>
+    </message>
+    <message>
+        <source>Message signing failed.</source>
+        <translation>Message signing failed.</translation>
+    </message>
+    <message>
+        <source>Message signed.</source>
+        <translation>Message signed.</translation>
+    </message>
+    <message>
+        <source>The signature could not be decoded.</source>
+        <translation>The signature could not be decoded.</translation>
+    </message>
+    <message>
+        <source>Please check the signature and try again.</source>
+        <translation>Please check the signature and try again.</translation>
+    </message>
+    <message>
+        <source>The signature did not match the message digest.</source>
+        <translation>The signature did not match the message digest.</translation>
+    </message>
+    <message>
+        <source>Message verification failed.</source>
+        <translation>Message verification failed.</translation>
+    </message>
+    <message>
+        <source>Message verified.</source>
+        <translation>Message verified.</translation>
+    </message>
+</context>
+<context>
+    <name>TrafficGraphWidget</name>
+    <message>
+        <source>KB/s</source>
+        <translation>KB/s</translation>
+    </message>
+</context>
+<context>
+    <name>TransactionDesc</name>
+    <message numerus="yes">
+        <source>Open for %n more block(s)</source>
+        <translation><numerusform>Open for %n more block</numerusform><numerusform>Open for %n more blocks</numerusform></translation>
+    </message>
+    <message>
+        <source>Open until %1</source>
+        <translation>Open until %1</translation>
+    </message>
+    <message>
+        <source>conflicted with a transaction with %1 confirmations</source>
+        <translation>conflicted with a transaction with %1 confirmations</translation>
+    </message>
+    <message>
+        <source>0/unconfirmed, %1</source>
+        <translation>0/unconfirmed, %1</translation>
+    </message>
+    <message>
+        <source>in memory pool</source>
+        <translation>in memory pool</translation>
+    </message>
+    <message>
+        <source>not in memory pool</source>
+        <translation>not in memory pool</translation>
+    </message>
+    <message>
+        <source>abandoned</source>
+        <translation>abandoned</translation>
+    </message>
+    <message>
+        <source>%1/unconfirmed</source>
+        <translation>%1/unco
