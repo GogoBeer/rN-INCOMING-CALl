@@ -176,4 +176,215 @@ Signing is only possible with addresses of the type 'legacy'.</source>
     <message>
         <source>Are you sure you wish to encrypt your wallet?</source>
         <translation>האם אתה בטוח שברצונך להצפין את הארנק?</translation>
-    </messa
+    </message>
+    <message>
+        <source>Wallet encrypted</source>
+        <translation>הארנק מוצפן</translation>
+    </message>
+    <message>
+        <source>Enter the new passphrase for the wallet.&lt;br/&gt;Please use a passphrase of &lt;b&gt;ten or more random characters&lt;/b&gt;, or &lt;b&gt;eight or more words&lt;/b&gt;.</source>
+        <translation>הקש סיסמה חדשה לארנק.
+השתמש בסיסמה הכוללת עשרה או יותר תווים אקראים, או שמונה או יותר מילים.</translation>
+    </message>
+    <message>
+        <source>Enter the old passphrase and new passphrase for the wallet.</source>
+        <translation>הקש את הסיסמא הישנה והחדשה לארנק.</translation>
+    </message>
+    <message>
+        <source>Remember that encrypting your wallet cannot fully protect your bitcoins from being stolen by malware infecting your computer.</source>
+        <translation>זכור שהצפנת הארנק לא יכולה להגן עליך לגמרי מגניבת המטבעות שלך על ידי תוכנה זדונית שנמצאת על המחשב שלך.</translation>
+    </message>
+    <message>
+        <source>Wallet to be encrypted</source>
+        <translation>הארנק המיועד להצפנה</translation>
+    </message>
+    <message>
+        <source>Your wallet is about to be encrypted. </source>
+        <translation>הארנק שלך עומד להיות מוצפן.</translation>
+    </message>
+    <message>
+        <source>Your wallet is now encrypted. </source>
+        <translation>הארנק שלך מוצפן כעת.</translation>
+    </message>
+    <message>
+        <source>IMPORTANT: Any previous backups you have made of your wallet file should be replaced with the newly generated, encrypted wallet file. For security reasons, previous backups of the unencrypted wallet file will become useless as soon as you start using the new, encrypted wallet.</source>
+        <translation>חשוב! כל גיבוי קודם שעשית לארנק שלך יש להחליף עם קובץ הארנק המוצפן שזה עתה נוצר. מסיבות אבטחה, גיבויים קודמים של קובץ הארנק הלא-מוצפן יהפכו לחסרי שימוש ברגע שתתחיל להשתמש בארנק החדש המוצפן.</translation>
+    </message>
+    <message>
+        <source>Wallet encryption failed</source>
+        <translation>הצפנת הארנק נכשלה</translation>
+    </message>
+    <message>
+        <source>Wallet encryption failed due to an internal error. Your wallet was not encrypted.</source>
+        <translation>הצפנת הארנק נכשלה עקב תקלה פנימית. הארנק שלך לא הוצפן.</translation>
+    </message>
+    <message>
+        <source>The supplied passphrases do not match.</source>
+        <translation>הסיסמות שניתנו אינן תואמות.</translation>
+    </message>
+    <message>
+        <source>Wallet unlock failed</source>
+        <translation>פתיחת הארנק נכשלה</translation>
+    </message>
+    <message>
+        <source>The passphrase entered for the wallet decryption was incorrect.</source>
+        <translation>הסיסמה שהוכנסה לפענוח הארנק שגויה.</translation>
+    </message>
+    <message>
+        <source>Wallet decryption failed</source>
+        <translation>פענוח הארנק נכשל</translation>
+    </message>
+    <message>
+        <source>Wallet passphrase was successfully changed.</source>
+        <translation>סיסמת הארנק שונתה בהצלחה.</translation>
+    </message>
+    <message>
+        <source>Warning: The Caps Lock key is on!</source>
+        <translation>אזהרה: מקש ה־Caps Lock פעיל!</translation>
+    </message>
+</context>
+<context>
+    <name>BanTableModel</name>
+    <message>
+        <source>IP/Netmask</source>
+        <translation>IP/Netmask</translation>
+    </message>
+    <message>
+        <source>Banned Until</source>
+        <translation>חסום עד</translation>
+    </message>
+</context>
+<context>
+    <name>BitcoinGUI</name>
+    <message>
+        <source>Sign &amp;message...</source>
+        <translation>חתום &amp;הודעה...</translation>
+    </message>
+    <message>
+        <source>Synchronizing with network...</source>
+        <translation>מסתנכרן עם הרשת...</translation>
+    </message>
+    <message>
+        <source>&amp;Overview</source>
+        <translation>&amp;סקירה</translation>
+    </message>
+    <message>
+        <source>Show general overview of wallet</source>
+        <translation>הצג סקירה כללית של הארנק</translation>
+    </message>
+    <message>
+        <source>&amp;Transactions</source>
+        <translation>&amp;העברות</translation>
+    </message>
+    <message>
+        <source>Browse transaction history</source>
+        <translation>עיין בהיסטוריית ההעברות</translation>
+    </message>
+    <message>
+        <source>E&amp;xit</source>
+        <translation>י&amp;ציאה</translation>
+    </message>
+    <message>
+        <source>Quit application</source>
+        <translation>יציאה מהיישום</translation>
+    </message>
+    <message>
+        <source>&amp;About %1</source>
+        <translation>&amp;אודות %1</translation>
+    </message>
+    <message>
+        <source>Show information about %1</source>
+        <translation>הצג מידע על %1</translation>
+    </message>
+    <message>
+        <source>About &amp;Qt</source>
+        <translation>אודות &amp;Qt</translation>
+    </message>
+    <message>
+        <source>Show information about Qt</source>
+        <translation>הצג מידע על Qt</translation>
+    </message>
+    <message>
+        <source>&amp;Options...</source>
+        <translation>&amp;אפשרויות...</translation>
+    </message>
+    <message>
+        <source>Modify configuration options for %1</source>
+        <translation>שינוי אפשרויות התצורה עבור %1</translation>
+    </message>
+    <message>
+        <source>&amp;Encrypt Wallet...</source>
+        <translation>&amp;הצפנת הארנק...</translation>
+    </message>
+    <message>
+        <source>&amp;Backup Wallet...</source>
+        <translation>&amp;גיבוי הארנק...</translation>
+    </message>
+    <message>
+        <source>&amp;Change Passphrase...</source>
+        <translation>&amp;שנה סיסמה...</translation>
+    </message>
+    <message>
+        <source>Open &amp;URI...</source>
+        <translation>פתיחת &amp;כתובת משאב...</translation>
+    </message>
+    <message>
+        <source>Create Wallet...</source>
+        <translation>יצירת ארנק...</translation>
+    </message>
+    <message>
+        <source>Create a new wallet</source>
+        <translation>יצירת ארנק חדש</translation>
+    </message>
+    <message>
+        <source>Wallet:</source>
+        <translation>ארנק:</translation>
+    </message>
+    <message>
+        <source>Click to disable network activity.</source>
+        <translation>לחץ כדי לנטרל את פעילות הרשת.</translation>
+    </message>
+    <message>
+        <source>Network activity disabled.</source>
+        <translation>פעילות הרשת נוטרלה.</translation>
+    </message>
+    <message>
+        <source>Click to enable network activity again.</source>
+        <translation>לחץ כדי לחדש את פעילות הרשת.</translation>
+    </message>
+    <message>
+        <source>Syncing Headers (%1%)...</source>
+        <translation>הכותרות מתעדכנות (%1%)...</translation>
+    </message>
+    <message>
+        <source>Reindexing blocks on disk...</source>
+        <translation>המקטעים נוספים למפתח בכונן…</translation>
+    </message>
+    <message>
+        <source>Proxy is &lt;b&gt;enabled&lt;/b&gt;: %1</source>
+        <translation>שרת הפרוקסי &lt;b&gt;פעיל&lt;/b&gt;: %1</translation>
+    </message>
+    <message>
+        <source>Send coins to a Bitcoin address</source>
+        <translation>שליחת מטבעות לכתובת ביטקוין</translation>
+    </message>
+    <message>
+        <source>Backup wallet to another location</source>
+        <translation>גיבוי הארנק למיקום אחר</translation>
+    </message>
+    <message>
+        <source>Change the passphrase used for wallet encryption</source>
+        <translation>שינוי הסיסמה המשמשת להצפנת הארנק</translation>
+    </message>
+    <message>
+        <source>&amp;Verify message...</source>
+        <translation>&amp;אימות הודעה…</translation>
+    </message>
+    <message>
+        <source>&amp;Send</source>
+        <translation>&amp;שליחה</translation>
+    </message>
+    <message>
+        <source>&amp;Receive</source>
+        <translation>&amp;קבלה</translation>
+    </me
