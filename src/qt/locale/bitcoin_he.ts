@@ -1208,4 +1208,192 @@ Signing is only possible with addresses of the type 'legacy'.</source>
     </message>
     <message>
         <source>&amp;Network</source>
-        <translation>&amp;רשת</
+        <translation>&amp;רשת</translation>
+    </message>
+    <message>
+        <source>Disables some advanced features but all blocks will still be fully validated. Reverting this setting requires re-downloading the entire blockchain. Actual disk usage may be somewhat higher.</source>
+        <translation>משבית מספר תכונות מתקדמות אבל כל הבלוקים עדיין יעברו אימות מלא. שינוי של הגדרה זו מצריך הורדה מחדש של הבלוקצ'יין. נצילות הדיסק עלולה לעלות.</translation>
+    </message>
+    <message>
+        <source>Prune &amp;block storage to</source>
+        <translation>יש לגזום את &amp;מאגר הבלוקים אל</translation>
+    </message>
+    <message>
+        <source>GB</source>
+        <translation>ג״ב</translation>
+    </message>
+    <message>
+        <source>Reverting this setting requires re-downloading the entire blockchain.</source>
+        <translation>שינוי הגדרה זו מצריך הורדה מחדש של הבלוקצ'יין</translation>
+    </message>
+    <message>
+        <source>MiB</source>
+        <translation>MiB</translation>
+    </message>
+    <message>
+        <source>(0 = auto, &lt;0 = leave that many cores free)</source>
+        <translation>(0 = אוטומטי, &lt;0 = להשאיר כזאת כמות של ליבות חופשיות)</translation>
+    </message>
+    <message>
+        <source>W&amp;allet</source>
+        <translation>&amp;ארנק</translation>
+    </message>
+    <message>
+        <source>Expert</source>
+        <translation>מומחה</translation>
+    </message>
+    <message>
+        <source>Enable coin &amp;control features</source>
+        <translation>הפעלת תכונות &amp;בקרת מטבעות</translation>
+    </message>
+    <message>
+        <source>If you disable the spending of unconfirmed change, the change from a transaction cannot be used until that transaction has at least one confirmation. This also affects how your balance is computed.</source>
+        <translation>אם אפשרות ההשקעה של עודף בלתי מאושר תנוטרל, לא ניתן יהיה להשתמש בעודף מההעברה עד שלהעברה יהיה לפחות אישור אחד. פעולה זו גם משפיעה על חישוב המאזן שלך.</translation>
+    </message>
+    <message>
+        <source>&amp;Spend unconfirmed change</source>
+        <translation>עודף &amp;בלתי מאושר מההשקעה</translation>
+    </message>
+    <message>
+        <source>Automatically open the Bitcoin client port on the router. This only works when your router supports UPnP and it is enabled.</source>
+        <translation>פתיחת הפתחה של ביטקוין בנתב באופן אוטומטי. עובד רק אם UPnP מופעל ונתמך בנתב.</translation>
+    </message>
+    <message>
+        <source>Map port using &amp;UPnP</source>
+        <translation>מיפוי פתחה באמצעות UPnP</translation>
+    </message>
+    <message>
+        <source>Accept connections from outside.</source>
+        <translation>אשר חיבורים חיצוניים</translation>
+    </message>
+    <message>
+        <source>Allow incomin&amp;g connections</source>
+        <translation>לאפשר חיבורים &amp;נכנסים</translation>
+    </message>
+    <message>
+        <source>Connect to the Bitcoin network through a SOCKS5 proxy.</source>
+        <translation>התחבר לרשת הביטקוין דרך פרוקסי SOCKS5.</translation>
+    </message>
+    <message>
+        <source>&amp;Connect through SOCKS5 proxy (default proxy):</source>
+        <translation>להתחבר &amp;דרך מתווך SOCKS5 (מתווך בררת מחדל):</translation>
+    </message>
+    <message>
+        <source>Proxy &amp;IP:</source>
+        <translation>כתובת ה־&amp;IP של הפרוקסי:</translation>
+    </message>
+    <message>
+        <source>&amp;Port:</source>
+        <translation>&amp;פתחה:</translation>
+    </message>
+    <message>
+        <source>Port of the proxy (e.g. 9050)</source>
+        <translation>הפתחה של הפרוקסי (למשל 9050)</translation>
+    </message>
+    <message>
+        <source>Used for reaching peers via:</source>
+        <translation>עבור הגעה לעמיתים דרך:</translation>
+    </message>
+    <message>
+        <source>IPv4</source>
+        <translation>IPv4</translation>
+    </message>
+    <message>
+        <source>IPv6</source>
+        <translation>IPv6</translation>
+    </message>
+    <message>
+        <source>Tor</source>
+        <translation>Tor</translation>
+    </message>
+    <message>
+        <source>&amp;Window</source>
+        <translation>&amp;חלון</translation>
+    </message>
+    <message>
+        <source>Show only a tray icon after minimizing the window.</source>
+        <translation>הצג סמל מגש בלבד לאחר מזעור החלון.</translation>
+    </message>
+    <message>
+        <source>&amp;Minimize to the tray instead of the taskbar</source>
+        <translation>מ&amp;זעור למגש במקום לשורת המשימות</translation>
+    </message>
+    <message>
+        <source>M&amp;inimize on close</source>
+        <translation>מ&amp;זעור עם סגירה</translation>
+    </message>
+    <message>
+        <source>&amp;Display</source>
+        <translation>ת&amp;צוגה</translation>
+    </message>
+    <message>
+        <source>User Interface &amp;language:</source>
+        <translation>&amp;שפת מנשק המשתמש:</translation>
+    </message>
+    <message>
+        <source>The user interface language can be set here. This setting will take effect after restarting %1.</source>
+        <translation>ניתן להגדיר כאן את שפת מנשק המשתמש. הגדרה זו תיכנס לתוקף לאחר הפעלה של %1 מחדש.</translation>
+    </message>
+    <message>
+        <source>&amp;Unit to show amounts in:</source>
+        <translation>י&amp;חידת מידה להצגת סכומים:</translation>
+    </message>
+    <message>
+        <source>Choose the default subdivision unit to show in the interface and when sending coins.</source>
+        <translation>ניתן לבחור את בררת המחדל ליחידת החלוקה שתוצג במנשק ובעת שליחת מטבעות.</translation>
+    </message>
+    <message>
+        <source>Whether to show coin control features or not.</source>
+        <translation>האם להציג תכונות שליטת מטבע או לא.</translation>
+    </message>
+    <message>
+        <source>Connect to the Bitcoin network through a separate SOCKS5 proxy for Tor onion services.</source>
+        <translation>התחבר לרשת ביטקוין דרך פרוקסי נפרד SOCKS5 proxy לשרותי שכבות בצל (onion services).</translation>
+    </message>
+    <message>
+        <source>Use separate SOCKS&amp;5 proxy to reach peers via Tor onion services:</source>
+        <translation>השתמש בפרוקסי נפרד  SOCKS&amp;5 להגעה לעמיתים דרך שרותי השכבות של  Tor :</translation>
+    </message>
+    <message>
+        <source>&amp;Third party transaction URLs</source>
+        <translation>&amp;כתובות אינטרנט של עסקאות צד שלישי</translation>
+    </message>
+    <message>
+        <source>Options set in this dialog are overridden by the command line or in the configuration file:</source>
+        <translation>אפשרויות שמוגדרות בדיאלוג הזה נדרסות ע"י שורת הפקודה או קובץ הקונפיגורציה</translation>
+    </message>
+    <message>
+        <source>&amp;OK</source>
+        <translation>&amp;אישור</translation>
+    </message>
+    <message>
+        <source>&amp;Cancel</source>
+        <translation>&amp;ביטול</translation>
+    </message>
+    <message>
+        <source>default</source>
+        <translation>בררת מחדל</translation>
+    </message>
+    <message>
+        <source>none</source>
+        <translation>ללא</translation>
+    </message>
+    <message>
+        <source>Confirm options reset</source>
+        <translation>אישור איפוס האפשרויות</translation>
+    </message>
+    <message>
+        <source>Client restart required to activate changes.</source>
+        <translation>נדרשת הפעלה מחדש של הלקוח כדי להפעיל את השינויים.</translation>
+    </message>
+    <message>
+        <source>Client will be shut down. Do you want to proceed?</source>
+        <translation>הלקוח יכבה. להמשיך?</translation>
+    </message>
+    <message>
+        <source>Configuration options</source>
+        <translation>אפשרויות להגדרה</translation>
+    </message>
+    <message>
+        <source>The configuration file is used to specify advanced user options which override GUI settings. Additionally, any command-line options will override this configuration file.</source>
+        <translation>בקו
