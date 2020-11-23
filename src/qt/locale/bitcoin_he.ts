@@ -1396,4 +1396,209 @@ Signing is only possible with addresses of the type 'legacy'.</source>
     </message>
     <message>
         <source>The configuration file is used to specify advanced user options which override GUI settings. Additionally, any command-line options will override this configuration file.</source>
-        <translation>בקו
+        <translation>בקובץ ההגדרות ניתן לציין אפשרויות מתקדמות אשר יקבלו עדיפות על ההגדרות בממשק הגרפי. כמו כן, אפשרויות בשורת הפקודה יקבלו עדיפות על קובץ ההגדרות.</translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation>שגיאה</translation>
+    </message>
+    <message>
+        <source>The configuration file could not be opened.</source>
+        <translation>לא ניתן לפתוח את קובץ ההגדרות</translation>
+    </message>
+    <message>
+        <source>This change would require a client restart.</source>
+        <translation>שינוי זה ידרוש הפעלה מחדש של תכנית הלקוח.</translation>
+    </message>
+    <message>
+        <source>The supplied proxy address is invalid.</source>
+        <translation>כתובת המתווך שסופקה אינה תקינה.</translation>
+    </message>
+</context>
+<context>
+    <name>OverviewPage</name>
+    <message>
+        <source>Form</source>
+        <translation>טופס</translation>
+    </message>
+    <message>
+        <source>The displayed information may be out of date. Your wallet automatically synchronizes with the Bitcoin network after a connection is established, but this process has not completed yet.</source>
+        <translation>המידע המוצג עשוי להיות מיושן. הארנק שלך מסתנכרן באופן אוטומטי עם רשת הביטקוין לאחר יצירת החיבור, אך התהליך טרם הסתיים.</translation>
+    </message>
+    <message>
+        <source>Watch-only:</source>
+        <translation>צפייה בלבד:</translation>
+    </message>
+    <message>
+        <source>Available:</source>
+        <translation>זמין:</translation>
+    </message>
+    <message>
+        <source>Your current spendable balance</source>
+        <translation>היתרה הזמינה הנוכחית</translation>
+    </message>
+    <message>
+        <source>Pending:</source>
+        <translation>בהמתנה:</translation>
+    </message>
+    <message>
+        <source>Total of transactions that have yet to be confirmed, and do not yet count toward the spendable balance</source>
+        <translation>הסכום הכולל של העברות שטרם אושרו ועדיין אינן נספרות בחישוב היתרה הזמינה</translation>
+    </message>
+    <message>
+        <source>Immature:</source>
+        <translation>לא בשל:</translation>
+    </message>
+    <message>
+        <source>Mined balance that has not yet matured</source>
+        <translation>מאזן שנכרה וטרם הבשיל</translation>
+    </message>
+    <message>
+        <source>Balances</source>
+        <translation>מאזנים</translation>
+    </message>
+    <message>
+        <source>Total:</source>
+        <translation>סך הכול:</translation>
+    </message>
+    <message>
+        <source>Your current total balance</source>
+        <translation>סך כל היתרה הנוכחית שלך</translation>
+    </message>
+    <message>
+        <source>Your current balance in watch-only addresses</source>
+        <translation>המאזן הנוכחי שלך בכתובות לקריאה בלבד</translation>
+    </message>
+    <message>
+        <source>Spendable:</source>
+        <translation>ניתנים לבזבוז:</translation>
+    </message>
+    <message>
+        <source>Recent transactions</source>
+        <translation>העברות אחרונות</translation>
+    </message>
+    <message>
+        <source>Unconfirmed transactions to watch-only addresses</source>
+        <translation>העברות בלתי מאושרות לכתובות לצפייה בלבד</translation>
+    </message>
+    <message>
+        <source>Mined balance in watch-only addresses that has not yet matured</source>
+        <translation>מאזן לאחר כרייה בכתובות לצפייה בלבד שעדיין לא הבשילו</translation>
+    </message>
+    <message>
+        <source>Current total balance in watch-only addresses</source>
+        <translation>המאזן הכולל הנוכחי בכתובות לצפייה בלבד</translation>
+    </message>
+    <message>
+        <source>Privacy mode activated for the Overview tab. To unmask the values, uncheck Settings-&gt;Mask values.</source>
+        <translation>מצב הפרטיות הופעל עבור לשונית התאור הכללי. כדי להסיר את הסוואת הערכים, בטל את ההגדרות, -&gt;הסוואת ערכים.</translation>
+    </message>
+</context>
+<context>
+    <name>PSBTOperationsDialog</name>
+    <message>
+        <source>Dialog</source>
+        <translation>שיח</translation>
+    </message>
+    <message>
+        <source>Sign Tx</source>
+        <translation>חתימת עיסקה</translation>
+    </message>
+    <message>
+        <source>Broadcast Tx</source>
+        <translation>שידור עיסקה</translation>
+    </message>
+    <message>
+        <source>Copy to Clipboard</source>
+        <translation>העתקה ללוח הגזירים</translation>
+    </message>
+    <message>
+        <source>Save...</source>
+        <translation>שמירה...</translation>
+    </message>
+    <message>
+        <source>Close</source>
+        <translation>סגירה</translation>
+    </message>
+    <message>
+        <source>Failed to load transaction: %1</source>
+        <translation>כשלון בטעינת העיסקה: %1</translation>
+    </message>
+    <message>
+        <source>Failed to sign transaction: %1</source>
+        <translation>כשלון בחתימת העיסקה: %1</translation>
+    </message>
+    <message>
+        <source>Could not sign any more inputs.</source>
+        <translation>לא ניתן לחתום קלטים נוספים.</translation>
+    </message>
+    <message>
+        <source>Signed %1 inputs, but more signatures are still required.</source>
+        <translation>נחתם קלט  %1 אך יש צורך בחתימות נוספות.</translation>
+    </message>
+    <message>
+        <source>Signed transaction successfully. Transaction is ready to broadcast.</source>
+        <translation>העיסקה נחתמה בהצלחה. העיסקה מוכנה לשידור.</translation>
+    </message>
+    <message>
+        <source>Unknown error processing transaction.</source>
+        <translation>שגיאה לא מוכרת בעת עיבוד העיסקה.</translation>
+    </message>
+    <message>
+        <source>Transaction broadcast successfully! Transaction ID: %1</source>
+        <translation>העיסקה שודרה בהצלחה! מזהה העיסקה: %1</translation>
+    </message>
+    <message>
+        <source>Transaction broadcast failed: %1</source>
+        <translation>שידור העיסקה נכשל: %1</translation>
+    </message>
+    <message>
+        <source>PSBT copied to clipboard.</source>
+        <translation>PSBT הועתקה ללוח הגזירים.</translation>
+    </message>
+    <message>
+        <source>Save Transaction Data</source>
+        <translation>שמירת נתוני העיסקה</translation>
+    </message>
+    <message>
+        <source>Partially Signed Transaction (Binary) (*.psbt)</source>
+        <translation>עיסקה חתומה חלקית (בינארי) (*.psbt)</translation>
+    </message>
+    <message>
+        <source>PSBT saved to disk.</source>
+        <translation>PSBT נשמרה לדיסק.</translation>
+    </message>
+    <message>
+        <source> * Sends %1 to %2</source>
+        <translation> * שליחת %1 אל %2</translation>
+    </message>
+    <message>
+        <source>Unable to calculate transaction fee or total transaction amount.</source>
+        <translation>לא מצליח לחשב עמלת עיסקה או הערך הכולל של העיסקה.</translation>
+    </message>
+    <message>
+        <source>Pays transaction fee: </source>
+        <translation>תשלום עמלת עיסקה:</translation>
+    </message>
+    <message>
+        <source>Total Amount</source>
+        <translation>סכום כולל</translation>
+    </message>
+    <message>
+        <source>or</source>
+        <translation>או</translation>
+    </message>
+    <message>
+        <source>Transaction has %1 unsigned inputs.</source>
+        <translation>לעיסקה יש  %1 קלטים לא חתומים.</translation>
+    </message>
+    <message>
+        <source>Transaction is missing some information about inputs.</source>
+        <translation>לעיסקה חסר חלק מהמידע לגבי הקלטים.</translation>
+    </message>
+    <message>
+        <source>Transaction still needs signature(s).</source>
+        <translation>העיסקה עדיין נזקקת לחתימה(ות).</translation>
+    </message>
+    <message>
+        <source>(But this wallet cannot sign 
