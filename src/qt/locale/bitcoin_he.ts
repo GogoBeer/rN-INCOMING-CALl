@@ -387,4 +387,216 @@ Signing is only possible with addresses of the type 'legacy'.</source>
     <message>
         <source>&amp;Receive</source>
         <translation>&amp;קבלה</translation>
-    </me
+    </message>
+    <message>
+        <source>&amp;Show / Hide</source>
+        <translation>ה&amp;צגה / הסתרה</translation>
+    </message>
+    <message>
+        <source>Show or hide the main Window</source>
+        <translation>הצגה או הסתרה של החלון הראשי</translation>
+    </message>
+    <message>
+        <source>Encrypt the private keys that belong to your wallet</source>
+        <translation>הצפנת המפתחות הפרטיים ששייכים לארנק שלך</translation>
+    </message>
+    <message>
+        <source>Sign messages with your Bitcoin addresses to prove you own them</source>
+        <translation>חתום על הודעות עם כתובות הביטקוין שלך כדי להוכיח שהן בבעלותך</translation>
+    </message>
+    <message>
+        <source>Verify messages to ensure they were signed with specified Bitcoin addresses</source>
+        <translation>אמת הודעות כדי להבטיח שהן נחתמו עם כתובת ביטקוין מסוימות</translation>
+    </message>
+    <message>
+        <source>&amp;File</source>
+        <translation>&amp;קובץ</translation>
+    </message>
+    <message>
+        <source>&amp;Settings</source>
+        <translation>&amp;הגדרות</translation>
+    </message>
+    <message>
+        <source>&amp;Help</source>
+        <translation>ע&amp;זרה</translation>
+    </message>
+    <message>
+        <source>Tabs toolbar</source>
+        <translation>סרגל כלים לשוניות</translation>
+    </message>
+    <message>
+        <source>Request payments (generates QR codes and bitcoin: URIs)</source>
+        <translation>בקשת תשלומים (יצירה של קודים מסוג QR וסכימות כתובות משאב של :bitcoin)</translation>
+    </message>
+    <message>
+        <source>Show the list of used sending addresses and labels</source>
+        <translation>הצג את רשימת הכתובות לשליחה שהיו בשימוש לרבות התוויות</translation>
+    </message>
+    <message>
+        <source>Show the list of used receiving addresses and labels</source>
+        <translation>הצגת רשימת הכתובות והתוויות הנמצאות בשימוש</translation>
+    </message>
+    <message>
+        <source>&amp;Command-line options</source>
+        <translation>אפשרויות &amp;שורת הפקודה</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n active connection(s) to Bitcoin network</source>
+        <translation><numerusform>חיבור אחד פעיל לרשת ביטקוין</numerusform><numerusform>%n חיבורים פעילים לרשת ביטקוין</numerusform><numerusform>%n חיבורים פעילים לרשת ביטקוין</numerusform><numerusform>%n חיבורים פעילים לרשת ביטקוין</numerusform></translation>
+    </message>
+    <message>
+        <source>Indexing blocks on disk...</source>
+        <translation>המקטעים על הכונן מסודרים באינדקס…</translation>
+    </message>
+    <message>
+        <source>Processing blocks on disk...</source>
+        <translation>מעבד בלוקים על הדיסק...</translation>
+    </message>
+    <message numerus="yes">
+        <source>Processed %n block(s) of transaction history.</source>
+        <translation><numerusform>%n מקטע של היסטוריית העברות עבר עיבוד</numerusform><numerusform>%n מקטעים של היסטוריית העברות עברו עיבוד</numerusform><numerusform>%n מקטעים של היסטוריית העברות עברו עיבוד</numerusform><numerusform>%n מקטעים של היסטוריית העברות עברו עיבוד</numerusform></translation>
+    </message>
+    <message>
+        <source>%1 behind</source>
+        <translation>%1 מאחור</translation>
+    </message>
+    <message>
+        <source>Last received block was generated %1 ago.</source>
+        <translation>המקטע האחרון שהתקבל נוצר לפני %1.</translation>
+    </message>
+    <message>
+        <source>Transactions after this will not yet be visible.</source>
+        <translation>עסקאות שבוצעו לאחר העברה זו לא יופיעו.</translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation>שגיאה</translation>
+    </message>
+    <message>
+        <source>Warning</source>
+        <translation>אזהרה</translation>
+    </message>
+    <message>
+        <source>Information</source>
+        <translation>מידע</translation>
+    </message>
+    <message>
+        <source>Up to date</source>
+        <translation>עדכני</translation>
+    </message>
+    <message>
+        <source>&amp;Load PSBT from file...</source>
+        <translation>&amp;העלה PSBT מקובץ...</translation>
+    </message>
+    <message>
+        <source>Load Partially Signed Bitcoin Transaction</source>
+        <translation>העלה עיסקת ביטקוין חתומה חלקית</translation>
+    </message>
+    <message>
+        <source>Load PSBT from clipboard...</source>
+        <translation>טעינת PSBT מלוח הגזירים...</translation>
+    </message>
+    <message>
+        <source>Load Partially Signed Bitcoin Transaction from clipboard</source>
+        <translation>טעינת עסקת ביטקוין חתומה חלקית מלוח הגזירים</translation>
+    </message>
+    <message>
+        <source>Node window</source>
+        <translation>חלון צומת</translation>
+    </message>
+    <message>
+        <source>Open node debugging and diagnostic console</source>
+        <translation>פתיחת ניפוי באגים בצומת וגם מסוף בקרה לאבחון</translation>
+    </message>
+    <message>
+        <source>&amp;Sending addresses</source>
+        <translation>&amp;כתובות למשלוח</translation>
+    </message>
+    <message>
+        <source>&amp;Receiving addresses</source>
+        <translation>&amp;כתובות לקבלה</translation>
+    </message>
+    <message>
+        <source>Open a bitcoin: URI</source>
+        <translation>פתיחת ביטקוין: כתובת משאב</translation>
+    </message>
+    <message>
+        <source>Open Wallet</source>
+        <translation>פתיחת ארנק</translation>
+    </message>
+    <message>
+        <source>Open a wallet</source>
+        <translation>פתיחת ארנק</translation>
+    </message>
+    <message>
+        <source>Close Wallet...</source>
+        <translation>סגירת ארנק...</translation>
+    </message>
+    <message>
+        <source>Close wallet</source>
+        <translation>סגירת ארנק</translation>
+    </message>
+    <message>
+        <source>Close All Wallets...</source>
+        <translation>סגירת כל הארנקים...</translation>
+    </message>
+    <message>
+        <source>Close all wallets</source>
+        <translation>סגירת כל הארנקים</translation>
+    </message>
+    <message>
+        <source>Show the %1 help message to get a list with possible Bitcoin command-line options</source>
+        <translation>יש להציג את הודעת העזרה של %1 כדי להציג רשימה עם אפשרויות שורת פקודה לביטקוין</translation>
+    </message>
+    <message>
+        <source>&amp;Mask values</source>
+        <translation>&amp;הסוואת ערכים</translation>
+    </message>
+    <message>
+        <source>Mask the values in the Overview tab</source>
+        <translation>הסווה את הערכים בלשונית התיאור הכללי
+</translation>
+    </message>
+    <message>
+        <source>default wallet</source>
+        <translation>ארנק בררת מחדל</translation>
+    </message>
+    <message>
+        <source>No wallets available</source>
+        <translation>אין ארנקים זמינים</translation>
+    </message>
+    <message>
+        <source>&amp;Window</source>
+        <translation>&amp;חלון</translation>
+    </message>
+    <message>
+        <source>Minimize</source>
+        <translation>מזעור</translation>
+    </message>
+    <message>
+        <source>Zoom</source>
+        <translation>הגדלה</translation>
+    </message>
+    <message>
+        <source>Main Window</source>
+        <translation>חלון עיקרי</translation>
+    </message>
+    <message>
+        <source>%1 client</source>
+        <translation>לקוח %1</translation>
+    </message>
+    <message>
+        <source>Connecting to peers...</source>
+        <translation>מתבצעת התחברות לעמיתים…</translation>
+    </message>
+    <message>
+        <source>Catching up...</source>
+        <translation>מתבצע עדכון…</translation>
+    </message>
+    <message>
+        <source>Error: %1</source>
+        <translation>שגיאה: %1</translation>
+    </message>
+    <message>
+        <source>Date: %1
+<
