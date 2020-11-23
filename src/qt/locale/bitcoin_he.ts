@@ -599,4 +599,257 @@ Signing is only possible with addresses of the type 'legacy'.</source>
     </message>
     <message>
         <source>Date: %1
-<
+</source>
+        <translation>תאריך: %1
+</translation>
+    </message>
+    <message>
+        <source>Amount: %1
+</source>
+        <translation>סכום: %1
+</translation>
+    </message>
+    <message>
+        <source>Wallet: %1
+</source>
+        <translation>ארנק: %1
+</translation>
+    </message>
+    <message>
+        <source>Type: %1
+</source>
+        <translation>סוג: %1
+</translation>
+    </message>
+    <message>
+        <source>Label: %1
+</source>
+        <translation>תווית: %1
+</translation>
+    </message>
+    <message>
+        <source>Address: %1
+</source>
+        <translation>כתובת: %1
+</translation>
+    </message>
+    <message>
+        <source>Sent transaction</source>
+        <translation>העברת שליחה</translation>
+    </message>
+    <message>
+        <source>Incoming transaction</source>
+        <translation>העברת קבלה</translation>
+    </message>
+    <message>
+        <source>HD key generation is &lt;b&gt;enabled&lt;/b&gt;</source>
+        <translation>ייצור מפתחות HD &lt;b&gt;מופעל&lt;/b&gt;</translation>
+    </message>
+    <message>
+        <source>HD key generation is &lt;b&gt;disabled&lt;/b&gt;</source>
+        <translation>ייצור מפתחות HD &lt;b&gt;כבוי&lt;/b&gt;</translation>
+    </message>
+    <message>
+        <source>Private key &lt;b&gt;disabled&lt;/b&gt;</source>
+        <translation>מפתח פרטי &lt;b&gt;נוטרל&lt;/b&gt;</translation>
+    </message>
+    <message>
+        <source>Wallet is &lt;b&gt;encrypted&lt;/b&gt; and currently &lt;b&gt;unlocked&lt;/b&gt;</source>
+        <translation>הארנק &lt;b&gt;מוצפן&lt;/b&gt; ו&lt;b&gt;פתוח&lt;/b&gt; כרגע</translation>
+    </message>
+    <message>
+        <source>Wallet is &lt;b&gt;encrypted&lt;/b&gt; and currently &lt;b&gt;locked&lt;/b&gt;</source>
+        <translation>הארנק &lt;b&gt;מוצפן&lt;/b&gt; ו&lt;b&gt;נעול&lt;/b&gt; כרגע</translation>
+    </message>
+    <message>
+        <source>Original message:</source>
+        <translation>הודעה מקורית:</translation>
+    </message>
+    <message>
+        <source>A fatal error occurred. %1 can no longer continue safely and will quit.</source>
+        <translation>אירעה שגיאה חמורה, %1 לא יכול להמשיך בבטחון ולכן יופסק.</translation>
+    </message>
+</context>
+<context>
+    <name>CoinControlDialog</name>
+    <message>
+        <source>Coin Selection</source>
+        <translation>בחירת מטבע</translation>
+    </message>
+    <message>
+        <source>Quantity:</source>
+        <translation>כמות:</translation>
+    </message>
+    <message>
+        <source>Bytes:</source>
+        <translation>בתים:</translation>
+    </message>
+    <message>
+        <source>Amount:</source>
+        <translation>סכום:</translation>
+    </message>
+    <message>
+        <source>Fee:</source>
+        <translation>עמלה:</translation>
+    </message>
+    <message>
+        <source>Dust:</source>
+        <translation>אבק:</translation>
+    </message>
+    <message>
+        <source>After Fee:</source>
+        <translation>לאחר עמלה:</translation>
+    </message>
+    <message>
+        <source>Change:</source>
+        <translation>עודף:</translation>
+    </message>
+    <message>
+        <source>(un)select all</source>
+        <translation>ביטול/אישור הבחירה</translation>
+    </message>
+    <message>
+        <source>Tree mode</source>
+        <translation>מצב עץ</translation>
+    </message>
+    <message>
+        <source>List mode</source>
+        <translation>מצב רשימה</translation>
+    </message>
+    <message>
+        <source>Amount</source>
+        <translation>סכום</translation>
+    </message>
+    <message>
+        <source>Received with label</source>
+        <translation>התקבל עם תווית</translation>
+    </message>
+    <message>
+        <source>Received with address</source>
+        <translation>התקבל עם כתובת</translation>
+    </message>
+    <message>
+        <source>Date</source>
+        <translation>תאריך</translation>
+    </message>
+    <message>
+        <source>Confirmations</source>
+        <translation>אישורים</translation>
+    </message>
+    <message>
+        <source>Confirmed</source>
+        <translation>מאושר</translation>
+    </message>
+    <message>
+        <source>Copy address</source>
+        <translation>העתקת הכתובת</translation>
+    </message>
+    <message>
+        <source>Copy label</source>
+        <translation>העתקת התווית</translation>
+    </message>
+    <message>
+        <source>Copy amount</source>
+        <translation>העתקת הסכום</translation>
+    </message>
+    <message>
+        <source>Copy transaction ID</source>
+        <translation>העתקת מזהה העסקה</translation>
+    </message>
+    <message>
+        <source>Lock unspent</source>
+        <translation>נעילת יתרה</translation>
+    </message>
+    <message>
+        <source>Unlock unspent</source>
+        <translation>פתיחת יתרה</translation>
+    </message>
+    <message>
+        <source>Copy quantity</source>
+        <translation>העתקת הכמות</translation>
+    </message>
+    <message>
+        <source>Copy fee</source>
+        <translation>העתקת העמלה</translation>
+    </message>
+    <message>
+        <source>Copy after fee</source>
+        <translation>העתקה אחרי העמלה</translation>
+    </message>
+    <message>
+        <source>Copy bytes</source>
+        <translation>העתקת בתים</translation>
+    </message>
+    <message>
+        <source>Copy dust</source>
+        <translation>העתקת אבק</translation>
+    </message>
+    <message>
+        <source>Copy change</source>
+        <translation>העתקת השינוי</translation>
+    </message>
+    <message>
+        <source>(%1 locked)</source>
+        <translation>(%1 נעולים)</translation>
+    </message>
+    <message>
+        <source>yes</source>
+        <translation>כן</translation>
+    </message>
+    <message>
+        <source>no</source>
+        <translation>לא</translation>
+    </message>
+    <message>
+        <source>This label turns red if any recipient receives an amount smaller than the current dust threshold.</source>
+        <translation>תווית זו הופכת לאדומה אם מישהו מהנמענים מקבל סכום נמוך יותר מסף האבק הנוכחי.</translation>
+    </message>
+    <message>
+        <source>Can vary +/- %1 satoshi(s) per input.</source>
+        <translation>יכול להשתנות במגמה של +/- %1 סנטושי לקלט.</translation>
+    </message>
+    <message>
+        <source>(no label)</source>
+        <translation>(ללא תווית)</translation>
+    </message>
+    <message>
+        <source>change from %1 (%2)</source>
+        <translation>עודף מ־%1 (%2)</translation>
+    </message>
+    <message>
+        <source>(change)</source>
+        <translation>(עודף)</translation>
+    </message>
+</context>
+<context>
+    <name>CreateWalletActivity</name>
+    <message>
+        <source>Create wallet failed</source>
+        <translation>יצירת הארנק נכשלה</translation>
+    </message>
+    <message>
+        <source>Create wallet warning</source>
+        <translation>אזהרה לגבי יצירת הארנק</translation>
+    </message>
+</context>
+<context>
+    <name>CreateWalletDialog</name>
+    <message>
+        <source>Create Wallet</source>
+        <translation>יצירת ארנק</translation>
+    </message>
+    <message>
+        <source>Wallet Name</source>
+        <translation>שם הארנק</translation>
+    </message>
+    <message>
+        <source>Encrypt the wallet. The wallet will be encrypted with a passphrase of your choice.</source>
+        <translation>הצפן את הארנק. הארנק יהיה מוצפן באמצעות סיסמא לבחירתך.</translation>
+    </message>
+    <message>
+        <source>Encrypt Wallet</source>
+        <translation>הצפנת ארנק</translation>
+    </message>
+    <message>
+        <source>Disable private keys for this wallet. Wallets with private keys disabled will have no private keys and cannot have an HD seed or imported private keys. This is ideal for watch-only wallets.</source>
+        <translation>נטרלו מפתחות פרטיים לארנק זה. ארנקים עם מפתחות פרטיים מנוטרלים יהיו מחוסרי מפתחות פרטי
