@@ -2068,4 +2068,204 @@ Signing is only possible with addresses of the type 'legacy'.</source>
         <translation>ש&amp;בוע אחד</translation>
     </message>
     <message>
-        <source
+        <source>1 &amp;year</source>
+        <translation>ש&amp;נה אחת</translation>
+    </message>
+    <message>
+        <source>&amp;Disconnect</source>
+        <translation>&amp;ניתוק</translation>
+    </message>
+    <message>
+        <source>Ban for</source>
+        <translation>חסימה למשך</translation>
+    </message>
+    <message>
+        <source>&amp;Unban</source>
+        <translation>&amp;שחרור חסימה</translation>
+    </message>
+    <message>
+        <source>Welcome to the %1 RPC console.</source>
+        <translation>ברוך בואך למסוף ה־RPC של %1.</translation>
+    </message>
+    <message>
+        <source>Use up and down arrows to navigate history, and %1 to clear screen.</source>
+        <translation>יש להשתמש בחצים למעלה ומלטה כדי לנווט בהסיטוריה וב־%1 כדי לנקות את המסך.</translation>
+    </message>
+    <message>
+        <source>Type %1 for an overview of available commands.</source>
+        <translation>הקלידו %1 לקבלת סקירה של הפקודות הזמינות.</translation>
+    </message>
+    <message>
+        <source>For more information on using this console type %1.</source>
+        <translation>למידע נוסף על שימוש במסוף בקרה מסוג זה %1.</translation>
+    </message>
+    <message>
+        <source>WARNING: Scammers have been active, telling users to type commands here, stealing their wallet contents. Do not use this console without fully understanding the ramifications of a command.</source>
+        <translation>אזהרה! ישנם רמאים הנוהגים לשכנע משתמשים להקליד פקודות כאן ועל ידי כך לגנוב את תכולת הארנק שלהם. אל תשתמש במסוף הבקרה מבלי שאתה מבין באופן מלא את המשמעות של הפקודה!</translation>
+    </message>
+    <message>
+        <source>Network activity disabled</source>
+        <translation>פעילות הרשת נוטרלה</translation>
+    </message>
+    <message>
+        <source>Executing command without any wallet</source>
+        <translation>מבצע פקודה ללא כל ארנק</translation>
+    </message>
+    <message>
+        <source>Executing command using "%1" wallet</source>
+        <translation>מבצע פקודה באמצעות ארנק "%1" </translation>
+    </message>
+    <message>
+        <source>(node id: %1)</source>
+        <translation>(מזהה צומת: %1)</translation>
+    </message>
+    <message>
+        <source>via %1</source>
+        <translation>דרך %1</translation>
+    </message>
+    <message>
+        <source>never</source>
+        <translation>לעולם לא</translation>
+    </message>
+    <message>
+        <source>Inbound</source>
+        <translation>תעבורה נכנסת</translation>
+    </message>
+    <message>
+        <source>Outbound</source>
+        <translation>תעבורה יוצאת</translation>
+    </message>
+    <message>
+        <source>Unknown</source>
+        <translation>לא ידוע</translation>
+    </message>
+</context>
+<context>
+    <name>ReceiveCoinsDialog</name>
+    <message>
+        <source>&amp;Amount:</source>
+        <translation>&amp;סכום:</translation>
+    </message>
+    <message>
+        <source>&amp;Label:</source>
+        <translation>ת&amp;ווית:</translation>
+    </message>
+    <message>
+        <source>&amp;Message:</source>
+        <translation>הו&amp;דעה:</translation>
+    </message>
+    <message>
+        <source>An optional message to attach to the payment request, which will be displayed when the request is opened. Note: The message will not be sent with the payment over the Bitcoin network.</source>
+        <translation>הודעת רשות לצירוף לבקשת התשלום שתוצג בעת פתיחת הבקשה. לתשומת לבך: ההודעה לא תישלח עם התשלום ברשת ביטקוין.</translation>
+    </message>
+    <message>
+        <source>An optional label to associate with the new receiving address.</source>
+        <translation>תווית רשות לשיוך עם כתובת הקבלה החדשה.</translation>
+    </message>
+    <message>
+        <source>Use this form to request payments. All fields are &lt;b&gt;optional&lt;/b&gt;.</source>
+        <translation>יש להשתמש בטופס זה כדי לבקש תשלומים. כל השדות הם בגדר &lt;b&gt;רשות&lt;/b&gt;.</translation>
+    </message>
+    <message>
+        <source>An optional amount to request. Leave this empty or zero to not request a specific amount.</source>
+        <translation>סכום כרשות לבקשה. ניתן להשאיר זאת ריק כדי לא לבקש סכום מסוים.</translation>
+    </message>
+    <message>
+        <source>An optional label to associate with the new receiving address (used by you to identify an invoice).  It is also attached to the payment request.</source>
+        <translation>תווית אופצינלית לצירוף לכתובת קבלה חדשה (לשימושך לזיהוי חשבונות). היא גם מצורפת לבקשת התשלום.</translation>
+    </message>
+    <message>
+        <source>An optional message that is attached to the payment request and may be displayed to the sender.</source>
+        <translation>הודעה אוצפציונלית מצורפת לבקשת התשלום אשר ניתן להציגה לשולח.</translation>
+    </message>
+    <message>
+        <source>&amp;Create new receiving address</source>
+        <translation>&amp;יצירת כתובת קבלה חדשה</translation>
+    </message>
+    <message>
+        <source>Clear all fields of the form.</source>
+        <translation>ניקוי של כל השדות בטופס.</translation>
+    </message>
+    <message>
+        <source>Clear</source>
+        <translation>ניקוי</translation>
+    </message>
+    <message>
+        <source>Native segwit addresses (aka Bech32 or BIP-173) reduce your transaction fees later on and offer better protection against typos, but old wallets don't support them. When unchecked, an address compatible with older wallets will be created instead.</source>
+        <translation>כתובות segwit טבעיות (כלומר Bech32 או BIP-173) מפחיתות את עמלת העסקה שלכם בהמשך ומציעות הגנה נגד שגיאות כתיב, אך ארנקים ישנים לא תומכים בהן. אם לא סומן, כתובת תאימה לארנקים ישנים תיווצר במקום.</translation>
+    </message>
+    <message>
+        <source>Generate native segwit (Bech32) address</source>
+        <translation>הפקת כתובת segwit טבעית (Bech32)</translation>
+    </message>
+    <message>
+        <source>Requested payments history</source>
+        <translation>היסטוריית בקשות תשלום</translation>
+    </message>
+    <message>
+        <source>Show the selected request (does the same as double clicking an entry)</source>
+        <translation>הצגת בקשות נבחרות (דומה ללחיצה כפולה על רשומה)</translation>
+    </message>
+    <message>
+        <source>Show</source>
+        <translation>הצגה</translation>
+    </message>
+    <message>
+        <source>Remove the selected entries from the list</source>
+        <translation>הסרת הרשומות הנבחרות מהרשימה</translation>
+    </message>
+    <message>
+        <source>Remove</source>
+        <translation>הסרה</translation>
+    </message>
+    <message>
+        <source>Copy URI</source>
+        <translation>העתקת כתובת</translation>
+    </message>
+    <message>
+        <source>Copy label</source>
+        <translation>העתקת התווית</translation>
+    </message>
+    <message>
+        <source>Copy message</source>
+        <translation>העתקת הודעה</translation>
+    </message>
+    <message>
+        <source>Copy amount</source>
+        <translation>העתקת הסכום</translation>
+    </message>
+    <message>
+        <source>Could not unlock wallet.</source>
+        <translation>לא ניתן לשחרר את הארנק.</translation>
+    </message>
+    <message>
+        <source>Could not generate new %1 address</source>
+        <translation>לא ניתן לייצר כתובת %1 חדשה</translation>
+    </message>
+</context>
+<context>
+    <name>ReceiveRequestDialog</name>
+    <message>
+        <source>Request payment to ...</source>
+        <translation>בקשת תשלום לטובת…</translation>
+    </message>
+    <message>
+        <source>Address:</source>
+        <translation>כתובת:</translation>
+    </message>
+    <message>
+        <source>Amount:</source>
+        <translation>סכום:</translation>
+    </message>
+    <message>
+        <source>Label:</source>
+        <translation>תוית:</translation>
+    </message>
+    <message>
+        <source>Message:</source>
+        <translation>הודעה:</translation>
+    </message>
+    <message>
+        <source>Wallet:</source>
+        <translation>ארנק:</translation>
+    </me
