@@ -2671,4 +2671,182 @@ Note:  Since the fee is calculated on a per-byte basis, a fee of "100 satoshis p
         <translation>ת&amp;ווית:</translation>
     </message>
     <message>
-        <source>Choose previously used address
+        <source>Choose previously used address</source>
+        <translation>בחירת כתובת שהייתה בשימוש</translation>
+    </message>
+    <message>
+        <source>The Bitcoin address to send the payment to</source>
+        <translation>כתובת הביטקוין של המוטב</translation>
+    </message>
+    <message>
+        <source>Alt+A</source>
+        <translation>Alt+A</translation>
+    </message>
+    <message>
+        <source>Paste address from clipboard</source>
+        <translation>הדבקת כתובת מלוח הגזירים</translation>
+    </message>
+    <message>
+        <source>Alt+P</source>
+        <translation>Alt+P</translation>
+    </message>
+    <message>
+        <source>Remove this entry</source>
+        <translation>הסרת רשומה זו</translation>
+    </message>
+    <message>
+        <source>The amount to send in the selected unit</source>
+        <translation>הסכום לשליחה במטבע הנבחר</translation>
+    </message>
+    <message>
+        <source>The fee will be deducted from the amount being sent. The recipient will receive less bitcoins than you enter in the amount field. If multiple recipients are selected, the fee is split equally.</source>
+        <translation>העמלה תנוכה מהסכום שנשלח. הנמען יקבל פחות ביטקוינים ממה שהזנת בשדה הסכום. אם נבחרו מספר נמענים, העמלה תחולק באופן שווה.</translation>
+    </message>
+    <message>
+        <source>S&amp;ubtract fee from amount</source>
+        <translation>ה&amp;חסרת העמלה מהסכום</translation>
+    </message>
+    <message>
+        <source>Use available balance</source>
+        <translation>השתמש בכלל היתרה</translation>
+    </message>
+    <message>
+        <source>Message:</source>
+        <translation>הודעה:</translation>
+    </message>
+    <message>
+        <source>This is an unauthenticated payment request.</source>
+        <translation>זוהי בקשת תשלום לא מאומתת.</translation>
+    </message>
+    <message>
+        <source>This is an authenticated payment request.</source>
+        <translation>זוהי בקשה מאומתת לתשלום.</translation>
+    </message>
+    <message>
+        <source>Enter a label for this address to add it to the list of used addresses</source>
+        <translation>יש להזין תווית עבור כתובת זו כדי להוסיף אותה לרשימת הכתובות בשימוש</translation>
+    </message>
+    <message>
+        <source>A message that was attached to the bitcoin: URI which will be stored with the transaction for your reference. Note: This message will not be sent over the Bitcoin network.</source>
+        <translation>הודעה שצורפה לביטקוין: כתובת שתאוחסן בהעברה לצורך מעקב מצדך. לתשומת לבך: הודעה זו לא תישלח ברשת הביטקוין.</translation>
+    </message>
+    <message>
+        <source>Pay To:</source>
+        <translation>תשלום לטובת:</translation>
+    </message>
+    <message>
+        <source>Memo:</source>
+        <translation>תזכורת:</translation>
+    </message>
+</context>
+<context>
+    <name>ShutdownWindow</name>
+    <message>
+        <source>%1 is shutting down...</source>
+        <translation>%1 בתהליך כיבוי...</translation>
+    </message>
+    <message>
+        <source>Do not shut down the computer until this window disappears.</source>
+        <translation>אין לכבות את המחשב עד שחלון זה נעלם.</translation>
+    </message>
+</context>
+<context>
+    <name>SignVerifyMessageDialog</name>
+    <message>
+        <source>Signatures - Sign / Verify a Message</source>
+        <translation>חתימות - חתימה או אימות של הודעה</translation>
+    </message>
+    <message>
+        <source>&amp;Sign Message</source>
+        <translation>חתימה על הו&amp;דעה</translation>
+    </message>
+    <message>
+        <source>You can sign messages/agreements with your addresses to prove you can receive bitcoins sent to them. Be careful not to sign anything vague or random, as phishing attacks may try to trick you into signing your identity over to them. Only sign fully-detailed statements you agree to.</source>
+        <translation>באפשרותך לחתום על הודעות/הסכמים באמצעות הכתובות שלך, כדי להוכיח שאתה יכול לקבל את הביטקוינים הנשלחים אליהן. היזהר לא לחתום על תוכן עמום או אקראי, מכיוון שתקיפות פישינג עשויות לנסות לגנוב את הזהות שלך. חתום רק על הצהרות מפורטות שאתה מסכים להן.</translation>
+    </message>
+    <message>
+        <source>The Bitcoin address to sign the message with</source>
+        <translation>כתובת הביטקוין אתה לחתום אתה את ההודעה</translation>
+    </message>
+    <message>
+        <source>Choose previously used address</source>
+        <translation>בחירת כתובת שהייתה בשימוש</translation>
+    </message>
+    <message>
+        <source>Alt+A</source>
+        <translation>Alt+A</translation>
+    </message>
+    <message>
+        <source>Paste address from clipboard</source>
+        <translation>הדבקת כתובת מלוח הגזירים</translation>
+    </message>
+    <message>
+        <source>Alt+P</source>
+        <translation>Alt+P</translation>
+    </message>
+    <message>
+        <source>Enter the message you want to sign here</source>
+        <translation>יש להוסיף כאן את ההודעה עליה לחתום</translation>
+    </message>
+    <message>
+        <source>Signature</source>
+        <translation>חתימה</translation>
+    </message>
+    <message>
+        <source>Copy the current signature to the system clipboard</source>
+        <translation>העתקת החתימה הנוכחית ללוח הגזירים</translation>
+    </message>
+    <message>
+        <source>Sign the message to prove you own this Bitcoin address</source>
+        <translation>ניתן לחתום על ההודעה כדי להוכיח שכתובת ביטקוין זו בבעלותך</translation>
+    </message>
+    <message>
+        <source>Sign &amp;Message</source>
+        <translation>&amp;חתימה על הודעה</translation>
+    </message>
+    <message>
+        <source>Reset all sign message fields</source>
+        <translation>איפוס כל שדות החתימה על הודעה</translation>
+    </message>
+    <message>
+        <source>Clear &amp;All</source>
+        <translation>&amp;ניקוי הכול</translation>
+    </message>
+    <message>
+        <source>&amp;Verify Message</source>
+        <translation>&amp;אימות הודעה</translation>
+    </message>
+    <message>
+        <source>Enter the receiver's address, message (ensure you copy line breaks, spaces, tabs, etc. exactly) and signature below to verify the message. Be careful not to read more into the signature than what is in the signed message itself, to avoid being tricked by a man-in-the-middle attack. Note that this only proves the signing party receives with the address, it cannot prove sendership of any transaction!</source>
+        <translation>יש להזין את כתובת הנמען, ההודעה (נא לוודא שמעתיקים במדויק את תווי קפיצות השורה, רווחים, טאבים וכדומה). והחותימה מתחת אשר מאמתת את ההודעה. יש להזהר שלא לקרוא לתוך החתימה יותר מאשר בהודעה החתומה עצמה, כדי להמנע מניצול לרעה של המתווך שבדרך. יש לשים לב שהדגר רק מוכיח שהצד החותם מקבל עם הכתובת. הדבר אינו מוכיח משלוח כלשהו של עיסקה!</translation>
+    </message>
+    <message>
+        <source>The Bitcoin address the message was signed with</source>
+        <translation>כתובת הביטקוין שאתה נחתמה ההודעה</translation>
+    </message>
+    <message>
+        <source>The signed message to verify</source>
+        <translation>ההודעה החתומה לאימות</translation>
+    </message>
+    <message>
+        <source>The signature given when the message was signed</source>
+        <translation>החתימה שניתנת כאשר ההודעה נחתמה</translation>
+    </message>
+    <message>
+        <source>Verify the message to ensure it was signed with the specified Bitcoin address</source>
+        <translation>ניתן לאמת את ההודעה כדי להבטיח שהיא נחתמה עם כתובת הביטקוין הנתונה</translation>
+    </message>
+    <message>
+        <source>Verify &amp;Message</source>
+        <translation>&amp;אימות הודעה</translation>
+    </message>
+    <message>
+        <source>Reset all verify message fields</source>
+        <translation>איפוס כל שדות אימות ההודעה</translation>
+    </message>
+    <message>
+        <source>Click "Sign Message" to generate signature</source>
+        <translation>יש ללחוץ על „חתימת ההודעה“ כדי לייצר חתימה</translation>
+    </message>
+    <message>
+        <sour
