@@ -2268,4 +2268,205 @@ Signing is only possible with addresses of the type 'legacy'.</source>
     <message>
         <source>Wallet:</source>
         <translation>ארנק:</translation>
-    </me
+    </message>
+    <message>
+        <source>Copy &amp;URI</source>
+        <translation>העתקת &amp;כתובת משאב</translation>
+    </message>
+    <message>
+        <source>Copy &amp;Address</source>
+        <translation>העתקת &amp;כתובת</translation>
+    </message>
+    <message>
+        <source>&amp;Save Image...</source>
+        <translation>&amp;שמירת תמונה…</translation>
+    </message>
+    <message>
+        <source>Request payment to %1</source>
+        <translation>בקשת תשלום אל %1</translation>
+    </message>
+    <message>
+        <source>Payment information</source>
+        <translation>פרטי תשלום</translation>
+    </message>
+</context>
+<context>
+    <name>RecentRequestsTableModel</name>
+    <message>
+        <source>Date</source>
+        <translation>תאריך</translation>
+    </message>
+    <message>
+        <source>Label</source>
+        <translation>תוית</translation>
+    </message>
+    <message>
+        <source>Message</source>
+        <translation>הודעה</translation>
+    </message>
+    <message>
+        <source>(no label)</source>
+        <translation>(ללא תוית)</translation>
+    </message>
+    <message>
+        <source>(no message)</source>
+        <translation>(אין הודעה)</translation>
+    </message>
+    <message>
+        <source>(no amount requested)</source>
+        <translation>(לא התבקש סכום)</translation>
+    </message>
+    <message>
+        <source>Requested</source>
+        <translation>בקשה</translation>
+    </message>
+</context>
+<context>
+    <name>SendCoinsDialog</name>
+    <message>
+        <source>Send Coins</source>
+        <translation>שליחת מטבעות</translation>
+    </message>
+    <message>
+        <source>Coin Control Features</source>
+        <translation>תכונות בקרת מטבעות</translation>
+    </message>
+    <message>
+        <source>Inputs...</source>
+        <translation>קלט...</translation>
+    </message>
+    <message>
+        <source>automatically selected</source>
+        <translation>בבחירה אוטומטית</translation>
+    </message>
+    <message>
+        <source>Insufficient funds!</source>
+        <translation>אין מספיק כספים!</translation>
+    </message>
+    <message>
+        <source>Quantity:</source>
+        <translation>כמות:</translation>
+    </message>
+    <message>
+        <source>Bytes:</source>
+        <translation>בתים:</translation>
+    </message>
+    <message>
+        <source>Amount:</source>
+        <translation>סכום:</translation>
+    </message>
+    <message>
+        <source>Fee:</source>
+        <translation>עמלה:</translation>
+    </message>
+    <message>
+        <source>After Fee:</source>
+        <translation>לאחר עמלה:</translation>
+    </message>
+    <message>
+        <source>Change:</source>
+        <translation>עודף:</translation>
+    </message>
+    <message>
+        <source>If this is activated, but the change address is empty or invalid, change will be sent to a newly generated address.</source>
+        <translation>אם אפשרות זו מופעלת אך כתובת העודף ריקה או שגויה, העודף יישלח לכתובת חדשה שתיווצר.</translation>
+    </message>
+    <message>
+        <source>Custom change address</source>
+        <translation>כתובת לעודף מותאמת אישית</translation>
+    </message>
+    <message>
+        <source>Transaction Fee:</source>
+        <translation>עמלת העברה:</translation>
+    </message>
+    <message>
+        <source>Choose...</source>
+        <translation>בחר...</translation>
+    </message>
+    <message>
+        <source>Using the fallbackfee can result in sending a transaction that will take several hours or days (or never) to confirm. Consider choosing your fee manually or wait until you have validated the complete chain.</source>
+        <translation>שימוש בעמלת בררת המחדל עלול לגרום לשליחת עסקה שתכלל בבלוק עוד מספר שעות או ימים (או לעולם לא). נא שקלו בחירה ידנית של העמלה או המתינו לאימות מלא של הבלוקצ'יין.</translation>
+    </message>
+    <message>
+        <source>Warning: Fee estimation is currently not possible.</source>
+        <translation>אזהרה: שערוך העמלה לא אפשרי כעת.</translation>
+    </message>
+    <message>
+        <source>Specify a custom fee per kB (1,000 bytes) of the transaction's virtual size.
+
+Note:  Since the fee is calculated on a per-byte basis, a fee of "100 satoshis per kB" for a transaction size of 500 bytes (half of 1 kB) would ultimately yield a fee of only 50 satoshis.</source>
+        <translation>ציינו עמלה מותאמת אישית פר קילובייט (1000 בתים) של הגודל הוירטואלי של העסקה.
+
+לתשומת לבכם: מאחר והעמלה מחושבת על בסיס פר-בית, עמלה של "100 סטושי פר קילובייט" עבור עסקה בגודל 500 בתים (חצי קילובייט) תפיק בסופו של דבר עמלה של 50 סטושי בלבד.</translation>
+    </message>
+    <message>
+        <source>per kilobyte</source>
+        <translation>עבור קילו-בית</translation>
+    </message>
+    <message>
+        <source>Hide</source>
+        <translation>הסתר</translation>
+    </message>
+    <message>
+        <source>Recommended:</source>
+        <translation>מומלץ:</translation>
+    </message>
+    <message>
+        <source>Custom:</source>
+        <translation>מותאם אישית:</translation>
+    </message>
+    <message>
+        <source>(Smart fee not initialized yet. This usually takes a few blocks...)</source>
+        <translation>(שירות עמלה חכמה לא אותחל עדיין. יש להמתין מספר בלוקים...)</translation>
+    </message>
+    <message>
+        <source>Send to multiple recipients at once</source>
+        <translation>שליחה למספר מוטבים בו־זמנית</translation>
+    </message>
+    <message>
+        <source>Add &amp;Recipient</source>
+        <translation>הוספת &amp;מוטב</translation>
+    </message>
+    <message>
+        <source>Clear all fields of the form.</source>
+        <translation>ניקוי של כל השדות בטופס.</translation>
+    </message>
+    <message>
+        <source>Dust:</source>
+        <translation>אבק:</translation>
+    </message>
+    <message>
+        <source>Hide transaction fee settings</source>
+        <translation>הסתרת הגדרות עמלת עסקה</translation>
+    </message>
+    <message>
+        <source>When there is less transaction volume than space in the blocks, miners as well as relaying nodes may enforce a minimum fee. Paying only this minimum fee is just fine, but be aware that this can result in a never confirming transaction once there is more demand for bitcoin transactions than the network can process.</source>
+        <translation>כאשר יש פחות נפח עסקאות מאשר מקום בבלוק, כורים וכן צמתות מקשרות יכולות להכתיב עמלות מינימום. התשלום של עמלת מינימום הנו תקין, אך יש לקחת בחשבון שהדבר יכול לגרום לעסקה שלא תאושר ברגע שיש יותר ביקוש לעסקאות ביטקוין מאשר הרשת יכולה לעבד.</translation>
+    </message>
+    <message>
+        <source>A too low fee might result in a never confirming transaction (read the tooltip)</source>
+        <translation>עמלה נמוכה מדי עלולה לגרום לכך שהעסקה לעולם לא תאושר (ניתן לקרוא על כך ב tooltip)</translation>
+    </message>
+    <message>
+        <source>Confirmation time target:</source>
+        <translation>זמן לקבלת אישור:</translation>
+    </message>
+    <message>
+        <source>Enable Replace-By-Fee</source>
+        <translation>אפשר ״החלפה-על ידי עמלה״</translation>
+    </message>
+    <message>
+        <source>With Replace-By-Fee (BIP-125) you can increase a transaction's fee after it is sent. Without this, a higher fee may be recommended to compensate for increased transaction delay risk.</source>
+        <translation>באמצעות עמלה-ניתנת-לשינוי (BIP-125) תוכלו להגדיל עמלת עסקה גם לאחר שליחתה. ללא אפשרות זו, עמלה גבוהה יותר יכולה להיות מומלצת כדי להקטין את הסיכון בעיכוב אישור העסקה.</translation>
+    </message>
+    <message>
+        <source>Clear &amp;All</source>
+        <translation>&amp;ניקוי הכול</translation>
+    </message>
+    <message>
+        <source>Balance:</source>
+        <translation>מאזן:</translation>
+    </message>
+    <message>
+        <source>Confirm the send action</source>
+        <translation>אישור פעולת הש
