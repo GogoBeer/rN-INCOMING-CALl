@@ -2469,4 +2469,206 @@ Note:  Since the fee is calculated on a per-byte basis, a fee of "100 satoshis p
     </message>
     <message>
         <source>Confirm the send action</source>
-        <translation>אישור פעולת הש
+        <translation>אישור פעולת השליחה</translation>
+    </message>
+    <message>
+        <source>S&amp;end</source>
+        <translation>&amp;שליחה</translation>
+    </message>
+    <message>
+        <source>Copy quantity</source>
+        <translation>העתקת הכמות</translation>
+    </message>
+    <message>
+        <source>Copy amount</source>
+        <translation>העתקת הסכום</translation>
+    </message>
+    <message>
+        <source>Copy fee</source>
+        <translation>העתקת העמלה</translation>
+    </message>
+    <message>
+        <source>Copy after fee</source>
+        <translation>העתקה אחרי העמלה</translation>
+    </message>
+    <message>
+        <source>Copy bytes</source>
+        <translation>העתקת בתים</translation>
+    </message>
+    <message>
+        <source>Copy dust</source>
+        <translation>העתקת אבק</translation>
+    </message>
+    <message>
+        <source>Copy change</source>
+        <translation>העתקת השינוי</translation>
+    </message>
+    <message>
+        <source>%1 (%2 blocks)</source>
+        <translation>%1 (%2 בלוקים)</translation>
+    </message>
+    <message>
+        <source>Cr&amp;eate Unsigned</source>
+        <translation>י&amp;צירת לא חתומה</translation>
+    </message>
+    <message>
+        <source>Creates a Partially Signed Bitcoin Transaction (PSBT) for use with e.g. an offline %1 wallet, or a PSBT-compatible hardware wallet.</source>
+        <translation>יוצר עסקת ביטקוין חתומה חלקית (PSBT) לשימוש עם ארנק %1 לא מחובר למשל, או עם PSBT ארנק חומרה תואם.</translation>
+    </message>
+    <message>
+        <source> from wallet '%1'</source>
+        <translation>מתוך ארנק '%1'</translation>
+    </message>
+    <message>
+        <source>%1 to '%2'</source>
+        <translation>%1 אל '%2'</translation>
+    </message>
+    <message>
+        <source>%1 to %2</source>
+        <translation>%1 ל %2</translation>
+    </message>
+    <message>
+        <source>Do you want to draft this transaction?</source>
+        <translation>האם ברצונך לשמור עסקה זו כטיוטה?</translation>
+    </message>
+    <message>
+        <source>Are you sure you want to send?</source>
+        <translation>לשלוח?</translation>
+    </message>
+    <message>
+        <source>Create Unsigned</source>
+        <translation>יצירת לא חתומה</translation>
+    </message>
+    <message>
+        <source>Save Transaction Data</source>
+        <translation>שמירת נתוני העיסקה</translation>
+    </message>
+    <message>
+        <source>Partially Signed Transaction (Binary) (*.psbt)</source>
+        <translation>עיסקה חתומה חלקית (בינארי) (*.psbt)</translation>
+    </message>
+    <message>
+        <source>PSBT saved</source>
+        <translation>PSBT נשמרה</translation>
+    </message>
+    <message>
+        <source>or</source>
+        <translation>או</translation>
+    </message>
+    <message>
+        <source>You can increase the fee later (signals Replace-By-Fee, BIP-125).</source>
+        <translation>תוכלו להגדיל את העמלה מאוחר יותר (איתות Replace-By-Fee, BIP-125).</translation>
+    </message>
+    <message>
+        <source>Please, review your transaction proposal. This will produce a Partially Signed Bitcoin Transaction (PSBT) which you can save or copy and then sign with e.g. an offline %1 wallet, or a PSBT-compatible hardware wallet.</source>
+        <translation>בבקשה לסקור את העיסקה המוצעת. הדבר יצור עיסקת ביטקוין חתומה חלקית (PSBT) אשר ניתן לשמור או להעתיק ואז לחתום עם למשל ארנק לא מקוון %1, או עם ארנק חומרה תואם-PSBT.</translation>
+    </message>
+    <message>
+        <source>Please, review your transaction.</source>
+        <translation>אנא עברו שוב על העסקה שלכם.</translation>
+    </message>
+    <message>
+        <source>Transaction fee</source>
+        <translation>עמלת העברה</translation>
+    </message>
+    <message>
+        <source>Not signalling Replace-By-Fee, BIP-125.</source>
+        <translation>לא משדר Replace-By-Fee, BIP-125.</translation>
+    </message>
+    <message>
+        <source>Total Amount</source>
+        <translation>סכום כולל</translation>
+    </message>
+    <message>
+        <source>To review recipient list click "Show Details..."</source>
+        <translation>כדי לסקור את רשימת המקבלים יש להקיש "הצגת פרטים..."</translation>
+    </message>
+    <message>
+        <source>Confirm send coins</source>
+        <translation>אימות שליחת מטבעות</translation>
+    </message>
+    <message>
+        <source>Confirm transaction proposal</source>
+        <translation>אישור הצעת עיסקה</translation>
+    </message>
+    <message>
+        <source>Send</source>
+        <translation>שליחה</translation>
+    </message>
+    <message>
+        <source>Watch-only balance:</source>
+        <translation>יתרת צפייה-בלבד</translation>
+    </message>
+    <message>
+        <source>The recipient address is not valid. Please recheck.</source>
+        <translation>כתובת הנמען שגויה. נא לבדוק שוב.</translation>
+    </message>
+    <message>
+        <source>The amount to pay must be larger than 0.</source>
+        <translation>הסכום לתשלום צריך להיות גדול מ־0.</translation>
+    </message>
+    <message>
+        <source>The amount exceeds your balance.</source>
+        <translation>הסכום חורג מהמאזן שלך.</translation>
+    </message>
+    <message>
+        <source>The total exceeds your balance when the %1 transaction fee is included.</source>
+        <translation>הסכום גבוה מהמאזן שלכם לאחר כלילת עמלת עסקה  %1.</translation>
+    </message>
+    <message>
+        <source>Duplicate address found: addresses should only be used once each.</source>
+        <translation>נמצאה כתובת כפולה: יש להשתמש בכל כתובת פעם אחת בלבד.</translation>
+    </message>
+    <message>
+        <source>Transaction creation failed!</source>
+        <translation>יצירת ההעברה נכשלה!</translation>
+    </message>
+    <message>
+        <source>A fee higher than %1 is considered an absurdly high fee.</source>
+        <translation>עמלה מעל לסכום של %1 נחשבת לעמלה גבוהה באופן מוגזם.</translation>
+    </message>
+    <message>
+        <source>Payment request expired.</source>
+        <translation>בקשת התשלום פגה.</translation>
+    </message>
+    <message numerus="yes">
+        <source>Estimated to begin confirmation within %n block(s).</source>
+        <translation><numerusform>האמדן לתחילת ביצוע אימות בתוך בלוק %n </numerusform><numerusform>האמדן לתחילת ביצוע אימות בתוך %n בלוקים</numerusform><numerusform>האמדן לתחילת ביצוע אימות בתוך %n בלוקים</numerusform><numerusform>C.</numerusform></translation>
+    </message>
+    <message>
+        <source>Warning: Invalid Bitcoin address</source>
+        <translation>אזהרה: כתובת ביטקיון שגויה</translation>
+    </message>
+    <message>
+        <source>Warning: Unknown change address</source>
+        <translation>אזהרה: כתובת החלפה בלתי ידועה</translation>
+    </message>
+    <message>
+        <source>Confirm custom change address</source>
+        <translation>אימות כתובת החלפה בהתאמה אישית</translation>
+    </message>
+    <message>
+        <source>The address you selected for change is not part of this wallet. Any or all funds in your wallet may be sent to this address. Are you sure?</source>
+        <translation>הכתובת שבחרת עבור ההחלפה אינה חלק מארנק זה. כל ההסכום שבארנק שלך עשוי להישלח לכתובת זו. מקובל עליך?</translation>
+    </message>
+    <message>
+        <source>(no label)</source>
+        <translation>(ללא תווית)</translation>
+    </message>
+</context>
+<context>
+    <name>SendCoinsEntry</name>
+    <message>
+        <source>A&amp;mount:</source>
+        <translation>&amp;כמות:</translation>
+    </message>
+    <message>
+        <source>Pay &amp;To:</source>
+        <translation>לשלם ל&amp;טובת:</translation>
+    </message>
+    <message>
+        <source>&amp;Label:</source>
+        <translation>ת&amp;ווית:</translation>
+    </message>
+    <message>
+        <source>Choose previously used address
