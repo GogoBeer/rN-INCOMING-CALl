@@ -1813,4 +1813,259 @@ Signing is only possible with addresses of the type 'legacy'.</source>
         <translation>שגיאה בקידוד ה URI לברקוד.</translation>
     </message>
     <message>
-        <source>QR code s
+        <source>QR code support not available.</source>
+        <translation>תמיכה בקוד QR לא זמינה.</translation>
+    </message>
+    <message>
+        <source>Save QR Code</source>
+        <translation>שמירת קוד QR</translation>
+    </message>
+    <message>
+        <source>PNG Image (*.png)</source>
+        <translation>תמונת PNG (‏‎*.png)</translation>
+    </message>
+</context>
+<context>
+    <name>RPCConsole</name>
+    <message>
+        <source>N/A</source>
+        <translation>לא זמין</translation>
+    </message>
+    <message>
+        <source>Client version</source>
+        <translation>גרסה</translation>
+    </message>
+    <message>
+        <source>&amp;Information</source>
+        <translation>מי&amp;דע</translation>
+    </message>
+    <message>
+        <source>General</source>
+        <translation>כללי</translation>
+    </message>
+    <message>
+        <source>Using BerkeleyDB version</source>
+        <translation>גרסת BerkeleyDB</translation>
+    </message>
+    <message>
+        <source>Datadir</source>
+        <translation>Datadir</translation>
+    </message>
+    <message>
+        <source>To specify a non-default location of the data directory use the '%1' option.</source>
+        <translation>כדי לציין מיקום שאינו ברירת המחדל לתיקיית הבלוקים יש להשתמש באפשרות "%1"</translation>
+    </message>
+    <message>
+        <source>Blocksdir</source>
+        <translation>Blocksdir</translation>
+    </message>
+    <message>
+        <source>To specify a non-default location of the blocks directory use the '%1' option.</source>
+        <translation>כדי לציין מיקום שאינו ברירת המחדל לתיקיית הבלוקים יש להשתמש באפשרות "%1"</translation>
+    </message>
+    <message>
+        <source>Startup time</source>
+        <translation>זמן עלייה</translation>
+    </message>
+    <message>
+        <source>Network</source>
+        <translation>רשת</translation>
+    </message>
+    <message>
+        <source>Name</source>
+        <translation>שם</translation>
+    </message>
+    <message>
+        <source>Number of connections</source>
+        <translation>מספר חיבורים</translation>
+    </message>
+    <message>
+        <source>Block chain</source>
+        <translation>שרשרת מקטעים</translation>
+    </message>
+    <message>
+        <source>Memory Pool</source>
+        <translation>מאגר זכרון</translation>
+    </message>
+    <message>
+        <source>Current number of transactions</source>
+        <translation>מספר עסקאות נוכחי</translation>
+    </message>
+    <message>
+        <source>Memory usage</source>
+        <translation>ניצול זכרון</translation>
+    </message>
+    <message>
+        <source>Wallet: </source>
+        <translation>ארנק:</translation>
+    </message>
+    <message>
+        <source>(none)</source>
+        <translation>(אין)</translation>
+    </message>
+    <message>
+        <source>&amp;Reset</source>
+        <translation>&amp;איפוס</translation>
+    </message>
+    <message>
+        <source>Received</source>
+        <translation>התקבלו</translation>
+    </message>
+    <message>
+        <source>Sent</source>
+        <translation>נשלחו</translation>
+    </message>
+    <message>
+        <source>&amp;Peers</source>
+        <translation>&amp;עמיתים</translation>
+    </message>
+    <message>
+        <source>Banned peers</source>
+        <translation>משתמשים חסומים</translation>
+    </message>
+    <message>
+        <source>Select a peer to view detailed information.</source>
+        <translation>נא לבחור בעמית כדי להציג מידע מפורט.</translation>
+    </message>
+    <message>
+        <source>Direction</source>
+        <translation>כיוון</translation>
+    </message>
+    <message>
+        <source>Version</source>
+        <translation>גרסה</translation>
+    </message>
+    <message>
+        <source>Starting Block</source>
+        <translation>בלוק התחלה</translation>
+    </message>
+    <message>
+        <source>Synced Headers</source>
+        <translation>כותרות עדכניות</translation>
+    </message>
+    <message>
+        <source>Synced Blocks</source>
+        <translation>בלוקים מסונכרנים</translation>
+    </message>
+    <message>
+        <source>The mapped Autonomous System used for diversifying peer selection.</source>
+        <translation>המערכת האוטונומית הממופה משמשת לגיוון בחירת עמיתים.</translation>
+    </message>
+    <message>
+        <source>Mapped AS</source>
+        <translation>מופה בתור</translation>
+    </message>
+    <message>
+        <source>User Agent</source>
+        <translation>סוכן משתמש</translation>
+    </message>
+    <message>
+        <source>Node window</source>
+        <translation>חלון צומת</translation>
+    </message>
+    <message>
+        <source>Current block height</source>
+        <translation>גובה הבלוק הנוכחי</translation>
+    </message>
+    <message>
+        <source>Open the %1 debug log file from the current data directory. This can take a few seconds for large log files.</source>
+        <translation>פתיחת יומן ניפוי הבאגים %1 מתיקיית הנתונים הנוכחית. עבור קובצי יומן גדולים ייתכן זמן המתנה של מספר שניות.</translation>
+    </message>
+    <message>
+        <source>Decrease font size</source>
+        <translation>הקטן גודל גופן</translation>
+    </message>
+    <message>
+        <source>Increase font size</source>
+        <translation>הגדל גודל גופן</translation>
+    </message>
+    <message>
+        <source>Permissions</source>
+        <translation>הרשאות</translation>
+    </message>
+    <message>
+        <source>Services</source>
+        <translation>שירותים</translation>
+    </message>
+    <message>
+        <source>Connection Time</source>
+        <translation>זמן החיבור</translation>
+    </message>
+    <message>
+        <source>Last Send</source>
+        <translation>שליחה אחרונה</translation>
+    </message>
+    <message>
+        <source>Last Receive</source>
+        <translation>קבלה אחרונה</translation>
+    </message>
+    <message>
+        <source>Ping Time</source>
+        <translation>זמן המענה</translation>
+    </message>
+    <message>
+        <source>The duration of a currently outstanding ping.</source>
+        <translation>משך הפינג הבולט הנוכחי</translation>
+    </message>
+    <message>
+        <source>Ping Wait</source>
+        <translation>פינג</translation>
+    </message>
+    <message>
+        <source>Min Ping</source>
+        <translation>פינג מינימלי</translation>
+    </message>
+    <message>
+        <source>Time Offset</source>
+        <translation>הפרש זמן</translation>
+    </message>
+    <message>
+        <source>Last block time</source>
+        <translation>זמן המקטע האחרון</translation>
+    </message>
+    <message>
+        <source>&amp;Open</source>
+        <translation>&amp;פתיחה</translation>
+    </message>
+    <message>
+        <source>&amp;Console</source>
+        <translation>מ&amp;סוף בקרה</translation>
+    </message>
+    <message>
+        <source>&amp;Network Traffic</source>
+        <translation>&amp;תעבורת רשת</translation>
+    </message>
+    <message>
+        <source>Totals</source>
+        <translation>סכומים</translation>
+    </message>
+    <message>
+        <source>In:</source>
+        <translation>נכנס:</translation>
+    </message>
+    <message>
+        <source>Out:</source>
+        <translation>יוצא:</translation>
+    </message>
+    <message>
+        <source>Debug log file</source>
+        <translation>קובץ יומן ניפוי</translation>
+    </message>
+    <message>
+        <source>Clear console</source>
+        <translation>ניקוי מסוף הבקרה</translation>
+    </message>
+    <message>
+        <source>1 &amp;hour</source>
+        <translation>&amp;שעה אחת</translation>
+    </message>
+    <message>
+        <source>1 &amp;day</source>
+        <translation>&amp;יום אחד</translation>
+    </message>
+    <message>
+        <source>1 &amp;week</source>
+        <translation>ש&amp;בוע אחד</translation>
+    </message>
+    <message>
+        <source
