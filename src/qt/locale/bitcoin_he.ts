@@ -3075,4 +3075,256 @@ Note:  Since the fee is calculated on a per-byte basis, a fee of "100 satoshis p
         <translation>אמת</translation>
     </message>
     <message>
-  
+        <source>false</source>
+        <translation>שקר</translation>
+    </message>
+</context>
+<context>
+    <name>TransactionDescDialog</name>
+    <message>
+        <source>This pane shows a detailed description of the transaction</source>
+        <translation>חלונית זו מציגה תיאור מפורט של ההעברה</translation>
+    </message>
+    <message>
+        <source>Details for %1</source>
+        <translation>פרטים עבור %1</translation>
+    </message>
+</context>
+<context>
+    <name>TransactionTableModel</name>
+    <message>
+        <source>Date</source>
+        <translation>תאריך</translation>
+    </message>
+    <message>
+        <source>Type</source>
+        <translation>סוג</translation>
+    </message>
+    <message>
+        <source>Label</source>
+        <translation>תוית</translation>
+    </message>
+    <message numerus="yes">
+        <source>Open for %n more block(s)</source>
+        <translation><numerusform>פתוחה למשך בלוק אחד נוסף</numerusform><numerusform>פתוחה למשך %n בלוקים נוספים</numerusform><numerusform>פתוחה למשך %n בלוקים נוספים</numerusform><numerusform>פתוחה למשך %n בלוקים נוספים</numerusform></translation>
+    </message>
+    <message>
+        <source>Open until %1</source>
+        <translation>פתוחה עד %1</translation>
+    </message>
+    <message>
+        <source>Unconfirmed</source>
+        <translation>לא מאושרת</translation>
+    </message>
+    <message>
+        <source>Abandoned</source>
+        <translation>ננטש</translation>
+    </message>
+    <message>
+        <source>Confirming (%1 of %2 recommended confirmations)</source>
+        <translation>באישור (%1 מתוך %2 אישורים מומלצים)</translation>
+    </message>
+    <message>
+        <source>Confirmed (%1 confirmations)</source>
+        <translation>מאושרת (%1 אישורים)</translation>
+    </message>
+    <message>
+        <source>Conflicted</source>
+        <translation>מתנגשת</translation>
+    </message>
+    <message>
+        <source>Immature (%1 confirmations, will be available after %2)</source>
+        <translation>צעירה (%1 אישורים, תהיה זמינה לאחר %2)</translation>
+    </message>
+    <message>
+        <source>Generated but not accepted</source>
+        <translation>הבלוק יוצר אך לא אושר</translation>
+    </message>
+    <message>
+        <source>Received with</source>
+        <translation>התקבל עם</translation>
+    </message>
+    <message>
+        <source>Received from</source>
+        <translation>התקבל מאת</translation>
+    </message>
+    <message>
+        <source>Sent to</source>
+        <translation>נשלח אל</translation>
+    </message>
+    <message>
+        <source>Payment to yourself</source>
+        <translation>תשלום לעצמך</translation>
+    </message>
+    <message>
+        <source>Mined</source>
+        <translation>נכרו</translation>
+    </message>
+    <message>
+        <source>watch-only</source>
+        <translation>צפייה בלבד</translation>
+    </message>
+    <message>
+        <source>(n/a)</source>
+        <translation>(לא זמין)</translation>
+    </message>
+    <message>
+        <source>(no label)</source>
+        <translation>(ללא תוית)</translation>
+    </message>
+    <message>
+        <source>Transaction status. Hover over this field to show number of confirmations.</source>
+        <translation>מצב ההעברה. יש להמתין עם הסמן מעל שדה זה כדי לראות את מספר האישורים.</translation>
+    </message>
+    <message>
+        <source>Date and time that the transaction was received.</source>
+        <translation>התאריך והשעה בהם העברה זו התקבלה.</translation>
+    </message>
+    <message>
+        <source>Type of transaction.</source>
+        <translation>סוג ההעברה.</translation>
+    </message>
+    <message>
+        <source>Whether or not a watch-only address is involved in this transaction.</source>
+        <translation>האם כתובת לצפייה בלבד כלולה בעסקה זו.</translation>
+    </message>
+    <message>
+        <source>User-defined intent/purpose of the transaction.</source>
+        <translation>ייעוד/תכלית מגדר ע"י המשתמש של העסקה.</translation>
+    </message>
+    <message>
+        <source>Amount removed from or added to balance.</source>
+        <translation>סכום ירד או התווסף למאזן</translation>
+    </message>
+</context>
+<context>
+    <name>TransactionView</name>
+    <message>
+        <source>All</source>
+        <translation>הכול</translation>
+    </message>
+    <message>
+        <source>Today</source>
+        <translation>היום</translation>
+    </message>
+    <message>
+        <source>This week</source>
+        <translation>השבוע</translation>
+    </message>
+    <message>
+        <source>This month</source>
+        <translation>החודש</translation>
+    </message>
+    <message>
+        <source>Last month</source>
+        <translation>חודש שעבר</translation>
+    </message>
+    <message>
+        <source>This year</source>
+        <translation>השנה הזאת</translation>
+    </message>
+    <message>
+        <source>Range...</source>
+        <translation>טווח…</translation>
+    </message>
+    <message>
+        <source>Received with</source>
+        <translation>התקבל עם</translation>
+    </message>
+    <message>
+        <source>Sent to</source>
+        <translation>נשלח אל</translation>
+    </message>
+    <message>
+        <source>To yourself</source>
+        <translation>לעצמך</translation>
+    </message>
+    <message>
+        <source>Mined</source>
+        <translation>נכרו</translation>
+    </message>
+    <message>
+        <source>Other</source>
+        <translation>אחר</translation>
+    </message>
+    <message>
+        <source>Enter address, transaction id, or label to search</source>
+        <translation>הכנס כתובת, מזהה העברה, או תווית לחיפוש</translation>
+    </message>
+    <message>
+        <source>Min amount</source>
+        <translation>סכום מזערי</translation>
+    </message>
+    <message>
+        <source>Abandon transaction</source>
+        <translation>נטישת העברה</translation>
+    </message>
+    <message>
+        <source>Increase transaction fee</source>
+        <translation>הגדל עמלת העברה</translation>
+    </message>
+    <message>
+        <source>Copy address</source>
+        <translation>העתקת הכתובת</translation>
+    </message>
+    <message>
+        <source>Copy label</source>
+        <translation>העתקת התווית</translation>
+    </message>
+    <message>
+        <source>Copy amount</source>
+        <translation>העתקת הסכום</translation>
+    </message>
+    <message>
+        <source>Copy transaction ID</source>
+        <translation>העתקת מזהה ההעברה</translation>
+    </message>
+    <message>
+        <source>Copy raw transaction</source>
+        <translation>העתקת העברה גולמית</translation>
+    </message>
+    <message>
+        <source>Copy full transaction details</source>
+        <translation>העתקת פרטי ההעברה המלאים</translation>
+    </message>
+    <message>
+        <source>Edit label</source>
+        <translation>עריכת תווית</translation>
+    </message>
+    <message>
+        <source>Show transaction details</source>
+        <translation>הצגת פרטי העברה</translation>
+    </message>
+    <message>
+        <source>Export Transaction History</source>
+        <translation>יצוא היסטוריית העברה</translation>
+    </message>
+    <message>
+        <source>Comma separated file (*.csv)</source>
+        <translation>קובץ מופרד בפסיקים (‎*.csv)</translation>
+    </message>
+    <message>
+        <source>Confirmed</source>
+        <translation>מאושרת</translation>
+    </message>
+    <message>
+        <source>Watch-only</source>
+        <translation>צפייה בלבד</translation>
+    </message>
+    <message>
+        <source>Date</source>
+        <translation>תאריך</translation>
+    </message>
+    <message>
+        <source>Type</source>
+        <translation>סוג</translation>
+    </message>
+    <message>
+        <source>Label</source>
+        <translation>תוית</translation>
+    </message>
+    <message>
+        <source>Address</source>
+        <translation>כתובת</translation>
+    </message>
+    <m
