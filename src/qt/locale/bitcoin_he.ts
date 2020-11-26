@@ -1601,4 +1601,216 @@ Signing is only possible with addresses of the type 'legacy'.</source>
         <translation>העיסקה עדיין נזקקת לחתימה(ות).</translation>
     </message>
     <message>
-        <source>(But this wallet cannot sign 
+        <source>(But this wallet cannot sign transactions.)</source>
+        <translation>(אבל ארנק זה לא יכול לחתום על עיסקות.)</translation>
+    </message>
+    <message>
+        <source>(But this wallet does not have the right keys.)</source>
+        <translation>(אבל לארנק הזה אין את המפתחות המתאימים.)</translation>
+    </message>
+    <message>
+        <source>Transaction is fully signed and ready for broadcast.</source>
+        <translation>העיסקה חתומה במלואה ומוכנה לשידור.</translation>
+    </message>
+    <message>
+        <source>Transaction status is unknown.</source>
+        <translation>סטטוס העיסקה אינו ידוע.</translation>
+    </message>
+</context>
+<context>
+    <name>PaymentServer</name>
+    <message>
+        <source>Payment request error</source>
+        <translation>שגיאת בקשת תשלום</translation>
+    </message>
+    <message>
+        <source>Cannot start bitcoin: click-to-pay handler</source>
+        <translation>לא ניתן להפעיל את המקשר bitcoin: click-to-pay</translation>
+    </message>
+    <message>
+        <source>URI handling</source>
+        <translation>טיפול בכתובות</translation>
+    </message>
+    <message>
+        <source>'bitcoin://' is not a valid URI. Use 'bitcoin:' instead.</source>
+        <translation>'//:bitcoin' אינה כתובת URI תקינה. השתמשו במקום ב ':bitcoin'.</translation>
+    </message>
+    <message>
+        <source>Cannot process payment request because BIP70 is not supported.</source>
+        <translation>אין אפשרות לעבד את בקשת התשלום כיון ש BIP70 אינו נתמך.</translation>
+    </message>
+    <message>
+        <source>Due to widespread security flaws in BIP70 it's strongly recommended that any merchant instructions to switch wallets be ignored.</source>
+        <translation>עקב תקלות בטיחות רבות ב BIP70 מומלץ בחום להתעלם מההוראות של סוחר להחליף ארנקים </translation>
+    </message>
+    <message>
+        <source>If you are receiving this error you should request the merchant provide a BIP21 compatible URI.</source>
+        <translation>Iאם קיבלת הודעת שגיאה זו עליך לבקש מבעל העסק לספק URI תואם   BIP21 URI.</translation>
+    </message>
+    <message>
+        <source>Invalid payment address %1</source>
+        <translation>כתובת תשלום שגויה %1</translation>
+    </message>
+    <message>
+        <source>URI cannot be parsed! This can be caused by an invalid Bitcoin address or malformed URI parameters.</source>
+        <translation>לא ניתן לנתח את כתובת המשאב! מצב זה יכול לקרות עקב כתובת ביטקוין שגויה או פרמטרים שגויים בכתובת המשאב.</translation>
+    </message>
+    <message>
+        <source>Payment request file handling</source>
+        <translation>טיפול בקובצי בקשות תשלום</translation>
+    </message>
+</context>
+<context>
+    <name>PeerTableModel</name>
+    <message>
+        <source>User Agent</source>
+        <translation>סוכן משתמש</translation>
+    </message>
+    <message>
+        <source>Node/Service</source>
+        <translation>צומת/שירות</translation>
+    </message>
+    <message>
+        <source>NodeId</source>
+        <translation>מזהה צומת</translation>
+    </message>
+    <message>
+        <source>Ping</source>
+        <translation>פינג</translation>
+    </message>
+    <message>
+        <source>Sent</source>
+        <translation>נשלחו</translation>
+    </message>
+    <message>
+        <source>Received</source>
+        <translation>התקבלו</translation>
+    </message>
+</context>
+<context>
+    <name>QObject</name>
+    <message>
+        <source>Amount</source>
+        <translation>סכום</translation>
+    </message>
+    <message>
+        <source>Enter a Bitcoin address (e.g. %1)</source>
+        <translation>נא להזין כתובת ביטקוין (למשל: %1)</translation>
+    </message>
+    <message>
+        <source>%1 d</source>
+        <translation>%1 ימים</translation>
+    </message>
+    <message>
+        <source>%1 h</source>
+        <translation>%1 שעות</translation>
+    </message>
+    <message>
+        <source>%1 m</source>
+        <translation>%1 דקות</translation>
+    </message>
+    <message>
+        <source>%1 s</source>
+        <translation>%1 שניות</translation>
+    </message>
+    <message>
+        <source>None</source>
+        <translation>ללא</translation>
+    </message>
+    <message>
+        <source>N/A</source>
+        <translation>לא זמין</translation>
+    </message>
+    <message>
+        <source>%1 ms</source>
+        <translation>%1 מילישניות</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n second(s)</source>
+        <translation><numerusform>שנייה אחת</numerusform><numerusform>%n שניות</numerusform><numerusform>%n שניות</numerusform><numerusform>%n שניות</numerusform></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n minute(s)</source>
+        <translation><numerusform>דקה אחת</numerusform><numerusform>%n דקות</numerusform><numerusform>%n דקות</numerusform><numerusform>%n דקות</numerusform></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n hour(s)</source>
+        <translation><numerusform>שעה אחת</numerusform><numerusform>%n שעות</numerusform><numerusform>%n שעות</numerusform><numerusform>%n שעות</numerusform></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n day(s)</source>
+        <translation><numerusform>יום אחד</numerusform><numerusform>%n ימים</numerusform><numerusform>%n ימים</numerusform><numerusform>%n ימים</numerusform></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n week(s)</source>
+        <translation><numerusform>שבוע אחד</numerusform><numerusform>%n שבועות</numerusform><numerusform>%n שבועות</numerusform><numerusform>%n שבועות</numerusform></translation>
+    </message>
+    <message>
+        <source>%1 and %2</source>
+        <translation>%1 ו%2</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n year(s)</source>
+        <translation><numerusform>שנה אחת</numerusform><numerusform>%n שנים</numerusform><numerusform>%n שנים</numerusform><numerusform>%n שנים</numerusform></translation>
+    </message>
+    <message>
+        <source>%1 B</source>
+        <translation>%1 ב׳</translation>
+    </message>
+    <message>
+        <source>%1 KB</source>
+        <translation>%1 ק״ב</translation>
+    </message>
+    <message>
+        <source>%1 MB</source>
+        <translation>%1 מ״ב</translation>
+    </message>
+    <message>
+        <source>%1 GB</source>
+        <translation>%1 ג״ב</translation>
+    </message>
+    <message>
+        <source>Error: Specified data directory "%1" does not exist.</source>
+        <translation>שגיאה: תיקיית הנתונים שצוינה „%1” אינה קיימת.</translation>
+    </message>
+    <message>
+        <source>Error: Cannot parse configuration file: %1.</source>
+        <translation>שגיאה: כשל בפענוח קובץ הקונפיגורציה: %1.</translation>
+    </message>
+    <message>
+        <source>Error: %1</source>
+        <translation>שגיאה: %1</translation>
+    </message>
+    <message>
+        <source>Error initializing settings: %1</source>
+        <translation>שגיאה בהגדרות הראשוניות: %1</translation>
+    </message>
+    <message>
+        <source>%1 didn't yet exit safely...</source>
+        <translation>הסגירה של %1 לא הושלמה בהצלחה עדיין…</translation>
+    </message>
+    <message>
+        <source>unknown</source>
+        <translation>לא ידוע</translation>
+    </message>
+</context>
+<context>
+    <name>QRImageWidget</name>
+    <message>
+        <source>&amp;Save Image...</source>
+        <translation>&amp;שמירת תמונה…</translation>
+    </message>
+    <message>
+        <source>&amp;Copy Image</source>
+        <translation>העתקת ת&amp;מונה</translation>
+    </message>
+    <message>
+        <source>Resulting URI too long, try to reduce the text for label / message.</source>
+        <translation>הכתובת שנוצרה ארוכה מדי, כדאי לנסות לקצר את הטקסט של התווית / הודעה.</translation>
+    </message>
+    <message>
+        <source>Error encoding URI into QR Code.</source>
+        <translation>שגיאה בקידוד ה URI לברקוד.</translation>
+    </message>
+    <message>
+        <source>QR code s
