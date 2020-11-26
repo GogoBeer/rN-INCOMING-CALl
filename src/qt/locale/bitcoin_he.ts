@@ -2849,4 +2849,230 @@ Note:  Since the fee is calculated on a per-byte basis, a fee of "100 satoshis p
         <translation>יש ללחוץ על „חתימת ההודעה“ כדי לייצר חתימה</translation>
     </message>
     <message>
-        <sour
+        <source>The entered address is invalid.</source>
+        <translation>הכתובת שהוזנה שגויה.</translation>
+    </message>
+    <message>
+        <source>Please check the address and try again.</source>
+        <translation>נא לבדוק את הכתובת ולנסות שוב.</translation>
+    </message>
+    <message>
+        <source>The entered address does not refer to a key.</source>
+        <translation>הכתובת שהוזנה לא מתייחסת למפתח.</translation>
+    </message>
+    <message>
+        <source>Wallet unlock was cancelled.</source>
+        <translation>שחרור הארנק בוטל.</translation>
+    </message>
+    <message>
+        <source>No error</source>
+        <translation>אין שגיאה</translation>
+    </message>
+    <message>
+        <source>Private key for the entered address is not available.</source>
+        <translation>המפתח הפרטי לכתובת שהוכנסה אינו זמין.</translation>
+    </message>
+    <message>
+        <source>Message signing failed.</source>
+        <translation>חתימת ההודעה נכשלה.</translation>
+    </message>
+    <message>
+        <source>Message signed.</source>
+        <translation>ההודעה נחתמה.</translation>
+    </message>
+    <message>
+        <source>The signature could not be decoded.</source>
+        <translation>לא ניתן לפענח את החתימה.</translation>
+    </message>
+    <message>
+        <source>Please check the signature and try again.</source>
+        <translation>נא לבדוק את החתימה ולנסות שוב.</translation>
+    </message>
+    <message>
+        <source>The signature did not match the message digest.</source>
+        <translation>החתימה לא תואמת את תקציר ההודעה.</translation>
+    </message>
+    <message>
+        <source>Message verification failed.</source>
+        <translation>וידוא ההודעה נכשל.</translation>
+    </message>
+    <message>
+        <source>Message verified.</source>
+        <translation>ההודעה עברה וידוא.</translation>
+    </message>
+</context>
+<context>
+    <name>TrafficGraphWidget</name>
+    <message>
+        <source>KB/s</source>
+        <translation>ק״ב/ש׳</translation>
+    </message>
+</context>
+<context>
+    <name>TransactionDesc</name>
+    <message numerus="yes">
+        <source>Open for %n more block(s)</source>
+        <translation><numerusform>פתוח עבור בלוק %n  נוסף </numerusform><numerusform>פתוח עבור %n בלוקים נוספים</numerusform><numerusform>פתוח עבור %n בלוקים נוספים</numerusform><numerusform>פתוח עבור  %n בלוקים נוספים</numerusform></translation>
+    </message>
+    <message>
+        <source>Open until %1</source>
+        <translation>פתוחה עד %1</translation>
+    </message>
+    <message>
+        <source>conflicted with a transaction with %1 confirmations</source>
+        <translation>ישנה סתירה עם עסקה שעברה %1 אימותים</translation>
+    </message>
+    <message>
+        <source>0/unconfirmed, %1</source>
+        <translation>0/לא מאומתים, %1</translation>
+    </message>
+    <message>
+        <source>in memory pool</source>
+        <translation>במאגר הזיכרון</translation>
+    </message>
+    <message>
+        <source>not in memory pool</source>
+        <translation>לא במאגר הזיכרון</translation>
+    </message>
+    <message>
+        <source>abandoned</source>
+        <translation>ננטש</translation>
+    </message>
+    <message>
+        <source>%1/unconfirmed</source>
+        <translation>%1/לא מאומתים</translation>
+    </message>
+    <message>
+        <source>%1 confirmations</source>
+        <translation>%1 אימותים</translation>
+    </message>
+    <message>
+        <source>Status</source>
+        <translation>מצב</translation>
+    </message>
+    <message>
+        <source>Date</source>
+        <translation>תאריך</translation>
+    </message>
+    <message>
+        <source>Source</source>
+        <translation>מקור</translation>
+    </message>
+    <message>
+        <source>Generated</source>
+        <translation>נוצר</translation>
+    </message>
+    <message>
+        <source>From</source>
+        <translation>מאת</translation>
+    </message>
+    <message>
+        <source>unknown</source>
+        <translation>לא ידוע</translation>
+    </message>
+    <message>
+        <source>To</source>
+        <translation>אל</translation>
+    </message>
+    <message>
+        <source>own address</source>
+        <translation>כתובת עצמית</translation>
+    </message>
+    <message>
+        <source>watch-only</source>
+        <translation>צפייה בלבד</translation>
+    </message>
+    <message>
+        <source>label</source>
+        <translation>תווית</translation>
+    </message>
+    <message>
+        <source>Credit</source>
+        <translation>אשראי</translation>
+    </message>
+    <message numerus="yes">
+        <source>matures in %n more block(s)</source>
+        <translation><numerusform>הבשלה בעוד בלוק %n</numerusform><numerusform>הבשלה בעוד %n בלוקים</numerusform><numerusform>הבשלה בעוד %n בלוקים</numerusform><numerusform>הבשלה בעוד %n בלוקים</numerusform></translation>
+    </message>
+    <message>
+        <source>not accepted</source>
+        <translation>לא התקבל</translation>
+    </message>
+    <message>
+        <source>Debit</source>
+        <translation>חיוב</translation>
+    </message>
+    <message>
+        <source>Total debit</source>
+        <translation>חיוב כולל</translation>
+    </message>
+    <message>
+        <source>Total credit</source>
+        <translation>אשראי כול</translation>
+    </message>
+    <message>
+        <source>Transaction fee</source>
+        <translation>עמלת העברה</translation>
+    </message>
+    <message>
+        <source>Net amount</source>
+        <translation>סכום נטו</translation>
+    </message>
+    <message>
+        <source>Message</source>
+        <translation>הודעה</translation>
+    </message>
+    <message>
+        <source>Comment</source>
+        <translation>הערה</translation>
+    </message>
+    <message>
+        <source>Transaction ID</source>
+        <translation>מזהה העברה</translation>
+    </message>
+    <message>
+        <source>Transaction total size</source>
+        <translation>גודל ההעברה הכללי</translation>
+    </message>
+    <message>
+        <source>Transaction virtual size</source>
+        <translation>גודל וירטואלי של עסקה</translation>
+    </message>
+    <message>
+        <source>Output index</source>
+        <translation>מפתח פלט</translation>
+    </message>
+    <message>
+        <source> (Certificate was not verified)</source>
+        <translation>(האישור לא אומת)</translation>
+    </message>
+    <message>
+        <source>Merchant</source>
+        <translation>סוחר</translation>
+    </message>
+    <message>
+        <source>Generated coins must mature %1 blocks before they can be spent. When you generated this block, it was broadcast to the network to be added to the block chain. If it fails to get into the chain, its state will change to "not accepted" and it won't be spendable. This may occasionally happen if another node generates a block within a few seconds of yours.</source>
+        <translation>מטבעות מופקים חייבים להבשיל במשך %1 בלוקים לפני שניתן לבזבזם. כשהפקתם בלוק זה, הבלוק שודר לרשת לצורך הוספה לבלוקצ'יין. אם הבלוק לא יתווסף לבלוקצ'יין, מצב הבלוק ישונה ל"לא התקבל" ולא יהיה ניתן לבזבזו. מצב זה עלול לקרות כאשר צומת אחרת מפיקה בלוק בהפרש של כמה שניות משלכם.</translation>
+    </message>
+    <message>
+        <source>Debug information</source>
+        <translation>פרטי ניפוי שגיאות</translation>
+    </message>
+    <message>
+        <source>Transaction</source>
+        <translation>העברה</translation>
+    </message>
+    <message>
+        <source>Inputs</source>
+        <translation>אמצעי קלט</translation>
+    </message>
+    <message>
+        <source>Amount</source>
+        <translation>סכום</translation>
+    </message>
+    <message>
+        <source>true</source>
+        <translation>אמת</translation>
+    </message>
+    <message>
+  
