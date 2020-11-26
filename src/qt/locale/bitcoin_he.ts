@@ -3550,4 +3550,160 @@ Go to File &gt; Open Wallet to load a wallet.
         <translation>ה %s מפתחים</translation>
     </message>
     <message>
-        <source>Cannot provide specific connection
+        <source>Cannot provide specific connections and have addrman find outgoing connections at the same.</source>
+        <translation>לא מצליח לספק קשרים ספציפיים ולגרום ל addrman למצוא קשרים חיצוניים יחדיו.</translation>
+    </message>
+    <message>
+        <source>Error reading %s! All keys read correctly, but transaction data or address book entries might be missing or incorrect.</source>
+        <translation>שגיאה בנסיון לקרוא את %s! כל המפתחות נקראו נכונה, אך נתוני העסקה או הכתובות יתכן שחסרו או שגויים.</translation>
+    </message>
+    <message>
+        <source>Please check that your computer's date and time are correct! If your clock is wrong, %s will not work properly.</source>
+        <translation>נא בדקו שהתאריך והשעה במחשב שלכם נכונים! אם השעון שלכם לא מסונכרן, %s לא יעבוד כהלכה.</translation>
+    </message>
+    <message>
+        <source>Please contribute if you find %s useful. Visit %s for further information about the software.</source>
+        <translation>אנא שקלו תרומה אם מצאתם את %s שימושי. בקרו ב %s למידע נוסף על התוכנה.</translation>
+    </message>
+    <message>
+        <source>The block database contains a block which appears to be from the future. This may be due to your computer's date and time being set incorrectly. Only rebuild the block database if you are sure that your computer's date and time are correct</source>
+        <translation>מאגר נתוני הבלוקים מכיל בלוק עם תאריך עתידי. הדבר יכול להיגרם מתאריך ושעה שגויים במחשב שלכם. בצעו בנייה מחדש של מאגר נתוני הבלוקים רק אם אתם בטוחים שהתאריך והשעה במחשבכם נכונים</translation>
+    </message>
+    <message>
+        <source>This is a pre-release test build - use at your own risk - do not use for mining or merchant applications</source>
+        <translation>זוהי בניית ניסיון טרום־פרסום – השימוש באחריותך – אין להשתמש בה לצורך כרייה או יישומי מסחר</translation>
+    </message>
+    <message>
+        <source>This is the transaction fee you may discard if change is smaller than dust at this level</source>
+        <translation>זוהי עמלת העסקה שתוכל לזנוח אם היתרה הנה קטנה יותר מאבק ברמה הזו.</translation>
+    </message>
+    <message>
+        <source>Unable to replay blocks. You will need to rebuild the database using -reindex-chainstate.</source>
+        <translation>שידור-חוזר של הבלוקים לא הצליח. תצטרכו לבצע בנייה מחדש של מאגר הנתונים באמצעות הדגל reindex-chainstate-.</translation>
+    </message>
+    <message>
+        <source>Unable to rewind the database to a pre-fork state. You will need to redownload the blockchain</source>
+        <translation>הרצה-לאחור של מאגר הנתונים למצב טרום-פיצולי לא הצליחה. תצטרכו להוריד מחדש את הבלוקצ'יין.</translation>
+    </message>
+    <message>
+        <source>Warning: The network does not appear to fully agree! Some miners appear to be experiencing issues.</source>
+        <translation>אזהרה: נראה כי הרשת אינה מסכימה באופן מלא! חלק מהכורים חווים תקלות.</translation>
+    </message>
+    <message>
+        <source>Warning: We do not appear to fully agree with our peers! You may need to upgrade, or other nodes may need to upgrade.</source>
+        <translation>אזהרה: יתכן שלא נסכים לגמרי עם עמיתינו! יתכן שתצטרכו לשדרג או שצמתות אחרות יצטרכו לשדרג.</translation>
+    </message>
+    <message>
+        <source>-maxmempool must be at least %d MB</source>
+        <translation>‎-maxmempool חייב להיות לפחות %d מ״ב</translation>
+    </message>
+    <message>
+        <source>Cannot resolve -%s address: '%s'</source>
+        <translation>לא מצליח לפענח -%s כתובת: '%s'</translation>
+    </message>
+    <message>
+        <source>Change index out of range</source>
+        <translation>אינדקס העודף מחוץ לתחום</translation>
+    </message>
+    <message>
+        <source>Config setting for %s only applied on %s network when in [%s] section.</source>
+        <translation>הגדרות הקונפיג עבור %s מיושמות רק  %s הרשת כאשר בקבוצה [%s] .</translation>
+    </message>
+    <message>
+        <source>Copyright (C) %i-%i</source>
+        <translation>כל הזכויות שמורות (C) %i-‏%i</translation>
+    </message>
+    <message>
+        <source>Corrupted block database detected</source>
+        <translation>מסד נתוני בלוקים פגום זוהה</translation>
+    </message>
+    <message>
+        <source>Could not find asmap file %s</source>
+        <translation>  קובץ asmap %s לא נמצא</translation>
+    </message>
+    <message>
+        <source>Could not parse asmap file %s</source>
+        <translation> קובץ asmap %s לא נפרס</translation>
+    </message>
+    <message>
+        <source>Do you want to rebuild the block database now?</source>
+        <translation>האם לבנות מחדש את מסד נתוני המקטעים?</translation>
+    </message>
+    <message>
+        <source>Error initializing block database</source>
+        <translation>שגיאה באתחול מסד נתוני המקטעים</translation>
+    </message>
+    <message>
+        <source>Error initializing wallet database environment %s!</source>
+        <translation>שגיאה באתחול סביבת מסד נתוני הארנקים %s!</translation>
+    </message>
+    <message>
+        <source>Error loading %s</source>
+        <translation>שגיאה בטעינת %s</translation>
+    </message>
+    <message>
+        <source>Error loading %s: Private keys can only be disabled during creation</source>
+        <translation>שגיאת טעינה %s: מפתחות פרטיים ניתנים לניטרול רק בעת תהליך היצירה</translation>
+    </message>
+    <message>
+        <source>Error loading %s: Wallet corrupted</source>
+        <translation>שגיאת טעינה %s: הארנק משובש</translation>
+    </message>
+    <message>
+        <source>Error loading %s: Wallet requires newer version of %s</source>
+        <translation>שגיאת טעינה %s: הארנק מצריך גירסה חדשה יותר של %s</translation>
+    </message>
+    <message>
+        <source>Error loading block database</source>
+        <translation>שגיאה בטעינת מסד נתוני המקטעים</translation>
+    </message>
+    <message>
+        <source>Error opening block database</source>
+        <translation>שגיאה בטעינת מסד נתוני המקטעים</translation>
+    </message>
+    <message>
+        <source>Failed to listen on any port. Use -listen=0 if you want this.</source>
+        <translation>האזנה נכשלה בכל פורט. השתמש ב- -listen=0 אם ברצונך בכך.</translation>
+    </message>
+    <message>
+        <source>Failed to rescan the wallet during initialization</source>
+        <translation>כשל בסריקה מחדש של הארנק בזמן האתחול</translation>
+    </message>
+    <message>
+        <source>Importing...</source>
+        <translation>מתבצע יבוא…</translation>
+    </message>
+    <message>
+        <source>Incorrect or no genesis block found. Wrong datadir for network?</source>
+        <translation>מקטע הפתיח הוא שגוי או לא נמצא. תיקיית נתונים שגויה עבור הרשת?</translation>
+    </message>
+    <message>
+        <source>Initialization sanity check failed. %s is shutting down.</source>
+        <translation>איתחול של תהליך בדיקות השפיות נכשל. %s  בתהליך סגירה.</translation>
+    </message>
+    <message>
+        <source>Invalid P2P permission: '%s'</source>
+        <translation>הרשאת P2P שגויה: '%s'</translation>
+    </message>
+    <message>
+        <source>Invalid amount for -%s=&lt;amount&gt;: '%s'</source>
+        <translation>סכום שגוי עבור ‎-%s=&lt;amount&gt;:‏ '%s'</translation>
+    </message>
+    <message>
+        <source>Invalid amount for -discardfee=&lt;amount&gt;: '%s'</source>
+        <translation>סכום שגוי של -discardfee=&lt;amount&gt;‏: '%s'</translation>
+    </message>
+    <message>
+        <source>Invalid amount for -fallbackfee=&lt;amount&gt;: '%s'</source>
+        <translation>סכום שגוי עבור ‎-fallbackfee=&lt;amount&gt;:‏ '%s'</translation>
+    </message>
+    <message>
+        <source>Specified blocks directory "%s" does not exist.</source>
+        <translation>התיקיה שהוגדרה "%s" לא קיימת.</translation>
+    </message>
+    <message>
+        <source>Unknown address type '%s'</source>
+        <translation>כתובת לא ידועה מסוג "%s"</translation>
+    </message>
+    <message>
+        <source>Unk
