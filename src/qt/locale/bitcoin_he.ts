@@ -3327,4 +3327,227 @@ Note:  Since the fee is calculated on a per-byte basis, a fee of "100 satoshis p
         <source>Address</source>
         <translation>כתובת</translation>
     </message>
-    <m
+    <message>
+        <source>ID</source>
+        <translation>מזהה</translation>
+    </message>
+    <message>
+        <source>Exporting Failed</source>
+        <translation>הייצוא נכשל</translation>
+    </message>
+    <message>
+        <source>There was an error trying to save the transaction history to %1.</source>
+        <translation>הייתה שגיאה בניסיון לשמור את היסטוריית העסקאות אל %1.</translation>
+    </message>
+    <message>
+        <source>Exporting Successful</source>
+        <translation>הייצוא נכשל</translation>
+    </message>
+    <message>
+        <source>The transaction history was successfully saved to %1.</source>
+        <translation>היסטוריית העסקאות נשמרה בהצלחה אל %1.</translation>
+    </message>
+    <message>
+        <source>Range:</source>
+        <translation>טווח:</translation>
+    </message>
+    <message>
+        <source>to</source>
+        <translation>עד</translation>
+    </message>
+</context>
+<context>
+    <name>UnitDisplayStatusBarControl</name>
+    <message>
+        <source>Unit to show amounts in. Click to select another unit.</source>
+        <translation>יחידת המידה להצגת הסכומים. יש ללחוץ כדי לבחור ביחידת מידה אחרת.</translation>
+    </message>
+</context>
+<context>
+    <name>WalletController</name>
+    <message>
+        <source>Close wallet</source>
+        <translation>סגירת ארנק</translation>
+    </message>
+    <message>
+        <source>Are you sure you wish to close the wallet &lt;i&gt;%1&lt;/i&gt;?</source>
+        <translation>האם אכן ברצונך לסגור את הארנק &lt;i&gt;%1&lt;/i&gt;?</translation>
+    </message>
+    <message>
+        <source>Closing the wallet for too long can result in having to resync the entire chain if pruning is enabled.</source>
+        <translation>סגירת הארנק למשך זמן רב מדי יכול לגרור את הצורך לסינכרון מחדש של כל השרשרת אם אופצית הגיזום אקטיבית.</translation>
+    </message>
+    <message>
+        <source>Close all wallets</source>
+        <translation>סגירת כל הארנקים</translation>
+    </message>
+    <message>
+        <source>Are you sure you wish to close all wallets?</source>
+        <translation>האם אכן ברצונך לסגור את כל הארנקים?</translation>
+    </message>
+</context>
+<context>
+    <name>WalletFrame</name>
+    <message>
+        <source>No wallet has been loaded.
+Go to File &gt; Open Wallet to load a wallet.
+- OR -</source>
+        <translation>לא נטען ארנק.
+עליך לגשת לקובץ &gt; פתיחת ארנק כדי לטעון ארנק.
+- או -</translation>
+    </message>
+    <message>
+        <source>Create a new wallet</source>
+        <translation>יצירת ארנק חדש</translation>
+    </message>
+</context>
+<context>
+    <name>WalletModel</name>
+    <message>
+        <source>Send Coins</source>
+        <translation>שליחת מטבעות</translation>
+    </message>
+    <message>
+        <source>Fee bump error</source>
+        <translation>נמצאה שגיאת סכום עמלה</translation>
+    </message>
+    <message>
+        <source>Increasing transaction fee failed</source>
+        <translation>כשל בהעלאת עמלת עסקה</translation>
+    </message>
+    <message>
+        <source>Do you want to increase the fee?</source>
+        <translation>האם ברצונך להגדיל את העמלה?</translation>
+    </message>
+    <message>
+        <source>Do you want to draft a transaction with fee increase?</source>
+        <translation>האם ברצונך להכין עסיקה עם עמלה מוגברת?</translation>
+    </message>
+    <message>
+        <source>Current fee:</source>
+        <translation>העמלה הנוכחית:</translation>
+    </message>
+    <message>
+        <source>Increase:</source>
+        <translation>הגדלה:</translation>
+    </message>
+    <message>
+        <source>New fee:</source>
+        <translation>עמלה חדשה:</translation>
+    </message>
+    <message>
+        <source>Confirm fee bump</source>
+        <translation>אישור הקפצת עמלה</translation>
+    </message>
+    <message>
+        <source>Can't draft transaction.</source>
+        <translation>לא ניתן לשמור את העסקה כטיוטה.</translation>
+    </message>
+    <message>
+        <source>PSBT copied</source>
+        <translation>PSBT הועתקה</translation>
+    </message>
+    <message>
+        <source>Can't sign transaction.</source>
+        <translation>אי אפשר לחתום על ההעברה.</translation>
+    </message>
+    <message>
+        <source>Could not commit transaction</source>
+        <translation>שילוב העסקה נכשל</translation>
+    </message>
+    <message>
+        <source>default wallet</source>
+        <translation>ארנק בררת מחדל</translation>
+    </message>
+</context>
+<context>
+    <name>WalletView</name>
+    <message>
+        <source>&amp;Export</source>
+        <translation>&amp;יצוא</translation>
+    </message>
+    <message>
+        <source>Export the data in the current tab to a file</source>
+        <translation>יצוא הנתונים בלשונית הנוכחית לקובץ</translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation>שגיאה</translation>
+    </message>
+    <message>
+        <source>Unable to decode PSBT from clipboard (invalid base64)</source>
+        <translation>לא ניתן לפענח PSBT מתוך לוח הגזירים (base64 שגוי)  </translation>
+    </message>
+    <message>
+        <source>Load Transaction Data</source>
+        <translation>טעינת נתוני עיסקה</translation>
+    </message>
+    <message>
+        <source>Partially Signed Transaction (*.psbt)</source>
+        <translation>עיסקה חתומה חלקית  (*.psbt)</translation>
+    </message>
+    <message>
+        <source>PSBT file must be smaller than 100 MiB</source>
+        <translation>קובץ PSBT צריך להיות קטמן מ 100 MiB</translation>
+    </message>
+    <message>
+        <source>Unable to decode PSBT</source>
+        <translation>לא מצליח לפענח PSBT</translation>
+    </message>
+    <message>
+        <source>Backup Wallet</source>
+        <translation>גיבוי הארנק</translation>
+    </message>
+    <message>
+        <source>Wallet Data (*.dat)</source>
+        <translation>נתוני ארנק (‎*.dat)</translation>
+    </message>
+    <message>
+        <source>Backup Failed</source>
+        <translation>הגיבוי נכשל</translation>
+    </message>
+    <message>
+        <source>There was an error trying to save the wallet data to %1.</source>
+        <translation>אירעה שגיאה בעת הניסיון לשמור את נתוני הארנק אל %1.</translation>
+    </message>
+    <message>
+        <source>Backup Successful</source>
+        <translation>הגיבוי הצליח</translation>
+    </message>
+    <message>
+        <source>The wallet data was successfully saved to %1.</source>
+        <translation>נתוני הארנק נשמרו בהצלחה אל %1.</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>ביטול</translation>
+    </message>
+</context>
+<context>
+    <name>bitcoin-core</name>
+    <message>
+        <source>Distributed under the MIT software license, see the accompanying file %s or %s</source>
+        <translation>מופץ תחת רשיון התוכנה של MIT, ראה קובץ מלווה  %s או %s</translation>
+    </message>
+    <message>
+        <source>Prune configured below the minimum of %d MiB.  Please use a higher number.</source>
+        <translation>הגיזום הוגדר כפחות מהמינימום של  %d MiB. נא להשתמש במספר גבוה יותר.</translation>
+    </message>
+    <message>
+        <source>Prune: last wallet synchronisation goes beyond pruned data. You need to -reindex (download the whole blockchain again in case of pruned node)</source>
+        <translation>גיזום: הסינכרון האחרון של הארנק עובר את היקף הנתונים שנגזמו. יש לבצע חידוש אידקסציה (נא להוריד את כל שרשרת הבלוקים שוב במקרה של צומת מקוצצת)</translation>
+    </message>
+    <message>
+        <source>Pruning blockstore...</source>
+        <translation>מקצץ את ה blockstore...</translation>
+    </message>
+    <message>
+        <source>Unable to start HTTP server. See debug log for details.</source>
+        <translation>שרת ה HTTP לא עלה. ראו את ה debug לוג לפרטים.</translation>
+    </message>
+    <message>
+        <source>The %s developers</source>
+        <translation>ה %s מפתחים</translation>
+    </message>
+    <message>
+        <source>Cannot provide specific connection
