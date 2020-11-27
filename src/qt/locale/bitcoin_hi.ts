@@ -208,4 +208,259 @@
         <translation>वॉलेट एन्क्रिप्शन विफल रहा</translation>
     </message>
     <message>
-        <source>Wallet encryption failed due to an internal error. Your wallet was not encrypted.
+        <source>Wallet encryption failed due to an internal error. Your wallet was not encrypted.</source>
+        <translation>आंतरिक त्रुटि के कारण वॉलेट एन्क्रिप्शन विफल रहा। आपका वॉलेट "बटुआ" एन्क्रिप्ट नहीं किया गया था।</translation>
+    </message>
+    <message>
+        <source>The supplied passphrases do not match.</source>
+        <translation>आपूर्ति किए गए पासफ़्रेज़ मेल नहीं खाते हैं।</translation>
+    </message>
+    <message>
+        <source>Wallet unlock failed</source>
+        <translation>वॉलेट अनलॉक विफल रहा</translation>
+    </message>
+    <message>
+        <source>The passphrase entered for the wallet decryption was incorrect.</source>
+        <translation>वॉलेट डिक्रिप्शन के लिए दर्ज किया गया पासफ़्रेज़ गलत था।</translation>
+    </message>
+    <message>
+        <source>Wallet decryption failed</source>
+        <translation>वॉलेट डिक्रिप्शन विफल</translation>
+    </message>
+    <message>
+        <source>Wallet passphrase was successfully changed.</source>
+        <translation>वॉलेट पासफ़्रेज़ को सफलतापूर्वक बदल दिया गया था।</translation>
+    </message>
+    <message>
+        <source>Warning: The Caps Lock key is on!</source>
+        <translation>चेतावनी: कैप्स लॉक कुंजी चालू है!</translation>
+    </message>
+</context>
+<context>
+    <name>BanTableModel</name>
+    <message>
+        <source>IP/Netmask</source>
+        <translation>आईपी /नेटमास्क "Netmask"</translation>
+    </message>
+    <message>
+        <source>Banned Until</source>
+        <translation> तक बैन कर दिया</translation>
+    </message>
+</context>
+<context>
+    <name>BitcoinGUI</name>
+    <message>
+        <source>Sign &amp;message...</source>
+        <translation>हस्ताक्षर और संदेश ...</translation>
+    </message>
+    <message>
+        <source>Synchronizing with network...</source>
+        <translation>नेटवर्क से समकालिकरण जारी है ...</translation>
+    </message>
+    <message>
+        <source>&amp;Overview</source>
+        <translation>&amp;विवरण</translation>
+    </message>
+    <message>
+        <source>Show general overview of wallet</source>
+        <translation>वॉलेट का सामानया विवरण दिखाए !</translation>
+    </message>
+    <message>
+        <source>&amp;Transactions</source>
+        <translation>&amp; लेन-देन
+</translation>
+    </message>
+    <message>
+        <source>Browse transaction history</source>
+        <translation>देखिए पुराने लेन-देन के विवरण !</translation>
+    </message>
+    <message>
+        <source>E&amp;xit</source>
+        <translation>बाहर जायें</translation>
+    </message>
+    <message>
+        <source>Quit application</source>
+        <translation>अप्लिकेशन से बाहर निकलना !</translation>
+    </message>
+    <message>
+        <source>&amp;About %1</source>
+        <translation>और %1 के बारे में</translation>
+    </message>
+    <message>
+        <source>Show information about %1</source>
+        <translation>%1 के बारे में जानकारी दिखाएं</translation>
+    </message>
+    <message>
+        <source>About &amp;Qt</source>
+        <translation>के बारे में और क्यूटी "Qt"</translation>
+    </message>
+    <message>
+        <source>Show information about Qt</source>
+        <translation>क्यूटी "Qt" के बारे में जानकारी दिखाएँ</translation>
+    </message>
+    <message>
+        <source>&amp;Options...</source>
+        <translation>&amp;विकल्प</translation>
+    </message>
+    <message>
+        <source>&amp;Encrypt Wallet...</source>
+        <translation>और वॉलेट को गोपित "एन्क्रिप्ट" करें</translation>
+    </message>
+    <message>
+        <source>&amp;Backup Wallet...</source>
+        <translation>&amp;बैकप वॉलेट</translation>
+    </message>
+    <message>
+        <source>&amp;Change Passphrase...</source>
+        <translation>और पासफ़्रेज़ बदलें</translation>
+    </message>
+    <message>
+        <source>Wallet:</source>
+        <translation>तिजोरी</translation>
+    </message>
+    <message>
+        <source>Send coins to a Bitcoin address</source>
+        <translation>इस पते पर बिटकौइन भेजें</translation>
+    </message>
+    <message>
+        <source>Change the passphrase used for wallet encryption</source>
+        <translation>पहचान शब्द/अक्षर जो वॉलेट एनक्रिपशन के लिए इस्तेमाल किया है उसे बदलिए!</translation>
+    </message>
+    <message>
+        <source>&amp;File</source>
+        <translation>&amp;फाइल</translation>
+    </message>
+    <message>
+        <source>&amp;Settings</source>
+        <translation>&amp;सेट्टिंग्स</translation>
+    </message>
+    <message>
+        <source>&amp;Help</source>
+        <translation>&amp;मदद</translation>
+    </message>
+    <message>
+        <source>Tabs toolbar</source>
+        <translation>टैबस टूलबार</translation>
+    </message>
+    <message>
+        <source>%1 behind</source>
+        <translation>%1 पीछे</translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation>भूल</translation>
+    </message>
+    <message>
+        <source>Warning</source>
+        <translation>चेतावनी</translation>
+    </message>
+    <message>
+        <source>Information</source>
+        <translation>जानकारी</translation>
+    </message>
+    <message>
+        <source>Up to date</source>
+        <translation>नवीनतम</translation>
+    </message>
+    <message>
+        <source>Open a wallet</source>
+        <translation>बटुआ खोलें</translation>
+    </message>
+    <message>
+        <source>Close Wallet...</source>
+        <translation>बटुआ बंद करें...</translation>
+    </message>
+    <message>
+        <source>Close wallet</source>
+        <translation>बटुआ बंद करें</translation>
+    </message>
+    <message>
+        <source>Close All Wallets...</source>
+        <translation>सारे बटुएँ बंद करें...</translation>
+    </message>
+    <message>
+        <source>Sent transaction</source>
+        <translation>भेजी ट्रांजक्शन</translation>
+    </message>
+    <message>
+        <source>Incoming transaction</source>
+        <translation>प्राप्त हुई ट्रांजक्शन</translation>
+    </message>
+    <message>
+        <source>Wallet is &lt;b&gt;encrypted&lt;/b&gt; and currently &lt;b&gt;unlocked&lt;/b&gt;</source>
+        <translation>वॉलेट एन्क्रिप्टेड है तथा अभी लॉक्ड नहीं है</translation>
+    </message>
+    <message>
+        <source>Wallet is &lt;b&gt;encrypted&lt;/b&gt; and currently &lt;b&gt;locked&lt;/b&gt;</source>
+        <translation>वॉलेट एन्क्रिप्टेड है तथा अभी लॉक्ड है</translation>
+    </message>
+    </context>
+<context>
+    <name>CoinControlDialog</name>
+    <message>
+        <source>Quantity:</source>
+        <translation>मात्रा :</translation>
+    </message>
+    <message>
+        <source>Amount:</source>
+        <translation>राशि :</translation>
+    </message>
+    <message>
+        <source>Amount</source>
+        <translation>राशि</translation>
+    </message>
+    <message>
+        <source>Date</source>
+        <translation>taareek</translation>
+    </message>
+    <message>
+        <source>Confirmed</source>
+        <translation>पक्का</translation>
+    </message>
+    <message>
+        <source>yes</source>
+        <translation>हाँ</translation>
+    </message>
+    <message>
+        <source>no</source>
+        <translation>नहीं</translation>
+    </message>
+    <message>
+        <source>(no label)</source>
+        <translation>(कोई परचा नहीं )</translation>
+    </message>
+    </context>
+<context>
+    <name>CreateWalletActivity</name>
+    </context>
+<context>
+    <name>CreateWalletDialog</name>
+    </context>
+<context>
+    <name>EditAddressDialog</name>
+    <message>
+        <source>Edit Address</source>
+        <translation>पता एडिट करना</translation>
+    </message>
+    <message>
+        <source>&amp;Label</source>
+        <translation>&amp;लेबल</translation>
+    </message>
+    <message>
+        <source>&amp;Address</source>
+        <translation>&amp;पता</translation>
+    </message>
+    </context>
+<context>
+    <name>FreespaceChecker</name>
+    </context>
+<context>
+    <name>HelpMessageDialog</name>
+    <message>
+        <source>version</source>
+        <translation>संस्करण</translation>
+    </message>
+    </context>
+<context>
+    <name>Intro</name>
+    <mes
