@@ -463,4 +463,313 @@
     </context>
 <context>
     <name>Intro</name>
-    <mes
+    <message>
+        <source>Bitcoin</source>
+        <translation>बीटकोइन</translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation>भूल</translation>
+    </message>
+    </context>
+<context>
+    <name>ModalOverlay</name>
+    <message>
+        <source>Form</source>
+        <translation>फार्म</translation>
+    </message>
+    </context>
+<context>
+    <name>OpenURIDialog</name>
+    </context>
+<context>
+    <name>OpenWalletActivity</name>
+    </context>
+<context>
+    <name>OptionsDialog</name>
+    <message>
+        <source>Options</source>
+        <translation>विकल्प</translation>
+    </message>
+    <message>
+        <source>W&amp;allet</source>
+        <translation>वॉलेट</translation>
+    </message>
+    <message>
+        <source>&amp;OK</source>
+        <translation>&amp;ओके</translation>
+    </message>
+    <message>
+        <source>&amp;Cancel</source>
+        <translation>&amp;कैन्सल</translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation>भूल</translation>
+    </message>
+    </context>
+<context>
+    <name>OverviewPage</name>
+    <message>
+        <source>Form</source>
+        <translation>फार्म</translation>
+    </message>
+    </context>
+<context>
+    <name>PSBTOperationsDialog</name>
+    </context>
+<context>
+    <name>PaymentServer</name>
+    </context>
+<context>
+    <name>PeerTableModel</name>
+    </context>
+<context>
+    <name>QObject</name>
+    <message>
+        <source>Amount</source>
+        <translation>राशि</translation>
+    </message>
+    <message>
+        <source>N/A</source>
+        <translation>लागू नही
+</translation>
+    </message>
+    <message>
+        <source>unknown</source>
+        <translation>अज्ञात</translation>
+    </message>
+</context>
+<context>
+    <name>QRImageWidget</name>
+    </context>
+<context>
+    <name>RPCConsole</name>
+    <message>
+        <source>N/A</source>
+        <translation>लागू नही
+</translation>
+    </message>
+    <message>
+        <source>&amp;Information</source>
+        <translation>जानकारी</translation>
+    </message>
+    </context>
+<context>
+    <name>ReceiveCoinsDialog</name>
+    <message>
+        <source>&amp;Amount:</source>
+        <translation>राशि :</translation>
+    </message>
+    <message>
+        <source>&amp;Label:</source>
+        <translation>लेबल:</translation>
+    </message>
+    </context>
+<context>
+    <name>ReceiveRequestDialog</name>
+    <message>
+        <source>Amount:</source>
+        <translation>राशि :</translation>
+    </message>
+    <message>
+        <source>Wallet:</source>
+        <translation>तिजोरी</translation>
+    </message>
+    <message>
+        <source>Copy &amp;Address</source>
+        <translation>&amp;पता कॉपी करे</translation>
+    </message>
+    </context>
+<context>
+    <name>RecentRequestsTableModel</name>
+    <message>
+        <source>Date</source>
+        <translation>taareek</translation>
+    </message>
+    <message>
+        <source>Label</source>
+        <translation>परचा</translation>
+    </message>
+    <message>
+        <source>(no label)</source>
+        <translation>(कोई परचा नहीं )</translation>
+    </message>
+    </context>
+<context>
+    <name>SendCoinsDialog</name>
+    <message>
+        <source>Send Coins</source>
+        <translation>सिक्के भेजें|</translation>
+    </message>
+    <message>
+        <source>Quantity:</source>
+        <translation>मात्रा :</translation>
+    </message>
+    <message>
+        <source>Amount:</source>
+        <translation>राशि :</translation>
+    </message>
+    <message>
+        <source>Send to multiple recipients at once</source>
+        <translation>एक साथ कई प्राप्तकर्ताओं को भेजें</translation>
+    </message>
+    <message>
+        <source>Balance:</source>
+        <translation>बाकी रकम :</translation>
+    </message>
+    <message>
+        <source>Confirm the send action</source>
+        <translation>भेजने की पुष्टि करें</translation>
+    </message>
+    <message>
+        <source>(no label)</source>
+        <translation>(कोई परचा नहीं )</translation>
+    </message>
+</context>
+<context>
+    <name>SendCoinsEntry</name>
+    <message>
+        <source>A&amp;mount:</source>
+        <translation>अमाउंट:</translation>
+    </message>
+    <message>
+        <source>Pay &amp;To:</source>
+        <translation>प्राप्तकर्ता:</translation>
+    </message>
+    <message>
+        <source>&amp;Label:</source>
+        <translation>लेबल:</translation>
+    </message>
+    <message>
+        <source>Alt+A</source>
+        <translation>Alt-A</translation>
+    </message>
+    <message>
+        <source>Paste address from clipboard</source>
+        <translation>Clipboard से एड्रेस paste करें</translation>
+    </message>
+    <message>
+        <source>Alt+P</source>
+        <translation>Alt-P</translation>
+    </message>
+    <message>
+        <source>Pay To:</source>
+        <translation>प्राप्तकर्ता:</translation>
+    </message>
+    </context>
+<context>
+    <name>ShutdownWindow</name>
+    </context>
+<context>
+    <name>SignVerifyMessageDialog</name>
+    <message>
+        <source>Alt+A</source>
+        <translation>Alt-A</translation>
+    </message>
+    <message>
+        <source>Paste address from clipboard</source>
+        <translation>Clipboard से एड्रेस paste करें</translation>
+    </message>
+    <message>
+        <source>Alt+P</source>
+        <translation>Alt-P</translation>
+    </message>
+    <message>
+        <source>Signature</source>
+        <translation>हस्ताक्षर</translation>
+    </message>
+    </context>
+<context>
+    <name>TrafficGraphWidget</name>
+    </context>
+<context>
+    <name>TransactionDesc</name>
+    <message>
+        <source>Date</source>
+        <translation>दिनांक</translation>
+    </message>
+    <message>
+        <source>Source</source>
+        <translation>स्रोत</translation>
+    </message>
+    <message>
+        <source>Generated</source>
+        <translation>उत्पन्न</translation>
+    </message>
+    <message>
+        <source>unknown</source>
+        <translation>अज्ञात</translation>
+    </message>
+    <message>
+        <source>Amount</source>
+        <translation>राशि</translation>
+    </message>
+    </context>
+<context>
+    <name>TransactionDescDialog</name>
+    <message>
+        <source>This pane shows a detailed description of the transaction</source>
+        <translation>ये खिड़की आपको लेन-देन का विस्तृत विवरण देगी !</translation>
+    </message>
+    </context>
+<context>
+    <name>TransactionTableModel</name>
+    <message>
+        <source>Date</source>
+        <translation>taareek</translation>
+    </message>
+    <message>
+        <source>Label</source>
+        <translation>परचा</translation>
+    </message>
+    <message>
+        <source>(no label)</source>
+        <translation>(कोई परचा नहीं )</translation>
+    </message>
+    </context>
+<context>
+    <name>TransactionView</name>
+    <message>
+        <source>Comma separated file (*.csv)</source>
+        <translation>कोमा द्वारा अलग की गई फ़ाइल (* .csv)</translation>
+    </message>
+    <message>
+        <source>Confirmed</source>
+        <translation>पक्का</translation>
+    </message>
+    <message>
+        <source>Date</source>
+        <translation>taareek</translation>
+    </message>
+    <message>
+        <source>Label</source>
+        <translation>परचा</translation>
+    </message>
+    <message>
+        <source>Address</source>
+        <translation>पता</translation>
+    </message>
+    <message>
+        <source>Exporting Failed</source>
+        <translation>निर्यात विफल रहा</translation>
+    </message>
+    </context>
+<context>
+    <name>UnitDisplayStatusBarControl</name>
+    </context>
+<context>
+    <name>WalletController</name>
+    <message>
+        <source>Close wallet</source>
+        <translation>बटुआ बंद करें</translation>
+    </message>
+    </context>
+<context>
+    <name>WalletFrame</name>
+    </context>
+<context>
+    <name>WalletModel</name>
+    <message>
+        <source>Send Coins</source>
+        <translatio
