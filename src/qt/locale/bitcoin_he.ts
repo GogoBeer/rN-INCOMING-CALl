@@ -3706,4 +3706,168 @@ Go to File &gt; Open Wallet to load a wallet.
         <translation>כתובת לא ידועה מסוג "%s"</translation>
     </message>
     <message>
-        <source>Unk
+        <source>Unknown change type '%s'</source>
+        <translation>סוג שינוי לא ידוע: "%s"</translation>
+    </message>
+    <message>
+        <source>Upgrading txindex database</source>
+        <translation>שדרוג מאגר נתוני txindex </translation>
+    </message>
+    <message>
+        <source>Loading P2P addresses...</source>
+        <translation>טעינת כתובות P2P...</translation>
+    </message>
+    <message>
+        <source>Loading banlist...</source>
+        <translation>טוען רשימת חסומים...</translation>
+    </message>
+    <message>
+        <source>Not enough file descriptors available.</source>
+        <translation>אין מספיק מידע על הקובץ</translation>
+    </message>
+    <message>
+        <source>Prune cannot be configured with a negative value.</source>
+        <translation>לא ניתן להגדיר גיזום כערך שלילי</translation>
+    </message>
+    <message>
+        <source>Prune mode is incompatible with -txindex.</source>
+        <translation>שיטת הגיזום אינה תואמת את  -txindex.</translation>
+    </message>
+    <message>
+        <source>Replaying blocks...</source>
+        <translation>הצגה מחודשת של הבלוקים...</translation>
+    </message>
+    <message>
+        <source>Rewinding blocks...</source>
+        <translation>חזרה לאחור של הבלוקים...</translation>
+    </message>
+    <message>
+        <source>The source code is available from %s.</source>
+        <translation>קוד המקור זמין ב %s.</translation>
+    </message>
+    <message>
+        <source>Transaction fee and change calculation failed</source>
+        <translation>החישוב עבור עמלת העיסקה והעודף נכשל</translation>
+    </message>
+    <message>
+        <source>Unable to bind to %s on this computer. %s is probably already running.</source>
+        <translation>לא מצליח להתחבר אל %s על מחשב זה. %s  קרוב לודאי שכבר רץ.</translation>
+    </message>
+    <message>
+        <source>Unable to generate keys</source>
+        <translation>כשל בהפקת מפתחות</translation>
+    </message>
+    <message>
+        <source>Unsupported logging category %s=%s.</source>
+        <translation>קטגורית רישום בלוג שאינה נמתמכת %s=%s.</translation>
+    </message>
+    <message>
+        <source>Upgrading UTXO database</source>
+        <translation>שדרוג מאגר נתוני UTXO </translation>
+    </message>
+    <message>
+        <source>User Agent comment (%s) contains unsafe characters.</source>
+        <translation>הערת צד המשתמש (%s) כוללת תווים שאינם בטוחים.</translation>
+    </message>
+    <message>
+        <source>Verifying blocks...</source>
+        <translation>באימות הבלוקים…</translation>
+    </message>
+    <message>
+        <source>Wallet needed to be rewritten: restart %s to complete</source>
+        <translation>יש לכתוב את הארנק מחדש: יש להפעיל את %s כדי להמשיך</translation>
+    </message>
+    <message>
+        <source>Error: Listening for incoming connections failed (listen returned error %s)</source>
+        <translation>שגיאה: האזנה לתקשורת נכנ סת נכשלה (ההאזנה מחזירה שגיאה  %s)</translation>
+    </message>
+    <message>
+        <source>%s corrupt. Try using the wallet tool bitcoin-wallet to salvage or restoring a backup.</source>
+        <translation>%s משובש. נסו להשתמש בכלי הארנק bitcoin-wallet כדי להציל או לשחזר מגיבוי..</translation>
+    </message>
+    <message>
+        <source>Cannot upgrade a non HD split wallet without upgrading to support pre split keypool. Please use version 169900 or no version specified.</source>
+        <translation>אין אפשרות לשדרג ארנק מפוצל שאינו HD מבלי לתמוך במאגר המפתחות טרם הפיצול. בבקשה להשתמש בגירסת 169900 או שלא צויינה גירסה.</translation>
+    </message>
+    <message>
+        <source>The transaction amount is too small to send after the fee has been deducted</source>
+        <translation>סכום העברה נמוך מדי לשליחה אחרי גביית העמלה</translation>
+    </message>
+    <message>
+        <source>This error could occur if this wallet was not shutdown cleanly and was last loaded using a build with a newer version of Berkeley DB. If so, please use the software that last loaded this wallet</source>
+        <translation>שגיאה זו יכלה לקרות אם הארנק לא נסגר באופן נקי והועלה לאחרונה עם מבנה מבוסס גירסת Berkeley DB חדשה יותר. במקרה זה, יש להשתמש בתוכנה אשר טענה את הארנק בפעם האחרונה.</translation>
+    </message>
+    <message>
+        <source>This is the maximum transaction fee you pay (in addition to the normal fee) to prioritize partial spend avoidance over regular coin selection.</source>
+        <translation>זוהי עמלת העיסקה המרבית שתשלם (בנוסף לעמלה הרגילה) כדי לתעדף מניעת תשלום חלקי על פני בחירה רגילה של מטבע. </translation>
+    </message>
+    <message>
+        <source>Transaction needs a change address, but we can't generate it. Please call keypoolrefill first.</source>
+        <translation>עיסקה מחייבת שינוי כתובת, אך לא ניתן לייצרה. נא לקרוא תחילה ל  keypoolrefill </translation>
+    </message>
+    <message>
+        <source>You need to rebuild the database using -reindex to go back to unpruned mode.  This will redownload the entire blockchain</source>
+        <translation>יש צורך בבניה מחדש של מסד הנתונים ע"י שימוש ב -reindex כדי לחזור חזרה לצומת שאינה גזומה.  הפעולה תוריד מחדש את כל שרשרת הבלוקים.</translation>
+    </message>
+    <message>
+        <source>A fatal internal error occurred, see debug.log for details</source>
+        <translation>שגיאה פטלית פנימית אירעה, לפירוט ראה את לוג הדיבאג.</translation>
+    </message>
+    <message>
+        <source>Cannot set -peerblockfilters without -blockfilterindex.</source>
+        <translation>לא מצליח להגדיר את  -peerblockfilters ללא-blockfilterindex.</translation>
+    </message>
+    <message>
+        <source>Disk space is too low!</source>
+        <translation>אין מספיק מקום בכונן!</translation>
+    </message>
+    <message>
+        <source>Error reading from database, shutting down.</source>
+        <translation>שגיאת קריאה ממסד הנתונים. סוגר את התהליך.</translation>
+    </message>
+    <message>
+        <source>Error upgrading chainstate database</source>
+        <translation>שגיאת שידרוג מסד הנתונים של מצב השרשרת chainstate</translation>
+    </message>
+    <message>
+        <source>Error: Disk space is low for %s</source>
+        <translation>שגיאה: שטח הדיסק קטן מדי עובר %s</translation>
+    </message>
+    <message>
+        <source>Error: Keypool ran out, please call keypoolrefill first</source>
+        <translation>שגיאה: Keypool עבר את המכסה, קרא תחילה ל  keypoolrefill </translation>
+    </message>
+    <message>
+        <source>Fee rate (%s) is lower than the minimum fee rate setting (%s)</source>
+        <translation>שיעור העמלה (%s) נמוך משיעור העמלה המינימלי המוגדר  (%s)</translation>
+    </message>
+    <message>
+        <source>Invalid -onion address or hostname: '%s'</source>
+        <translation>אי תקינות כתובת  -onion או hostname: '%s'</translation>
+    </message>
+    <message>
+        <source>Invalid -proxy address or hostname: '%s'</source>
+        <translation>אי תקינות כתובת -proxy או hostname: '%s'</translation>
+    </message>
+    <message>
+        <source>Invalid amount for -paytxfee=&lt;amount&gt;: '%s' (must be at least %s)</source>
+        <translation>סכום שגוי של ‎-paytxfee=&lt;amount&gt;‏‎:‏‏ '%s' (נדרשת %s לפחות)</translation>
+    </message>
+    <message>
+        <source>Invalid netmask specified in -whitelist: '%s'</source>
+        <translation>מסכת הרשת שצוינה עם ‎-whitelist שגויה: '%s'</translation>
+    </message>
+    <message>
+        <source>Need to specify a port with -whitebind: '%s'</source>
+        <translation>יש לציין פתחה עם ‎-whitebind:‏ '%s'</translation>
+    </message>
+    <message>
+        <source>No proxy server specified. Use -proxy=&lt;ip&gt; or -proxy=&lt;ip:port&gt;.</source>
+        <translation>לא הוגדר פרוקסי. יש להשתמש ב־‎ -proxy=&lt;ip&gt; או ב־‎ -proxy=&lt;ip:port&gt;.</translation>
+    </message>
+    <message>
+        <source>Prune mode is incompatible with -blockfilterindex.</source>
+        <translation>מצב מצומצם לא ניתן לשימוש עם blockfilterindex</translation>
+    </message>
+    <message>
+        <source>Reducing -maxconnections from %d to %d, because of system limi
