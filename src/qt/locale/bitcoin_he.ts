@@ -3870,4 +3870,162 @@ Go to File &gt; Open Wallet to load a wallet.
         <translation>מצב מצומצם לא ניתן לשימוש עם blockfilterindex</translation>
     </message>
     <message>
-        <source>Reducing -maxconnections from %d to %d, because of system limi
+        <source>Reducing -maxconnections from %d to %d, because of system limitations.</source>
+        <translation>הורדת -maxconnections מ %d ל %d, עקב מגבלות מערכת.</translation>
+    </message>
+    <message>
+        <source>Section [%s] is not recognized.</source>
+        <translation>הפסקה [%s] אינה מזוהה.</translation>
+    </message>
+    <message>
+        <source>Signing transaction failed</source>
+        <translation>החתימה על ההעברה נכשלה</translation>
+    </message>
+    <message>
+        <source>Specified -walletdir "%s" does not exist</source>
+        <translation>תיקיית הארנק שצויינה  -walletdir "%s" אינה קיימת</translation>
+    </message>
+    <message>
+        <source>Specified -walletdir "%s" is a relative path</source>
+        <translation>תיקיית הארנק שצויינה -walletdir "%s" הנה נתיב יחסי</translation>
+    </message>
+    <message>
+        <source>Specified -walletdir "%s" is not a directory</source>
+        <translation>תיקיית הארנק שצויינה -walletdir‏ "%s" אינה תיקיה</translation>
+    </message>
+    <message>
+        <source>The specified config file %s does not exist
+</source>
+        <translation>קובץ הקונפיג שצויין  %s אינו קיים
+</translation>
+    </message>
+    <message>
+        <source>The transaction amount is too small to pay the fee</source>
+        <translation>סכום ההעברה נמוך מכדי לשלם את העמלה</translation>
+    </message>
+    <message>
+        <source>This is experimental software.</source>
+        <translation>זוהי תכנית נסיונית.</translation>
+    </message>
+    <message>
+        <source>Transaction amount too small</source>
+        <translation>סכום ההעברה קטן מדי</translation>
+    </message>
+    <message>
+        <source>Transaction too large</source>
+        <translation>סכום ההעברה גדול מדי</translation>
+    </message>
+    <message>
+        <source>Unable to bind to %s on this computer (bind returned error %s)</source>
+        <translation>לא ניתן להתאגד עם הפתחה %s במחשב זה (פעולת האיגוד החזירה את השגיאה %s)</translation>
+    </message>
+    <message>
+        <source>Unable to create the PID file '%s': %s</source>
+        <translation>לא ניתן ליצור את קובץ PID‏ '%s':‏ %s</translation>
+    </message>
+    <message>
+        <source>Unable to generate initial keys</source>
+        <translation>לא ניתן ליצור מפתחות ראשוניים</translation>
+    </message>
+    <message>
+        <source>Unknown -blockfilterindex value %s.</source>
+        <translation>ערך -blockfilterindex   %s לא ידוע.</translation>
+    </message>
+    <message>
+        <source>Verifying wallet(s)...</source>
+        <translation>באימות הארנק(ים)...</translation>
+    </message>
+    <message>
+        <source>Warning: unknown new rules activated (versionbit %i)</source>
+        <translation>אזהרה: חוקים חדשים שאינם מוכרים שופעלו (versionbit %i)</translation>
+    </message>
+    <message>
+        <source>-maxtxfee is set very high! Fees this large could be paid on a single transaction.</source>
+        <translation>-maxtxfee נקבע לעמלות גבוהות מאד! עמלות גבוהות כאלו יכולות משולמות עבר עסקה בודדת.</translation>
+    </message>
+    <message>
+        <source>This is the transaction fee you may pay when fee estimates are not available.</source>
+        <translation>זוהי עמלת העסקה שתוכל לשלם כאשר אמדן גובה העמלה אינו זמין.</translation>
+    </message>
+    <message>
+        <source>Total length of network version string (%i) exceeds maximum length (%i). Reduce the number or size of uacomments.</source>
+        <translation>האורך הכולל של רצף התווים של גירסת הרשת  (%i) גדול מהאורך המרבי המותר (%i). יש להקטין את המספר או האורך של uacomments.</translation>
+    </message>
+    <message>
+        <source>%s is set very high!</source>
+        <translation>%s הוגדר מאד גבוה!</translation>
+    </message>
+    <message>
+        <source>Error loading wallet %s. Duplicate -wallet filename specified.</source>
+        <translation>שגיאת טעינת ארנק %s. שם קובץ  -wallet  כפול הוגדר.</translation>
+    </message>
+    <message>
+        <source>Starting network threads...</source>
+        <translation>תהליכי הרשת מופעלים…</translation>
+    </message>
+    <message>
+        <source>The wallet will avoid paying less than the minimum relay fee.</source>
+        <translation>הארנק ימנע מלשלם פחות מאשר עמלת העברה מינימלית.</translation>
+    </message>
+    <message>
+        <source>This is the minimum transaction fee you pay on every transaction.</source>
+        <translation>זו עמלת ההעברה המזערית שתיגבה מכל העברה שלך.</translation>
+    </message>
+    <message>
+        <source>This is the transaction fee you will pay if you send a transaction.</source>
+        <translation>זו עמלת ההעברה שתיגבה ממך במידה של שליחת העברה.</translation>
+    </message>
+    <message>
+        <source>Transaction amounts must not be negative</source>
+        <translation>סכומי ההעברה לא יכולים להיות שליליים</translation>
+    </message>
+    <message>
+        <source>Transaction has too long of a mempool chain</source>
+        <translation>לעסקה יש שרשרת ארוכה מדי של mempool </translation>
+    </message>
+    <message>
+        <source>Transaction must have at least one recipient</source>
+        <translation>להעברה חייב להיות לפחות נמען אחד</translation>
+    </message>
+    <message>
+        <source>Unknown network specified in -onlynet: '%s'</source>
+        <translation>רשת לא ידועה צוינה דרך ‎-onlynet:‏ '%s'</translation>
+    </message>
+    <message>
+        <source>Insufficient funds</source>
+        <translation>אין מספיק כספים</translation>
+    </message>
+    <message>
+        <source>Fee estimation failed. Fallbackfee is disabled. Wait a few blocks or enable -fallbackfee.</source>
+        <translation>אמדן גובה עמלה נכשל. Fallbackfee  מנוטרל. יש להמתין מספר בלוקים או לשפעל את  -fallbackfee</translation>
+    </message>
+    <message>
+        <source>Warning: Private keys detected in wallet {%s} with disabled private keys</source>
+        <translation>אזהרה: זוהו מפתחות פרטיים בארנק {%s} עם מפתחות פרטיים מושבתים</translation>
+    </message>
+    <message>
+        <source>Cannot write to data directory '%s'; check permissions.</source>
+        <translation>לא ניתן לכתוב אל תיקיית הנתונים ‚%s’, נא לבדוק את ההרשאות.</translation>
+    </message>
+    <message>
+        <source>Loading block index...</source>
+        <translation>מפתח המקטעים נטען…</translation>
+    </message>
+    <message>
+        <source>Loading wallet...</source>
+        <translation>הארנק בטעינה…</translation>
+    </message>
+    <message>
+        <source>Cannot downgrade wallet</source>
+        <translation>לא ניתן להחזיר את גרסת הארנק</translation>
+    </message>
+    <message>
+        <source>Rescanning...</source>
+        <translation>סריקה מחדש…</translation>
+    </message>
+    <message>
+        <source>Done loading</source>
+        <translation>טעינה הושלמה</translation>
+    </message>
+</context>
+</TS>
