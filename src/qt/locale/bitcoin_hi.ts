@@ -772,4 +772,49 @@
     <name>WalletModel</name>
     <message>
         <source>Send Coins</source>
-        <translatio
+        <translation>सिक्के भेजें|</translation>
+    </message>
+    </context>
+<context>
+    <name>WalletView</name>
+    <message>
+        <source>&amp;Export</source>
+        <translation>&amp;निर्यात</translation>
+    </message>
+    <message>
+        <source>Export the data in the current tab to a file</source>
+        <translation>डेटा को मौजूदा टैब से एक फ़ाइल में निर्यात करें</translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation>भूल</translation>
+    </message>
+    </context>
+<context>
+    <name>bitcoin-core</name>
+    <message>
+        <source>This is a pre-release test build - use at your own risk - do not use for mining or merchant applications</source>
+        <translation>यह एक पूर्व-रिलीज़ परीक्षण बिल्ड है - अपने जोखिम पर उपयोग करें - खनन या व्यापारी अनुप्रयोगों के लिए उपयोग न करें</translation>
+    </message>
+    <message>
+        <source>Verifying blocks...</source>
+        <translation>ब्लॉक्स जाँचे जा रहा है...</translation>
+    </message>
+    <message>
+        <source>Loading block index...</source>
+        <translation>ब्लॉक इंडेक्स आ रहा है...</translation>
+    </message>
+    <message>
+        <source>Loading wallet...</source>
+        <translation>वॉलेट आ रहा है...</translation>
+    </message>
+    <message>
+        <source>Rescanning...</source>
+        <translation>रि-स्केनी-इंग...</translation>
+    </message>
+    <message>
+        <source>Done loading</source>
+        <translation>लोड हो गया|</translation>
+    </message>
+</context>
+</TS>
