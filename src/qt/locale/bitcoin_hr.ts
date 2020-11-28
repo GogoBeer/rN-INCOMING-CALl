@@ -169,4 +169,198 @@
     </message>
     <message>
         <source>Are you sure you wish to encrypt your wallet?</source>
-        <translation>Jeste li 
+        <translation>Jeste li sigurni da želite šifrirati svoj novčanik?</translation>
+    </message>
+    <message>
+        <source>Wallet encrypted</source>
+        <translation>Novčanik šifriran</translation>
+    </message>
+    <message>
+        <source>Enter the new passphrase for the wallet.&lt;br/&gt;Please use a passphrase of &lt;b&gt;ten or more random characters&lt;/b&gt;, or &lt;b&gt;eight or more words&lt;/b&gt;.</source>
+        <translation>Unesite novu lozinku za novčanik. &lt;br/&gt;Molimo vas da koristite zaporku od &lt;b&gt;deset ili više slučajnih znakova&lt;/b&gt;, ili &lt;b&gt;osam ili više riječi.&lt;/b&gt;</translation>
+    </message>
+    <message>
+        <source>Enter the old passphrase and new passphrase for the wallet.</source>
+        <translation>Unesite staru i novu lozinku za novčanik.</translation>
+    </message>
+    <message>
+        <source>Remember that encrypting your wallet cannot fully protect your bitcoins from being stolen by malware infecting your computer.</source>
+        <translation>Zapamtite da šifriranje vašeg novčanika ne može u potpunosti zaštititi vaše bitcoinove od zloćudnog softvera kojim se zarazi vaše računalo.</translation>
+    </message>
+    <message>
+        <source>Wallet to be encrypted</source>
+        <translation>Novčanik koji treba šifrirati</translation>
+    </message>
+    <message>
+        <source>Your wallet is about to be encrypted. </source>
+        <translation>Vaš novčanik će biti šifriran.</translation>
+    </message>
+    <message>
+        <source>Your wallet is now encrypted. </source>
+        <translation>Vaš novčanik je sad šifriran.</translation>
+    </message>
+    <message>
+        <source>IMPORTANT: Any previous backups you have made of your wallet file should be replaced with the newly generated, encrypted wallet file. For security reasons, previous backups of the unencrypted wallet file will become useless as soon as you start using the new, encrypted wallet.</source>
+        <translation>VAŽNO: Sve prethodne pričuve vašeg novčanika trebale bi biti zamijenjene novo stvorenom, šifriranom datotekom novčanika. Zbog sigurnosnih razloga, prethodne pričuve nešifriranog novčanika će postati beskorisne čim počnete koristiti novi, šifrirani novčanik.</translation>
+    </message>
+    <message>
+        <source>Wallet encryption failed</source>
+        <translation>Šifriranje novčanika nije uspjelo</translation>
+    </message>
+    <message>
+        <source>Wallet encryption failed due to an internal error. Your wallet was not encrypted.</source>
+        <translation>Šifriranje novčanika nije uspjelo zbog interne pogreške. Vaš novčanik nije šifriran.</translation>
+    </message>
+    <message>
+        <source>The supplied passphrases do not match.</source>
+        <translation>Priložene lozinke se ne podudaraju.</translation>
+    </message>
+    <message>
+        <source>Wallet unlock failed</source>
+        <translation>Otključavanje novčanika nije uspjelo</translation>
+    </message>
+    <message>
+        <source>The passphrase entered for the wallet decryption was incorrect.</source>
+        <translation>Lozinka za dešifriranje novčanika nije točna.</translation>
+    </message>
+    <message>
+        <source>Wallet decryption failed</source>
+        <translation>Dešifriranje novčanika nije uspjelo</translation>
+    </message>
+    <message>
+        <source>Wallet passphrase was successfully changed.</source>
+        <translation>Lozinka novčanika je uspješno promijenjena.</translation>
+    </message>
+    <message>
+        <source>Warning: The Caps Lock key is on!</source>
+        <translation>Upozorenje: Caps Lock je uključen!</translation>
+    </message>
+</context>
+<context>
+    <name>BanTableModel</name>
+    <message>
+        <source>IP/Netmask</source>
+        <translation>IP/Mrežna maska</translation>
+    </message>
+    <message>
+        <source>Banned Until</source>
+        <translation>Zabranjen do</translation>
+    </message>
+</context>
+<context>
+    <name>BitcoinGUI</name>
+    <message>
+        <source>Sign &amp;message...</source>
+        <translation>P&amp;otpišite poruku...</translation>
+    </message>
+    <message>
+        <source>Synchronizing with network...</source>
+        <translation>Sinkronizira se s mrežom...</translation>
+    </message>
+    <message>
+        <source>&amp;Overview</source>
+        <translation>&amp;Pregled</translation>
+    </message>
+    <message>
+        <source>Show general overview of wallet</source>
+        <translation>Prikaži opći pregled novčanika</translation>
+    </message>
+    <message>
+        <source>&amp;Transactions</source>
+        <translation>&amp;Transakcije</translation>
+    </message>
+    <message>
+        <source>Browse transaction history</source>
+        <translation>Pretražite povijest transakcija</translation>
+    </message>
+    <message>
+        <source>E&amp;xit</source>
+        <translation>&amp;Izlaz</translation>
+    </message>
+    <message>
+        <source>Quit application</source>
+        <translation>Zatvorite aplikaciju</translation>
+    </message>
+    <message>
+        <source>&amp;About %1</source>
+        <translation>&amp;Više o %1</translation>
+    </message>
+    <message>
+        <source>Show information about %1</source>
+        <translation>Prikažite informacije o programu %1</translation>
+    </message>
+    <message>
+        <source>About &amp;Qt</source>
+        <translation>Više o &amp;Qt</translation>
+    </message>
+    <message>
+        <source>Show information about Qt</source>
+        <translation>Prikažite informacije o Qt</translation>
+    </message>
+    <message>
+        <source>&amp;Options...</source>
+        <translation>Pos&amp;tavke...</translation>
+    </message>
+    <message>
+        <source>Modify configuration options for %1</source>
+        <translation>Promijenite postavke za %1</translation>
+    </message>
+    <message>
+        <source>&amp;Encrypt Wallet...</source>
+        <translation>Ši&amp;frirajte novčanik...</translation>
+    </message>
+    <message>
+        <source>&amp;Backup Wallet...</source>
+        <translation>Spremite &amp;kopiju novčanika...</translation>
+    </message>
+    <message>
+        <source>&amp;Change Passphrase...</source>
+        <translation>Promijenite &amp;lozinku...</translation>
+    </message>
+    <message>
+        <source>Open &amp;URI...</source>
+        <translation>Otvorite &amp;URI...</translation>
+    </message>
+    <message>
+        <source>Create Wallet...</source>
+        <translation>Stvorite novčanik...</translation>
+    </message>
+    <message>
+        <source>Create a new wallet</source>
+        <translation>Stvorite novi novčanik</translation>
+    </message>
+    <message>
+        <source>Wallet:</source>
+        <translation>Novčanik:</translation>
+    </message>
+    <message>
+        <source>Click to disable network activity.</source>
+        <translation>Kliknite da isključite mrežnu aktivnost.</translation>
+    </message>
+    <message>
+        <source>Network activity disabled.</source>
+        <translation>Mrežna aktivnost isključena.</translation>
+    </message>
+    <message>
+        <source>Click to enable network activity again.</source>
+        <translation>Kliknite da ponovo uključite mrežnu aktivnost.</translation>
+    </message>
+    <message>
+        <source>Syncing Headers (%1%)...</source>
+        <translation>Sinkroniziraju se zaglavlja (%1%)...</translation>
+    </message>
+    <message>
+        <source>Reindexing blocks on disk...</source>
+        <translation>Re-indeksiranje blokova na disku...</translation>
+    </message>
+    <message>
+        <source>Proxy is &lt;b&gt;enabled&lt;/b&gt;: %1</source>
+        <translation>Proxy je &lt;b&gt;uključen&lt;/b&gt;: %1</translation>
+    </message>
+    <message>
+        <source>Send coins to a Bitcoin address</source>
+        <translation>Pošaljite novac na Bitcoin adresu</translation>
+    </message>
+    <message>
+        <source>Backup wallet to another location</source>
+        <translation>Napravite sigurnosnu kopiju novčanika na drugoj lokaciji</translation
