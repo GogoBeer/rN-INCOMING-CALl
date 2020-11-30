@@ -810,4 +810,170 @@
         <translation>Stvorite prazni novčanik. Prazni novčanici nemaju privatnih ključeva ili skripta. Mogu se naknadno uvesti privatne ključeve i adrese ili postaviti HD sjeme.</translation>
     </message>
     <message>
-  
+        <source>Make Blank Wallet</source>
+        <translation>Stvorite prazni novčanik</translation>
+    </message>
+    <message>
+        <source>Create</source>
+        <translation>Stvorite</translation>
+    </message>
+</context>
+<context>
+    <name>EditAddressDialog</name>
+    <message>
+        <source>Edit Address</source>
+        <translation>Uredite adresu</translation>
+    </message>
+    <message>
+        <source>&amp;Label</source>
+        <translation>&amp;Oznaka</translation>
+    </message>
+    <message>
+        <source>The label associated with this address list entry</source>
+        <translation>Oznaka ovog zapisa u adresaru</translation>
+    </message>
+    <message>
+        <source>The address associated with this address list entry. This can only be modified for sending addresses.</source>
+        <translation>Adresa ovog zapisa u adresaru. Može se mijenjati samo kod adresa za slanje.</translation>
+    </message>
+    <message>
+        <source>&amp;Address</source>
+        <translation>&amp;Adresa</translation>
+    </message>
+    <message>
+        <source>New sending address</source>
+        <translation>Nova adresa za slanje</translation>
+    </message>
+    <message>
+        <source>Edit receiving address</source>
+        <translation>Uredi adresu za primanje</translation>
+    </message>
+    <message>
+        <source>Edit sending address</source>
+        <translation>Uredi adresu za slanje</translation>
+    </message>
+    <message>
+        <source>The entered address "%1" is not a valid Bitcoin address.</source>
+        <translation>Upisana adresa "%1" nije valjana Bitcoin adresa.</translation>
+    </message>
+    <message>
+        <source>Address "%1" already exists as a receiving address with label "%2" and so cannot be added as a sending address.</source>
+        <translation>Adresa "%1" već postoji kao primateljska adresa s oznakom "%2" te se ne može dodati kao pošiljateljska adresa.</translation>
+    </message>
+    <message>
+        <source>The entered address "%1" is already in the address book with label "%2".</source>
+        <translation>Unesena adresa "%1" postoji već u imeniku pod oznakom "%2".</translation>
+    </message>
+    <message>
+        <source>Could not unlock wallet.</source>
+        <translation>Ne može se otključati novčanik.</translation>
+    </message>
+    <message>
+        <source>New key generation failed.</source>
+        <translation>Stvaranje novog ključa nije uspjelo.</translation>
+    </message>
+</context>
+<context>
+    <name>FreespaceChecker</name>
+    <message>
+        <source>A new data directory will be created.</source>
+        <translation>Bit će stvorena nova podatkovna mapa.</translation>
+    </message>
+    <message>
+        <source>name</source>
+        <translation>ime</translation>
+    </message>
+    <message>
+        <source>Directory already exists. Add %1 if you intend to create a new directory here.</source>
+        <translation>Mapa već postoji. Dodajte %1 ako namjeravate stvoriti novu mapu ovdje.</translation>
+    </message>
+    <message>
+        <source>Path already exists, and is not a directory.</source>
+        <translation>Put već postoji i nije mapa.</translation>
+    </message>
+    <message>
+        <source>Cannot create data directory here.</source>
+        <translation>Nije moguće stvoriti direktorij za podatke na tom mjestu.</translation>
+    </message>
+</context>
+<context>
+    <name>HelpMessageDialog</name>
+    <message>
+        <source>version</source>
+        <translation>verzija</translation>
+    </message>
+    <message>
+        <source>About %1</source>
+        <translation>O programu %1</translation>
+    </message>
+    <message>
+        <source>Command-line options</source>
+        <translation>Opcije programa u naredbenoj liniji</translation>
+    </message>
+</context>
+<context>
+    <name>Intro</name>
+    <message>
+        <source>Welcome</source>
+        <translation>Dobrodošli</translation>
+    </message>
+    <message>
+        <source>Welcome to %1.</source>
+        <translation>Dobrodošli u %1.</translation>
+    </message>
+    <message>
+        <source>As this is the first time the program is launched, you can choose where %1 will store its data.</source>
+        <translation>Kako je ovo prvi put da je ova aplikacija pokrenuta, možete izabrati gdje će %1 spremati svoje podatke.</translation>
+    </message>
+    <message>
+        <source>When you click OK, %1 will begin to download and process the full %4 block chain (%2GB) starting with the earliest transactions in %3 when %4 initially launched.</source>
+        <translation>Kada kliknete OK, %1 počet će preuzimati i procesirati cijeli lanac blokova (%2GB) počevši s najranijim transakcijama u %3 kad je %4 prvi put pokrenut.</translation>
+    </message>
+    <message>
+        <source>Reverting this setting requires re-downloading the entire blockchain. It is faster to download the full chain first and prune it later. Disables some advanced features.</source>
+        <translation>Vraćanje na ovu postavku zahtijeva ponovno preuzimanje cijelog lanca blokova. Brže je najprije preuzeti cijeli lanac pa ga kasnije obrezati. Isključuje napredne mogućnosti.</translation>
+    </message>
+    <message>
+        <source>This initial synchronisation is very demanding, and may expose hardware problems with your computer that had previously gone unnoticed. Each time you run %1, it will continue downloading where it left off.</source>
+        <translation>Početna sinkronizacija je vrlo zahtjevna i može otkriti hardverske probleme kod vašeg računala koji su prije prošli nezamijećeno. Svaki put kad pokrenete %1, nastavit će preuzimati odakle je stao.</translation>
+    </message>
+    <message>
+        <source>If you have chosen to limit block chain storage (pruning), the historical data must still be downloaded and processed, but will be deleted afterward to keep your disk usage low.</source>
+        <translation>Ako odlučite ograničiti spremanje lanca blokova pomoću pruninga (obrezivanja), treba preuzeti i procesirati povijesne podatke. Bit će obrisani naknadno kako bi se smanjila količina zauzetog prostora na disku.</translation>
+    </message>
+    <message>
+        <source>Use the default data directory</source>
+        <translation>Koristite uobičajenu podatkovnu mapu</translation>
+    </message>
+    <message>
+        <source>Use a custom data directory:</source>
+        <translation>Odaberite različitu podatkovnu mapu:</translation>
+    </message>
+    <message>
+        <source>Bitcoin</source>
+        <translation>Bitcoin</translation>
+    </message>
+    <message>
+        <source>Discard blocks after verification, except most recent %1 GB (prune)</source>
+        <translation>Odbacite blokove nakon provjere osim one najnovije do %1 GB-a (obrezujte)</translation>
+    </message>
+    <message>
+        <source>At least %1 GB of data will be stored in this directory, and it will grow over time.</source>
+        <translation>Bit će spremljeno barem %1 GB podataka u ovoj mapi te će se povećati tijekom vremena.</translation>
+    </message>
+    <message>
+        <source>Approximately %1 GB of data will be stored in this directory.</source>
+        <translation>Otprilike %1 GB podataka bit će spremljeno u ovoj mapi.</translation>
+    </message>
+    <message>
+        <source>%1 will download and store a copy of the Bitcoin block chain.</source>
+        <translation>%1 preuzet će i pohraniti kopiju Bitcoinovog lanca blokova.</translation>
+    </message>
+    <message>
+        <source>The wallet will also be stored in this directory.</source>
+        <translation>Novčanik bit će pohranjen u ovoj mapi.</translation>
+    </message>
+    <message>
+        <source>Error: Specified data directory "%1" cannot be created.</source>
+        <translation>Greška: Zadana podatkovna mapa "%1" ne može biti stvorena.</translation>
+    </m
