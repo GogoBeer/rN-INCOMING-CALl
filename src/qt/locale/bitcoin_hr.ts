@@ -1760,4 +1760,214 @@
     </message>
     <message>
         <source>Open the %1 debug log file from the current data directory. This can take a few seconds for large log files.</source>
-        <translation>Otvorite datoteku zapisa programa %1 i
+        <translation>Otvorite datoteku zapisa programa %1 iz trenutne podatkovne mape. Može potrajati nekoliko sekundi za velike datoteke zapisa.</translation>
+    </message>
+    <message>
+        <source>Decrease font size</source>
+        <translation>Smanjite veličinu fonta</translation>
+    </message>
+    <message>
+        <source>Increase font size</source>
+        <translation>Povećajte veličinu fonta</translation>
+    </message>
+    <message>
+        <source>Services</source>
+        <translation>Usluge</translation>
+    </message>
+    <message>
+        <source>Connection Time</source>
+        <translation>Trajanje veze</translation>
+    </message>
+    <message>
+        <source>Last Send</source>
+        <translation>Zadnja pošiljka</translation>
+    </message>
+    <message>
+        <source>Last Receive</source>
+        <translation>Zadnji primitak</translation>
+    </message>
+    <message>
+        <source>Ping Time</source>
+        <translation>Vrijeme pinga</translation>
+    </message>
+    <message>
+        <source>The duration of a currently outstanding ping.</source>
+        <translation>Trajanje trenutno izvanrednog pinga</translation>
+    </message>
+    <message>
+        <source>Ping Wait</source>
+        <translation>Zakašnjenje pinga</translation>
+    </message>
+    <message>
+        <source>Min Ping</source>
+        <translation>Min ping</translation>
+    </message>
+    <message>
+        <source>Time Offset</source>
+        <translation>Vremenski ofset</translation>
+    </message>
+    <message>
+        <source>Last block time</source>
+        <translation>Posljednje vrijeme bloka</translation>
+    </message>
+    <message>
+        <source>&amp;Open</source>
+        <translation>&amp;Otvori</translation>
+    </message>
+    <message>
+        <source>&amp;Console</source>
+        <translation>&amp;Konzola</translation>
+    </message>
+    <message>
+        <source>&amp;Network Traffic</source>
+        <translation>&amp;Mrežni promet</translation>
+    </message>
+    <message>
+        <source>Totals</source>
+        <translation>Ukupno:</translation>
+    </message>
+    <message>
+        <source>In:</source>
+        <translation>Dolazne:</translation>
+    </message>
+    <message>
+        <source>Out:</source>
+        <translation>Izlazne:</translation>
+    </message>
+    <message>
+        <source>Debug log file</source>
+        <translation>Datoteka ispisa za debagiranje</translation>
+    </message>
+    <message>
+        <source>Clear console</source>
+        <translation>Očisti konzolu</translation>
+    </message>
+    <message>
+        <source>1 &amp;hour</source>
+        <translation>1 &amp;sat</translation>
+    </message>
+    <message>
+        <source>1 &amp;day</source>
+        <translation>1 &amp;dan</translation>
+    </message>
+    <message>
+        <source>1 &amp;week</source>
+        <translation>1 &amp;tjedan</translation>
+    </message>
+    <message>
+        <source>1 &amp;year</source>
+        <translation>1 &amp;godinu</translation>
+    </message>
+    <message>
+        <source>&amp;Disconnect</source>
+        <translation>&amp;Odspojite</translation>
+    </message>
+    <message>
+        <source>Ban for</source>
+        <translation>Zabranite za</translation>
+    </message>
+    <message>
+        <source>&amp;Unban</source>
+        <translation>&amp;Ukinite zabranu</translation>
+    </message>
+    <message>
+        <source>Welcome to the %1 RPC console.</source>
+        <translation>Dobrodošli u %1 RPC konzolu.</translation>
+    </message>
+    <message>
+        <source>Use up and down arrows to navigate history, and %1 to clear screen.</source>
+        <translation>Koristite tipke gore i dolje za izbor već korištenih naredbi. %1 kako biste očistili ekran i povijest naredbi.</translation>
+    </message>
+    <message>
+        <source>Type %1 for an overview of available commands.</source>
+        <translation>Utipkajte %1 za pregled dostupnih naredbi.</translation>
+    </message>
+    <message>
+        <source>For more information on using this console type %1.</source>
+        <translation>Za više informacija o korištenju ove konzole utipkajte %1.</translation>
+    </message>
+    <message>
+        <source>WARNING: Scammers have been active, telling users to type commands here, stealing their wallet contents. Do not use this console without fully understanding the ramifications of a command.</source>
+        <translation>UPOZORENJE: Prevaranti su aktivni i govore korisnicima da utipkaju naredbe ovdje kako bi ispraznili sadržaje njihovih novčanika. Ne koristite ovu konzolu bez da u potpunosti razumijete posljedice naredbe.</translation>
+    </message>
+    <message>
+        <source>Network activity disabled</source>
+        <translation>Mrežna aktivnost isključena</translation>
+    </message>
+    <message>
+        <source>Executing command without any wallet</source>
+        <translation>Izvršava se naredba bez bilo kakvog novčanika</translation>
+    </message>
+    <message>
+        <source>Executing command using "%1" wallet</source>
+        <translation>Izvršava se naredba koristeći novčanik "%1"</translation>
+    </message>
+    <message>
+        <source>(node id: %1)</source>
+        <translation>(ID čvora: %1)</translation>
+    </message>
+    <message>
+        <source>via %1</source>
+        <translation>preko %1</translation>
+    </message>
+    <message>
+        <source>never</source>
+        <translation>nikad</translation>
+    </message>
+    <message>
+        <source>Inbound</source>
+        <translation>Dolazni</translation>
+    </message>
+    <message>
+        <source>Outbound</source>
+        <translation>Izlazni</translation>
+    </message>
+    <message>
+        <source>Unknown</source>
+        <translation>Nepoznato</translation>
+    </message>
+</context>
+<context>
+    <name>ReceiveCoinsDialog</name>
+    <message>
+        <source>&amp;Amount:</source>
+        <translation>&amp;Iznos:</translation>
+    </message>
+    <message>
+        <source>&amp;Label:</source>
+        <translation>&amp;Oznaka:</translation>
+    </message>
+    <message>
+        <source>&amp;Message:</source>
+        <translation>&amp;Poruka:</translation>
+    </message>
+    <message>
+        <source>An optional message to attach to the payment request, which will be displayed when the request is opened. Note: The message will not be sent with the payment over the Bitcoin network.</source>
+        <translation>Opcionalna poruka koja se može dodati kao privitak zahtjevu za plaćanje. Bit će prikazana kad je zahtjev otvoren. Napomena: Ova poruka neće biti poslana zajedno s uplatom preko Bitcoin mreže.</translation>
+    </message>
+    <message>
+        <source>An optional label to associate with the new receiving address.</source>
+        <translation>Opcionalna oznaka koja će se povezati s novom primateljskom adresom.</translation>
+    </message>
+    <message>
+        <source>Use this form to request payments. All fields are &lt;b&gt;optional&lt;/b&gt;.</source>
+        <translation>Koristite ovaj formular kako biste zahtijevali uplate. Sva su polja &lt;b&gt;opcionalna&lt;/b&gt;.</translation>
+    </message>
+    <message>
+        <source>An optional amount to request. Leave this empty or zero to not request a specific amount.</source>
+        <translation>Opcionalan iznos koji možete zahtijevati. Ostavite ovo prazno ili unesite nulu ako ne želite zahtijevati specifičan iznos.</translation>
+    </message>
+    <message>
+        <source>&amp;Create new receiving address</source>
+        <translation>&amp;Stvorite novu primateljsku adresu</translation>
+    </message>
+    <message>
+        <source>Clear all fields of the form.</source>
+        <translation>Obriši sva polja</translation>
+    </message>
+    <message>
+        <source>Clear</source>
+        <translation>Obrišite</translation>
+    </message>
+    <message>
+        <source>Native segwit addresses (aka Bech32 or BIP-173) reduce your transaction fees later on and offer better protection against typos, but
