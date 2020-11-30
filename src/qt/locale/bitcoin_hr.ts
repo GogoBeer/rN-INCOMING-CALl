@@ -2364,4 +2364,185 @@ Napomena: Budući da se naknada računa po bajtu, naknada od "100 satošija po k
         <translation><numerusform>Procijenjeno je da će početi potvrđivanje unutar %n bloka.</numerusform><numerusform>Procijenjeno je da će početi potvrđivanje unutar %n bloka.</numerusform><numerusform>Procijenjeno je da će početi potvrđivanje unutar %n blokova.</numerusform></translation>
     </message>
     <message>
-        <source>Warning: Invalid Bitcoin address</so
+        <source>Warning: Invalid Bitcoin address</source>
+        <translation>Upozorenje: Nevažeća Bitcoin adresa</translation>
+    </message>
+    <message>
+        <source>Warning: Unknown change address</source>
+        <translation>Upozorenje: Nepoznata adresa u koju će ostatak biti poslan</translation>
+    </message>
+    <message>
+        <source>Confirm custom change address</source>
+        <translation>Potvrdite zadanu adresu u koju će ostatak biti poslan</translation>
+    </message>
+    <message>
+        <source>The address you selected for change is not part of this wallet. Any or all funds in your wallet may be sent to this address. Are you sure?</source>
+        <translation>Adresa koju ste izabrali kamo ćete poslati ostatak nije dio ovog novčanika. Bilo koji iznosi u vašem novčaniku mogu biti poslani na ovu adresu. Jeste li sigurni?</translation>
+    </message>
+    <message>
+        <source>(no label)</source>
+        <translation>(nema oznake)</translation>
+    </message>
+</context>
+<context>
+    <name>SendCoinsEntry</name>
+    <message>
+        <source>A&amp;mount:</source>
+        <translation>&amp;Iznos:</translation>
+    </message>
+    <message>
+        <source>Pay &amp;To:</source>
+        <translation>&amp;Primatelj plaćanja:</translation>
+    </message>
+    <message>
+        <source>&amp;Label:</source>
+        <translation>&amp;Oznaka:</translation>
+    </message>
+    <message>
+        <source>Choose previously used address</source>
+        <translation>Odaberite prethodno korištenu adresu</translation>
+    </message>
+    <message>
+        <source>The Bitcoin address to send the payment to</source>
+        <translation>Bitcoin adresa na koju ćete poslati uplatu</translation>
+    </message>
+    <message>
+        <source>Alt+A</source>
+        <translation>Alt+A</translation>
+    </message>
+    <message>
+        <source>Paste address from clipboard</source>
+        <translation>Zalijepi adresu iz međuspremnika</translation>
+    </message>
+    <message>
+        <source>Alt+P</source>
+        <translation>Alt+P</translation>
+    </message>
+    <message>
+        <source>Remove this entry</source>
+        <translation>Obrišite ovaj zapis</translation>
+    </message>
+    <message>
+        <source>The amount to send in the selected unit</source>
+        <translation>Iznos za slanje u odabranoj valuti </translation>
+    </message>
+    <message>
+        <source>The fee will be deducted from the amount being sent. The recipient will receive less bitcoins than you enter in the amount field. If multiple recipients are selected, the fee is split equally.</source>
+        <translation>Naknada će biti oduzeta od poslanog iznosa. Primatelj će primiti manji iznos od onoga koji unesete u polje iznosa. Ako je odabrano više primatelja, onda će naknada biti podjednako raspodijeljena.</translation>
+    </message>
+    <message>
+        <source>S&amp;ubtract fee from amount</source>
+        <translation>Oduzmite naknadu od iznosa</translation>
+    </message>
+    <message>
+        <source>Use available balance</source>
+        <translation>Koristite dostupno stanje</translation>
+    </message>
+    <message>
+        <source>Message:</source>
+        <translation>Poruka:</translation>
+    </message>
+    <message>
+        <source>This is an unauthenticated payment request.</source>
+        <translation>Ovo je neautenticiran zahtjev za plaćanje.</translation>
+    </message>
+    <message>
+        <source>This is an authenticated payment request.</source>
+        <translation>Ovo je autenticiran zahtjev za plaćanje.</translation>
+    </message>
+    <message>
+        <source>Enter a label for this address to add it to the list of used addresses</source>
+        <translation>Unesite oznaku za ovu adresu kako bi ju dodali u vaš adresar</translation>
+    </message>
+    <message>
+        <source>A message that was attached to the bitcoin: URI which will be stored with the transaction for your reference. Note: This message will not be sent over the Bitcoin network.</source>
+        <translation>Poruka koja je dodana uplati: URI koji će biti spremljen s transakcijom za referencu. Napomena: Ova poruka neće biti poslana preko Bitcoin mreže.</translation>
+    </message>
+    <message>
+        <source>Pay To:</source>
+        <translation>Primatelj plaćanja:</translation>
+    </message>
+    <message>
+        <source>Memo:</source>
+        <translation>Zapis:</translation>
+    </message>
+</context>
+<context>
+    <name>ShutdownWindow</name>
+    <message>
+        <source>%1 is shutting down...</source>
+        <translation>Zatvara se %1...</translation>
+    </message>
+    <message>
+        <source>Do not shut down the computer until this window disappears.</source>
+        <translation>Ne ugasite računalo dok ovaj prozor ne nestane.</translation>
+    </message>
+</context>
+<context>
+    <name>SignVerifyMessageDialog</name>
+    <message>
+        <source>Signatures - Sign / Verify a Message</source>
+        <translation>Potpisi - Potpisujte / Provjerite poruku</translation>
+    </message>
+    <message>
+        <source>&amp;Sign Message</source>
+        <translation>&amp;Potpišite poruku</translation>
+    </message>
+    <message>
+        <source>You can sign messages/agreements with your addresses to prove you can receive bitcoins sent to them. Be careful not to sign anything vague or random, as phishing attacks may try to trick you into signing your identity over to them. Only sign fully-detailed statements you agree to.</source>
+        <translation>Možete potpisati poruke/dogovore svojim adresama kako biste dokazali da možete pristupiti bitcoinima poslanim na te adrese. Budite oprezni da ne potpisujte ništa nejasno ili nasumično, jer napadi phishingom vas mogu prevariti da prepišite svoj identitet njima. Potpisujte samo detaljno objašnjene izjave s kojima se slažete.</translation>
+    </message>
+    <message>
+        <source>The Bitcoin address to sign the message with</source>
+        <translation>Bitcoin adresa pomoću koje ćete potpisati poruku</translation>
+    </message>
+    <message>
+        <source>Choose previously used address</source>
+        <translation>Odaberite prethodno korištenu adresu</translation>
+    </message>
+    <message>
+        <source>Alt+A</source>
+        <translation>Alt+A</translation>
+    </message>
+    <message>
+        <source>Paste address from clipboard</source>
+        <translation>Zalijepi adresu iz međuspremnika</translation>
+    </message>
+    <message>
+        <source>Alt+P</source>
+        <translation>Alt+P</translation>
+    </message>
+    <message>
+        <source>Enter the message you want to sign here</source>
+        <translation>Upišite poruku koju želite potpisati ovdje</translation>
+    </message>
+    <message>
+        <source>Signature</source>
+        <translation>Potpis</translation>
+    </message>
+    <message>
+        <source>Copy the current signature to the system clipboard</source>
+        <translation>Kopirajte trenutni potpis u međuspremnik</translation>
+    </message>
+    <message>
+        <source>Sign the message to prove you own this Bitcoin address</source>
+        <translation>Potpišite poruku kako biste dokazali da posjedujete ovu Bitcoin adresu</translation>
+    </message>
+    <message>
+        <source>Sign &amp;Message</source>
+        <translation>&amp;Potpišite poruku</translation>
+    </message>
+    <message>
+        <source>Reset all sign message fields</source>
+        <translation>Resetirajte sva polja formulara</translation>
+    </message>
+    <message>
+        <source>Clear &amp;All</source>
+        <translation>Obriši &amp;sve</translation>
+    </message>
+    <message>
+        <source>&amp;Verify Message</source>
+        <translation>&amp;Potvrdite poruku</translation>
+    </message>
+    <message>
+        <source>Enter the receiver's address, message (ensure you copy line breaks, spaces, tabs, etc. exactly) and signature below 
