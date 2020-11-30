@@ -1147,4 +1147,183 @@
     </message>
     <message>
         <source>Disables some advanced features but all blocks will still be fully validated. Reverting this setting requires re-downloading the entire blockchain. Actual disk usage may be somewhat higher.</source>
-        <translation>Isključuje napredne mogućnosti ali će svi blokovi ipak biti potpuno validirani. Vraćanje na prijašnje stanje zahtijeva ponovo preuzimanje cijelog lanca blokova. Realna količina zauzetog pro
+        <translation>Isključuje napredne mogućnosti ali će svi blokovi ipak biti potpuno validirani. Vraćanje na prijašnje stanje zahtijeva ponovo preuzimanje cijelog lanca blokova. Realna količina zauzetog prostora na disku može biti ponešto veća.</translation>
+    </message>
+    <message>
+        <source>Prune &amp;block storage to</source>
+        <translation>Obrezujte pohranu &amp;blokova na</translation>
+    </message>
+    <message>
+        <source>GB</source>
+        <translation>GB</translation>
+    </message>
+    <message>
+        <source>Reverting this setting requires re-downloading the entire blockchain.</source>
+        <translation>Vraćanje na prijašnje stanje zahtijeva ponovo preuzimanje cijelog lanca blokova.</translation>
+    </message>
+    <message>
+        <source>MiB</source>
+        <translation>MiB</translation>
+    </message>
+    <message>
+        <source>(0 = auto, &lt;0 = leave that many cores free)</source>
+        <translation>(0 = automatski odredite, &lt;0 = ostavite slobodno upravo toliko jezgri)</translation>
+    </message>
+    <message>
+        <source>W&amp;allet</source>
+        <translation>&amp;Novčanik</translation>
+    </message>
+    <message>
+        <source>Expert</source>
+        <translation>Stručne postavke</translation>
+    </message>
+    <message>
+        <source>Enable coin &amp;control features</source>
+        <translation>Uključite postavke kontroliranja inputa</translation>
+    </message>
+    <message>
+        <source>If you disable the spending of unconfirmed change, the change from a transaction cannot be used until that transaction has at least one confirmation. This also affects how your balance is computed.</source>
+        <translation>Ako isključite trošenje nepotvrđenog ostatka, ostatak transakcije ne može biti korišten dok ta transakcija ne dobije barem jednu potvrdu. Također utječe na to kako je vaše stanje računato.</translation>
+    </message>
+    <message>
+        <source>&amp;Spend unconfirmed change</source>
+        <translation>&amp;Trošenje nepotvrđenih vraćenih iznosa</translation>
+    </message>
+    <message>
+        <source>Automatically open the Bitcoin client port on the router. This only works when your router supports UPnP and it is enabled.</source>
+        <translation>Automatski otvori port Bitcoin klijenta na ruteru. To radi samo ako ruter podržava UPnP i ako je omogućen.</translation>
+    </message>
+    <message>
+        <source>Map port using &amp;UPnP</source>
+        <translation>Mapiraj port koristeći &amp;UPnP</translation>
+    </message>
+    <message>
+        <source>Accept connections from outside.</source>
+        <translation>Prihvatite veze izvana.</translation>
+    </message>
+    <message>
+        <source>Allow incomin&amp;g connections</source>
+        <translation>Dozvolite dolazeće veze</translation>
+    </message>
+    <message>
+        <source>Connect to the Bitcoin network through a SOCKS5 proxy.</source>
+        <translation>Spojite se na Bitcoin mrežu kroz SOCKS5 proxy.</translation>
+    </message>
+    <message>
+        <source>&amp;Connect through SOCKS5 proxy (default proxy):</source>
+        <translation>&amp;Spojite se kroz SOCKS5 proxy (uobičajeni proxy)</translation>
+    </message>
+    <message>
+        <source>Proxy &amp;IP:</source>
+        <translation>Proxy &amp;IP:</translation>
+    </message>
+    <message>
+        <source>&amp;Port:</source>
+        <translation>&amp;Vrata:</translation>
+    </message>
+    <message>
+        <source>Port of the proxy (e.g. 9050)</source>
+        <translation>Proxy vrata (npr. 9050)</translation>
+    </message>
+    <message>
+        <source>Used for reaching peers via:</source>
+        <translation>Korišten za dohvaćanje klijenata preko:</translation>
+    </message>
+    <message>
+        <source>IPv4</source>
+        <translation>IPv4-a</translation>
+    </message>
+    <message>
+        <source>IPv6</source>
+        <translation>IPv6-a</translation>
+    </message>
+    <message>
+        <source>Tor</source>
+        <translation>Tora</translation>
+    </message>
+    <message>
+        <source>&amp;Window</source>
+        <translation>&amp;Prozor</translation>
+    </message>
+    <message>
+        <source>Show only a tray icon after minimizing the window.</source>
+        <translation>Prikaži samo ikonu u sistemskoj traci nakon minimiziranja prozora</translation>
+    </message>
+    <message>
+        <source>&amp;Minimize to the tray instead of the taskbar</source>
+        <translation>&amp;Minimiziraj u sistemsku traku umjesto u traku programa</translation>
+    </message>
+    <message>
+        <source>M&amp;inimize on close</source>
+        <translation>M&amp;inimiziraj kod zatvaranja</translation>
+    </message>
+    <message>
+        <source>&amp;Display</source>
+        <translation>&amp;Prikaz</translation>
+    </message>
+    <message>
+        <source>User Interface &amp;language:</source>
+        <translation>Jezi&amp;k sučelja:</translation>
+    </message>
+    <message>
+        <source>The user interface language can be set here. This setting will take effect after restarting %1.</source>
+        <translation>Jezik korisničkog sučelja može se postaviti ovdje. Postavka će vrijediti nakon ponovnog pokretanja programa %1.</translation>
+    </message>
+    <message>
+        <source>&amp;Unit to show amounts in:</source>
+        <translation>&amp;Jedinica za prikaz iznosa:</translation>
+    </message>
+    <message>
+        <source>Choose the default subdivision unit to show in the interface and when sending coins.</source>
+        <translation>Izaberite željeni najmanji dio bitcoina koji će biti prikazan u sučelju i koji će se koristiti za plaćanje.</translation>
+    </message>
+    <message>
+        <source>Whether to show coin control features or not.</source>
+        <translation>Ovisi želite li prikazati mogućnosti kontroliranja inputa ili ne.</translation>
+    </message>
+    <message>
+        <source>&amp;Third party transaction URLs</source>
+        <translation>&amp;URL-ovi treće stranke o transakciji</translation>
+    </message>
+    <message>
+        <source>Options set in this dialog are overridden by the command line or in the configuration file:</source>
+        <translation>Opcije postavljene u ovom dijalogu nadglašene su naredbenom linijom ili konfiguracijskom datotekom:</translation>
+    </message>
+    <message>
+        <source>&amp;OK</source>
+        <translation>&amp;U redu</translation>
+    </message>
+    <message>
+        <source>&amp;Cancel</source>
+        <translation>&amp;Odustani</translation>
+    </message>
+    <message>
+        <source>default</source>
+        <translation>standardne vrijednosti</translation>
+    </message>
+    <message>
+        <source>none</source>
+        <translation>ništa</translation>
+    </message>
+    <message>
+        <source>Confirm options reset</source>
+        <translation>Potvrdite resetiranje opcija</translation>
+    </message>
+    <message>
+        <source>Client restart required to activate changes.</source>
+        <translation>Potrebno je ponovno pokretanje klijenta kako bi se promjene aktivirale.</translation>
+    </message>
+    <message>
+        <source>Client will be shut down. Do you want to proceed?</source>
+        <translation>Zatvorit će se klijent. Želite li nastaviti?</translation>
+    </message>
+    <message>
+        <source>Configuration options</source>
+        <translation>Konfiguracijske postavke</translation>
+    </message>
+    <message>
+        <source>The configuration file is used to specify advanced user options which override GUI settings. Additionally, any command-line options will override this configuration file.</source>
+        <translation>Ova konfiguracijska datoteka je korištena za specificiranje napredne korisničke opcije koje će poništiti postavke GUI-a. Također će bilo koje opcije navedene preko terminala poništiti ovu konfiguracijsku datoteku.</translation>
+    </message>
+    <message>
+ 
