@@ -594,4 +594,220 @@
     </message>
     <message>
         <source>HD key generation is &lt;b&gt;enabled&lt;/b&gt;</source>
-        <translation>Gene
+        <translation>Generiranje HD ključeva je &lt;b&gt;uključeno&lt;/b&gt;</translation>
+    </message>
+    <message>
+        <source>HD key generation is &lt;b&gt;disabled&lt;/b&gt;</source>
+        <translation>Generiranje HD ključeva je &lt;b&gt;isključeno&lt;/b&gt;</translation>
+    </message>
+    <message>
+        <source>Private key &lt;b&gt;disabled&lt;/b&gt;</source>
+        <translation>Privatni ključ &lt;b&gt;onemogućen&lt;/b&gt;</translation>
+    </message>
+    <message>
+        <source>Wallet is &lt;b&gt;encrypted&lt;/b&gt; and currently &lt;b&gt;unlocked&lt;/b&gt;</source>
+        <translation>Novčanik je &lt;b&gt;šifriran&lt;/b&gt; i trenutno &lt;b&gt;otključan&lt;/b&gt;</translation>
+    </message>
+    <message>
+        <source>Wallet is &lt;b&gt;encrypted&lt;/b&gt; and currently &lt;b&gt;locked&lt;/b&gt;</source>
+        <translation>Novčanik je &lt;b&gt;šifriran&lt;/b&gt; i trenutno &lt;b&gt;zaključan&lt;/b&gt;</translation>
+    </message>
+    </context>
+<context>
+    <name>CoinControlDialog</name>
+    <message>
+        <source>Coin Selection</source>
+        <translation>Izbor ulaza transakcije</translation>
+    </message>
+    <message>
+        <source>Quantity:</source>
+        <translation>Količina:</translation>
+    </message>
+    <message>
+        <source>Bytes:</source>
+        <translation>Bajtova:</translation>
+    </message>
+    <message>
+        <source>Amount:</source>
+        <translation>Iznos:</translation>
+    </message>
+    <message>
+        <source>Fee:</source>
+        <translation>Naknada:</translation>
+    </message>
+    <message>
+        <source>Dust:</source>
+        <translation>Prašina:</translation>
+    </message>
+    <message>
+        <source>After Fee:</source>
+        <translation>Nakon naknade:</translation>
+    </message>
+    <message>
+        <source>Change:</source>
+        <translation>Vraćeno:</translation>
+    </message>
+    <message>
+        <source>(un)select all</source>
+        <translation>Izaberi sve/ništa</translation>
+    </message>
+    <message>
+        <source>Tree mode</source>
+        <translation>Prikažite kao stablo</translation>
+    </message>
+    <message>
+        <source>List mode</source>
+        <translation>Prikažite kao listu</translation>
+    </message>
+    <message>
+        <source>Amount</source>
+        <translation>Iznos</translation>
+    </message>
+    <message>
+        <source>Received with label</source>
+        <translation>Primljeno pod oznakom</translation>
+    </message>
+    <message>
+        <source>Received with address</source>
+        <translation>Primljeno na adresu</translation>
+    </message>
+    <message>
+        <source>Date</source>
+        <translation>Datum</translation>
+    </message>
+    <message>
+        <source>Confirmations</source>
+        <translation>Broj potvrda</translation>
+    </message>
+    <message>
+        <source>Confirmed</source>
+        <translation>Potvrđeno</translation>
+    </message>
+    <message>
+        <source>Copy address</source>
+        <translation>Kopirajte adresu</translation>
+    </message>
+    <message>
+        <source>Copy label</source>
+        <translation>Kopirajte oznaku</translation>
+    </message>
+    <message>
+        <source>Copy amount</source>
+        <translation>Kopirajte iznos</translation>
+    </message>
+    <message>
+        <source>Copy transaction ID</source>
+        <translation>Kopirajte ID transakcije</translation>
+    </message>
+    <message>
+        <source>Lock unspent</source>
+        <translation>Zaključajte nepotrošen input</translation>
+    </message>
+    <message>
+        <source>Unlock unspent</source>
+        <translation>Otključajte nepotrošen input</translation>
+    </message>
+    <message>
+        <source>Copy quantity</source>
+        <translation>Kopirajte iznos</translation>
+    </message>
+    <message>
+        <source>Copy fee</source>
+        <translation>Kopirajte naknadu</translation>
+    </message>
+    <message>
+        <source>Copy after fee</source>
+        <translation>Kopirajte iznos nakon naknade</translation>
+    </message>
+    <message>
+        <source>Copy bytes</source>
+        <translation>Kopirajte količinu bajtova</translation>
+    </message>
+    <message>
+        <source>Copy dust</source>
+        <translation>Kopirajte prašinu</translation>
+    </message>
+    <message>
+        <source>Copy change</source>
+        <translation>Kopirajte ostatak</translation>
+    </message>
+    <message>
+        <source>(%1 locked)</source>
+        <translation>(%1 zaključen)</translation>
+    </message>
+    <message>
+        <source>yes</source>
+        <translation>da</translation>
+    </message>
+    <message>
+        <source>no</source>
+        <translation>ne</translation>
+    </message>
+    <message>
+        <source>This label turns red if any recipient receives an amount smaller than the current dust threshold.</source>
+        <translation>Oznaka postane crvene boje ako bilo koji primatelj dobije iznos manji od trenutnog praga "prašine" (sićušnog iznosa).</translation>
+    </message>
+    <message>
+        <source>Can vary +/- %1 satoshi(s) per input.</source>
+        <translation>Može varirati +/- %1 satoši(ja) po inputu.</translation>
+    </message>
+    <message>
+        <source>(no label)</source>
+        <translation>(nema oznake)</translation>
+    </message>
+    <message>
+        <source>change from %1 (%2)</source>
+        <translation>ostatak od %1 (%2)</translation>
+    </message>
+    <message>
+        <source>(change)</source>
+        <translation>(ostatak)</translation>
+    </message>
+</context>
+<context>
+    <name>CreateWalletActivity</name>
+    <message>
+        <source>Creating Wallet &lt;b&gt;%1&lt;/b&gt;...</source>
+        <translation>Stvara se novčanik &lt;b&gt;%1&lt;/b&gt;...</translation>
+    </message>
+    <message>
+        <source>Create wallet failed</source>
+        <translation>Neuspješno stvaranje novčanika</translation>
+    </message>
+    <message>
+        <source>Create wallet warning</source>
+        <translation>Upozorenje kod stvaranja novčanika</translation>
+    </message>
+</context>
+<context>
+    <name>CreateWalletDialog</name>
+    <message>
+        <source>Create Wallet</source>
+        <translation>Stvorite novčanik</translation>
+    </message>
+    <message>
+        <source>Wallet Name</source>
+        <translation>Ime novčanika</translation>
+    </message>
+    <message>
+        <source>Encrypt the wallet. The wallet will be encrypted with a passphrase of your choice.</source>
+        <translation>Šifrirajte novčanik. Novčanik bit će šifriran lozinkom po vašem izboru.</translation>
+    </message>
+    <message>
+        <source>Encrypt Wallet</source>
+        <translation>Šifrirajte novčanik</translation>
+    </message>
+    <message>
+        <source>Disable private keys for this wallet. Wallets with private keys disabled will have no private keys and cannot have an HD seed or imported private keys. This is ideal for watch-only wallets.</source>
+        <translation>Isključite privatne ključeve za ovaj novčanik. Novčanici gdje su privatni ključevi isključeni neće sadržati privatne ključeve te ne mogu imati HD sjeme ili uvezene privatne ključeve. Ova postavka je idealna za novčanike koje su isključivo za promatranje.</translation>
+    </message>
+    <message>
+        <source>Disable Private Keys</source>
+        <translation>Isključite privatne ključeve</translation>
+    </message>
+    <message>
+        <source>Make a blank wallet. Blank wallets do not initially have private keys or scripts. Private keys and addresses can be imported, or an HD seed can be set, at a later time.</source>
+        <translation>Stvorite prazni novčanik. Prazni novčanici nemaju privatnih ključeva ili skripta. Mogu se naknadno uvesti privatne ključeve i adrese ili postaviti HD sjeme.</translation>
+    </message>
+    <message>
+  
