@@ -1326,4 +1326,214 @@
         <translation>Ova konfiguracijska datoteka je korištena za specificiranje napredne korisničke opcije koje će poništiti postavke GUI-a. Također će bilo koje opcije navedene preko terminala poništiti ovu konfiguracijsku datoteku.</translation>
     </message>
     <message>
- 
+        <source>Error</source>
+        <translation>Greška</translation>
+    </message>
+    <message>
+        <source>The configuration file could not be opened.</source>
+        <translation>Konfiguracijska datoteka nije se mogla otvoriti.</translation>
+    </message>
+    <message>
+        <source>This change would require a client restart.</source>
+        <translation>Ova promjena zahtijeva da se klijent ponovo pokrene.</translation>
+    </message>
+    <message>
+        <source>The supplied proxy address is invalid.</source>
+        <translation>Priložena proxy adresa je nevažeća.</translation>
+    </message>
+</context>
+<context>
+    <name>OverviewPage</name>
+    <message>
+        <source>Form</source>
+        <translation>Oblik</translation>
+    </message>
+    <message>
+        <source>The displayed information may be out of date. Your wallet automatically synchronizes with the Bitcoin network after a connection is established, but this process has not completed yet.</source>
+        <translation>Prikazani podatci mogu biti zastarjeli. Vaš novčanik se automatski sinkronizira s Bitcoin mrežom kada je veza uspostavljena, ali taj proces još nije završen.</translation>
+    </message>
+    <message>
+        <source>Watch-only:</source>
+        <translation>Isključivno promatrane adrese:</translation>
+    </message>
+    <message>
+        <source>Available:</source>
+        <translation>Dostupno:</translation>
+    </message>
+    <message>
+        <source>Your current spendable balance</source>
+        <translation>Trenutno stanje koje možete trošiti</translation>
+    </message>
+    <message>
+        <source>Pending:</source>
+        <translation>Neriješeno:</translation>
+    </message>
+    <message>
+        <source>Total of transactions that have yet to be confirmed, and do not yet count toward the spendable balance</source>
+        <translation>Ukupan iznos transakcija koje se još moraju potvrditi te se ne računa kao stanje koje se može trošiti</translation>
+    </message>
+    <message>
+        <source>Immature:</source>
+        <translation>Nezrelo:</translation>
+    </message>
+    <message>
+        <source>Mined balance that has not yet matured</source>
+        <translation>Izrudareno stanje koje još nije dozrijevalo</translation>
+    </message>
+    <message>
+        <source>Balances</source>
+        <translation>Stanja</translation>
+    </message>
+    <message>
+        <source>Total:</source>
+        <translation>Ukupno:</translation>
+    </message>
+    <message>
+        <source>Your current total balance</source>
+        <translation>Vaše trenutno svekupno stanje</translation>
+    </message>
+    <message>
+        <source>Your current balance in watch-only addresses</source>
+        <translation>Vaše trenutno stanje kod eksluzivno promatranih (watch-only) adresa</translation>
+    </message>
+    <message>
+        <source>Spendable:</source>
+        <translation>Stanje koje se može trošiti:</translation>
+    </message>
+    <message>
+        <source>Recent transactions</source>
+        <translation>Nedavne transakcije</translation>
+    </message>
+    <message>
+        <source>Unconfirmed transactions to watch-only addresses</source>
+        <translation>Nepotvrđene transakcije isključivo promatranim adresama</translation>
+    </message>
+    <message>
+        <source>Mined balance in watch-only addresses that has not yet matured</source>
+        <translation>Izrudareno stanje na isključivo promatranim adresama koje još nije dozrijevalo</translation>
+    </message>
+    <message>
+        <source>Current total balance in watch-only addresses</source>
+        <translation>Trenutno ukupno stanje na isključivo promatranim adresama</translation>
+    </message>
+    </context>
+<context>
+    <name>PSBTOperationsDialog</name>
+    <message>
+        <source>Dialog</source>
+        <translation>Dijalog</translation>
+    </message>
+    <message>
+        <source>Total Amount</source>
+        <translation>Ukupni iznos</translation>
+    </message>
+    <message>
+        <source>or</source>
+        <translation>ili</translation>
+    </message>
+    </context>
+<context>
+    <name>PaymentServer</name>
+    <message>
+        <source>Payment request error</source>
+        <translation>Greška kod zahtjeva za plaćanje</translation>
+    </message>
+    <message>
+        <source>Cannot start bitcoin: click-to-pay handler</source>
+        <translation>Ne može se pokrenuti klijent: rukovatelj "kliknite da platite"</translation>
+    </message>
+    <message>
+        <source>URI handling</source>
+        <translation>URI upravljanje</translation>
+    </message>
+    <message>
+        <source>'bitcoin://' is not a valid URI. Use 'bitcoin:' instead.</source>
+        <translation>'bitcoin://' nije ispravan URI. Koristite 'bitcoin:' umjesto toga.</translation>
+    </message>
+    <message>
+        <source>Due to widespread security flaws in BIP70 it's strongly recommended that any merchant instructions to switch wallets be ignored.</source>
+        <translation>Zbog rasprostranjenih sigurnosnih mana u BIP70-u, strogo se preporučuje da se ignoriraju bilo kakve naredbe o zamjeni novčanika sa strane trgovca.</translation>
+    </message>
+    <message>
+        <source>If you are receiving this error you should request the merchant provide a BIP21 compatible URI.</source>
+        <translation>Ako dobivate ovu grešku, trebali biste zatražiti od trgovca BIP21 kompatibilan URI.</translation>
+    </message>
+    <message>
+        <source>Invalid payment address %1</source>
+        <translation>Nevažeća adresa za plaćanje %1</translation>
+    </message>
+    <message>
+        <source>URI cannot be parsed! This can be caused by an invalid Bitcoin address or malformed URI parameters.</source>
+        <translation>Ne može se parsirati URI! Uzrok tomu može biti nevažeća Bitcoin adresa ili neispravni parametri kod URI-a.</translation>
+    </message>
+    <message>
+        <source>Payment request file handling</source>
+        <translation>Rukovanje datotekom zahtjeva za plaćanje</translation>
+    </message>
+</context>
+<context>
+    <name>PeerTableModel</name>
+    <message>
+        <source>User Agent</source>
+        <translation>Korisnički agent</translation>
+    </message>
+    <message>
+        <source>Node/Service</source>
+        <translation>Čvor/Servis</translation>
+    </message>
+    <message>
+        <source>NodeId</source>
+        <translation>NodeId (ID čvora)</translation>
+    </message>
+    <message>
+        <source>Ping</source>
+        <translation>Ping</translation>
+    </message>
+    <message>
+        <source>Sent</source>
+        <translation>Poslano</translation>
+    </message>
+    <message>
+        <source>Received</source>
+        <translation>Primljeno</translation>
+    </message>
+</context>
+<context>
+    <name>QObject</name>
+    <message>
+        <source>Amount</source>
+        <translation>Iznos</translation>
+    </message>
+    <message>
+        <source>Enter a Bitcoin address (e.g. %1)</source>
+        <translation>Unesite Bitcoin adresu (npr. %1)</translation>
+    </message>
+    <message>
+        <source>%1 d</source>
+        <translation>%1 d</translation>
+    </message>
+    <message>
+        <source>%1 h</source>
+        <translation>%1 h</translation>
+    </message>
+    <message>
+        <source>%1 m</source>
+        <translation>%1 m</translation>
+    </message>
+    <message>
+        <source>%1 s</source>
+        <translation>%1 s</translation>
+    </message>
+    <message>
+        <source>None</source>
+        <translation>Ništa</translation>
+    </message>
+    <message>
+        <source>N/A</source>
+        <translation>N/A</translation>
+    </message>
+    <message>
+        <source>%1 ms</source>
+        <translation>%1 ms</translation>
+    </message>
+    <message nume
