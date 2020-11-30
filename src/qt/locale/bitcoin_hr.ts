@@ -1970,4 +1970,217 @@
         <translation>Obrišite</translation>
     </message>
     <message>
-        <source>Native segwit addresses (aka Bech32 or BIP-173) reduce your transaction fees later on and offer better protection against typos, but
+        <source>Native segwit addresses (aka Bech32 or BIP-173) reduce your transaction fees later on and offer better protection against typos, but old wallets don't support them. When unchecked, an address compatible with older wallets will be created instead.</source>
+        <translation>Izvorne SegWit adrese (tzv. Bech32 ili BIP-173) smanjuju vaše transakcijske naknade ubuduće i nude bolju zaštitu protiv tipfelera, ali stari novčanici ih ne podržavaju. Kada je ova opcija isključena, bit će umjesto toga stvorena adresa koja je kompatibilna sa starijim novčanicima.</translation>
+    </message>
+    <message>
+        <source>Generate native segwit (Bech32) address</source>
+        <translation>Generirajte izvornu SegWit (Bech32) adresu</translation>
+    </message>
+    <message>
+        <source>Requested payments history</source>
+        <translation>Povijest zahtjeva za plaćanje</translation>
+    </message>
+    <message>
+        <source>Show the selected request (does the same as double clicking an entry)</source>
+        <translation>Prikazuje izabran zahtjev (isto učini dvostruki klik na zapis)</translation>
+    </message>
+    <message>
+        <source>Show</source>
+        <translation>Pokaži</translation>
+    </message>
+    <message>
+        <source>Remove the selected entries from the list</source>
+        <translation>Uklonite odabrane zapise s popisa</translation>
+    </message>
+    <message>
+        <source>Remove</source>
+        <translation>Uklonite</translation>
+    </message>
+    <message>
+        <source>Copy URI</source>
+        <translation>Kopirajte URI</translation>
+    </message>
+    <message>
+        <source>Copy label</source>
+        <translation>Kopiraj oznaku</translation>
+    </message>
+    <message>
+        <source>Copy message</source>
+        <translation>Kopirajte poruku</translation>
+    </message>
+    <message>
+        <source>Copy amount</source>
+        <translation>Kopiraj iznos</translation>
+    </message>
+    <message>
+        <source>Could not unlock wallet.</source>
+        <translation>Ne može se otključati novčanik.</translation>
+    </message>
+    </context>
+<context>
+    <name>ReceiveRequestDialog</name>
+    <message>
+        <source>Amount:</source>
+        <translation>Iznos:</translation>
+    </message>
+    <message>
+        <source>Label:</source>
+        <translation>Oznaka</translation>
+    </message>
+    <message>
+        <source>Message:</source>
+        <translation>Poruka:</translation>
+    </message>
+    <message>
+        <source>Wallet:</source>
+        <translation>Novčanik:</translation>
+    </message>
+    <message>
+        <source>Copy &amp;URI</source>
+        <translation>Kopiraj &amp;URI</translation>
+    </message>
+    <message>
+        <source>Copy &amp;Address</source>
+        <translation>Kopiraj &amp;adresu</translation>
+    </message>
+    <message>
+        <source>&amp;Save Image...</source>
+        <translation>&amp;Spremi sliku...</translation>
+    </message>
+    <message>
+        <source>Request payment to %1</source>
+        <translation>&amp;Zatražite plaćanje na adresu %1</translation>
+    </message>
+    <message>
+        <source>Payment information</source>
+        <translation>Informacije o uplati</translation>
+    </message>
+</context>
+<context>
+    <name>RecentRequestsTableModel</name>
+    <message>
+        <source>Date</source>
+        <translation>Datum</translation>
+    </message>
+    <message>
+        <source>Label</source>
+        <translation>Oznaka</translation>
+    </message>
+    <message>
+        <source>Message</source>
+        <translation>Poruka</translation>
+    </message>
+    <message>
+        <source>(no label)</source>
+        <translation>(nema oznake)</translation>
+    </message>
+    <message>
+        <source>(no message)</source>
+        <translation>(bez poruke)</translation>
+    </message>
+    <message>
+        <source>(no amount requested)</source>
+        <translation>(nikakav iznos zahtijevan)</translation>
+    </message>
+    <message>
+        <source>Requested</source>
+        <translation>Zatraženo</translation>
+    </message>
+</context>
+<context>
+    <name>SendCoinsDialog</name>
+    <message>
+        <source>Send Coins</source>
+        <translation>Slanje novca</translation>
+    </message>
+    <message>
+        <source>Coin Control Features</source>
+        <translation>Mogućnosti kontroliranja inputa</translation>
+    </message>
+    <message>
+        <source>Inputs...</source>
+        <translation>Inputi...</translation>
+    </message>
+    <message>
+        <source>automatically selected</source>
+        <translation>automatski izabrano</translation>
+    </message>
+    <message>
+        <source>Insufficient funds!</source>
+        <translation>Nedovoljna sredstva</translation>
+    </message>
+    <message>
+        <source>Quantity:</source>
+        <translation>Količina:</translation>
+    </message>
+    <message>
+        <source>Bytes:</source>
+        <translation>Bajtova:</translation>
+    </message>
+    <message>
+        <source>Amount:</source>
+        <translation>Iznos:</translation>
+    </message>
+    <message>
+        <source>Fee:</source>
+        <translation>Naknada:</translation>
+    </message>
+    <message>
+        <source>After Fee:</source>
+        <translation>Nakon naknade:</translation>
+    </message>
+    <message>
+        <source>Change:</source>
+        <translation>Vraćeno:</translation>
+    </message>
+    <message>
+        <source>If this is activated, but the change address is empty or invalid, change will be sent to a newly generated address.</source>
+        <translation>Ako je ovo aktivirano, ali adresa u koju treba poslati ostatak je prazna ili nevažeća, onda će ostatak biti poslan u novo generiranu adresu.</translation>
+    </message>
+    <message>
+        <source>Custom change address</source>
+        <translation>Zadana adresa u koju će ostatak biti poslan</translation>
+    </message>
+    <message>
+        <source>Transaction Fee:</source>
+        <translation>Naknada za transakciju:</translation>
+    </message>
+    <message>
+        <source>Choose...</source>
+        <translation>Birajte...</translation>
+    </message>
+    <message>
+        <source>Using the fallbackfee can result in sending a transaction that will take several hours or days (or never) to confirm. Consider choosing your fee manually or wait until you have validated the complete chain.</source>
+        <translation>Korištenje rezervnu naknadu može rezultirati slanjem transakcije kojoj može trebati nekoliko sati ili dana (ili pak nikad) da se potvrdi. Uzmite u obzir ručno biranje naknade ili pričekajte da se cijeli lanac validira.</translation>
+    </message>
+    <message>
+        <source>Warning: Fee estimation is currently not possible.</source>
+        <translation>Upozorenje: Procjena naknada trenutno nije moguća.</translation>
+    </message>
+    <message>
+        <source>Specify a custom fee per kB (1,000 bytes) of the transaction's virtual size.
+
+Note:  Since the fee is calculated on a per-byte basis, a fee of "100 satoshis per kB" for a transaction size of 500 bytes (half of 1 kB) would ultimately yield a fee of only 50 satoshis.</source>
+        <translation>Zadajte prilagođeu naknadu po kB (1000 bajtova) virtualne veličine transakcije.
+
+Napomena: Budući da se naknada računa po bajtu, naknada od "100 satošija po kB" za transakciju veličine 500 bajtova (polovica od 1 kB) rezultirala bi ultimativno naknadom od samo 50 satošija.</translation>
+    </message>
+    <message>
+        <source>per kilobyte</source>
+        <translation>po kilobajtu</translation>
+    </message>
+    <message>
+        <source>Hide</source>
+        <translation>Sakrijte</translation>
+    </message>
+    <message>
+        <source>Recommended:</source>
+        <translation>Preporučeno:</translation>
+    </message>
+    <message>
+        <source>Custom:</source>
+        <translation>Zadano:</translation>
+    </message>
+    <message>
+        <source>(Smart fee not initialized yet. This usually takes a few bloc
