@@ -2183,4 +2183,185 @@ Napomena: Budući da se naknada računa po bajtu, naknada od "100 satošija po k
         <translation>Zadano:</translation>
     </message>
     <message>
-        <source>(Smart fee not initialized yet. This usually takes a few bloc
+        <source>(Smart fee not initialized yet. This usually takes a few blocks...)</source>
+        <translation>(Pametna procjena naknada još nije inicijalizirana. Uobičajeno traje nekoliko blokova...)</translation>
+    </message>
+    <message>
+        <source>Send to multiple recipients at once</source>
+        <translation>Pošalji novce većem broju primatelja u jednoj transakciji</translation>
+    </message>
+    <message>
+        <source>Add &amp;Recipient</source>
+        <translation>&amp;Dodaj primatelja</translation>
+    </message>
+    <message>
+        <source>Clear all fields of the form.</source>
+        <translation>Obriši sva polja</translation>
+    </message>
+    <message>
+        <source>Dust:</source>
+        <translation>Prah:</translation>
+    </message>
+    <message>
+        <source>Hide transaction fee settings</source>
+        <translation>Sakrijte postavke za transakcijske provizije
+</translation>
+    </message>
+    <message>
+        <source>When there is less transaction volume than space in the blocks, miners as well as relaying nodes may enforce a minimum fee. Paying only this minimum fee is just fine, but be aware that this can result in a never confirming transaction once there is more demand for bitcoin transactions than the network can process.</source>
+        <translation>Kada je kapacitet transakcija manja od prostora u blokovima, rudari i čvorovi prenositelji mogu zatražiti minimalnu naknadu. Prihvatljivo je platiti samo ovu minimalnu naknadu, ali budite svjesni da ovime može nastati transakcija koja se nikad ne potvrđuje čim je potražnja za korištenjem Bitcoina veća nego što mreža može obraditi.</translation>
+    </message>
+    <message>
+        <source>A too low fee might result in a never confirming transaction (read the tooltip)</source>
+        <translation>Preniska naknada može rezultirati transakcijom koja se nikad ne potvrđuje (vidite oblačić)</translation>
+    </message>
+    <message>
+        <source>Confirmation time target:</source>
+        <translation>Ciljno vrijeme potvrde:</translation>
+    </message>
+    <message>
+        <source>Enable Replace-By-Fee</source>
+        <translation>Uključite Replace-By-Fee</translation>
+    </message>
+    <message>
+        <source>With Replace-By-Fee (BIP-125) you can increase a transaction's fee after it is sent. Without this, a higher fee may be recommended to compensate for increased transaction delay risk.</source>
+        <translation>Pomoću mogućnosti Replace-By-Fee (BIP-125) možete povećati naknadu transakcije nakon što je poslana. Bez ovoga može biti preporučena veća naknada kako bi nadoknadila povećani rizik zakašnjenja transakcije.</translation>
+    </message>
+    <message>
+        <source>Clear &amp;All</source>
+        <translation>Obriši &amp;sve</translation>
+    </message>
+    <message>
+        <source>Balance:</source>
+        <translation>Stanje:</translation>
+    </message>
+    <message>
+        <source>Confirm the send action</source>
+        <translation>Potvrdi akciju slanja</translation>
+    </message>
+    <message>
+        <source>S&amp;end</source>
+        <translation>&amp;Pošalji</translation>
+    </message>
+    <message>
+        <source>Copy quantity</source>
+        <translation>Kopiraj iznos</translation>
+    </message>
+    <message>
+        <source>Copy amount</source>
+        <translation>Kopiraj iznos</translation>
+    </message>
+    <message>
+        <source>Copy fee</source>
+        <translation>Kopirajte naknadu</translation>
+    </message>
+    <message>
+        <source>Copy after fee</source>
+        <translation>Kopirajte iznos nakon naknade</translation>
+    </message>
+    <message>
+        <source>Copy bytes</source>
+        <translation>Kopirajte količinu bajtova</translation>
+    </message>
+    <message>
+        <source>Copy dust</source>
+        <translation>Kopirajte sićušne iznose ("prašinu")</translation>
+    </message>
+    <message>
+        <source>Copy change</source>
+        <translation>Kopirajte ostatak</translation>
+    </message>
+    <message>
+        <source>%1 (%2 blocks)</source>
+        <translation>%1 (%2 blokova)</translation>
+    </message>
+    <message>
+        <source> from wallet '%1'</source>
+        <translation>iz novčanika '%1'</translation>
+    </message>
+    <message>
+        <source>%1 to '%2'</source>
+        <translation>od %1 do '%2'</translation>
+    </message>
+    <message>
+        <source>%1 to %2</source>
+        <translation>%1 na %2</translation>
+    </message>
+    <message>
+        <source>Are you sure you want to send?</source>
+        <translation>Jeste li sigurni da želite poslati transakciju?</translation>
+    </message>
+    <message>
+        <source>or</source>
+        <translation>ili</translation>
+    </message>
+    <message>
+        <source>You can increase the fee later (signals Replace-By-Fee, BIP-125).</source>
+        <translation>Možete kasnije povećati naknadu (javlja Replace-By-Fee, BIP-125).</translation>
+    </message>
+    <message>
+        <source>Please, review your transaction.</source>
+        <translation>Molim vas, pregledajte svoju transakciju.</translation>
+    </message>
+    <message>
+        <source>Transaction fee</source>
+        <translation>Naknada za transakciju</translation>
+    </message>
+    <message>
+        <source>Not signalling Replace-By-Fee, BIP-125.</source>
+        <translation>Ne javlja Replace-By-Fee, BIP-125.</translation>
+    </message>
+    <message>
+        <source>Total Amount</source>
+        <translation>Ukupni iznos</translation>
+    </message>
+    <message>
+        <source>To review recipient list click "Show Details..."</source>
+        <translation>Kliknite "Prikažite detalje..." kako biste pregledali popis primatelja</translation>
+    </message>
+    <message>
+        <source>Confirm send coins</source>
+        <translation>Potvrdi slanje novca</translation>
+    </message>
+    <message>
+        <source>Send</source>
+        <translation>Pošalji</translation>
+    </message>
+    <message>
+        <source>The recipient address is not valid. Please recheck.</source>
+        <translation>Adresa primatelja je nevažeća. Provjerite ponovno, molim vas.</translation>
+    </message>
+    <message>
+        <source>The amount to pay must be larger than 0.</source>
+        <translation>Iznos mora biti veći od 0.</translation>
+    </message>
+    <message>
+        <source>The amount exceeds your balance.</source>
+        <translation>Iznos je veći od raspoložljivog stanja novčanika.</translation>
+    </message>
+    <message>
+        <source>The total exceeds your balance when the %1 transaction fee is included.</source>
+        <translation>Iznos je veći od stanja novčanika kad se doda naknada za transakcije od %1.</translation>
+    </message>
+    <message>
+        <source>Duplicate address found: addresses should only be used once each.</source>
+        <translation>Duplikatna adresa pronađena: adrese trebaju biti korištene samo jedanput.</translation>
+    </message>
+    <message>
+        <source>Transaction creation failed!</source>
+        <translation>Neuspješno stvorenje transakcije!</translation>
+    </message>
+    <message>
+        <source>A fee higher than %1 is considered an absurdly high fee.</source>
+        <translation>Naknada veća od %1 smatra se apsurdno visokim naknadom.</translation>
+    </message>
+    <message>
+        <source>Payment request expired.</source>
+        <translation>Zahtjev za plaćanje istekao.</translation>
+    </message>
+    <message numerus="yes">
+        <source>Estimated to begin confirmation within %n block(s).</source>
+        <translation><numerusform>Procijenjeno je da će početi potvrđivanje unutar %n bloka.</numerusform><numerusform>Procijenjeno je da će početi potvrđivanje unutar %n bloka.</numerusform><numerusform>Procijenjeno je da će početi potvrđivanje unutar %n blokova.</numerusform></translation>
+    </message>
+    <message>
+        <source>Warning: Invalid Bitcoin address</so
