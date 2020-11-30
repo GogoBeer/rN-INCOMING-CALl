@@ -1536,4 +1536,228 @@
         <source>%1 ms</source>
         <translation>%1 ms</translation>
     </message>
-    <message nume
+    <message numerus="yes">
+        <source>%n second(s)</source>
+        <translation><numerusform>%n sekund</numerusform><numerusform>%n sekundi</numerusform><numerusform>%n sekundi</numerusform></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n minute(s)</source>
+        <translation><numerusform>%n minut</numerusform><numerusform>%n minuta</numerusform><numerusform>%n minuta</numerusform></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n hour(s)</source>
+        <translation><numerusform>%n sat</numerusform><numerusform>%n sata</numerusform><numerusform>%n sati</numerusform></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n day(s)</source>
+        <translation><numerusform>%n dan</numerusform><numerusform>%n dana</numerusform><numerusform>%n dana</numerusform></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n week(s)</source>
+        <translation><numerusform>%n tjedan</numerusform><numerusform>%n tjedna</numerusform><numerusform>%n tjedana</numerusform></translation>
+    </message>
+    <message>
+        <source>%1 and %2</source>
+        <translation>%1 i %2</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n year(s)</source>
+        <translation><numerusform>%n godina</numerusform><numerusform>%n godine</numerusform><numerusform>%n godina</numerusform></translation>
+    </message>
+    <message>
+        <source>%1 B</source>
+        <translation>%1 B</translation>
+    </message>
+    <message>
+        <source>%1 KB</source>
+        <translation>%1 KB</translation>
+    </message>
+    <message>
+        <source>%1 MB</source>
+        <translation>%1 MB</translation>
+    </message>
+    <message>
+        <source>%1 GB</source>
+        <translation>%1 GB</translation>
+    </message>
+    <message>
+        <source>Error: Specified data directory "%1" does not exist.</source>
+        <translation>Greška: Zadana podatkovna mapa "%1" ne postoji.</translation>
+    </message>
+    <message>
+        <source>Error: Cannot parse configuration file: %1.</source>
+        <translation>Greška: Ne može se parsirati konfiguracijska datoteka: %1.</translation>
+    </message>
+    <message>
+        <source>Error: %1</source>
+        <translation>Greška: %1</translation>
+    </message>
+    <message>
+        <source>%1 didn't yet exit safely...</source>
+        <translation>%1 se još nije sigurno zatvorio.</translation>
+    </message>
+    <message>
+        <source>unknown</source>
+        <translation>nepoznato</translation>
+    </message>
+</context>
+<context>
+    <name>QRImageWidget</name>
+    <message>
+        <source>&amp;Save Image...</source>
+        <translation>&amp;Spremi sliku...</translation>
+    </message>
+    <message>
+        <source>&amp;Copy Image</source>
+        <translation>&amp;Kopirajte sliku</translation>
+    </message>
+    <message>
+        <source>Resulting URI too long, try to reduce the text for label / message.</source>
+        <translation>URI je predug, probajte skratiti tekst za naslov / poruku.</translation>
+    </message>
+    <message>
+        <source>Error encoding URI into QR Code.</source>
+        <translation>Greška kod kodiranja URI adrese u QR kod.</translation>
+    </message>
+    <message>
+        <source>QR code support not available.</source>
+        <translation>Podrška za QR kodove je nedostupna.</translation>
+    </message>
+    <message>
+        <source>Save QR Code</source>
+        <translation>Spremi QR kod</translation>
+    </message>
+    <message>
+        <source>PNG Image (*.png)</source>
+        <translation>PNG slika (*.png)</translation>
+    </message>
+</context>
+<context>
+    <name>RPCConsole</name>
+    <message>
+        <source>N/A</source>
+        <translation>N/A</translation>
+    </message>
+    <message>
+        <source>Client version</source>
+        <translation>Verzija klijenta</translation>
+    </message>
+    <message>
+        <source>&amp;Information</source>
+        <translation>&amp;Informacije</translation>
+    </message>
+    <message>
+        <source>General</source>
+        <translation>Općenito</translation>
+    </message>
+    <message>
+        <source>Using BerkeleyDB version</source>
+        <translation>Verzija BerkeleyDB-a</translation>
+    </message>
+    <message>
+        <source>Datadir</source>
+        <translation>Datadir (podatkovna mapa)</translation>
+    </message>
+    <message>
+        <source>To specify a non-default location of the data directory use the '%1' option.</source>
+        <translation>Koristite opciju '%1' ako želite zadati drugu lokaciju podatkovnoj mapi.</translation>
+    </message>
+    <message>
+        <source>Blocksdir</source>
+        <translation>Blocksdir</translation>
+    </message>
+    <message>
+        <source>To specify a non-default location of the blocks directory use the '%1' option.</source>
+        <translation>Koristite opciju '%1' ako želite zadati drugu lokaciju mapi u kojoj se nalaze blokovi.</translation>
+    </message>
+    <message>
+        <source>Startup time</source>
+        <translation>Vrijeme pokretanja</translation>
+    </message>
+    <message>
+        <source>Network</source>
+        <translation>Mreža</translation>
+    </message>
+    <message>
+        <source>Name</source>
+        <translation>Ime</translation>
+    </message>
+    <message>
+        <source>Number of connections</source>
+        <translation>Broj veza</translation>
+    </message>
+    <message>
+        <source>Block chain</source>
+        <translation>Lanac blokova</translation>
+    </message>
+    <message>
+        <source>Memory Pool</source>
+        <translation>Memorijski bazen</translation>
+    </message>
+    <message>
+        <source>Current number of transactions</source>
+        <translation>Trenutan broj transakcija</translation>
+    </message>
+    <message>
+        <source>Memory usage</source>
+        <translation>Korištena memorija</translation>
+    </message>
+    <message>
+        <source>Wallet: </source>
+        <translation>Novčanik:</translation>
+    </message>
+    <message>
+        <source>(none)</source>
+        <translation>(ništa)</translation>
+    </message>
+    <message>
+        <source>&amp;Reset</source>
+        <translation>&amp;Resetirajte</translation>
+    </message>
+    <message>
+        <source>Received</source>
+        <translation>Primljeno</translation>
+    </message>
+    <message>
+        <source>Sent</source>
+        <translation>Poslano</translation>
+    </message>
+    <message>
+        <source>&amp;Peers</source>
+        <translation>&amp;Klijenti</translation>
+    </message>
+    <message>
+        <source>Banned peers</source>
+        <translation>Zabranjeni klijenti</translation>
+    </message>
+    <message>
+        <source>Select a peer to view detailed information.</source>
+        <translation>Odaberite klijent kako biste vidjeli detaljne informacije.</translation>
+    </message>
+    <message>
+        <source>Direction</source>
+        <translation>Smjer</translation>
+    </message>
+    <message>
+        <source>Version</source>
+        <translation>Verzija</translation>
+    </message>
+    <message>
+        <source>Starting Block</source>
+        <translation>Početni blok</translation>
+    </message>
+    <message>
+        <source>Synced Headers</source>
+        <translation>Broj sinkroniziranih zaglavlja</translation>
+    </message>
+    <message>
+        <source>Synced Blocks</source>
+        <translation>Broj sinkronizranih blokova</translation>
+    </message>
+    <message>
+        <source>User Agent</source>
+        <translation>Korisnički agent</translation>
+    </message>
+    <message>
+        <source>Open the %1 debug log file from the current data directory. This can take a few seconds for large log files.</source>
+        <translation>Otvorite datoteku zapisa programa %1 i
