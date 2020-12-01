@@ -3521,4 +3521,139 @@ Napomena: Budući da se naknada računa po bajtu, naknada od "100 satošija po k
         <source>Specified -walletdir "%s" is not a directory</source>
         <translation>Zadan -walletdir "%s" nije mapa</translation>
     </message>
-    <m
+    <message>
+        <source>The specified config file %s does not exist
+</source>
+        <translation>Navedena konfiguracijska datoteka %s ne postoji
+</translation>
+    </message>
+    <message>
+        <source>The transaction amount is too small to pay the fee</source>
+        <translation>Transakcijiski iznos je premalen da plati naknadu</translation>
+    </message>
+    <message>
+        <source>This is experimental software.</source>
+        <translation>Ovo je eksperimentalni softver.</translation>
+    </message>
+    <message>
+        <source>Transaction amount too small</source>
+        <translation>Transakcijski iznos premalen</translation>
+    </message>
+    <message>
+        <source>Transaction too large</source>
+        <translation>Transakcija prevelika</translation>
+    </message>
+    <message>
+        <source>Unable to bind to %s on this computer (bind returned error %s)</source>
+        <translation>Ne može se povezati na %s na ovom računalu. (povezivanje je vratilo grešku %s)</translation>
+    </message>
+    <message>
+        <source>Unable to create the PID file '%s': %s</source>
+        <translation>Nije moguće stvoriti PID datoteku '%s': %s</translation>
+    </message>
+    <message>
+        <source>Unable to generate initial keys</source>
+        <translation>Ne mogu se generirati početni ključevi</translation>
+    </message>
+    <message>
+        <source>Unknown -blockfilterindex value %s.</source>
+        <translation>Nepoznata vrijednost parametra -blockfilterindex %s.</translation>
+    </message>
+    <message>
+        <source>Verifying wallet(s)...</source>
+        <translation>Provjerava(ju) se novčanik/(ci)...</translation>
+    </message>
+    <message>
+        <source>Warning: unknown new rules activated (versionbit %i)</source>
+        <translation>Upozorenje: nepoznata nova pravila aktivirana (versionbit %i)</translation>
+    </message>
+    <message>
+        <source>-maxtxfee is set very high! Fees this large could be paid on a single transaction.</source>
+        <translation>-maxtxfee je postavljen preveliko. Naknade ove veličine će biti plaćene na individualnoj transakciji.</translation>
+    </message>
+    <message>
+        <source>This is the transaction fee you may pay when fee estimates are not available.</source>
+        <translation>Ovo je transakcijska naknada koju ćete možda platiti kada su nedostupne procjene naknada.</translation>
+    </message>
+    <message>
+        <source>Total length of network version string (%i) exceeds maximum length (%i). Reduce the number or size of uacomments.</source>
+        <translation>Ukupna duljina stringa verzije mreže (%i) prelazi maksimalnu duljinu (%i). Smanjite broj ili veličinu komentara o korisničkom agentu (uacomments).</translation>
+    </message>
+    <message>
+        <source>%s is set very high!</source>
+        <translation>%s je postavljen preveliko!</translation>
+    </message>
+    <message>
+        <source>Error loading wallet %s. Duplicate -wallet filename specified.</source>
+        <translation>Greška kod učitavanja novčanika %s. Duplikat imena novčanika zadan.</translation>
+    </message>
+    <message>
+        <source>Starting network threads...</source>
+        <translation>Pokreću se mrežne niti...</translation>
+    </message>
+    <message>
+        <source>The wallet will avoid paying less than the minimum relay fee.</source>
+        <translation>Ovaj novčanik će izbjegavati plaćanje manje od minimalne naknade prijenosa.</translation>
+    </message>
+    <message>
+        <source>This is the minimum transaction fee you pay on every transaction.</source>
+        <translation>Ovo je minimalna transakcijska naknada koju plaćate za svaku transakciju.</translation>
+    </message>
+    <message>
+        <source>This is the transaction fee you will pay if you send a transaction.</source>
+        <translation>Ovo je transakcijska naknada koju ćete platiti ako pošaljete transakciju.</translation>
+    </message>
+    <message>
+        <source>Transaction amounts must not be negative</source>
+        <translation>Iznosi transakcije ne smiju biti negativni</translation>
+    </message>
+    <message>
+        <source>Transaction has too long of a mempool chain</source>
+        <translation>Transakcija ima prevelik lanac memorijskog bazena</translation>
+    </message>
+    <message>
+        <source>Transaction must have at least one recipient</source>
+        <translation>Transakcija mora imati barem jednog primatelja</translation>
+    </message>
+    <message>
+        <source>Unknown network specified in -onlynet: '%s'</source>
+        <translation>Nepoznata mreža zadana kod -onlynet: '%s'</translation>
+    </message>
+    <message>
+        <source>Insufficient funds</source>
+        <translation>Nedovoljna sredstva</translation>
+    </message>
+    <message>
+        <source>Fee estimation failed. Fallbackfee is disabled. Wait a few blocks or enable -fallbackfee.</source>
+        <translation>Neuspješno procjenjivanje naknada. Fallbackfee je isključena. Pričekajte nekoliko blokova ili uključite -fallbackfee.</translation>
+    </message>
+    <message>
+        <source>Warning: Private keys detected in wallet {%s} with disabled private keys</source>
+        <translation>Upozorenje: Privatni ključevi pronađeni u novčaniku {%s} s isključenim privatnim ključevima</translation>
+    </message>
+    <message>
+        <source>Cannot write to data directory '%s'; check permissions.</source>
+        <translation>Nije moguće pisati u podatkovnu mapu '%s'; provjerite dozvole.</translation>
+    </message>
+    <message>
+        <source>Loading block index...</source>
+        <translation>Učitavanje indeksa blokova...</translation>
+    </message>
+    <message>
+        <source>Loading wallet...</source>
+        <translation>Učitavanje novčanika...</translation>
+    </message>
+    <message>
+        <source>Cannot downgrade wallet</source>
+        <translation>Nije moguće novčanik vratiti na prijašnju verziju.</translation>
+    </message>
+    <message>
+        <source>Rescanning...</source>
+        <translation>Ponovno pretraživanje...</translation>
+    </message>
+    <message>
+        <source>Done loading</source>
+        <translation>Učitavanje gotovo</translation>
+    </message>
+</context>
+</TS>
