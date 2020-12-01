@@ -3207,4 +3207,144 @@ Napomena: Budući da se naknada računa po bajtu, naknada od "100 satošija po k
     </message>
     <message>
         <source>Prune: last wallet synchronisation goes beyond pruned data. You need to -reindex (download the whole blockchain again in case of pruned node)</source>
-        <translation>Obrezivanje: zadnja sinkronizacija novčanika ide dalje od obrezivanih podataka. Mo
+        <translation>Obrezivanje: zadnja sinkronizacija novčanika ide dalje od obrezivanih podataka. Morate koristiti -reindex (ponovo preuzeti cijeli lanac blokova u slučaju obrezivanog čvora)</translation>
+    </message>
+    <message>
+        <source>Pruning blockstore...</source>
+        <translation>Obrezuje se blockstore...</translation>
+    </message>
+    <message>
+        <source>Unable to start HTTP server. See debug log for details.</source>
+        <translation>Ne može se pokrenuti HTTP server. Vidite debug.log za više detalja.</translation>
+    </message>
+    <message>
+        <source>The %s developers</source>
+        <translation>Ekipa %s</translation>
+    </message>
+    <message>
+        <source>Cannot obtain a lock on data directory %s. %s is probably already running.</source>
+        <translation>Program ne može pristupiti podatkovnoj mapi %s. %s je vjerojatno već pokrenut.</translation>
+    </message>
+    <message>
+        <source>Cannot provide specific connections and have addrman find outgoing connections at the same.</source>
+        <translation>Ne može ponuditi specifične veze i dati addrman da traži izlazne veze istovremeno.</translation>
+    </message>
+    <message>
+        <source>Error reading %s! All keys read correctly, but transaction data or address book entries might be missing or incorrect.</source>
+        <translation>Greška kod iščitanja %s! Svi ključevi su ispravno učitani, ali transakcijski podaci ili zapisi u adresaru mogu biti nepotpuni ili netočni.</translation>
+    </message>
+    <message>
+        <source>Please check that your computer's date and time are correct! If your clock is wrong, %s will not work properly.</source>
+        <translation>Molimo provjerite jesu li datum i vrijeme na vašem računalu točni. Ako je vaš sat krivo namješten, %s neće raditi ispravno.</translation>
+    </message>
+    <message>
+        <source>Please contribute if you find %s useful. Visit %s for further information about the software.</source>
+        <translation>Molimo vas da doprinijete programu %s ako ga smatrate korisnim. Posjetite %s za više informacija.</translation>
+    </message>
+    <message>
+        <source>The block database contains a block which appears to be from the future. This may be due to your computer's date and time being set incorrectly. Only rebuild the block database if you are sure that your computer's date and time are correct</source>
+        <translation>Baza blokova sadrži blok koji je naizgled iz budućnosti. Može to biti posljedica krivo namještenog datuma i vremena na vašem računalu. Obnovite bazu blokova samo ako ste sigurni da su točni datum i vrijeme na vašem računalu.</translation>
+    </message>
+    <message>
+        <source>This is a pre-release test build - use at your own risk - do not use for mining or merchant applications</source>
+        <translation>Ovo je eksperimentalna verzija za testiranje - koristite je na vlastitu odgovornost - ne koristite je za rudarenje ili trgovačke primjene</translation>
+    </message>
+    <message>
+        <source>This is the transaction fee you may discard if change is smaller than dust at this level</source>
+        <translation>Ovo je transakcijska naknada koju možete odbaciti ako je ostatak manji od "prašine" (sićušnih iznosa) po ovoj stopi</translation>
+    </message>
+    <message>
+        <source>Unable to replay blocks. You will need to rebuild the database using -reindex-chainstate.</source>
+        <translation>Ne mogu se ponovo odigrati blokovi. Morat ćete ponovo složiti bazu koristeći -reindex-chainstate.</translation>
+    </message>
+    <message>
+        <source>Unable to rewind the database to a pre-fork state. You will need to redownload the blockchain</source>
+        <translation>Baza se ne može povratiti na stanje prije raskola. Morat ćete ponovno preuzeti lanac blokova</translation>
+    </message>
+    <message>
+        <source>Warning: The network does not appear to fully agree! Some miners appear to be experiencing issues.</source>
+        <translation>Upozorenje: Čini se da se mreža ne slaže u potpunosti! Izgleda da su neki rudari suočeni s poteškoćama.</translation>
+    </message>
+    <message>
+        <source>Warning: We do not appear to fully agree with our peers! You may need to upgrade, or other nodes may need to upgrade.</source>
+        <translation>Upozorenje: Izgleda da se ne slažemo u potpunosti s našim klijentima! Možda ćete se vi ili ostali čvorovi morati ažurirati.</translation>
+    </message>
+    <message>
+        <source>-maxmempool must be at least %d MB</source>
+        <translation>-maxmempool mora biti barem %d MB</translation>
+    </message>
+    <message>
+        <source>Cannot resolve -%s address: '%s'</source>
+        <translation>Ne može se razriješiti adresa -%s: '%s'</translation>
+    </message>
+    <message>
+        <source>Change index out of range</source>
+        <translation>Indeks ostatka izvan dosega</translation>
+    </message>
+    <message>
+        <source>Config setting for %s only applied on %s network when in [%s] section.</source>
+        <translation>Konfiguriranje postavki za %s primijenjeno je samo na %s mreži u odjeljku [%s].</translation>
+    </message>
+    <message>
+        <source>Copyright (C) %i-%i</source>
+        <translation>Copyright (C) %i-%i</translation>
+    </message>
+    <message>
+        <source>Corrupted block database detected</source>
+        <translation>Pokvarena baza blokova otkrivena</translation>
+    </message>
+    <message>
+        <source>Do you want to rebuild the block database now?</source>
+        <translation>Želite li sada obnoviti bazu blokova?</translation>
+    </message>
+    <message>
+        <source>Error initializing block database</source>
+        <translation>Greška kod inicijaliziranja baze blokova</translation>
+    </message>
+    <message>
+        <source>Error initializing wallet database environment %s!</source>
+        <translation>Greška kod inicijaliziranja okoline baze novčanika %s!</translation>
+    </message>
+    <message>
+        <source>Error loading %s</source>
+        <translation>Greška kod pokretanja programa %s!</translation>
+    </message>
+    <message>
+        <source>Error loading %s: Private keys can only be disabled during creation</source>
+        <translation>Greška kod učitavanja %s: Privatni ključevi mogu biti isključeni samo tijekom stvaranja</translation>
+    </message>
+    <message>
+        <source>Error loading %s: Wallet corrupted</source>
+        <translation>Greška kod učitavanja %s: Novčanik pokvaren</translation>
+    </message>
+    <message>
+        <source>Error loading %s: Wallet requires newer version of %s</source>
+        <translation>Greška kod učitavanja %s: Novčanik zahtijeva noviju verziju softvera %s.</translation>
+    </message>
+    <message>
+        <source>Error loading block database</source>
+        <translation>Greška kod pokretanja baze blokova</translation>
+    </message>
+    <message>
+        <source>Error opening block database</source>
+        <translation>Greška kod otvaranja baze blokova</translation>
+    </message>
+    <message>
+        <source>Failed to listen on any port. Use -listen=0 if you want this.</source>
+        <translation>Neuspješno slušanje na svim portovima. Koristite -listen=0 ako to želite.</translation>
+    </message>
+    <message>
+        <source>Failed to rescan the wallet during initialization</source>
+        <translation>Neuspješno ponovo skeniranje novčanika tijekom inicijalizacije</translation>
+    </message>
+    <message>
+        <source>Importing...</source>
+        <translation>Uvozi se...</translation>
+    </message>
+    <message>
+        <source>Incorrect or no genesis block found. Wrong datadir for network?</source>
+        <translation>Neispravan ili nepostojeći blok geneze. Možda je kriva podatkovna mapa za mrežu?</translation>
+    </message>
+    <message>
+        <source>Initialization sanity check failed. %s is shutting down.</source>
+        <translation>Brzinska provjera inicijalizacije neuspješna. %s se zatvara.</tr
