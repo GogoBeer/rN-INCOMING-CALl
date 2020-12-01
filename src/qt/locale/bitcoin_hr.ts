@@ -2757,4 +2757,231 @@ Napomena: Budući da se naknada računa po bajtu, naknada od "100 satošija po k
     <message>
         <source>Transaction virtual size</source>
         <translation>Virtualna veličina transakcije</translation>
-    </message
+    </message>
+    <message>
+        <source>Output index</source>
+        <translation>Indeks outputa</translation>
+    </message>
+    <message>
+        <source> (Certificate was not verified)</source>
+        <translation>(Certifikat nije bio ovjeren)</translation>
+    </message>
+    <message>
+        <source>Merchant</source>
+        <translation>Trgovac</translation>
+    </message>
+    <message>
+        <source>Generated coins must mature %1 blocks before they can be spent. When you generated this block, it was broadcast to the network to be added to the block chain. If it fails to get into the chain, its state will change to "not accepted" and it won't be spendable. This may occasionally happen if another node generates a block within a few seconds of yours.</source>
+        <translation>Generirani novčići moraju dozrijeti %1 blokova prije nego što mogu biti potrošeni. Kada ste generirali ovaj blok, bio je emitiran na mreži kako bi bio dodan lancu blokova. Ako ne uspije ući u lanac, stanje će mu promijeniti na "neprihvaćeno" i neće se moći trošiti. Ovo se može dogoditi povremeno ako drugi čvor generira blok u roku od nekoliko sekundi od vas.</translation>
+    </message>
+    <message>
+        <source>Debug information</source>
+        <translation>Informacije za debugiranje</translation>
+    </message>
+    <message>
+        <source>Transaction</source>
+        <translation>Transakcija</translation>
+    </message>
+    <message>
+        <source>Inputs</source>
+        <translation>Unosi</translation>
+    </message>
+    <message>
+        <source>Amount</source>
+        <translation>Iznos</translation>
+    </message>
+    <message>
+        <source>true</source>
+        <translation>istina</translation>
+    </message>
+    <message>
+        <source>false</source>
+        <translation>laž</translation>
+    </message>
+</context>
+<context>
+    <name>TransactionDescDialog</name>
+    <message>
+        <source>This pane shows a detailed description of the transaction</source>
+        <translation>Ovaj prozor prikazuje detaljni opis transakcije</translation>
+    </message>
+    <message>
+        <source>Details for %1</source>
+        <translation>Detalji za %1</translation>
+    </message>
+</context>
+<context>
+    <name>TransactionTableModel</name>
+    <message>
+        <source>Date</source>
+        <translation>Datum</translation>
+    </message>
+    <message>
+        <source>Type</source>
+        <translation>Tip</translation>
+    </message>
+    <message>
+        <source>Label</source>
+        <translation>Oznaka</translation>
+    </message>
+    <message numerus="yes">
+        <source>Open for %n more block(s)</source>
+        <translation><numerusform>Otvoren za još %n blok</numerusform><numerusform>Otvoren za još %n bloka</numerusform><numerusform>Otvoren za još %n blokova</numerusform></translation>
+    </message>
+    <message>
+        <source>Open until %1</source>
+        <translation>Otvoren do %1</translation>
+    </message>
+    <message>
+        <source>Unconfirmed</source>
+        <translation>Nepotvrđeno</translation>
+    </message>
+    <message>
+        <source>Abandoned</source>
+        <translation>Napušteno</translation>
+    </message>
+    <message>
+        <source>Confirming (%1 of %2 recommended confirmations)</source>
+        <translation>Potvrđuje se (%1 od %2 preporučenih potvrda)</translation>
+    </message>
+    <message>
+        <source>Confirmed (%1 confirmations)</source>
+        <translation>Potvrđen (%1 potvrda)</translation>
+    </message>
+    <message>
+        <source>Conflicted</source>
+        <translation>Sukobljeno</translation>
+    </message>
+    <message>
+        <source>Immature (%1 confirmations, will be available after %2)</source>
+        <translation>Nezrelo (%1 potvrda/e, bit će dostupno nakon %2)</translation>
+    </message>
+    <message>
+        <source>Generated but not accepted</source>
+        <translation>Generirano, ali nije prihvaćeno</translation>
+    </message>
+    <message>
+        <source>Received with</source>
+        <translation>Primljeno s</translation>
+    </message>
+    <message>
+        <source>Received from</source>
+        <translation>Primljeno od</translation>
+    </message>
+    <message>
+        <source>Sent to</source>
+        <translation>Poslano za</translation>
+    </message>
+    <message>
+        <source>Payment to yourself</source>
+        <translation>Plaćanje samom sebi</translation>
+    </message>
+    <message>
+        <source>Mined</source>
+        <translation>Rudareno</translation>
+    </message>
+    <message>
+        <source>watch-only</source>
+        <translation>isključivo promatrano</translation>
+    </message>
+    <message>
+        <source>(n/a)</source>
+        <translation>(n/d)</translation>
+    </message>
+    <message>
+        <source>(no label)</source>
+        <translation>(nema oznake)</translation>
+    </message>
+    <message>
+        <source>Transaction status. Hover over this field to show number of confirmations.</source>
+        <translation>Status transakcije</translation>
+    </message>
+    <message>
+        <source>Date and time that the transaction was received.</source>
+        <translation>Datum i vrijeme kad je transakcija primljena</translation>
+    </message>
+    <message>
+        <source>Type of transaction.</source>
+        <translation>Vrsta transakcije.</translation>
+    </message>
+    <message>
+        <source>Whether or not a watch-only address is involved in this transaction.</source>
+        <translation>Ovisi je li isključivo promatrana adresa povezana s ovom transakcijom ili ne.</translation>
+    </message>
+    <message>
+        <source>User-defined intent/purpose of the transaction.</source>
+        <translation>Korisničko definirana namjera transakcije.</translation>
+    </message>
+    <message>
+        <source>Amount removed from or added to balance.</source>
+        <translation>Iznos odbijen od ili dodan k saldu.</translation>
+    </message>
+</context>
+<context>
+    <name>TransactionView</name>
+    <message>
+        <source>All</source>
+        <translation>Sve</translation>
+    </message>
+    <message>
+        <source>Today</source>
+        <translation>Danas</translation>
+    </message>
+    <message>
+        <source>This week</source>
+        <translation>Ovaj tjedan</translation>
+    </message>
+    <message>
+        <source>This month</source>
+        <translation>Ovaj mjesec</translation>
+    </message>
+    <message>
+        <source>Last month</source>
+        <translation>Prošli mjesec</translation>
+    </message>
+    <message>
+        <source>This year</source>
+        <translation>Ove godine</translation>
+    </message>
+    <message>
+        <source>Range...</source>
+        <translation>Raspon...</translation>
+    </message>
+    <message>
+        <source>Received with</source>
+        <translation>Primljeno s</translation>
+    </message>
+    <message>
+        <source>Sent to</source>
+        <translation>Poslano za</translation>
+    </message>
+    <message>
+        <source>To yourself</source>
+        <translation>Samom sebi</translation>
+    </message>
+    <message>
+        <source>Mined</source>
+        <translation>Rudareno</translation>
+    </message>
+    <message>
+        <source>Other</source>
+        <translation>Ostalo</translation>
+    </message>
+    <message>
+        <source>Enter address, transaction id, or label to search</source>
+        <translation>Unesite adresu, ID transakcije ili oznaku za pretragu</translation>
+    </message>
+    <message>
+        <source>Min amount</source>
+        <translation>Min iznos</translation>
+    </message>
+    <message>
+        <source>Abandon transaction</source>
+        <translation>Napustite transakciju</translation>
+    </message>
+    <message>
+        <source>Increase transaction fee</source>
+        <translation>Povećajte transakcijsku naknadu</translation>
+    </message>
+    <message>
+        <source>Copy 
