@@ -2545,4 +2545,216 @@ Napomena: Budući da se naknada računa po bajtu, naknada od "100 satošija po k
         <translation>&amp;Potvrdite poruku</translation>
     </message>
     <message>
-        <source>Enter the receiver's address, message (ensure you copy line breaks, spaces, tabs, etc. exactly) and signature below 
+        <source>Enter the receiver's address, message (ensure you copy line breaks, spaces, tabs, etc. exactly) and signature below to verify the message. Be careful not to read more into the signature than what is in the signed message itself, to avoid being tricked by a man-in-the-middle attack. Note that this only proves the signing party receives with the address, it cannot prove sendership of any transaction!</source>
+        <translation>Unesite primateljevu adresu, poruku (provjerite da kopirate prekide crta, razmake, tabove, itd. točno) i potpis ispod da provjerite poruku. Pazite da ne pridodate veće značenje potpisu nego što je sadržano u samoj poruci kako biste izbjegli napad posrednika (MITM attack). Primijetite da ovo samo dokazuje da stranka koja potpisuje prima na adresu. Ne može dokažati da je neka stranka poslala transakciju!</translation>
+    </message>
+    <message>
+        <source>The Bitcoin address the message was signed with</source>
+        <translation>Bitcoin adresa kojom je poruka potpisana</translation>
+    </message>
+    <message>
+        <source>Verify the message to ensure it was signed with the specified Bitcoin address</source>
+        <translation>Provjerite poruku da budete sigurni da je potpisana zadanom Bitcoin adresom</translation>
+    </message>
+    <message>
+        <source>Verify &amp;Message</source>
+        <translation>&amp;Potvrdite poruku</translation>
+    </message>
+    <message>
+        <source>Reset all verify message fields</source>
+        <translation>Resetirajte sva polja provjeravanja poruke</translation>
+    </message>
+    <message>
+        <source>Click "Sign Message" to generate signature</source>
+        <translation>Kliknite "Potpišite poruku" da generirate potpis</translation>
+    </message>
+    <message>
+        <source>The entered address is invalid.</source>
+        <translation>Unesena adresa je neispravna.</translation>
+    </message>
+    <message>
+        <source>Please check the address and try again.</source>
+        <translation>Molim provjerite adresu i pokušajte ponovo.</translation>
+    </message>
+    <message>
+        <source>The entered address does not refer to a key.</source>
+        <translation>Unesena adresa ne odnosi se na ključ.</translation>
+    </message>
+    <message>
+        <source>Wallet unlock was cancelled.</source>
+        <translation>Otključavanje novčanika je otkazano.</translation>
+    </message>
+    <message>
+        <source>No error</source>
+        <translation>Bez greške</translation>
+    </message>
+    <message>
+        <source>Private key for the entered address is not available.</source>
+        <translation>Privatni ključ za unesenu adresu nije dostupan.</translation>
+    </message>
+    <message>
+        <source>Message signing failed.</source>
+        <translation>Potpisivanje poruke neuspješno.</translation>
+    </message>
+    <message>
+        <source>Message signed.</source>
+        <translation>Poruka je potpisana.</translation>
+    </message>
+    <message>
+        <source>The signature could not be decoded.</source>
+        <translation>Potpis nije mogao biti dešifriran.</translation>
+    </message>
+    <message>
+        <source>Please check the signature and try again.</source>
+        <translation>Molim provjerite potpis i pokušajte ponovo.</translation>
+    </message>
+    <message>
+        <source>The signature did not match the message digest.</source>
+        <translation>Potpis se ne poklapa sa sažetkom poruke (message digest).</translation>
+    </message>
+    <message>
+        <source>Message verification failed.</source>
+        <translation>Provjera poruke neuspješna.</translation>
+    </message>
+    <message>
+        <source>Message verified.</source>
+        <translation>Poruka provjerena.</translation>
+    </message>
+</context>
+<context>
+    <name>TrafficGraphWidget</name>
+    <message>
+        <source>KB/s</source>
+        <translation>KB/s</translation>
+    </message>
+</context>
+<context>
+    <name>TransactionDesc</name>
+    <message numerus="yes">
+        <source>Open for %n more block(s)</source>
+        <translation><numerusform>Otvoren za još %n blok</numerusform><numerusform>Otvoren za još %n bloka</numerusform><numerusform>Otvoren za još %n blokova</numerusform></translation>
+    </message>
+    <message>
+        <source>Open until %1</source>
+        <translation>Otvoren do %1</translation>
+    </message>
+    <message>
+        <source>conflicted with a transaction with %1 confirmations</source>
+        <translation>subokljen s transakcijom broja potvrde %1</translation>
+    </message>
+    <message>
+        <source>0/unconfirmed, %1</source>
+        <translation>0/nepotvrđeno, %1</translation>
+    </message>
+    <message>
+        <source>in memory pool</source>
+        <translation>u memorijskom bazenu</translation>
+    </message>
+    <message>
+        <source>not in memory pool</source>
+        <translation>nije u memorijskom bazenu</translation>
+    </message>
+    <message>
+        <source>abandoned</source>
+        <translation>napušteno</translation>
+    </message>
+    <message>
+        <source>%1/unconfirmed</source>
+        <translation>%1/nepotvrđeno</translation>
+    </message>
+    <message>
+        <source>%1 confirmations</source>
+        <translation>%1 potvrda</translation>
+    </message>
+    <message>
+        <source>Status</source>
+        <translation>Status</translation>
+    </message>
+    <message>
+        <source>Date</source>
+        <translation>Datum</translation>
+    </message>
+    <message>
+        <source>Source</source>
+        <translation>Izvor</translation>
+    </message>
+    <message>
+        <source>Generated</source>
+        <translation>Generiran</translation>
+    </message>
+    <message>
+        <source>From</source>
+        <translation>Od</translation>
+    </message>
+    <message>
+        <source>unknown</source>
+        <translation>nepoznato</translation>
+    </message>
+    <message>
+        <source>To</source>
+        <translation>Za</translation>
+    </message>
+    <message>
+        <source>own address</source>
+        <translation>vlastita adresa</translation>
+    </message>
+    <message>
+        <source>watch-only</source>
+        <translation>isključivo promatrano</translation>
+    </message>
+    <message>
+        <source>label</source>
+        <translation>oznaka</translation>
+    </message>
+    <message>
+        <source>Credit</source>
+        <translation>Uplaćeno</translation>
+    </message>
+    <message numerus="yes">
+        <source>matures in %n more block(s)</source>
+        <translation><numerusform>dozrije za još %n blok</numerusform><numerusform>dozrije za još %n bloka</numerusform><numerusform>dozrije za još %n blokova</numerusform></translation>
+    </message>
+    <message>
+        <source>not accepted</source>
+        <translation>Nije prihvaćeno</translation>
+    </message>
+    <message>
+        <source>Debit</source>
+        <translation>Zaduženje</translation>
+    </message>
+    <message>
+        <source>Total debit</source>
+        <translation>Ukupni debit</translation>
+    </message>
+    <message>
+        <source>Total credit</source>
+        <translation>Ukupni kredit</translation>
+    </message>
+    <message>
+        <source>Transaction fee</source>
+        <translation>Naknada za transakciju</translation>
+    </message>
+    <message>
+        <source>Net amount</source>
+        <translation>Neto iznos</translation>
+    </message>
+    <message>
+        <source>Message</source>
+        <translation>Poruka</translation>
+    </message>
+    <message>
+        <source>Comment</source>
+        <translation>Komentar</translation>
+    </message>
+    <message>
+        <source>Transaction ID</source>
+        <translation>ID transakcije</translation>
+    </message>
+    <message>
+        <source>Transaction total size</source>
+        <translation>Ukupna veličina transakcije</translation>
+    </message>
+    <message>
+        <source>Transaction virtual size</source>
+        <translation>Virtualna veličina transakcije</translation>
+    </message
