@@ -2984,4 +2984,227 @@ Napomena: Budući da se naknada računa po bajtu, naknada od "100 satošija po k
         <translation>Povećajte transakcijsku naknadu</translation>
     </message>
     <message>
-        <source>Copy 
+        <source>Copy address</source>
+        <translation>Kopiraj adresu</translation>
+    </message>
+    <message>
+        <source>Copy label</source>
+        <translation>Kopiraj oznaku</translation>
+    </message>
+    <message>
+        <source>Copy amount</source>
+        <translation>Kopiraj iznos</translation>
+    </message>
+    <message>
+        <source>Copy transaction ID</source>
+        <translation>Kopiraj ID transakcije</translation>
+    </message>
+    <message>
+        <source>Copy raw transaction</source>
+        <translation>Kopirajte sirovu transakciju</translation>
+    </message>
+    <message>
+        <source>Copy full transaction details</source>
+        <translation>Kopirajte potpune transakcijske detalje</translation>
+    </message>
+    <message>
+        <source>Edit label</source>
+        <translation>Izmjeni oznaku</translation>
+    </message>
+    <message>
+        <source>Show transaction details</source>
+        <translation>Prikaži detalje transakcije</translation>
+    </message>
+    <message>
+        <source>Export Transaction History</source>
+        <translation>Izvozite povijest transakcija</translation>
+    </message>
+    <message>
+        <source>Comma separated file (*.csv)</source>
+        <translation>Datoteka podataka odvojenih zarezima (*.csv)</translation>
+    </message>
+    <message>
+        <source>Confirmed</source>
+        <translation>Potvrđeno</translation>
+    </message>
+    <message>
+        <source>Watch-only</source>
+        <translation>Isključivo promatrano</translation>
+    </message>
+    <message>
+        <source>Date</source>
+        <translation>Datum</translation>
+    </message>
+    <message>
+        <source>Type</source>
+        <translation>Tip</translation>
+    </message>
+    <message>
+        <source>Label</source>
+        <translation>Oznaka</translation>
+    </message>
+    <message>
+        <source>Address</source>
+        <translation>Adresa</translation>
+    </message>
+    <message>
+        <source>ID</source>
+        <translation>ID</translation>
+    </message>
+    <message>
+        <source>Exporting Failed</source>
+        <translation>Izvoz neuspješan</translation>
+    </message>
+    <message>
+        <source>There was an error trying to save the transaction history to %1.</source>
+        <translation>Nastala je greška pokušavajući snimiti povijest transakcija na %1.</translation>
+    </message>
+    <message>
+        <source>Exporting Successful</source>
+        <translation>Izvoz uspješan</translation>
+    </message>
+    <message>
+        <source>The transaction history was successfully saved to %1.</source>
+        <translation>Povijest transakcija je bila uspješno snimljena na %1.</translation>
+    </message>
+    <message>
+        <source>Range:</source>
+        <translation>Raspon:</translation>
+    </message>
+    <message>
+        <source>to</source>
+        <translation>za</translation>
+    </message>
+</context>
+<context>
+    <name>UnitDisplayStatusBarControl</name>
+    <message>
+        <source>Unit to show amounts in. Click to select another unit.</source>
+        <translation>Jedinica u kojoj ćete prikazati iznose. Kliknite da izabrate drugu jedinicu.</translation>
+    </message>
+</context>
+<context>
+    <name>WalletController</name>
+    <message>
+        <source>Close wallet</source>
+        <translation>Zatvorite novčanik</translation>
+    </message>
+    <message>
+        <source>Are you sure you wish to close the wallet &lt;i&gt;%1&lt;/i&gt;?</source>
+        <translation>Jeste li sigurni da želite zatvoriti novčanik &lt;i&gt;%1&lt;/i&gt;?</translation>
+    </message>
+    <message>
+        <source>Closing the wallet for too long can result in having to resync the entire chain if pruning is enabled.</source>
+        <translation>Držanje novčanik zatvorenim predugo može rezultirati ponovnom sinkronizacijom cijelog lanca ako je obrezivanje uključeno.</translation>
+    </message>
+    </context>
+<context>
+    <name>WalletFrame</name>
+    <message>
+        <source>Create a new wallet</source>
+        <translation>Stvorite novi novčanik</translation>
+    </message>
+</context>
+<context>
+    <name>WalletModel</name>
+    <message>
+        <source>Send Coins</source>
+        <translation>Slanje novca</translation>
+    </message>
+    <message>
+        <source>Fee bump error</source>
+        <translation>Greška kod povećanja naknade</translation>
+    </message>
+    <message>
+        <source>Increasing transaction fee failed</source>
+        <translation>Povećavanje transakcijske naknade neuspješno</translation>
+    </message>
+    <message>
+        <source>Do you want to increase the fee?</source>
+        <translation>Želite li povećati naknadu?</translation>
+    </message>
+    <message>
+        <source>Current fee:</source>
+        <translation>Trenutna naknada:</translation>
+    </message>
+    <message>
+        <source>Increase:</source>
+        <translation>Povećanje:</translation>
+    </message>
+    <message>
+        <source>New fee:</source>
+        <translation>Nova naknada:</translation>
+    </message>
+    <message>
+        <source>Confirm fee bump</source>
+        <translation>Potvrdite povećanje naknade</translation>
+    </message>
+    <message>
+        <source>Can't sign transaction.</source>
+        <translation>Transakcija ne može biti potpisana.</translation>
+    </message>
+    <message>
+        <source>Could not commit transaction</source>
+        <translation>Transakcija ne može biti izvršena.</translation>
+    </message>
+    <message>
+        <source>default wallet</source>
+        <translation>uobičajeni novčanik</translation>
+    </message>
+</context>
+<context>
+    <name>WalletView</name>
+    <message>
+        <source>&amp;Export</source>
+        <translation>&amp;Izvozi</translation>
+    </message>
+    <message>
+        <source>Export the data in the current tab to a file</source>
+        <translation>Izvoz podataka iz trenutnog lista u datoteku</translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation>Greška</translation>
+    </message>
+    <message>
+        <source>Backup Wallet</source>
+        <translation>Arhiviranje novčanika</translation>
+    </message>
+    <message>
+        <source>Wallet Data (*.dat)</source>
+        <translation>Podaci novčanika (*.dat)</translation>
+    </message>
+    <message>
+        <source>Backup Failed</source>
+        <translation>Arhiviranje nije uspjelo</translation>
+    </message>
+    <message>
+        <source>There was an error trying to save the wallet data to %1.</source>
+        <translation>Nastala je greška pokušavajući snimiti podatke novčanika na %1.</translation>
+    </message>
+    <message>
+        <source>Backup Successful</source>
+        <translation>Sigurnosna kopija uspješna</translation>
+    </message>
+    <message>
+        <source>The wallet data was successfully saved to %1.</source>
+        <translation>Podaci novčanika su bili uspješno snimljeni na %1.</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Odustanite</translation>
+    </message>
+</context>
+<context>
+    <name>bitcoin-core</name>
+    <message>
+        <source>Distributed under the MIT software license, see the accompanying file %s or %s</source>
+        <translation>Distribuirano pod MIT licencom softvera. Vidite pripadajuću datoteku %s ili %s.</translation>
+    </message>
+    <message>
+        <source>Prune configured below the minimum of %d MiB.  Please use a higher number.</source>
+        <translation>Obrezivanje postavljeno ispod minimuma od %d MiB. Molim koristite veći broj.</translation>
+    </message>
+    <message>
+        <source>Prune: last wallet synchronisation goes beyond pruned data. You need to -reindex (download the whole blockchain again in case of pruned node)</source>
+        <translation>Obrezivanje: zadnja sinkronizacija novčanika ide dalje od obrezivanih podataka. Mo
