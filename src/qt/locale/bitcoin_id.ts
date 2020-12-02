@@ -338,4 +338,219 @@
         <translation>Klik untuk menonaktifkan aktivitas jaringan.</translation>
     </message>
     <message>
-        <source>Network activity di
+        <source>Network activity disabled.</source>
+        <translation>Aktivitas jaringan dinonaktifkan.</translation>
+    </message>
+    <message>
+        <source>Click to enable network activity again.</source>
+        <translation>Klik untuk mengaktifkan aktivitas jaringan lagi.</translation>
+    </message>
+    <message>
+        <source>Syncing Headers (%1%)...</source>
+        <translation>Menyinkronkan Header (%1%) ...</translation>
+    </message>
+    <message>
+        <source>Reindexing blocks on disk...</source>
+        <translation>Mengindex ulang blok di dalam disk...</translation>
+    </message>
+    <message>
+        <source>Proxy is &lt;b&gt;enabled&lt;/b&gt;: %1</source>
+        <translation>Proxy di &lt;b&gt;aktifkan&lt;/b&gt;: %1</translation>
+    </message>
+    <message>
+        <source>Send coins to a Bitcoin address</source>
+        <translation>Kirim koin ke alamat Bitcoin</translation>
+    </message>
+    <message>
+        <source>Backup wallet to another location</source>
+        <translation>Cadangkan dompet ke lokasi lain</translation>
+    </message>
+    <message>
+        <source>Change the passphrase used for wallet encryption</source>
+        <translation>Ubah kata kunci yang digunakan untuk enkripsi dompet</translation>
+    </message>
+    <message>
+        <source>&amp;Verify message...</source>
+        <translation>&amp;Verifikasi pesan...</translation>
+    </message>
+    <message>
+        <source>&amp;Send</source>
+        <translation>&amp;Kirim</translation>
+    </message>
+    <message>
+        <source>&amp;Receive</source>
+        <translation>&amp;Menerima</translation>
+    </message>
+    <message>
+        <source>&amp;Show / Hide</source>
+        <translation>&amp;Tampilkan / Sembunyikan</translation>
+    </message>
+    <message>
+        <source>Show or hide the main Window</source>
+        <translation>Tampilkan atau sembunyikan jendela utama</translation>
+    </message>
+    <message>
+        <source>Encrypt the private keys that belong to your wallet</source>
+        <translation>Enkripsi private key yang dimiliki dompet Anda</translation>
+    </message>
+    <message>
+        <source>Sign messages with your Bitcoin addresses to prove you own them</source>
+        <translation>Tanda tangani sebuah pesan menggunakan alamat Bitcoin Anda untuk membuktikan bahwa Anda adalah pemilik alamat tersebut</translation>
+    </message>
+    <message>
+        <source>Verify messages to ensure they were signed with specified Bitcoin addresses</source>
+        <translation>Verifikasi pesan untuk memastikan bahwa pesan tersebut ditanda tangani oleh suatu alamat Bitcoin tertentu</translation>
+    </message>
+    <message>
+        <source>&amp;File</source>
+        <translation>&amp;Berkas</translation>
+    </message>
+    <message>
+        <source>&amp;Settings</source>
+        <translation>&amp;Pengaturan</translation>
+    </message>
+    <message>
+        <source>&amp;Help</source>
+        <translation>&amp;Bantuan</translation>
+    </message>
+    <message>
+        <source>Tabs toolbar</source>
+        <translation>Baris tab</translation>
+    </message>
+    <message>
+        <source>Request payments (generates QR codes and bitcoin: URIs)</source>
+        <translation>Permintaan pembayaran (membuat kode QR dan bitcoin: URIs)</translation>
+    </message>
+    <message>
+        <source>Show the list of used sending addresses and labels</source>
+        <translation>Tampilkan daftar alamat dan label yang terkirim</translation>
+    </message>
+    <message>
+        <source>Show the list of used receiving addresses and labels</source>
+        <translation>Tampilkan daftar alamat dan label yang diterima</translation>
+    </message>
+    <message>
+        <source>&amp;Command-line options</source>
+        <translation>&amp;pilihan Command-line</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n active connection(s) to Bitcoin network</source>
+        <translation><numerusform>%n koneksi aktif ke jaringan Bitcoin</numerusform></translation>
+    </message>
+    <message>
+        <source>Indexing blocks on disk...</source>
+        <translation>Pengindeksan blok pada disk ...</translation>
+    </message>
+    <message>
+        <source>Processing blocks on disk...</source>
+        <translation>Memproses blok pada disk ...</translation>
+    </message>
+    <message numerus="yes">
+        <source>Processed %n block(s) of transaction history.</source>
+        <translation><numerusform>%n blok dari riwayat transaksi diproses.</numerusform></translation>
+    </message>
+    <message>
+        <source>%1 behind</source>
+        <translation>kurang %1</translation>
+    </message>
+    <message>
+        <source>Last received block was generated %1 ago.</source>
+        <translation>Blok terakhir yang diterima %1 lalu.</translation>
+    </message>
+    <message>
+        <source>Transactions after this will not yet be visible.</source>
+        <translation>Transaksi setelah ini belum akan terlihat.</translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation>Terjadi sebuah kesalahan</translation>
+    </message>
+    <message>
+        <source>Warning</source>
+        <translation>Peringatan</translation>
+    </message>
+    <message>
+        <source>Information</source>
+        <translation>Informasi</translation>
+    </message>
+    <message>
+        <source>Up to date</source>
+        <translation>Terbaru</translation>
+    </message>
+    <message>
+        <source>Node window</source>
+        <translation>Jendela Node</translation>
+    </message>
+    <message>
+        <source>Open node debugging and diagnostic console</source>
+        <translation>Buka konsol debug dan diagnosa node</translation>
+    </message>
+    <message>
+        <source>&amp;Sending addresses</source>
+        <translation>Address &amp;Pengirim</translation>
+    </message>
+    <message>
+        <source>&amp;Receiving addresses</source>
+        <translation>Address &amp;Penerima</translation>
+    </message>
+    <message>
+        <source>Open a bitcoin: URI</source>
+        <translation>Buka URI bitcoin:</translation>
+    </message>
+    <message>
+        <source>Open Wallet</source>
+        <translation>Buka Wallet</translation>
+    </message>
+    <message>
+        <source>Open a wallet</source>
+        <translation>Buka sebuah wallet</translation>
+    </message>
+    <message>
+        <source>Close Wallet...</source>
+        <translation>Tutup Wallet</translation>
+    </message>
+    <message>
+        <source>Close wallet</source>
+        <translation>Tutup wallet</translation>
+    </message>
+    <message>
+        <source>Show the %1 help message to get a list with possible Bitcoin command-line options</source>
+        <translation>Tampilkan %1 pesan bantuan untuk mendapatkan daftar opsi baris perintah Bitcoin yang memungkinkan</translation>
+    </message>
+    <message>
+        <source>default wallet</source>
+        <translation>wallet default</translation>
+    </message>
+    <message>
+        <source>No wallets available</source>
+        <translation>Tidak ada wallet tersedia</translation>
+    </message>
+    <message>
+        <source>&amp;Window</source>
+        <translation>&amp;Jendela</translation>
+    </message>
+    <message>
+        <source>Minimize</source>
+        <translation>Minimalkan</translation>
+    </message>
+    <message>
+        <source>Zoom</source>
+        <translation>Zoom</translation>
+    </message>
+    <message>
+        <source>Main Window</source>
+        <translation>Jendela Utama</translation>
+    </message>
+    <message>
+        <source>%1 client</source>
+        <translation>%1 klien</translation>
+    </message>
+    <message>
+        <source>Connecting to peers...</source>
+        <translation>Menghubungkan ke peer...</translation>
+    </message>
+    <message>
+        <source>Catching up...</source>
+        <translation>Menyusul...</translation>
+    </message>
+    <messag
