@@ -553,4 +553,262 @@
         <source>Catching up...</source>
         <translation>Menyusul...</translation>
     </message>
-    <messag
+    <message>
+        <source>Error: %1</source>
+        <translation>Error: %1</translation>
+    </message>
+    <message>
+        <source>Warning: %1</source>
+        <translation>Peringatan: %1</translation>
+    </message>
+    <message>
+        <source>Date: %1
+</source>
+        <translation>Tanggal: %1
+</translation>
+    </message>
+    <message>
+        <source>Amount: %1
+</source>
+        <translation>Jumlah: %1
+</translation>
+    </message>
+    <message>
+        <source>Wallet: %1
+</source>
+        <translation>Wallet: %1
+</translation>
+    </message>
+    <message>
+        <source>Type: %1
+</source>
+        <translation>Tipe: %1
+</translation>
+    </message>
+    <message>
+        <source>Label: %1
+</source>
+        <translation>Label: %1
+</translation>
+    </message>
+    <message>
+        <source>Address: %1
+</source>
+        <translation>Alamat: %1
+</translation>
+    </message>
+    <message>
+        <source>Sent transaction</source>
+        <translation>Transaksi terkirim</translation>
+    </message>
+    <message>
+        <source>Incoming transaction</source>
+        <translation>Transaksi diterima</translation>
+    </message>
+    <message>
+        <source>HD key generation is &lt;b&gt;enabled&lt;/b&gt;</source>
+        <translation>Pembuatan kunci HD &lt;b&gt;diaktifkan&lt;/b&gt;</translation>
+    </message>
+    <message>
+        <source>HD key generation is &lt;b&gt;disabled&lt;/b&gt;</source>
+        <translation>Pembuatan kunci HD &lt;b&gt;dinonaktifkan&lt;/b&gt;</translation>
+    </message>
+    <message>
+        <source>Private key &lt;b&gt;disabled&lt;/b&gt;</source>
+        <translation>Private key &lt;b&gt;non aktif&lt;/b&gt;</translation>
+    </message>
+    <message>
+        <source>Wallet is &lt;b&gt;encrypted&lt;/b&gt; and currently &lt;b&gt;unlocked&lt;/b&gt;</source>
+        <translation>Dompet saat ini &lt;b&gt;terenkripsi&lt;/b&gt; dan &lt;b&gt;terbuka&lt;/b&gt;</translation>
+    </message>
+    <message>
+        <source>Wallet is &lt;b&gt;encrypted&lt;/b&gt; and currently &lt;b&gt;locked&lt;/b&gt;</source>
+        <translation>Dompet saat ini &lt;b&gt;terenkripsi&lt;/b&gt; dan &lt;b&gt;terkunci&lt;/b&gt;</translation>
+    </message>
+    </context>
+<context>
+    <name>CoinControlDialog</name>
+    <message>
+        <source>Coin Selection</source>
+        <translation>Pemilihan Koin</translation>
+    </message>
+    <message>
+        <source>Quantity:</source>
+        <translation>Kuantitas:</translation>
+    </message>
+    <message>
+        <source>Bytes:</source>
+        <translation>Bytes:</translation>
+    </message>
+    <message>
+        <source>Amount:</source>
+        <translation>Jumlah:</translation>
+    </message>
+    <message>
+        <source>Fee:</source>
+        <translation>Biaya:</translation>
+    </message>
+    <message>
+        <source>Dust:</source>
+        <translation>Dust:</translation>
+    </message>
+    <message>
+        <source>After Fee:</source>
+        <translation>Dengan Biaya:</translation>
+    </message>
+    <message>
+        <source>Change:</source>
+        <translation>Kembalian:</translation>
+    </message>
+    <message>
+        <source>(un)select all</source>
+        <translation>(Tidak)memilih semua</translation>
+    </message>
+    <message>
+        <source>Tree mode</source>
+        <translation>Tree mode</translation>
+    </message>
+    <message>
+        <source>List mode</source>
+        <translation>Mode daftar</translation>
+    </message>
+    <message>
+        <source>Amount</source>
+        <translation>Jumlah</translation>
+    </message>
+    <message>
+        <source>Received with label</source>
+        <translation>Diterima dengan label</translation>
+    </message>
+    <message>
+        <source>Received with address</source>
+        <translation>Diterima dengan alamat</translation>
+    </message>
+    <message>
+        <source>Date</source>
+        <translation>Tanggal</translation>
+    </message>
+    <message>
+        <source>Confirmations</source>
+        <translation>Konfirmasi</translation>
+    </message>
+    <message>
+        <source>Confirmed</source>
+        <translation>Terkonfirmasi</translation>
+    </message>
+    <message>
+        <source>Copy address</source>
+        <translation>Salin alamat</translation>
+    </message>
+    <message>
+        <source>Copy label</source>
+        <translation>Salin label</translation>
+    </message>
+    <message>
+        <source>Copy amount</source>
+        <translation>Salin Jumlah</translation>
+    </message>
+    <message>
+        <source>Copy transaction ID</source>
+        <translation>Salain ID Transaksi</translation>
+    </message>
+    <message>
+        <source>Lock unspent</source>
+        <translation>Kunci Yang Tidak Digunakan</translation>
+    </message>
+    <message>
+        <source>Unlock unspent</source>
+        <translation>Buka Kunci Yang Tidak Digunakan</translation>
+    </message>
+    <message>
+        <source>Copy quantity</source>
+        <translation>Salin Kuantitas</translation>
+    </message>
+    <message>
+        <source>Copy fee</source>
+        <translation>Salin biaya</translation>
+    </message>
+    <message>
+        <source>Copy after fee</source>
+        <translation>Salin Setelah Upah</translation>
+    </message>
+    <message>
+        <source>Copy bytes</source>
+        <translation>Salin bytes</translation>
+    </message>
+    <message>
+        <source>Copy dust</source>
+        <translation>Salin jumlah yang lebih kecil</translation>
+    </message>
+    <message>
+        <source>Copy change</source>
+        <translation>Salin Perubahan</translation>
+    </message>
+    <message>
+        <source>(%1 locked)</source>
+        <translation>(%1 terkunci)</translation>
+    </message>
+    <message>
+        <source>yes</source>
+        <translation>Ya</translation>
+    </message>
+    <message>
+        <source>no</source>
+        <translation>Tidak</translation>
+    </message>
+    <message>
+        <source>This label turns red if any recipient receives an amount smaller than the current dust threshold.</source>
+        <translation>Label ini akan menjadi merah apabila penerima menerima jumlah yang lebih kecil daripada ambang habuk semasa.</translation>
+    </message>
+    <message>
+        <source>Can vary +/- %1 satoshi(s) per input.</source>
+        <translation>Dapat bervariasi +/- %1 satoshi per input.</translation>
+    </message>
+    <message>
+        <source>(no label)</source>
+        <translation>(tidak ada label)</translation>
+    </message>
+    <message>
+        <source>change from %1 (%2)</source>
+        <translation>kembalian dari %1 (%2)</translation>
+    </message>
+    <message>
+        <source>(change)</source>
+        <translation>(kembalian)</translation>
+    </message>
+</context>
+<context>
+    <name>CreateWalletActivity</name>
+    <message>
+        <source>Creating Wallet &lt;b&gt;%1&lt;/b&gt;...</source>
+        <translation>Membuat Dompet &lt;b&gt;%1&lt;/b&gt;...</translation>
+    </message>
+    <message>
+        <source>Create wallet failed</source>
+        <translation>Pembuatan dompet gagal</translation>
+    </message>
+    <message>
+        <source>Create wallet warning</source>
+        <translation>Peringatan membuat dompet</translation>
+    </message>
+</context>
+<context>
+    <name>CreateWalletDialog</name>
+    <message>
+        <source>Create Wallet</source>
+        <translation>Bikin dompet</translation>
+    </message>
+    <message>
+        <source>Wallet Name</source>
+        <translation>Nama Dompet</translation>
+    </message>
+    <message>
+        <source>Encrypt the wallet. The wallet will be encrypted with a passphrase of your choice.</source>
+        <translation>Enkripsi dompet. Dompet akan dienkripsi dengan passphrase pilihan Anda.</translation>
+    </message>
+    <message>
+        <source>Encrypt Wallet</source>
+        <translation>Enkripsi Dompet</translation>
+    </message>
+    <message>
+        <source>Disable private ke
