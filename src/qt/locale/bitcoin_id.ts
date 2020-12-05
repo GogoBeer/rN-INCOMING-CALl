@@ -1146,4 +1146,188 @@
         <source>Third party URLs (e.g. a block explorer) that appear in the transactions tab as context menu items. %s in the URL is replaced by transaction hash. Multiple URLs are separated by vertical bar |.</source>
         <translation>URL pihak ketika (misalnya sebuah block explorer) yang mumcul dalam tab transaksi sebagai konteks menu. %s dalam URL diganti dengan kode transaksi. URL dipisahkan dengan tanda vertikal |.</translation>
     </message>
-    
+    <message>
+        <source>Open the %1 configuration file from the working directory.</source>
+        <translation>Buka file konfigurasi %1 dari direktori kerja.</translation>
+    </message>
+    <message>
+        <source>Open Configuration File</source>
+        <translation>Buka Berkas Konfigurasi</translation>
+    </message>
+    <message>
+        <source>Reset all client options to default.</source>
+        <translation>Kembalikan semua pengaturan ke awal.</translation>
+    </message>
+    <message>
+        <source>&amp;Reset Options</source>
+        <translation>&amp;Reset Pilihan</translation>
+    </message>
+    <message>
+        <source>&amp;Network</source>
+        <translation>&amp;Jaringan</translation>
+    </message>
+    <message>
+        <source>Disables some advanced features but all blocks will still be fully validated. Reverting this setting requires re-downloading the entire blockchain. Actual disk usage may be somewhat higher.</source>
+        <translation>Menonaktifkan beberapa fitur canggih akan tetapi semua block akan tetap divalidasi seutuhnya. Mengembalikan pengaturan ini memerlukan untuk mengunduh seluruh blockchain. Penggunaan disk mungkin akan lebih tinggi.</translation>
+    </message>
+    <message>
+        <source>Prune &amp;block storage to</source>
+        <translation>Prune &amp;ruang penyimpan block ke</translation>
+    </message>
+    <message>
+        <source>GB</source>
+        <translation>GB</translation>
+    </message>
+    <message>
+        <source>Reverting this setting requires re-downloading the entire blockchain.</source>
+        <translation>Mengembalikan pengaturan ini membutuhkan pengunduhan seluruh blockchain lagi.</translation>
+    </message>
+    <message>
+        <source>MiB</source>
+        <translation>MiB</translation>
+    </message>
+    <message>
+        <source>(0 = auto, &lt;0 = leave that many cores free)</source>
+        <translation>(0 = auto, &lt;0 = leave that many cores free)</translation>
+    </message>
+    <message>
+        <source>W&amp;allet</source>
+        <translation>D&amp;ompet</translation>
+    </message>
+    <message>
+        <source>Expert</source>
+        <translation>Ahli</translation>
+    </message>
+    <message>
+        <source>Enable coin &amp;control features</source>
+        <translation>Perbolehkan fitur &amp;pengaturan koin</translation>
+    </message>
+    <message>
+        <source>If you disable the spending of unconfirmed change, the change from a transaction cannot be used until that transaction has at least one confirmation. This also affects how your balance is computed.</source>
+        <translation>Jika Anda menonaktifkan perubahan saldo untuk transaksi yang belum dikonfirmasi, perubahan dari transaksi tidak dapat dilakukan sampai transaksi memiliki setidaknya satu konfirmasi. Hal ini juga mempengaruhi bagaimana saldo Anda dihitung.</translation>
+    </message>
+    <message>
+        <source>&amp;Spend unconfirmed change</source>
+        <translation>&amp;Perubahan saldo untuk transaksi yang belum dikonfirmasi</translation>
+    </message>
+    <message>
+        <source>Automatically open the Bitcoin client port on the router. This only works when your router supports UPnP and it is enabled.</source>
+        <translation>Otomatis membuka port client Bitcoin di router. Hanya berjalan apabila router anda mendukung UPnP dan di-enable.</translation>
+    </message>
+    <message>
+        <source>Map port using &amp;UPnP</source>
+        <translation>Petakan port dengan &amp;UPnP</translation>
+    </message>
+    <message>
+        <source>Accept connections from outside.</source>
+        <translation>Terima koneksi-koneksi dari luar.</translation>
+    </message>
+    <message>
+        <source>Allow incomin&amp;g connections</source>
+        <translation>Terima koneksi-koneksi masuk</translation>
+    </message>
+    <message>
+        <source>Connect to the Bitcoin network through a SOCKS5 proxy.</source>
+        <translation>Hubungkan ke jaringan Bitcoin melalui SOCKS5 proxy.</translation>
+    </message>
+    <message>
+        <source>&amp;Connect through SOCKS5 proxy (default proxy):</source>
+        <translation>&amp;Hubungkan melalui proxy SOCKS5 (proxy default):</translation>
+    </message>
+    <message>
+        <source>Proxy &amp;IP:</source>
+        <translation>IP Proxy:</translation>
+    </message>
+    <message>
+        <source>&amp;Port:</source>
+        <translation>&amp;Port:</translation>
+    </message>
+    <message>
+        <source>Port of the proxy (e.g. 9050)</source>
+        <translation>Port proxy (cth. 9050)</translation>
+    </message>
+    <message>
+        <source>Used for reaching peers via:</source>
+        <translation>Digunakan untuk berhubungan dengan peers melalui:</translation>
+    </message>
+    <message>
+        <source>IPv4</source>
+        <translation>IPv4</translation>
+    </message>
+    <message>
+        <source>IPv6</source>
+        <translation>IPv6</translation>
+    </message>
+    <message>
+        <source>Tor</source>
+        <translation>Tor</translation>
+    </message>
+    <message>
+        <source>&amp;Window</source>
+        <translation>&amp;Jendela</translation>
+    </message>
+    <message>
+        <source>Show only a tray icon after minimizing the window.</source>
+        <translation>Hanya tampilkan ikon tray setelah meminilisasi jendela</translation>
+    </message>
+    <message>
+        <source>&amp;Minimize to the tray instead of the taskbar</source>
+        <translation>&amp;Meminilisasi ke tray daripada taskbar</translation>
+    </message>
+    <message>
+        <source>M&amp;inimize on close</source>
+        <translation>M&amp;eminilisasi saat tutup</translation>
+    </message>
+    <message>
+        <source>&amp;Display</source>
+        <translation>&amp;Tampilan</translation>
+    </message>
+    <message>
+        <source>User Interface &amp;language:</source>
+        <translation>&amp;Bahasa Antarmuka Pengguna:</translation>
+    </message>
+    <message>
+        <source>The user interface language can be set here. This setting will take effect after restarting %1.</source>
+        <translation>Bahasa tampilan dapat diatur di sini. Pengaturan ini akan berpengaruh setelah memulai ulang %1.</translation>
+    </message>
+    <message>
+        <source>&amp;Unit to show amounts in:</source>
+        <translation>&amp;Unit untuk menunjukkan nilai:</translation>
+    </message>
+    <message>
+        <source>Choose the default subdivision unit to show in the interface and when sending coins.</source>
+        <translation>Pilihan standar unit yang ingin ditampilkan pada layar aplikasi dan saat mengirim koin.</translation>
+    </message>
+    <message>
+        <source>Whether to show coin control features or not.</source>
+        <translation>Ingin menunjukkan cara pengaturan koin atau tidak.</translation>
+    </message>
+    <message>
+        <source>&amp;Third party transaction URLs</source>
+        <translation>&amp;URL transaksi pihak ketiga</translation>
+    </message>
+    <message>
+        <source>Options set in this dialog are overridden by the command line or in the configuration file:</source>
+        <translation>Set opsi pengaturan pada jendela dialog ini tertutup oleh baris perintah atau dalam konfigurasi file:</translation>
+    </message>
+    <message>
+        <source>&amp;OK</source>
+        <translation>&amp;YA</translation>
+    </message>
+    <message>
+        <source>&amp;Cancel</source>
+        <translation>&amp;Batal</translation>
+    </message>
+    <message>
+        <source>default</source>
+        <translation>standar</translation>
+    </message>
+    <message>
+        <source>none</source>
+        <translation>tidak satupun</translation>
+    </message>
+    <message>
+        <source>Confirm options reset</source>
+        <translation>Memastikan reset pilihan</translation>
+    </message>
+    <message>
