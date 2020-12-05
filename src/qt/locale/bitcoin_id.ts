@@ -1767,4 +1767,222 @@
         <source>Starting Block</source>
         <translation>Mulai Block</translation>
     </message>
-    <me
+    <message>
+        <source>Synced Headers</source>
+        <translation>Header Yang Telah Sinkron</translation>
+    </message>
+    <message>
+        <source>Synced Blocks</source>
+        <translation>Block Yang Telah Sinkron</translation>
+    </message>
+    <message>
+        <source>The mapped Autonomous System used for diversifying peer selection.</source>
+        <translation>Sistem Otonom yang dipetakan digunakan untuk mendiversifikasi pilihan peer</translation>
+    </message>
+    <message>
+        <source>Mapped AS</source>
+        <translation>AS yang Dipetakan</translation>
+    </message>
+    <message>
+        <source>User Agent</source>
+        <translation>Agen Pengguna
+
+</translation>
+    </message>
+    <message>
+        <source>Node window</source>
+        <translation>Jendela Node</translation>
+    </message>
+    <message>
+        <source>Open the %1 debug log file from the current data directory. This can take a few seconds for large log files.</source>
+        <translation>Buka file log debug %1 dari direktori data saat ini. Dapat memakan waktu beberapa detik untuk file log besar.</translation>
+    </message>
+    <message>
+        <source>Decrease font size</source>
+        <translation>Mengurangi ukuran font</translation>
+    </message>
+    <message>
+        <source>Increase font size</source>
+        <translation>Menambah ukuran font</translation>
+    </message>
+    <message>
+        <source>Services</source>
+        <translation>Layanan</translation>
+    </message>
+    <message>
+        <source>Connection Time</source>
+        <translation>Waktu Koneksi</translation>
+    </message>
+    <message>
+        <source>Last Send</source>
+        <translation>Pengiriman Terakhir</translation>
+    </message>
+    <message>
+        <source>Last Receive</source>
+        <translation>Kiriman Terakhir</translation>
+    </message>
+    <message>
+        <source>Ping Time</source>
+        <translation>Waktu Ping</translation>
+    </message>
+    <message>
+        <source>The duration of a currently outstanding ping.</source>
+        <translation>Durasi ping saat ini.</translation>
+    </message>
+    <message>
+        <source>Ping Wait</source>
+        <translation>Ping Tunggu</translation>
+    </message>
+    <message>
+        <source>Min Ping</source>
+        <translation>Ping Min</translation>
+    </message>
+    <message>
+        <source>Time Offset</source>
+        <translation>Waktu Offset</translation>
+    </message>
+    <message>
+        <source>Last block time</source>
+        <translation>Waktu blok terakhir</translation>
+    </message>
+    <message>
+        <source>&amp;Open</source>
+        <translation>&amp;Buka</translation>
+    </message>
+    <message>
+        <source>&amp;Console</source>
+        <translation>&amp;Konsol</translation>
+    </message>
+    <message>
+        <source>&amp;Network Traffic</source>
+        <translation>Kemacetan &amp;Jaringan</translation>
+    </message>
+    <message>
+        <source>Totals</source>
+        <translation>Total</translation>
+    </message>
+    <message>
+        <source>In:</source>
+        <translation>Masuk:</translation>
+    </message>
+    <message>
+        <source>Out:</source>
+        <translation>Keluar:</translation>
+    </message>
+    <message>
+        <source>Debug log file</source>
+        <translation>Berkas catatan debug</translation>
+    </message>
+    <message>
+        <source>Clear console</source>
+        <translation>Bersihkan konsol</translation>
+    </message>
+    <message>
+        <source>1 &amp;hour</source>
+        <translation>1 &amp;jam</translation>
+    </message>
+    <message>
+        <source>1 &amp;day</source>
+        <translation>1 &amp;hari</translation>
+    </message>
+    <message>
+        <source>1 &amp;week</source>
+        <translation>1 &amp;minggu</translation>
+    </message>
+    <message>
+        <source>1 &amp;year</source>
+        <translation>1 &amp;tahun</translation>
+    </message>
+    <message>
+        <source>&amp;Disconnect</source>
+        <translation>&amp;Memutuskan</translation>
+    </message>
+    <message>
+        <source>Ban for</source>
+        <translation>Ban untuk</translation>
+    </message>
+    <message>
+        <source>&amp;Unban</source>
+        <translation>&amp;Lepas ban</translation>
+    </message>
+    <message>
+        <source>Welcome to the %1 RPC console.</source>
+        <translation>Selamat datang pada konsol %1 RPC.</translation>
+    </message>
+    <message>
+        <source>Use up and down arrows to navigate history, and %1 to clear screen.</source>
+        <translation>Gunakan panah atas dan bawah untuk riwayat navigasi, dan %1 untuk bersihkan layar.</translation>
+    </message>
+    <message>
+        <source>Type %1 for an overview of available commands.</source>
+        <translation>Ketik %1 untuk ringkasan perintah yang tersedia.</translation>
+    </message>
+    <message>
+        <source>For more information on using this console type %1.</source>
+        <translation>Untuk informasi lebih gunakan konsol ini dengan ketik %1.</translation>
+    </message>
+    <message>
+        <source>WARNING: Scammers have been active, telling users to type commands here, stealing their wallet contents. Do not use this console without fully understanding the ramifications of a command.</source>
+        <translation>PERHATIAN: Para penipu sedang aktif, memberi tahu pengguna untuk mengetik perintah di sini, mencuri isi dompet mereka. Mohon tidak mengunakan konsol ini tanpa sepenuhnya memahami konsekuensi dari suatu perintah.</translation>
+    </message>
+    <message>
+        <source>Network activity disabled</source>
+        <translation>Aktivitas jaringan nonaktif</translation>
+    </message>
+    <message>
+        <source>Executing command without any wallet</source>
+        <translation>Menjalankan perintah tanpa dompet apa pun</translation>
+    </message>
+    <message>
+        <source>(node id: %1)</source>
+        <translation>(id simpul: %1)</translation>
+    </message>
+    <message>
+        <source>via %1</source>
+        <translation>via %1</translation>
+    </message>
+    <message>
+        <source>never</source>
+        <translation>tidak pernah</translation>
+    </message>
+    <message>
+        <source>Inbound</source>
+        <translation>masuk</translation>
+    </message>
+    <message>
+        <source>Outbound</source>
+        <translation>keluar</translation>
+    </message>
+    <message>
+        <source>Unknown</source>
+        <translation>Tidak diketahui</translation>
+    </message>
+</context>
+<context>
+    <name>ReceiveCoinsDialog</name>
+    <message>
+        <source>&amp;Amount:</source>
+        <translation>&amp;Nilai:</translation>
+    </message>
+    <message>
+        <source>&amp;Label:</source>
+        <translation>&amp;Label:</translation>
+    </message>
+    <message>
+        <source>&amp;Message:</source>
+        <translation>&amp;Pesan:</translation>
+    </message>
+    <message>
+        <source>An optional message to attach to the payment request, which will be displayed when the request is opened. Note: The message will not be sent with the payment over the Bitcoin network.</source>
+        <translation>Pesan opsional untuk dilampirkan ke permintaan pembayaran, yang akan ditampilkan ketika permintaan dibuka. Catatan: Pesan tidak akan dikirim dengan pembayaran melalui jaringan Bitcoin.</translation>
+    </message>
+    <message>
+        <source>An optional label to associate with the new receiving address.</source>
+        <translation>Label opsional untuk mengasosiasikan dengan alamat penerima baru.</translation>
+    </message>
+    <message>
+        <source>Use this form to request payments. All fields are &lt;b&gt;optional&lt;/b&gt;.</source>
+        <translation>Gunakan form ini untuk meminta pembayaran. Semua bidang adalah &lt;b&gt;opsional&lt;/b&gt;.</translation>
+    </message>
+    <message>
+        <
