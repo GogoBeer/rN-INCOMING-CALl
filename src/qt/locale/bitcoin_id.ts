@@ -1331,3 +1331,189 @@
         <translation>Memastikan reset pilihan</translation>
     </message>
     <message>
+        <source>Client restart required to activate changes.</source>
+        <translation>Restart klien diperlukan untuk mengaktifkan perubahan.</translation>
+    </message>
+    <message>
+        <source>Client will be shut down. Do you want to proceed?</source>
+        <translation>Klien akan dimatikan, apakah anda hendak melanjutkan?</translation>
+    </message>
+    <message>
+        <source>Configuration options</source>
+        <translation>Konfigurasi pengaturan</translation>
+    </message>
+    <message>
+        <source>The configuration file is used to specify advanced user options which override GUI settings. Additionally, any command-line options will override this configuration file.</source>
+        <translation>File konfigurasi digunakan untuk menspesifikkan pilihan khusus pengguna yang akan menimpa pengaturan GUI. Sebagai tambahan, pengaturan command-line apapun akan menimpa file konfigurasi itu.</translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation>Terjadi sebuah kesalahan</translation>
+    </message>
+    <message>
+        <source>The configuration file could not be opened.</source>
+        <translation>Berkas konfigurasi tidak dapat dibuka.</translation>
+    </message>
+    <message>
+        <source>This change would require a client restart.</source>
+        <translation>Perubahan ini akan memerlukan restart klien</translation>
+    </message>
+    <message>
+        <source>The supplied proxy address is invalid.</source>
+        <translation>Alamat proxy yang diisi tidak valid.</translation>
+    </message>
+</context>
+<context>
+    <name>OverviewPage</name>
+    <message>
+        <source>Form</source>
+        <translation>Formulir</translation>
+    </message>
+    <message>
+        <source>The displayed information may be out of date. Your wallet automatically synchronizes with the Bitcoin network after a connection is established, but this process has not completed yet.</source>
+        <translation>Informasi terlampir mungkin sudah kedaluwarsa. Dompet Anda secara otomatis mensinkronisasi dengan jaringan Bitcoin ketika sebuah hubungan terbentuk, namun proses ini belum selesai.</translation>
+    </message>
+    <message>
+        <source>Watch-only:</source>
+        <translation>Hanya lihat:</translation>
+    </message>
+    <message>
+        <source>Available:</source>
+        <translation>Tersedia:</translation>
+    </message>
+    <message>
+        <source>Your current spendable balance</source>
+        <translation>Jumlah yang Anda bisa keluarkan sekarang</translation>
+    </message>
+    <message>
+        <source>Pending:</source>
+        <translation>Ditunda</translation>
+    </message>
+    <message>
+        <source>Total of transactions that have yet to be confirmed, and do not yet count toward the spendable balance</source>
+        <translation>Jumlah keseluruhan transaksi yang belum dikonfirmasi, dan belum saatnya dihitung sebagai pengeluaran saldo yang telah dibelanjakan.</translation>
+    </message>
+    <message>
+        <source>Immature:</source>
+        <translation>Terlalu Muda:</translation>
+    </message>
+    <message>
+        <source>Mined balance that has not yet matured</source>
+        <translation>Saldo ditambang yang masih terlalu muda</translation>
+    </message>
+    <message>
+        <source>Balances</source>
+        <translation>Saldo:</translation>
+    </message>
+    <message>
+        <source>Total:</source>
+        <translation>Jumlah:</translation>
+    </message>
+    <message>
+        <source>Your current total balance</source>
+        <translation>Jumlah saldo Anda sekarang</translation>
+    </message>
+    <message>
+        <source>Your current balance in watch-only addresses</source>
+        <translation>Saldomu di alamat hanya lihat</translation>
+    </message>
+    <message>
+        <source>Spendable:</source>
+        <translation>Bisa digunakan:</translation>
+    </message>
+    <message>
+        <source>Recent transactions</source>
+        <translation>Transaksi-transaksi terkini</translation>
+    </message>
+    <message>
+        <source>Unconfirmed transactions to watch-only addresses</source>
+        <translation>Transaksi yang belum terkonfirmasi ke alamat hanya lihat</translation>
+    </message>
+    <message>
+        <source>Mined balance in watch-only addresses that has not yet matured</source>
+        <translation>Saldo hasil mining di alamat hanya lihat yang belum bisa digunakan</translation>
+    </message>
+    <message>
+        <source>Current total balance in watch-only addresses</source>
+        <translation>Jumlah saldo di alamat hanya lihat</translation>
+    </message>
+    </context>
+<context>
+    <name>PSBTOperationsDialog</name>
+    <message>
+        <source>Total Amount</source>
+        <translation>Jumlah Keseluruhan</translation>
+    </message>
+    <message>
+        <source>or</source>
+        <translation>atau</translation>
+    </message>
+    </context>
+<context>
+    <name>PaymentServer</name>
+    <message>
+        <source>Payment request error</source>
+        <translation>Terjadi kesalahan pada permintaan pembayaran</translation>
+    </message>
+    <message>
+        <source>Cannot start bitcoin: click-to-pay handler</source>
+        <translation>Tidak bisa memulai bitcoin: handler click-to-pay</translation>
+    </message>
+    <message>
+        <source>URI handling</source>
+        <translation>Pengelolaan URI</translation>
+    </message>
+    <message>
+        <source>'bitcoin://' is not a valid URI. Use 'bitcoin:' instead.</source>
+        <translation>'bitcoin://' bukanlah alamat URI yang valid. Silakan gunakan 'bitcoin:'.</translation>
+    </message>
+    <message>
+        <source>Cannot process payment request because BIP70 is not supported.</source>
+        <translation>Tidak dapat memproses pembayaran karena dukungan BIP70 tidak disertakan.</translation>
+    </message>
+    <message>
+        <source>Due to widespread security flaws in BIP70 it's strongly recommended that any merchant instructions to switch wallets be ignored.</source>
+        <translation>Berhubung kelemahan keamanan yang meluas di BIP70, sangat disarankan agar instruksi pedagang untuk mengganti dompet diabaikan.</translation>
+    </message>
+    <message>
+        <source>If you are receiving this error you should request the merchant provide a BIP21 compatible URI.</source>
+        <translation>Jika Anda menerima kesalahan ini, Anda harus meminta pedagang memberikan URI yang kompatibel dengan BIP21.</translation>
+    </message>
+    <message>
+        <source>Invalid payment address %1</source>
+        <translation>Alamat pembayaran tidak valid %1</translation>
+    </message>
+    <message>
+        <source>URI cannot be parsed! This can be caused by an invalid Bitcoin address or malformed URI parameters.</source>
+        <translation>URI tidak bisa dimengerti! Hal ini bisa disebabkan karena alamat Bitcoin yang tidak sah atau parameter URI yang tidak tepat.</translation>
+    </message>
+    <message>
+        <source>Payment request file handling</source>
+        <translation>Pengelolaan file permintaan pembayaran</translation>
+    </message>
+</context>
+<context>
+    <name>PeerTableModel</name>
+    <message>
+        <source>User Agent</source>
+        <translation>Agen Pengguna</translation>
+    </message>
+    <message>
+        <source>Node/Service</source>
+        <translation>Node/Service</translation>
+    </message>
+    <message>
+        <source>NodeId</source>
+        <translation>NodeID</translation>
+    </message>
+    <message>
+        <source>Ping</source>
+        <translation>Ping</translation>
+    </message>
+    <message>
+        <source>Sent</source>
+        <translation>Terkirim</translation>
+    </message>
+    <message>
+        <source>Received</source>
+        <translation>Diterima<
