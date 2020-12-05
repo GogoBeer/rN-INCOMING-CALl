@@ -1516,4 +1516,255 @@
     </message>
     <message>
         <source>Received</source>
-        <translation>Diterima<
+        <translation>Diterima</translation>
+    </message>
+</context>
+<context>
+    <name>QObject</name>
+    <message>
+        <source>Amount</source>
+        <translation>Nilai</translation>
+    </message>
+    <message>
+        <source>Enter a Bitcoin address (e.g. %1)</source>
+        <translation>Masukkan alamat Bitcoin (contoh %1)</translation>
+    </message>
+    <message>
+        <source>%1 d</source>
+        <translation>%1 d</translation>
+    </message>
+    <message>
+        <source>%1 h</source>
+        <translation>%1 Jam</translation>
+    </message>
+    <message>
+        <source>%1 m</source>
+        <translation>%1 menit</translation>
+    </message>
+    <message>
+        <source>%1 s</source>
+        <translation>%1 s</translation>
+    </message>
+    <message>
+        <source>None</source>
+        <translation>Tidak ada</translation>
+    </message>
+    <message>
+        <source>N/A</source>
+        <translation>T/S</translation>
+    </message>
+    <message>
+        <source>%1 ms</source>
+        <translation>%1 ms</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n second(s)</source>
+        <translation><numerusform>%n detik</numerusform></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n minute(s)</source>
+        <translation><numerusform>%n menit</numerusform></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n hour(s)</source>
+        <translation><numerusform>%n jam</numerusform></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n day(s)</source>
+        <translation><numerusform>%n hari</numerusform></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n week(s)</source>
+        <translation><numerusform>%n minggu</numerusform></translation>
+    </message>
+    <message>
+        <source>%1 and %2</source>
+        <translation>%1 dan %2</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n year(s)</source>
+        <translation><numerusform>%n tahun</numerusform></translation>
+    </message>
+    <message>
+        <source>%1 B</source>
+        <translation>%1 B</translation>
+    </message>
+    <message>
+        <source>%1 KB</source>
+        <translation>%1 KB</translation>
+    </message>
+    <message>
+        <source>%1 MB</source>
+        <translation>%1 MB</translation>
+    </message>
+    <message>
+        <source>%1 GB</source>
+        <translation>%1 GB</translation>
+    </message>
+    <message>
+        <source>Error: Specified data directory "%1" does not exist.</source>
+        <translation>Error: Direktori data yang ditentukan "%1" tidak ada.</translation>
+    </message>
+    <message>
+        <source>Error: Cannot parse configuration file: %1.</source>
+        <translation>Error: Tidak dapat parse konfigurasi file: %1.</translation>
+    </message>
+    <message>
+        <source>Error: %1</source>
+        <translation>Error: %1</translation>
+    </message>
+    <message>
+        <source>%1 didn't yet exit safely...</source>
+        <translation>%1 masih belum keluar secara aman...</translation>
+    </message>
+    <message>
+        <source>unknown</source>
+        <translation>tidak diketahui</translation>
+    </message>
+</context>
+<context>
+    <name>QRImageWidget</name>
+    <message>
+        <source>&amp;Save Image...</source>
+        <translation>&amp;Simpan Gambaran...</translation>
+    </message>
+    <message>
+        <source>&amp;Copy Image</source>
+        <translation>&amp;Salin Gambar</translation>
+    </message>
+    <message>
+        <source>Resulting URI too long, try to reduce the text for label / message.</source>
+        <translation>Pembuatan tautan terlalu lama, coba kurangi teks untuk label / pesan.</translation>
+    </message>
+    <message>
+        <source>Error encoding URI into QR Code.</source>
+        <translation>Error saat menyandikan tautan ke dalam kode QR.</translation>
+    </message>
+    <message>
+        <source>QR code support not available.</source>
+        <translation>Dukungan kode QR tidak tersedia.</translation>
+    </message>
+    <message>
+        <source>Save QR Code</source>
+        <translation>Simpan Kode QR</translation>
+    </message>
+    <message>
+        <source>PNG Image (*.png)</source>
+        <translation>Gambar PNG (*.png)</translation>
+    </message>
+</context>
+<context>
+    <name>RPCConsole</name>
+    <message>
+        <source>N/A</source>
+        <translation>T/S</translation>
+    </message>
+    <message>
+        <source>Client version</source>
+        <translation>Versi Klien</translation>
+    </message>
+    <message>
+        <source>&amp;Information</source>
+        <translation>&amp;Informasi</translation>
+    </message>
+    <message>
+        <source>General</source>
+        <translation>Umum</translation>
+    </message>
+    <message>
+        <source>Using BerkeleyDB version</source>
+        <translation>Menggunakan versi BerkeleyDB</translation>
+    </message>
+    <message>
+        <source>Datadir</source>
+        <translation>Datadir</translation>
+    </message>
+    <message>
+        <source>To specify a non-default location of the data directory use the '%1' option.</source>
+        <translation>Untuk menentukan lokasi direktori data yang tidak standar gunakan opsi '%1'.</translation>
+    </message>
+    <message>
+        <source>Blocksdir</source>
+        <translation>Blocksdir</translation>
+    </message>
+    <message>
+        <source>To specify a non-default location of the blocks directory use the '%1' option.</source>
+        <translation>Untuk menentukan lokasi direktori block non-default, gunakan opsi '%1'.</translation>
+    </message>
+    <message>
+        <source>Startup time</source>
+        <translation>Waktu nyala</translation>
+    </message>
+    <message>
+        <source>Network</source>
+        <translation>Jaringan</translation>
+    </message>
+    <message>
+        <source>Name</source>
+        <translation>Nama</translation>
+    </message>
+    <message>
+        <source>Number of connections</source>
+        <translation>Jumlah hubungan</translation>
+    </message>
+    <message>
+        <source>Block chain</source>
+        <translation>Rantai blok</translation>
+    </message>
+    <message>
+        <source>Memory Pool</source>
+        <translation>Memory Pool</translation>
+    </message>
+    <message>
+        <source>Current number of transactions</source>
+        <translation>Jumlah transaksi saat ini</translation>
+    </message>
+    <message>
+        <source>Memory usage</source>
+        <translation>Penggunaan memori</translation>
+    </message>
+    <message>
+        <source>Wallet: </source>
+        <translation>Wallet:</translation>
+    </message>
+    <message>
+        <source>(none)</source>
+        <translation>(tidak ada)</translation>
+    </message>
+    <message>
+        <source>&amp;Reset</source>
+        <translation>&amp;Reset</translation>
+    </message>
+    <message>
+        <source>Received</source>
+        <translation>Diterima</translation>
+    </message>
+    <message>
+        <source>Sent</source>
+        <translation>Terkirim</translation>
+    </message>
+    <message>
+        <source>&amp;Peers</source>
+        <translation>&amp;Peer</translation>
+    </message>
+    <message>
+        <source>Banned peers</source>
+        <translation>Peer yang telah dilarang</translation>
+    </message>
+    <message>
+        <source>Select a peer to view detailed information.</source>
+        <translation>Pilih satu peer untuk melihat informasi detail.</translation>
+    </message>
+    <message>
+        <source>Direction</source>
+        <translation>Panduan</translation>
+    </message>
+    <message>
+        <source>Version</source>
+        <translation>Versi</translation>
+    </message>
+    <message>
+        <source>Starting Block</source>
+        <translation>Mulai Block</translation>
+    </message>
+    <me
