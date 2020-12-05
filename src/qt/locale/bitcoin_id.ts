@@ -811,4 +811,163 @@
         <translation>Enkripsi Dompet</translation>
     </message>
     <message>
-        <source>Disable private ke
+        <source>Disable private keys for this wallet. Wallets with private keys disabled will have no private keys and cannot have an HD seed or imported private keys. This is ideal for watch-only wallets.</source>
+        <translation>Nonaktifkan private keys dompet ini. Dompet dengan private keys nonaktif tidak akan memiliki private keys dan tidak dapat memiliki seed HD atau private keys impor. Ini sangat ideal untuk dompet watch-only.</translation>
+    </message>
+    <message>
+        <source>Disable Private Keys</source>
+        <translation>Nonaktifkan private keys</translation>
+    </message>
+    <message>
+        <source>Make a blank wallet. Blank wallets do not initially have private keys or scripts. Private keys and addresses can be imported, or an HD seed can be set, at a later time.</source>
+        <translation>Buat dompet kosong. Dompet kosong pada awalnya tidak memiliki private keys atau skrip pribadi. Private keys dan alamat pribadi dapat diimpor, atau seed HD dapat diatur di kemudian hari.</translation>
+    </message>
+    <message>
+        <source>Make Blank Wallet</source>
+        <translation>Buat dompet kosong</translation>
+    </message>
+    <message>
+        <source>Create</source>
+        <translation>Membuat</translation>
+    </message>
+</context>
+<context>
+    <name>EditAddressDialog</name>
+    <message>
+        <source>Edit Address</source>
+        <translation>Ubah Alamat</translation>
+    </message>
+    <message>
+        <source>&amp;Label</source>
+        <translation>&amp;Label</translation>
+    </message>
+    <message>
+        <source>The label associated with this address list entry</source>
+        <translation>Label yang terkait dengan daftar alamat</translation>
+    </message>
+    <message>
+        <source>The address associated with this address list entry. This can only be modified for sending addresses.</source>
+        <translation>Alamat yang terkait dengan daftar alamat. Hanya dapat diubah untuk alamat pengirim.</translation>
+    </message>
+    <message>
+        <source>&amp;Address</source>
+        <translation>&amp;Alamat</translation>
+    </message>
+    <message>
+        <source>New sending address</source>
+        <translation>Alamat pengirim baru</translation>
+    </message>
+    <message>
+        <source>Edit receiving address</source>
+        <translation>Ubah alamat penerima</translation>
+    </message>
+    <message>
+        <source>Edit sending address</source>
+        <translation>Ubah alamat pengirim</translation>
+    </message>
+    <message>
+        <source>The entered address "%1" is not a valid Bitcoin address.</source>
+        <translation>Alamat yang dimasukkan "%1" bukanlah alamat Bitcoin yang valid.</translation>
+    </message>
+    <message>
+        <source>Address "%1" already exists as a receiving address with label "%2" and so cannot be added as a sending address.</source>
+        <translation>Alamat "%1" sudah ada sebagai alamat penerimaan dengan label "%2" sehingga tidak bisa ditambah sebagai alamat pengiriman.</translation>
+    </message>
+    <message>
+        <source>The entered address "%1" is already in the address book with label "%2".</source>
+        <translation>Alamat "%1" yang dimasukkan sudah ada di dalam buku alamat dengan label "%2".</translation>
+    </message>
+    <message>
+        <source>Could not unlock wallet.</source>
+        <translation>Tidak dapat membuka dompet.</translation>
+    </message>
+    <message>
+        <source>New key generation failed.</source>
+        <translation>Pembuatan kunci baru gagal.</translation>
+    </message>
+</context>
+<context>
+    <name>FreespaceChecker</name>
+    <message>
+        <source>A new data directory will be created.</source>
+        <translation>Sebuah data direktori baru telah dibuat.</translation>
+    </message>
+    <message>
+        <source>name</source>
+        <translation>nama</translation>
+    </message>
+    <message>
+        <source>Directory already exists. Add %1 if you intend to create a new directory here.</source>
+        <translation>Direktori masih ada. Tambahlah %1 apabila Anda ingin membuat direktori baru disini.</translation>
+    </message>
+    <message>
+        <source>Path already exists, and is not a directory.</source>
+        <translation>Sudah ada path, dan itu bukan direktori.</translation>
+    </message>
+    <message>
+        <source>Cannot create data directory here.</source>
+        <translation>Tidak bisa membuat direktori data disini.</translation>
+    </message>
+</context>
+<context>
+    <name>HelpMessageDialog</name>
+    <message>
+        <source>version</source>
+        <translation>versi</translation>
+    </message>
+    <message>
+        <source>About %1</source>
+        <translation>Tentang %1</translation>
+    </message>
+    <message>
+        <source>Command-line options</source>
+        <translation>Pilihan Command-line</translation>
+    </message>
+</context>
+<context>
+    <name>Intro</name>
+    <message>
+        <source>Welcome</source>
+        <translation>Selamat Datang</translation>
+    </message>
+    <message>
+        <source>Welcome to %1.</source>
+        <translation>Selamat Datang di %1.</translation>
+    </message>
+    <message>
+        <source>As this is the first time the program is launched, you can choose where %1 will store its data.</source>
+        <translation>Karena ini adalah pertama kalinya program dijalankan, Anda dapat memilih lokasi %1 akan menyimpan data.</translation>
+    </message>
+    <message>
+        <source>When you click OK, %1 will begin to download and process the full %4 block chain (%2GB) starting with the earliest transactions in %3 when %4 initially launched.</source>
+        <translation>Ketika Anda mengklik OK, %1 akan mulai mengunduh dan memproses %4 block chain penuh (%2GB), dimulai dari transaksi-transaksi awal di %3 saat %4 diluncurkan pertama kali.</translation>
+    </message>
+    <message>
+        <source>Reverting this setting requires re-downloading the entire blockchain. It is faster to download the full chain first and prune it later. Disables some advanced features.</source>
+        <translation>Mengembalikan pengaturan perlu mengunduh ulang seluruh blockchain. Lebih cepat mengunduh rantai penuh terlebih dahulu dan memangkasnya kemudian. Menonaktifkan beberapa fitur lanjutan.</translation>
+    </message>
+    <message>
+        <source>This initial synchronisation is very demanding, and may expose hardware problems with your computer that had previously gone unnoticed. Each time you run %1, it will continue downloading where it left off.</source>
+        <translation>Sinkronisasi awal sangat berat dan mungkin akan menunjukkan permasalahan pada perangkat keras komputer Anda yang sebelumnya tidak tampak. Setiap kali Anda menjalankan %1, aplikasi ini akan melanjutkan pengunduhan dari posisi terakhir.</translation>
+    </message>
+    <message>
+        <source>If you have chosen to limit block chain storage (pruning), the historical data must still be downloaded and processed, but will be deleted afterward to keep your disk usage low.</source>
+        <translation>Apabila Anda memilih untuk membatasi penyimpanan block chain (pruning), data historis tetap akan diunduh dan diproses. Namun, data akan dihapus setelahnya untuk menjaga pemakaian disk agar tetap sedikit.</translation>
+    </message>
+    <message>
+        <source>Use the default data directory</source>
+        <translation>Gunakan direktori data default.</translation>
+    </message>
+    <message>
+        <source>Use a custom data directory:</source>
+        <translation>Gunakan direktori pilihan Anda:</translation>
+    </message>
+    <message>
+        <source>Bitcoin</source>
+        <translation>Bitcoin</translation>
+    </message>
+    <message>
+        <source>Discard blocks after verification, except most recent %1 GB (prune)</source>
+        <translation>Buang blok setelah verifikasi, kecuali %1 GB terbaru (prune)</translation>
+    </message>
+    <m
