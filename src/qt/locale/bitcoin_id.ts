@@ -2187,4 +2187,192 @@
     </message>
     <message>
         <source>Using the fallbackfee can result in sending a transaction that will take several hours or days (or never) to confirm. Consider choosing your fee manually or wait until you have validated the complete chain.</source>
-        <translation>Menggunakan fallbackfee dapat mengakibatkan pengiriman transaksi yang akan memakan waktu beberapa jam atau hari (atau tidak pernah) untuk dikonfirmasi. Pertimbangkan untuk memilih bi
+        <translation>Menggunakan fallbackfee dapat mengakibatkan pengiriman transaksi yang akan memakan waktu beberapa jam atau hari (atau tidak pernah) untuk dikonfirmasi. Pertimbangkan untuk memilih biaya anda secara manual atau tunggu hingga anda telah megesahkan rantai yang lengkap.</translation>
+    </message>
+    <message>
+        <source>Warning: Fee estimation is currently not possible.</source>
+        <translation>Peringatan: Perkiraan biaya saat ini tidak memungkinkan.</translation>
+    </message>
+    <message>
+        <source>Specify a custom fee per kB (1,000 bytes) of the transaction's virtual size.
+
+Note:  Since the fee is calculated on a per-byte basis, a fee of "100 satoshis per kB" for a transaction size of 500 bytes (half of 1 kB) would ultimately yield a fee of only 50 satoshis.</source>
+        <translation>Tentukan biaya khusus per kB (1.000 byte) dari ukuran transaksi maya.
+
+Catatan: Karena biaya dihitung berdasarkan per byte, biaya "100 satoshi per kB" untuk ukuran transaksi 500 byte (setengah dari 1 kB) pada akhirnya akan menghasilkan biaya hanya 50 satoshi.</translation>
+    </message>
+    <message>
+        <source>per kilobyte</source>
+        <translation>per kilobyte</translation>
+    </message>
+    <message>
+        <source>Hide</source>
+        <translation>Sembunyikan</translation>
+    </message>
+    <message>
+        <source>Recommended:</source>
+        <translation>Disarankan</translation>
+    </message>
+    <message>
+        <source>Custom:</source>
+        <translation>Khusus</translation>
+    </message>
+    <message>
+        <source>(Smart fee not initialized yet. This usually takes a few blocks...)</source>
+        <translation>(Smart fee belum di-inisialisasi. Biasanya hal ini akan memerlukan beberapa block...)</translation>
+    </message>
+    <message>
+        <source>Send to multiple recipients at once</source>
+        <translation>Kirim ke beberapa penerima sekaligus</translation>
+    </message>
+    <message>
+        <source>Add &amp;Recipient</source>
+        <translation>Tambahlah &amp;Penerima</translation>
+    </message>
+    <message>
+        <source>Clear all fields of the form.</source>
+        <translation>Hapus informasi dari form.</translation>
+    </message>
+    <message>
+        <source>Dust:</source>
+        <translation>Dust:</translation>
+    </message>
+    <message>
+        <source>Hide transaction fee settings</source>
+        <translation>Sembunyikan pengaturan biaya transaksi</translation>
+    </message>
+    <message>
+        <source>When there is less transaction volume than space in the blocks, miners as well as relaying nodes may enforce a minimum fee. Paying only this minimum fee is just fine, but be aware that this can result in a never confirming transaction once there is more demand for bitcoin transactions than the network can process.</source>
+        <translation>Ketika volume transaksi lebih sedikit daripada ruang di blok, penambang serta simpul yang menyiarkanikan dapat memberlakukan biaya minimum. Anda boleh hanya membayar biaya minimum, tetapi perlu diketahui bahwa ini dapat menghasilkan transaksi yang tidak pernah dikonfirmasi setelah ada lebih banyak permintaan untuk transaksi bitcoin daripada yang dapat diproses jaringan.</translation>
+    </message>
+    <message>
+        <source>A too low fee might result in a never confirming transaction (read the tooltip)</source>
+        <translation>Biaya yang terlalu rendah dapat menyebabkan transaksi tidak terkonfirmasi (baca tooltip)</translation>
+    </message>
+    <message>
+        <source>Confirmation time target:</source>
+        <translation>Target waktu konfirmasi:</translation>
+    </message>
+    <message>
+        <source>Enable Replace-By-Fee</source>
+        <translation>Izinkan Replace-By-Fee</translation>
+    </message>
+    <message>
+        <source>With Replace-By-Fee (BIP-125) you can increase a transaction's fee after it is sent. Without this, a higher fee may be recommended to compensate for increased transaction delay risk.</source>
+        <translation>Dengan Replace-By-Fee (BIP-125) Anda dapat menambah biaya transaksi setelah dikirim. Tanpa ini, biaya yang lebih tinggi dapat direkomendasikan untuk mengkompensasi peningkatan risiko keterlambatan transaksi.</translation>
+    </message>
+    <message>
+        <source>Clear &amp;All</source>
+        <translation>Hapus &amp;Semua</translation>
+    </message>
+    <message>
+        <source>Balance:</source>
+        <translation>Saldo:</translation>
+    </message>
+    <message>
+        <source>Confirm the send action</source>
+        <translation>Konfirmasi aksi pengiriman</translation>
+    </message>
+    <message>
+        <source>S&amp;end</source>
+        <translation>K&amp;irim</translation>
+    </message>
+    <message>
+        <source>Copy quantity</source>
+        <translation>Salin Kuantitas</translation>
+    </message>
+    <message>
+        <source>Copy amount</source>
+        <translation>Salin Jumlah</translation>
+    </message>
+    <message>
+        <source>Copy fee</source>
+        <translation>Salin biaya</translation>
+    </message>
+    <message>
+        <source>Copy after fee</source>
+        <translation>Salin Setelah Upah</translation>
+    </message>
+    <message>
+        <source>Copy bytes</source>
+        <translation>Salin bytes</translation>
+    </message>
+    <message>
+        <source>Copy dust</source>
+        <translation>Salin dust</translation>
+    </message>
+    <message>
+        <source>Copy change</source>
+        <translation>Salin Perubahan</translation>
+    </message>
+    <message>
+        <source>%1 (%2 blocks)</source>
+        <translation>%1 (%2 block)</translation>
+    </message>
+    <message>
+        <source> from wallet '%1'</source>
+        <translation>dari dompet '%1'</translation>
+    </message>
+    <message>
+        <source>%1 to '%2'</source>
+        <translation>%1 ke '%2'</translation>
+    </message>
+    <message>
+        <source>%1 to %2</source>
+        <translation>%1 ke %2</translation>
+    </message>
+    <message>
+        <source>Do you want to draft this transaction?</source>
+        <translation>Apakah anda ingin menjadikan transaksi ini sebagai konsep?</translation>
+    </message>
+    <message>
+        <source>Are you sure you want to send?</source>
+        <translation>Apakah anda yakin ingin mengirimkan?</translation>
+    </message>
+    <message>
+        <source>or</source>
+        <translation>atau</translation>
+    </message>
+    <message>
+        <source>You can increase the fee later (signals Replace-By-Fee, BIP-125).</source>
+        <translation>Anda dapat menambah biaya kemudian (sinyal Replace-By-Fee, BIP-125).</translation>
+    </message>
+    <message>
+        <source>Please, review your transaction.</source>
+        <translation>Mohon periksa kembali transaksi anda.</translation>
+    </message>
+    <message>
+        <source>Transaction fee</source>
+        <translation>Biaya Transaksi</translation>
+    </message>
+    <message>
+        <source>Not signalling Replace-By-Fee, BIP-125.</source>
+        <translation>Tidak memberi sinyal Replace-By-Fee, BIP-125.</translation>
+    </message>
+    <message>
+        <source>Total Amount</source>
+        <translation>Jumlah Keseluruhan</translation>
+    </message>
+    <message>
+        <source>To review recipient list click "Show Details..."</source>
+        <translation>Untuk meninjau daftar penerima, klik "Tampilkan Detail ..."</translation>
+    </message>
+    <message>
+        <source>Confirm send coins</source>
+        <translation>Konfirmasi pengiriman koin</translation>
+    </message>
+    <message>
+        <source>Confirm transaction proposal</source>
+        <translation>Konfirmasi proposal transaksi</translation>
+    </message>
+    <message>
+        <source>Send</source>
+        <translation>Kirim</translation>
+    </message>
+    <message>
+        <source>Watch-only balance:</source>
+        <translation>Saldo (hanya lihat):</translation>
+    </message>
+    <message>
+        <source>The recipient address is not valid. Please recheck.</source>
+        <tra
