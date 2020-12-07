@@ -3003,4 +3003,234 @@ Catatan: Karena biaya dihitung berdasarkan per byte, biaya "100 satoshi per kB" 
     </message>
     <message>
         <source>Copy address</source>
-        <tran
+        <translation>Salin alamat</translation>
+    </message>
+    <message>
+        <source>Copy label</source>
+        <translation>Salin label</translation>
+    </message>
+    <message>
+        <source>Copy amount</source>
+        <translation>Salin Jumlah</translation>
+    </message>
+    <message>
+        <source>Copy transaction ID</source>
+        <translation>Salain ID Transaksi</translation>
+    </message>
+    <message>
+        <source>Copy raw transaction</source>
+        <translation>Salin transaksi yang belum diproses</translation>
+    </message>
+    <message>
+        <source>Copy full transaction details</source>
+        <translation>Salin detail transaksi</translation>
+    </message>
+    <message>
+        <source>Edit label</source>
+        <translation>Ubah label</translation>
+    </message>
+    <message>
+        <source>Show transaction details</source>
+        <translation>Lihat detail transaksi</translation>
+    </message>
+    <message>
+        <source>Export Transaction History</source>
+        <translation>Ekspor Riwayat Transaksi</translation>
+    </message>
+    <message>
+        <source>Comma separated file (*.csv)</source>
+        <translation>Berkas yang berformat(*.csv)</translation>
+    </message>
+    <message>
+        <source>Confirmed</source>
+        <translation>Terkonfirmasi</translation>
+    </message>
+    <message>
+        <source>Watch-only</source>
+        <translation>Hanya-melihat</translation>
+    </message>
+    <message>
+        <source>Date</source>
+        <translation>Tanggal</translation>
+    </message>
+    <message>
+        <source>Type</source>
+        <translation>Tipe</translation>
+    </message>
+    <message>
+        <source>Label</source>
+        <translation>Label</translation>
+    </message>
+    <message>
+        <source>Address</source>
+        <translation>Alamat</translation>
+    </message>
+    <message>
+        <source>ID</source>
+        <translation>ID</translation>
+    </message>
+    <message>
+        <source>Exporting Failed</source>
+        <translation>Mengekspor Gagal</translation>
+    </message>
+    <message>
+        <source>There was an error trying to save the transaction history to %1.</source>
+        <translation>Terjadi kesalahan saat mencoba menyimpan riwayat transaksi ke %1.</translation>
+    </message>
+    <message>
+        <source>Exporting Successful</source>
+        <translation>Ekspor Berhasil</translation>
+    </message>
+    <message>
+        <source>The transaction history was successfully saved to %1.</source>
+        <translation>Riwayat transaksi berhasil disimpan ke %1.</translation>
+    </message>
+    <message>
+        <source>Range:</source>
+        <translation>Jarak:</translation>
+    </message>
+    <message>
+        <source>to</source>
+        <translation>untuk</translation>
+    </message>
+</context>
+<context>
+    <name>UnitDisplayStatusBarControl</name>
+    <message>
+        <source>Unit to show amounts in. Click to select another unit.</source>
+        <translation>Unit untuk menunjukkan jumlah. Klik untuk memilih unit lain.</translation>
+    </message>
+</context>
+<context>
+    <name>WalletController</name>
+    <message>
+        <source>Close wallet</source>
+        <translation>Tutup wallet</translation>
+    </message>
+    <message>
+        <source>Are you sure you wish to close the wallet &lt;i&gt;%1&lt;/i&gt;?</source>
+        <translation>Apakah anda yakin ingin menutup dompet &lt;i&gt;%1&lt;/i&gt;?</translation>
+    </message>
+    <message>
+        <source>Closing the wallet for too long can result in having to resync the entire chain if pruning is enabled.</source>
+        <translation>Menutup dompet terlalu lama dapat menyebabkan harus menyinkron ulang seluruh rantai jika pemangkasan diaktifkan.</translation>
+    </message>
+    </context>
+<context>
+    <name>WalletFrame</name>
+    <message>
+        <source>Create a new wallet</source>
+        <translation>Bikin dompet baru</translation>
+    </message>
+</context>
+<context>
+    <name>WalletModel</name>
+    <message>
+        <source>Send Coins</source>
+        <translation>Kirim Koin</translation>
+    </message>
+    <message>
+        <source>Fee bump error</source>
+        <translation>Kesalahan biaya tagihan</translation>
+    </message>
+    <message>
+        <source>Increasing transaction fee failed</source>
+        <translation>Gagal meningkatkan biaya transaksi</translation>
+    </message>
+    <message>
+        <source>Do you want to increase the fee?</source>
+        <translation>Apa Anda ingin meningkatkan biayanya?</translation>
+    </message>
+    <message>
+        <source>Do you want to draft a transaction with fee increase?</source>
+        <translation>Apakah anda ingin membuat draf transaksi dengan kenaikan biaya?</translation>
+    </message>
+    <message>
+        <source>Current fee:</source>
+        <translation>Biaya saat ini:</translation>
+    </message>
+    <message>
+        <source>Increase:</source>
+        <translation>Tingkatkan:</translation>
+    </message>
+    <message>
+        <source>New fee:</source>
+        <translation>Biaya baru:</translation>
+    </message>
+    <message>
+        <source>Confirm fee bump</source>
+        <translation>Konfirmasi biaya tambahan</translation>
+    </message>
+    <message>
+        <source>Can't draft transaction.</source>
+        <translation>Tidak dapat membuat konsep transaksi.</translation>
+    </message>
+    <message>
+        <source>PSBT copied</source>
+        <translation>PSBT disalin</translation>
+    </message>
+    <message>
+        <source>Can't sign transaction.</source>
+        <translation>Tidak dapat menandatangani transaksi.</translation>
+    </message>
+    <message>
+        <source>Could not commit transaction</source>
+        <translation>Tidak dapat melakukan transaksi</translation>
+    </message>
+    <message>
+        <source>default wallet</source>
+        <translation>wallet default</translation>
+    </message>
+</context>
+<context>
+    <name>WalletView</name>
+    <message>
+        <source>&amp;Export</source>
+        <translation>&amp;Ekspor</translation>
+    </message>
+    <message>
+        <source>Export the data in the current tab to a file</source>
+        <translation>Ekspor data dalam tab sekarang ke sebuah berkas</translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation>Kesalahan</translation>
+    </message>
+    <message>
+        <source>Backup Wallet</source>
+        <translation>Cadangkan Dompet</translation>
+    </message>
+    <message>
+        <source>Wallet Data (*.dat)</source>
+        <translation>Data Dompet (*.dat)</translation>
+    </message>
+    <message>
+        <source>Backup Failed</source>
+        <translation>Pencadangan Gagal</translation>
+    </message>
+    <message>
+        <source>There was an error trying to save the wallet data to %1.</source>
+        <translation>Terjadi kesalahan saat mencoba menyimpan data dompet ke %1.</translation>
+    </message>
+    <message>
+        <source>Backup Successful</source>
+        <translation>Pencadangan Berhasil</translation>
+    </message>
+    <message>
+        <source>The wallet data was successfully saved to %1.</source>
+        <translation>Data dompet berhasil disimpan ke %1.</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Batal</translation>
+    </message>
+</context>
+<context>
+    <name>bitcoin-core</name>
+    <message>
+        <source>Distributed under the MIT software license, see the accompanying file %s or %s</source>
+        <translation>Didistribusikan di bawah lisensi perangkat lunak MIT, lihat berkas terlampir %s atau %s</translation>
+    </message>
+    <message>
+        <source>Prune configured below the minimum of %d MiB.  Please use a higher number.</source>
+        <translation>Pemangkasan dikonfigurasikan di bawah minimum dari %d MiB. Harap gunakan angka yang lebih tingg
