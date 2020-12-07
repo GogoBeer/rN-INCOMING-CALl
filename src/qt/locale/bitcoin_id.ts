@@ -3377,4 +3377,141 @@ Catatan: Karena biaya dihitung berdasarkan per byte, biaya "100 satoshi per kB" 
     </message>
     <message>
         <source>You need to rebuild the database using -reindex to go back to unpruned mode.  This will redownload the entire blockchain</source>
-        <translation>Anda perlu membangun kembali basis data menggunakan -reindex untuk kembali ke mo
+        <translation>Anda perlu membangun kembali basis data menggunakan -reindex untuk kembali ke mode tidak dipangkas. Ini akan mengunduh ulang seluruh blockchain</translation>
+    </message>
+    <message>
+        <source>Error reading from database, shutting down.</source>
+        <translation>Kesalahan membaca dari basis data, mematikan.</translation>
+    </message>
+    <message>
+        <source>Error upgrading chainstate database</source>
+        <translation>Kesalahan memutakhirkan basis data chainstate</translation>
+    </message>
+    <message>
+        <source>Error: Disk space is low for %s</source>
+        <translation>Eror: Kapasitas penyimpanan penuh untuk %s</translation>
+    </message>
+    <message>
+        <source>Invalid -onion address or hostname: '%s'</source>
+        <translation>Alamat -onion atau hostname tidak valid: '%s'</translation>
+    </message>
+    <message>
+        <source>Invalid -proxy address or hostname: '%s'</source>
+        <translation>Alamat proxy atau hostname tidak valid: '%s'</translation>
+    </message>
+    <message>
+        <source>Invalid netmask specified in -whitelist: '%s'</source>
+        <translation>Netmask tidak valid yang ditentukan di -whitelist: '%s'</translation>
+    </message>
+    <message>
+        <source>Need to specify a port with -whitebind: '%s'</source>
+        <translation>Perlu menentukan port dengan -whitebind: '%s'</translation>
+    </message>
+    <message>
+        <source>Prune mode is incompatible with -blockfilterindex.</source>
+        <translation>Mode pemangkasan tidak kompatibel dengan -blockfilterindex.</translation>
+    </message>
+    <message>
+        <source>Section [%s] is not recognized.</source>
+        <translation>Bagian [%s] tidak dikenali.</translation>
+    </message>
+    <message>
+        <source>Signing transaction failed</source>
+        <translation>Tandatangani transaksi tergagal</translation>
+    </message>
+    <message>
+        <source>The specified config file %s does not exist
+</source>
+        <translation>Berkas konfigurasi %s yang ditentukan tidak ada
+</translation>
+    </message>
+    <message>
+        <source>The transaction amount is too small to pay the fee</source>
+        <translation>Jumlah transaksi terlalu kecil untuk membayar biaya ongkos</translation>
+    </message>
+    <message>
+        <source>This is experimental software.</source>
+        <translation>Ini adalah perangkat lunak eksperimental.</translation>
+    </message>
+    <message>
+        <source>Transaction amount too small</source>
+        <translation>Nilai transaksi terlalu kecil</translation>
+    </message>
+    <message>
+        <source>Transaction too large</source>
+        <translation>Transaksi terlalu besar</translation>
+    </message>
+    <message>
+        <source>Verifying wallet(s)...</source>
+        <translation>Memverifikasi dompet...</translation>
+    </message>
+    <message>
+        <source>%s is set very high!</source>
+        <translation>%s diset sangat tinggi!</translation>
+    </message>
+    <message>
+        <source>Error loading wallet %s. Duplicate -wallet filename specified.</source>
+        <translation>Terjadi kesalahan saat memuat dompet %s duplikat -wallet  nama file yang diterapkan</translation>
+    </message>
+    <message>
+        <source>The wallet will avoid paying less than the minimum relay fee.</source>
+        <translation>Dompet akan menghindari pembayaran kurang dari biaya minimum ongkos relay.</translation>
+    </message>
+    <message>
+        <source>This is the minimum transaction fee you pay on every transaction.</source>
+        <translation>Ini adalah ongkos transaksi minimum yang anda bayarkan untuk setiap transaksi.</translation>
+    </message>
+    <message>
+        <source>This is the transaction fee you will pay if you send a transaction.</source>
+        <translation>Ini adalah ongkos transaksi yang akan anda bayarkan jika anda mengirim transaksi.</translation>
+    </message>
+    <message>
+        <source>Transaction amounts must not be negative</source>
+        <translation>Jumlah transaksi tidak boleh negatif</translation>
+    </message>
+    <message>
+        <source>Transaction has too long of a mempool chain</source>
+        <translation>Transaksi mempunyai rantai mempool yang terlalu panjang</translation>
+    </message>
+    <message>
+        <source>Transaction must have at least one recipient</source>
+        <translation>Transaksi harus mempunyai paling tidak satu penerima</translation>
+    </message>
+    <message>
+        <source>Unknown network specified in -onlynet: '%s'</source>
+        <translation>Jaringan tidak diketahui yang ditentukan dalam -onlynet: '%s'</translation>
+    </message>
+    <message>
+        <source>Insufficient funds</source>
+        <translation>Saldo tidak mencukupi</translation>
+    </message>
+    <message>
+        <source>Warning: Private keys detected in wallet {%s} with disabled private keys</source>
+        <translation>Peringatan: Kunci pribadi terdeteksi di dompet {%s} dengan kunci pribadi yang dinonaktifkan</translation>
+    </message>
+    <message>
+        <source>Cannot write to data directory '%s'; check permissions.</source>
+        <translation>Tidak dapat menulis ke direktori data '%s'; periksa izinnya.</translation>
+    </message>
+    <message>
+        <source>Loading block index...</source>
+        <translation>Memuat indeks blok...</translation>
+    </message>
+    <message>
+        <source>Loading wallet...</source>
+        <translation>Memuat dompet...</translation>
+    </message>
+    <message>
+        <source>Cannot downgrade wallet</source>
+        <translation>Tidak dapat menurunkan versi dompet</translation>
+    </message>
+    <message>
+        <source>Rescanning...</source>
+        <translation>Memindai ulang...</translation>
+    </message>
+    <message>
+        <source>Done loading</source>
+        <translation>Memuat selesai</translation>
+    </message>
+</context>
+</TS>
