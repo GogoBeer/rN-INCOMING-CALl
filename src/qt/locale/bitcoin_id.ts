@@ -2753,4 +2753,254 @@ Catatan: Karena biaya dihitung berdasarkan per byte, biaya "100 satoshi per kB" 
         <translation>tidak diterima</translation>
     </message>
     <message>
-        <s
+        <source>Debit</source>
+        <translation>Debit</translation>
+    </message>
+    <message>
+        <source>Total debit</source>
+        <translation>Total debit</translation>
+    </message>
+    <message>
+        <source>Total credit</source>
+        <translation>Total kredit</translation>
+    </message>
+    <message>
+        <source>Transaction fee</source>
+        <translation>Biaya Transaksi</translation>
+    </message>
+    <message>
+        <source>Net amount</source>
+        <translation>Jumlah bersih</translation>
+    </message>
+    <message>
+        <source>Message</source>
+        <translation>Pesan</translation>
+    </message>
+    <message>
+        <source>Comment</source>
+        <translation>Komentar</translation>
+    </message>
+    <message>
+        <source>Transaction ID</source>
+        <translation>ID Transaksi</translation>
+    </message>
+    <message>
+        <source>Transaction total size</source>
+        <translation>Ukuran transaksi total</translation>
+    </message>
+    <message>
+        <source>Transaction virtual size</source>
+        <translation>Ukuran transaksi virtual</translation>
+    </message>
+    <message>
+        <source>Output index</source>
+        <translation>Indeks outpu</translation>
+    </message>
+    <message>
+        <source> (Certificate was not verified)</source>
+        <translation>(Sertifikat tidak diverifikasi)</translation>
+    </message>
+    <message>
+        <source>Merchant</source>
+        <translation>Penjual</translation>
+    </message>
+    <message>
+        <source>Debug information</source>
+        <translation>Informasi debug</translation>
+    </message>
+    <message>
+        <source>Transaction</source>
+        <translation>Transaksi</translation>
+    </message>
+    <message>
+        <source>Inputs</source>
+        <translation>Input</translation>
+    </message>
+    <message>
+        <source>Amount</source>
+        <translation>Jumlah</translation>
+    </message>
+    <message>
+        <source>true</source>
+        <translation>benar</translation>
+    </message>
+    <message>
+        <source>false</source>
+        <translation>salah</translation>
+    </message>
+</context>
+<context>
+    <name>TransactionDescDialog</name>
+    <message>
+        <source>This pane shows a detailed description of the transaction</source>
+        <translation>Jendela ini menampilkan deskripsi rinci dari transaksi tersebut</translation>
+    </message>
+    <message>
+        <source>Details for %1</source>
+        <translation>Detail untuk %1</translation>
+    </message>
+</context>
+<context>
+    <name>TransactionTableModel</name>
+    <message>
+        <source>Date</source>
+        <translation>Tanggal</translation>
+    </message>
+    <message>
+        <source>Type</source>
+        <translation>Tipe</translation>
+    </message>
+    <message>
+        <source>Label</source>
+        <translation>Label</translation>
+    </message>
+    <message numerus="yes">
+        <source>Open for %n more block(s)</source>
+        <translation><numerusform>Buka %n untuk blok lebih</numerusform></translation>
+    </message>
+    <message>
+        <source>Open until %1</source>
+        <translation>Buka sampai %1</translation>
+    </message>
+    <message>
+        <source>Unconfirmed</source>
+        <translation>Belum dikonfirmasi</translation>
+    </message>
+    <message>
+        <source>Abandoned</source>
+        <translation>yang ditelantarkan</translation>
+    </message>
+    <message>
+        <source>Confirmed (%1 confirmations)</source>
+        <translation>Dikonfirmasi (%1 konfirmasi)</translation>
+    </message>
+    <message>
+        <source>Conflicted</source>
+        <translation>Bertentangan</translation>
+    </message>
+    <message>
+        <source>Generated but not accepted</source>
+        <translation>Dihasilkan tapi tidak diterima</translation>
+    </message>
+    <message>
+        <source>Received with</source>
+        <translation>Diterima dengan</translation>
+    </message>
+    <message>
+        <source>Received from</source>
+        <translation>Diterima dari</translation>
+    </message>
+    <message>
+        <source>Sent to</source>
+        <translation>Dikirim ke</translation>
+    </message>
+    <message>
+        <source>Payment to yourself</source>
+        <translation>Pembayaran untuk diri sendiri</translation>
+    </message>
+    <message>
+        <source>Mined</source>
+        <translation>Ditambang</translation>
+    </message>
+    <message>
+        <source>watch-only</source>
+        <translation>hanya-melihat</translation>
+    </message>
+    <message>
+        <source>(no label)</source>
+        <translation>(tidak ada label)</translation>
+    </message>
+    <message>
+        <source>Transaction status. Hover over this field to show number of confirmations.</source>
+        <translation>Status transaksi. Arahkan kursor ke bidang ini untuk menampilkan jumlah konfirmasi.</translation>
+    </message>
+    <message>
+        <source>Date and time that the transaction was received.</source>
+        <translation>Tanggal dan waktu transaksi telah diterima.</translation>
+    </message>
+    <message>
+        <source>Type of transaction.</source>
+        <translation>Tipe transaksi.</translation>
+    </message>
+    <message>
+        <source>Whether or not a watch-only address is involved in this transaction.</source>
+        <translation>Apakah alamat hanya-melihat terlibat dalam transaksi ini atau tidak.</translation>
+    </message>
+    <message>
+        <source>User-defined intent/purpose of the transaction.</source>
+        <translation>maksud/tujuan transaksi yang ditentukan pengguna.</translation>
+    </message>
+    <message>
+        <source>Amount removed from or added to balance.</source>
+        <translation>Jumlah dihapus dari atau ditambahkan ke saldo.</translation>
+    </message>
+</context>
+<context>
+    <name>TransactionView</name>
+    <message>
+        <source>All</source>
+        <translation>Semua</translation>
+    </message>
+    <message>
+        <source>Today</source>
+        <translation>Hari ini</translation>
+    </message>
+    <message>
+        <source>This week</source>
+        <translation>Minggu ini</translation>
+    </message>
+    <message>
+        <source>This month</source>
+        <translation>Bulan ini</translation>
+    </message>
+    <message>
+        <source>Last month</source>
+        <translation>Bulan lalu</translation>
+    </message>
+    <message>
+        <source>This year</source>
+        <translation>Tahun ini</translation>
+    </message>
+    <message>
+        <source>Range...</source>
+        <translation>Jarak...</translation>
+    </message>
+    <message>
+        <source>Received with</source>
+        <translation>Diterima dengan</translation>
+    </message>
+    <message>
+        <source>Sent to</source>
+        <translation>Dikirim ke</translation>
+    </message>
+    <message>
+        <source>To yourself</source>
+        <translation>Untuk diri sendiri</translation>
+    </message>
+    <message>
+        <source>Mined</source>
+        <translation>Ditambang</translation>
+    </message>
+    <message>
+        <source>Other</source>
+        <translation>Lainnya</translation>
+    </message>
+    <message>
+        <source>Enter address, transaction id, or label to search</source>
+        <translation>Ketik alamat, id transaksi, atau label untuk menelusuri</translation>
+    </message>
+    <message>
+        <source>Min amount</source>
+        <translation>Jumlah min</translation>
+    </message>
+    <message>
+        <source>Abandon transaction</source>
+        <translation>Batalkan transaksi</translation>
+    </message>
+    <message>
+        <source>Increase transaction fee</source>
+        <translation>Tingkatkan biaya transaksi</translation>
+    </message>
+    <message>
+        <source>Copy address</source>
+        <tran
