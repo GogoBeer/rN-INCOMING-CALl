@@ -3311,3 +3311,358 @@ Note:  Since the fee is calculated on a per-byte basis, a fee of "100 satoshis p
         <translation>블록 데이터베이스를 다시 생성하시겠습니까?</translation>
     </message>
     <message>
+        <source>Error initializing block database</source>
+        <translation>블록 데이터베이스를 초기화하는데 오류</translation>
+    </message>
+    <message>
+        <source>Error initializing wallet database environment %s!</source>
+        <translation>지갑 데이터베이스 환경 초기화하는데 오류 %s</translation>
+    </message>
+    <message>
+        <source>Error loading %s</source>
+        <translation>%s 불러오기 오류</translation>
+    </message>
+    <message>
+        <source>Error loading %s: Private keys can only be disabled during creation</source>
+        <translation>%s 로딩 실패: 개인키는 생성할때만 비활성화 할 수 있습니다</translation>
+    </message>
+    <message>
+        <source>Error loading %s: Wallet corrupted</source>
+        <translation>%s 불러오기 오류: 지갑이 손상됨</translation>
+    </message>
+    <message>
+        <source>Error loading %s: Wallet requires newer version of %s</source>
+        <translation>%s 불러오기 에러: 지갑은 새 버전의 %s이 필요합니다</translation>
+    </message>
+    <message>
+        <source>Error loading block database</source>
+        <translation>블록 데이터베이스를 불러오는데 오류</translation>
+    </message>
+    <message>
+        <source>Error opening block database</source>
+        <translation>블록 데이터베이스를 여는데 오류</translation>
+    </message>
+    <message>
+        <source>Failed to listen on any port. Use -listen=0 if you want this.</source>
+        <translation>어떤 포트도 열지 못했습니다. 필요하다면 -listen=0 옵션을 사용하세요.</translation>
+    </message>
+    <message>
+        <source>Failed to rescan the wallet during initialization</source>
+        <translation>지갑 스캔 오류</translation>
+    </message>
+    <message>
+        <source>Importing...</source>
+        <translation>불러오는 중...</translation>
+    </message>
+    <message>
+        <source>Incorrect or no genesis block found. Wrong datadir for network?</source>
+        <translation>제네시스 블록이 없거나 잘못됐습니다. 네트워크의 datadir이 잘못됐을수도 있습니다.</translation>
+    </message>
+    <message>
+        <source>Initialization sanity check failed. %s is shutting down.</source>
+        <translation>무결성 확인 초기화가 실패했습니다. %s가 종료됩니다.</translation>
+    </message>
+    <message>
+        <source>Invalid P2P permission: '%s'</source>
+        <translation>잘못된 P2P 권한: '%s'</translation>
+    </message>
+    <message>
+        <source>Invalid amount for -%s=&lt;amount&gt;: '%s'</source>
+        <translation>유효하지 않은 금액 -%s=&lt;amount&gt;: '%s'</translation>
+    </message>
+    <message>
+        <source>Invalid amount for -discardfee=&lt;amount&gt;: '%s'</source>
+        <translation>유효하지 않은 금액 -discardfee=&lt;amount&gt;: '%s'</translation>
+    </message>
+    <message>
+        <source>Invalid amount for -fallbackfee=&lt;amount&gt;: '%s'</source>
+        <translation>유효하지 않은 금액 -fallbackfee=&lt;amount&gt;: '%s'</translation>
+    </message>
+    <message>
+        <source>Specified blocks directory "%s" does not exist.</source>
+        <translation>지정한 블록 디렉토리 "%s" 가 존재하지 않습니다.</translation>
+    </message>
+    <message>
+        <source>Unknown change type '%s'</source>
+        <translation>알 수 없는 변경 형식 '%s'</translation>
+    </message>
+    <message>
+        <source>Upgrading txindex database</source>
+        <translation>txindex 데이터베이스 업테이트중</translation>
+    </message>
+    <message>
+        <source>Loading P2P addresses...</source>
+        <translation>P2P 주소 불러오는 중...</translation>
+    </message>
+    <message>
+        <source>Loading banlist...</source>
+        <translation>추방리스트를 불러오는 중...</translation>
+    </message>
+    <message>
+        <source>Not enough file descriptors available.</source>
+        <translation>파일 디스크립터가 부족합니다.</translation>
+    </message>
+    <message>
+        <source>Prune cannot be configured with a negative value.</source>
+        <translation>블록 축소는 음수로 설정할 수 없습니다.</translation>
+    </message>
+    <message>
+        <source>Prune mode is incompatible with -txindex.</source>
+        <translation>블록 축소 모드는 -txindex와 호환되지 않습니다.</translation>
+    </message>
+    <message>
+        <source>Replaying blocks...</source>
+        <translation>블록 재생중...</translation>
+    </message>
+    <message>
+        <source>Rewinding blocks...</source>
+        <translation>블록 되감는중...</translation>
+    </message>
+    <message>
+        <source>The source code is available from %s.</source>
+        <translation>소스코드는 %s 에서 확인하실 수 있습니다.</translation>
+    </message>
+    <message>
+        <source>Transaction fee and change calculation failed</source>
+        <translation>거래 수수료 및 잔돈 계산에 실패했습니다.</translation>
+    </message>
+    <message>
+        <source>Unable to bind to %s on this computer. %s is probably already running.</source>
+        <translation>이 컴퓨터의 %s에 바인딩 할 수 없습니다. 아마도 %s이 실행중인 것 같습니다.</translation>
+    </message>
+    <message>
+        <source>Unable to generate keys</source>
+        <translation>키 생성 불가</translation>
+    </message>
+    <message>
+        <source>Unsupported logging category %s=%s.</source>
+        <translation>지원되지 않는 로깅 카테고리 %s = %s.</translation>
+    </message>
+    <message>
+        <source>Upgrading UTXO database</source>
+        <translation>UTXO 데이터베이스 업그레이드</translation>
+    </message>
+    <message>
+        <source>User Agent comment (%s) contains unsafe characters.</source>
+        <translation>사용자 정의 코멘트 (%s)에 안전하지 못한 글자가 포함되어 있습니다.</translation>
+    </message>
+    <message>
+        <source>Verifying blocks...</source>
+        <translation>블록 검증중...</translation>
+    </message>
+    <message>
+        <source>Wallet needed to be rewritten: restart %s to complete</source>
+        <translation>지갑을 새로 써야 합니다:  진행을 위해 %s 를 다시 시작하세요.</translation>
+    </message>
+    <message>
+        <source>Error: Listening for incoming connections failed (listen returned error %s)</source>
+        <translation>오류: 들어오는 연결을 허용하는데 실패했습니다 (listen returned error %s)</translation>
+    </message>
+    <message>
+        <source>Invalid amount for -maxtxfee=&lt;amount&gt;: '%s' (must be at least the minrelay fee of %s to prevent stuck transactions)</source>
+        <translation>유효하지 않은 금액 -maxtxfee=&lt;amount&gt;: '%s' (거래가 막히는 상황을 방지하게 위해 적어도 %s 의 중계 수수료를 지정해야 합니다)</translation>
+    </message>
+    <message>
+        <source>The transaction amount is too small to send after the fee has been deducted</source>
+        <translation>거래액이 수수료를 지불하기엔 너무 작습니다</translation>
+    </message>
+    <message>
+        <source>You need to rebuild the database using -reindex to go back to unpruned mode.  This will redownload the entire blockchain</source>
+        <translation>블록 축소 모드를 해제하려면 데이터베이스를 재구성하기 위해 -reindex를 사용해야 합니다. 이 명령은 전체 블록체인을 다시 다운로드합니다.</translation>
+    </message>
+    <message>
+        <source>Error reading from database, shutting down.</source>
+        <translation>블록 데이터베이스를 불러오는데 오류가 발생하였습니다, 종료됩니다.</translation>
+    </message>
+    <message>
+        <source>Error upgrading chainstate database</source>
+        <translation>체인 상태 데이터베이스 업그레이드 중 오류가 발생했습니다.</translation>
+    </message>
+    <message>
+        <source>Error: Disk space is low for %s</source>
+        <translation>오류: %s 하기엔 저장공간이 부족합니다</translation>
+    </message>
+    <message>
+        <source>Invalid -onion address or hostname: '%s'</source>
+        <translation>올바르지 않은 -onion 주소 또는 호스트 이름: '%s'</translation>
+    </message>
+    <message>
+        <source>Invalid -proxy address or hostname: '%s'</source>
+        <translation>올바르지 않은 -proxy 주소 또는 호스트 이름: '%s'</translation>
+    </message>
+    <message>
+        <source>Invalid amount for -paytxfee=&lt;amount&gt;: '%s' (must be at least %s)</source>
+        <translation>유효하지 않은 금액 -paytxfee=&lt;amount&gt;: "%s" (최소 %s 이상이어야 됨)</translation>
+    </message>
+    <message>
+        <source>Invalid netmask specified in -whitelist: '%s'</source>
+        <translation>유효하지 않은 넷마스크가 -whitelist: '%s" 를 통해 지정됨</translation>
+    </message>
+    <message>
+        <source>Need to specify a port with -whitebind: '%s'</source>
+        <translation>-whitebind: '%s' 를 이용하여 포트를 지정해야 합니다</translation>
+    </message>
+    <message>
+        <source>Prune mode is incompatible with -blockfilterindex.</source>
+        <translation>블록 축소 모드는 -blockfileterindex와 호환되지 않습니다.</translation>
+    </message>
+    <message>
+        <source>Reducing -maxconnections from %d to %d, because of system limitations.</source>
+        <translation>시스템 한계로 인하여 -maxconnections를 %d 에서 %d로 줄였습니다.</translation>
+    </message>
+    <message>
+        <source>Section [%s] is not recognized.</source>
+        <translation>[%s] 항목은 인정되지 않습니다.</translation>
+    </message>
+    <message>
+        <source>Signing transaction failed</source>
+        <translation>거래 서명에 실패했습니다</translation>
+    </message>
+    <message>
+        <source>Specified -walletdir "%s" does not exist</source>
+        <translation>지정한 -walletdir "%s"은 존재하지 않습니다</translation>
+    </message>
+    <message>
+        <source>Specified -walletdir "%s" is a relative path</source>
+        <translation>지정한 -walletdir "%s"은 상대 경로입니다</translation>
+    </message>
+    <message>
+        <source>Specified -walletdir "%s" is not a directory</source>
+        <translation>지정한 -walletdir "%s"은 디렉토리가 아닙니다</translation>
+    </message>
+    <message>
+        <source>The specified config file %s does not exist
+</source>
+        <translation>지정한 설정 파일 "%s"는 존재하지 않습니다
+</translation>
+    </message>
+    <message>
+        <source>The transaction amount is too small to pay the fee</source>
+        <translation>거래액이 수수료를 지불하기엔 너무 작습니다</translation>
+    </message>
+    <message>
+        <source>This is experimental software.</source>
+        <translation>이 소프트웨어는 시험적입니다.</translation>
+    </message>
+    <message>
+        <source>Transaction amount too small</source>
+        <translation>거래액이 너무 적습니다</translation>
+    </message>
+    <message>
+        <source>Transaction too large</source>
+        <translation>거래가 너무 큽니다</translation>
+    </message>
+    <message>
+        <source>Unable to bind to %s on this computer (bind returned error %s)</source>
+        <translation>이 컴퓨터의 %s 에 바인딩할 수 없습니다 (바인딩 과정에 %s 오류 발생)</translation>
+    </message>
+    <message>
+        <source>Unable to create the PID file '%s': %s</source>
+        <translation>PID 파일 생성 실패 '%s': %s</translation>
+    </message>
+    <message>
+        <source>Unable to generate initial keys</source>
+        <translation>초기 키값 생성 불가</translation>
+    </message>
+    <message>
+        <source>Unknown -blockfilterindex value %s.</source>
+        <translation>알 수 없는 -blockfileterindex 값 %s.</translation>
+    </message>
+    <message>
+        <source>Verifying wallet(s)...</source>
+        <translation>지갑 검증중...</translation>
+    </message>
+    <message>
+        <source>Warning: unknown new rules activated (versionbit %i)</source>
+        <translation>경고: 알려지지 않은 새로운 규칙이 활성화되었습니다. (버전비트 %i)</translation>
+    </message>
+    <message>
+        <source>-maxtxfee is set very high! Fees this large could be paid on a single transaction.</source>
+        <translation>-maxtxfee 값이 너무 큽니다!  하나의 거래에 너무 큰 수수료가 지불 됩니다.</translation>
+    </message>
+    <message>
+        <source>This is the transaction fee you may pay when fee estimates are not available.</source>
+        <translation>이것은 수수료 추정을 이용할 수 없을 때 사용되는 거래 수수료입니다.</translation>
+    </message>
+    <message>
+        <source>Total length of network version string (%i) exceeds maximum length (%i). Reduce the number or size of uacomments.</source>
+        <translation>네트워크 버전 문자 (%i)의 길이가 최대길이 (%i)를 초과합니다. uacomments의 갯수나 길이를 줄이세요.</translation>
+    </message>
+    <message>
+        <source>%s is set very high!</source>
+        <translation>%s가 매우 높게 설정되었습니다!</translation>
+    </message>
+    <message>
+        <source>Error loading wallet %s. Duplicate -wallet filename specified.</source>
+        <translation>지갑 %s 로딩 에러,  중복된 -wallet 파일이름을 입력했습니다.</translation>
+    </message>
+    <message>
+        <source>Starting network threads...</source>
+        <translation>네트워크 스레드 시작중...</translation>
+    </message>
+    <message>
+        <source>The wallet will avoid paying less than the minimum relay fee.</source>
+        <translation>지갑은 최소 중계 수수료보다 적은 금액을 지불하는 것을 피할 것입니다.</translation>
+    </message>
+    <message>
+        <source>This is the minimum transaction fee you pay on every transaction.</source>
+        <translation>이것은 모든 거래에서 지불하는 최소 거래 수수료입니다.</translation>
+    </message>
+    <message>
+        <source>This is the transaction fee you will pay if you send a transaction.</source>
+        <translation>이것은 거래를 보낼 경우 지불 할 거래 수수료입니다.</translation>
+    </message>
+    <message>
+        <source>Transaction amounts must not be negative</source>
+        <translation>거래액은 반드시 0보다 큰 값이어야 합니다.</translation>
+    </message>
+    <message>
+        <source>Transaction has too long of a mempool chain</source>
+        <translation>거래가 너무 긴 mempool 체인을 갖고 있습니다</translation>
+    </message>
+    <message>
+        <source>Transaction must have at least one recipient</source>
+        <translation>거래에는 최소한 한명의 수령인이 있어야 합니다.</translation>
+    </message>
+    <message>
+        <source>Unknown network specified in -onlynet: '%s'</source>
+        <translation>-onlynet: '%s' 에 알수없는 네트워크가 지정되었습니다</translation>
+    </message>
+    <message>
+        <source>Insufficient funds</source>
+        <translation>잔액이 부족합니다</translation>
+    </message>
+    <message>
+        <source>Fee estimation failed. Fallbackfee is disabled. Wait a few blocks or enable -fallbackfee.</source>
+        <translation>수수료 추정이 실패했습니다. Fallbackfee가 비활성화 상태입니다. 몇 블록을 기다리거나 -fallbackfee를 활성화 하세요.</translation>
+    </message>
+    <message>
+        <source>Warning: Private keys detected in wallet {%s} with disabled private keys</source>
+        <translation>경고: 비활성화된 개인키 지갑 {%s} 에서 개인키들이 발견되었습니다</translation>
+    </message>
+    <message>
+        <source>Cannot write to data directory '%s'; check permissions.</source>
+        <translation>"%s" 데이터 폴더에 기록하지 못했습니다. 접근권한을 확인하세요.</translation>
+    </message>
+    <message>
+        <source>Loading block index...</source>
+        <translation>블록 인덱스를 불러오는 중...</translation>
+    </message>
+    <message>
+        <source>Loading wallet...</source>
+        <translation>지갑을 불러오는 중...</translation>
+    </message>
+    <message>
+        <source>Cannot downgrade wallet</source>
+        <translation>지갑을 다운그레이드 할 수 없습니다</translation>
+    </message>
+    <message>
+        <source>Rescanning...</source>
+        <translation>재스캔 중...</translation>
+    </message>
+    <message>
+        <source>Done loading</source>
+        <translation>로딩 완료</translation>
+    </message>
+</context>
+</TS>
