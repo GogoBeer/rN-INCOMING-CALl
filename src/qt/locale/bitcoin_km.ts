@@ -391,4 +391,199 @@
     </message>
     <message>
         <source>Error</source>
-  
+        <translation>បញ្ហា</translation>
+    </message>
+    </context>
+<context>
+    <name>CoinControlDialog</name>
+    <message>
+        <source>(no label)</source>
+        <translation>(គ្មាន​ឡាបែល)</translation>
+    </message>
+    </context>
+<context>
+    <name>CreateWalletActivity</name>
+    </context>
+<context>
+    <name>CreateWalletDialog</name>
+    <message>
+        <source>Create Wallet</source>
+        <translation>បង្កើតកាបូប</translation>
+    </message>
+    <message>
+        <source>Wallet Name</source>
+        <translation>ឈ្មោះកាបូប</translation>
+    </message>
+    </context>
+<context>
+    <name>EditAddressDialog</name>
+    </context>
+<context>
+    <name>FreespaceChecker</name>
+    </context>
+<context>
+    <name>HelpMessageDialog</name>
+    </context>
+<context>
+    <name>Intro</name>
+    <message>
+        <source>Welcome</source>
+        <translation>សូមស្វាគមន៍</translation>
+    </message>
+    <message>
+        <source>Bitcoin</source>
+        <translation>Bitcoin</translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation>បញ្ហា</translation>
+    </message>
+    </context>
+<context>
+    <name>ModalOverlay</name>
+    </context>
+<context>
+    <name>OpenURIDialog</name>
+    </context>
+<context>
+    <name>OpenWalletActivity</name>
+    </context>
+<context>
+    <name>OptionsDialog</name>
+    <message>
+        <source>Error</source>
+        <translation>បញ្ហា</translation>
+    </message>
+    </context>
+<context>
+    <name>OverviewPage</name>
+    </context>
+<context>
+    <name>PSBTOperationsDialog</name>
+    </context>
+<context>
+    <name>PaymentServer</name>
+    </context>
+<context>
+    <name>PeerTableModel</name>
+    </context>
+<context>
+    <name>QObject</name>
+    </context>
+<context>
+    <name>QRImageWidget</name>
+    </context>
+<context>
+    <name>RPCConsole</name>
+    </context>
+<context>
+    <name>ReceiveCoinsDialog</name>
+    </context>
+<context>
+    <name>ReceiveRequestDialog</name>
+    <message>
+        <source>Wallet:</source>
+        <translation>កាបូបចល័ត៖</translation>
+    </message>
+    </context>
+<context>
+    <name>RecentRequestsTableModel</name>
+    <message>
+        <source>Label</source>
+        <translation>ឡាបែល</translation>
+    </message>
+    <message>
+        <source>(no label)</source>
+        <translation>(គ្មាន​ឡាបែល)</translation>
+    </message>
+    </context>
+<context>
+    <name>SendCoinsDialog</name>
+    <message>
+        <source>(no label)</source>
+        <translation>(គ្មាន​ឡាបែល)</translation>
+    </message>
+</context>
+<context>
+    <name>SendCoinsEntry</name>
+    </context>
+<context>
+    <name>ShutdownWindow</name>
+    </context>
+<context>
+    <name>SignVerifyMessageDialog</name>
+    </context>
+<context>
+    <name>TrafficGraphWidget</name>
+    </context>
+<context>
+    <name>TransactionDesc</name>
+    </context>
+<context>
+    <name>TransactionDescDialog</name>
+    </context>
+<context>
+    <name>TransactionTableModel</name>
+    <message>
+        <source>Label</source>
+        <translation>ឡាបែល</translation>
+    </message>
+    <message>
+        <source>(no label)</source>
+        <translation>(គ្មាន​ឡាបែល)</translation>
+    </message>
+    </context>
+<context>
+    <name>TransactionView</name>
+    <message>
+        <source>Comma separated file (*.csv)</source>
+        <translation>ឯកសារបំបែកដោយក្បៀស (*.csv)</translation>
+    </message>
+    <message>
+        <source>Label</source>
+        <translation>ឡាបែល</translation>
+    </message>
+    <message>
+        <source>Address</source>
+        <translation>អាសយដ្ឋាន</translation>
+    </message>
+    <message>
+        <source>Exporting Failed</source>
+        <translation>បរាជ័យការបញ្ជូនចេញ</translation>
+    </message>
+    </context>
+<context>
+    <name>UnitDisplayStatusBarControl</name>
+    </context>
+<context>
+    <name>WalletController</name>
+    </context>
+<context>
+    <name>WalletFrame</name>
+    <message>
+        <source>Create a new wallet</source>
+        <translation>បង្កើតកាបូបចល័តថ្មី</translation>
+    </message>
+</context>
+<context>
+    <name>WalletModel</name>
+    </context>
+<context>
+    <name>WalletView</name>
+    <message>
+        <source>&amp;Export</source>
+        <translation>&amp;នាំចេញ</translation>
+    </message>
+    <message>
+        <source>Export the data in the current tab to a file</source>
+        <translation>នាំចេញទិន្នន័យនៃថេបបច្ចុប្បន្នទៅជាឯកសារ</translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation>បញ្ហា</translation>
+    </message>
+    </context>
+<context>
+    <name>bitcoin-core</name>
+    </context>
+</TS>
