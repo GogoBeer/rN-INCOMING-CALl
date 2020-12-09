@@ -390,3 +390,240 @@
 <context>
     <name>EditAddressDialog</name>
     <message>
+        <source>Edit Address</source>
+        <translation>Muta Inscriptionem</translation>
+    </message>
+    <message>
+        <source>&amp;Label</source>
+        <translation>&amp;Titulus</translation>
+    </message>
+    <message>
+        <source>&amp;Address</source>
+        <translation>&amp;Inscriptio</translation>
+    </message>
+    <message>
+        <source>New sending address</source>
+        <translation>Nova inscriptio mittendi</translation>
+    </message>
+    <message>
+        <source>Edit receiving address</source>
+        <translation>Muta inscriptionem accipiendi</translation>
+    </message>
+    <message>
+        <source>Edit sending address</source>
+        <translation>Muta inscriptionem mittendi</translation>
+    </message>
+    <message>
+        <source>The entered address "%1" is not a valid Bitcoin address.</source>
+        <translation>Inscriptio inserta "%1" non valida inscriptio Bitcoin est.</translation>
+    </message>
+    <message>
+        <source>Could not unlock wallet.</source>
+        <translation>Non potuisse cassidile reserare</translation>
+    </message>
+    <message>
+        <source>New key generation failed.</source>
+        <translation>Generare novam clavem abortum est.</translation>
+    </message>
+</context>
+<context>
+    <name>FreespaceChecker</name>
+    </context>
+<context>
+    <name>HelpMessageDialog</name>
+    <message>
+        <source>version</source>
+        <translation>versio</translation>
+    </message>
+    <message>
+        <source>Command-line options</source>
+        <translation>Optiones mandati initiantis</translation>
+    </message>
+</context>
+<context>
+    <name>Intro</name>
+    <message>
+        <source>Bitcoin</source>
+        <translation>Bitcoin</translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation>Error</translation>
+    </message>
+    </context>
+<context>
+    <name>ModalOverlay</name>
+    <message>
+        <source>Form</source>
+        <translation>Schema</translation>
+    </message>
+    <message>
+        <source>Last block time</source>
+        <translation>Hora postremi frusti</translation>
+    </message>
+    </context>
+<context>
+    <name>OpenURIDialog</name>
+    </context>
+<context>
+    <name>OpenWalletActivity</name>
+    </context>
+<context>
+    <name>OptionsDialog</name>
+    <message>
+        <source>Options</source>
+        <translation>Optiones</translation>
+    </message>
+    <message>
+        <source>&amp;Main</source>
+        <translation>&amp;Princeps</translation>
+    </message>
+    <message>
+        <source>Reset all client options to default.</source>
+        <translation>Reconstitue omnes optiones clientis ad praedefinita.</translation>
+    </message>
+    <message>
+        <source>&amp;Reset Options</source>
+        <translation>&amp;Reconstitue Optiones</translation>
+    </message>
+    <message>
+        <source>&amp;Network</source>
+        <translation>&amp;Rete</translation>
+    </message>
+    <message>
+        <source>W&amp;allet</source>
+        <translation>Cassidile</translation>
+    </message>
+    <message>
+        <source>Automatically open the Bitcoin client port on the router. This only works when your router supports UPnP and it is enabled.</source>
+        <translation>Aperi per se portam clientis Bitcoin in itineratore.  Hoc tantum effectivum est si itineratrum tuum supportat UPnP et id activum est.</translation>
+    </message>
+    <message>
+        <source>Map port using &amp;UPnP</source>
+        <translation>Designa portam utendo &amp;UPnP</translation>
+    </message>
+    <message>
+        <source>Proxy &amp;IP:</source>
+        <translation>&amp;IP vicarii:</translation>
+    </message>
+    <message>
+        <source>&amp;Port:</source>
+        <translation>&amp;Porta:</translation>
+    </message>
+    <message>
+        <source>Port of the proxy (e.g. 9050)</source>
+        <translation>Porta vicarii (e.g. 9050)</translation>
+    </message>
+    <message>
+        <source>&amp;Window</source>
+        <translation>&amp;Fenestra</translation>
+    </message>
+    <message>
+        <source>Show only a tray icon after minimizing the window.</source>
+        <translation>Monstra tantum iconem in tabella systematis postquam fenestram minifactam est.</translation>
+    </message>
+    <message>
+        <source>&amp;Minimize to the tray instead of the taskbar</source>
+        <translation>&amp;Minifac in tabellam systematis potius quam applicationum</translation>
+    </message>
+    <message>
+        <source>M&amp;inimize on close</source>
+        <translation>M&amp;inifac ad claudendum</translation>
+    </message>
+    <message>
+        <source>&amp;Display</source>
+        <translation>&amp;UI</translation>
+    </message>
+    <message>
+        <source>User Interface &amp;language:</source>
+        <translation>&amp;Lingua monstranda utenti:</translation>
+    </message>
+    <message>
+        <source>&amp;Unit to show amounts in:</source>
+        <translation>&amp;Unita qua quantitates monstrare:</translation>
+    </message>
+    <message>
+        <source>Choose the default subdivision unit to show in the interface and when sending coins.</source>
+        <translation>Selige praedefinitam unitam subdivisionis monstrare in interfacie et quando nummos mittere</translation>
+    </message>
+    <message>
+        <source>&amp;OK</source>
+        <translation>&amp;OK</translation>
+    </message>
+    <message>
+        <source>&amp;Cancel</source>
+        <translation>&amp;Cancella</translation>
+    </message>
+    <message>
+        <source>default</source>
+        <translation>praedefinitum</translation>
+    </message>
+    <message>
+        <source>Confirm options reset</source>
+        <translation>Confirma optionum reconstituere</translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation>Error</translation>
+    </message>
+    <message>
+        <source>The supplied proxy address is invalid.</source>
+        <translation>Inscriptio vicarii tradita non valida est.</translation>
+    </message>
+</context>
+<context>
+    <name>OverviewPage</name>
+    <message>
+        <source>Form</source>
+        <translation>Schema</translation>
+    </message>
+    <message>
+        <source>The displayed information may be out of date. Your wallet automatically synchronizes with the Bitcoin network after a connection is established, but this process has not completed yet.</source>
+        <translation>Monstrata informatio fortasse non recentissima est.  Tuum cassidile per se synchronizat cum rete Bitcoin postquam conexio constabilita est, sed hoc actio nondum perfecta est.</translation>
+    </message>
+    <message>
+        <source>Immature:</source>
+        <translation>Immatura:</translation>
+    </message>
+    <message>
+        <source>Mined balance that has not yet matured</source>
+        <translation>Fossum pendendum quod nondum maturum est</translation>
+    </message>
+    </context>
+<context>
+    <name>PSBTOperationsDialog</name>
+    </context>
+<context>
+    <name>PaymentServer</name>
+    <message>
+        <source>Cannot start bitcoin: click-to-pay handler</source>
+        <translation>Bitcoin incipere non potest: cliccare-ad-pensandum handler</translation>
+    </message>
+    <message>
+        <source>URI handling</source>
+        <translation>Tractatio URI</translation>
+    </message>
+    </context>
+<context>
+    <name>PeerTableModel</name>
+    </context>
+<context>
+    <name>QObject</name>
+    <message>
+        <source>Amount</source>
+        <translation>Quantitas</translation>
+    </message>
+    <message>
+        <source>N/A</source>
+        <translation>N/A</translation>
+    </message>
+    <message>
+        <source>unknown</source>
+        <translation>ignotum</translation>
+    </message>
+</context>
+<context>
+    <name>QRImageWidget</name>
+    <message>
+        <source>Resulting URI too long, try to reduce the text for label / message.</source>
+        <translation>Resultato URI nimis longo, conare minuer
