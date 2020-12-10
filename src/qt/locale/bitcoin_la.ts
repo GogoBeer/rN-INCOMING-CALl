@@ -626,4 +626,268 @@
     <name>QRImageWidget</name>
     <message>
         <source>Resulting URI too long, try to reduce the text for label / message.</source>
-        <translation>Resultato URI nimis longo, conare minuer
+        <translation>Resultato URI nimis longo, conare minuere verba pro titulo / nuntio.</translation>
+    </message>
+    <message>
+        <source>Error encoding URI into QR Code.</source>
+        <translation>Error codificandi URI in codicem QR.</translation>
+    </message>
+    <message>
+        <source>Save QR Code</source>
+        <translation>Salva codicem QR</translation>
+    </message>
+    </context>
+<context>
+    <name>RPCConsole</name>
+    <message>
+        <source>N/A</source>
+        <translation>N/A</translation>
+    </message>
+    <message>
+        <source>Client version</source>
+        <translation>Versio clientis</translation>
+    </message>
+    <message>
+        <source>&amp;Information</source>
+        <translation>&amp;Informatio</translation>
+    </message>
+    <message>
+        <source>Startup time</source>
+        <translation>Tempus initiandi</translation>
+    </message>
+    <message>
+        <source>Network</source>
+        <translation>Rete</translation>
+    </message>
+    <message>
+        <source>Number of connections</source>
+        <translation>Numerus conexionum</translation>
+    </message>
+    <message>
+        <source>Block chain</source>
+        <translation>Catena frustorum</translation>
+    </message>
+    <message>
+        <source>Last block time</source>
+        <translation>Hora postremi frusti</translation>
+    </message>
+    <message>
+        <source>&amp;Open</source>
+        <translation>&amp;Aperi</translation>
+    </message>
+    <message>
+        <source>&amp;Console</source>
+        <translation>&amp;Terminale</translation>
+    </message>
+    <message>
+        <source>Debug log file</source>
+        <translation>Debug catalogi plica</translation>
+    </message>
+    <message>
+        <source>Clear console</source>
+        <translation>Vacuefac terminale</translation>
+    </message>
+    </context>
+<context>
+    <name>ReceiveCoinsDialog</name>
+    <message>
+        <source>&amp;Amount:</source>
+        <translation>Quantitas:</translation>
+    </message>
+    <message>
+        <source>&amp;Label:</source>
+        <translation>&amp;Titulus:</translation>
+    </message>
+    <message>
+        <source>&amp;Message:</source>
+        <translation>Nuntius:</translation>
+    </message>
+    <message>
+        <source>Copy label</source>
+        <translation>Copia titulum</translation>
+    </message>
+    <message>
+        <source>Copy amount</source>
+        <translation>Copia quantitatem</translation>
+    </message>
+    <message>
+        <source>Could not unlock wallet.</source>
+        <translation>Non potuisse cassidile reserare</translation>
+    </message>
+    </context>
+<context>
+    <name>ReceiveRequestDialog</name>
+    <message>
+        <source>Amount:</source>
+        <translation>Quantitas:</translation>
+    </message>
+    <message>
+        <source>Label:</source>
+        <translation>Titulus:</translation>
+    </message>
+    <message>
+        <source>Message:</source>
+        <translation>Nuntius:</translation>
+    </message>
+    <message>
+        <source>Copy &amp;Address</source>
+        <translation>&amp;Copia Inscriptionem</translation>
+    </message>
+    </context>
+<context>
+    <name>RecentRequestsTableModel</name>
+    <message>
+        <source>Date</source>
+        <translation>Dies</translation>
+    </message>
+    <message>
+        <source>Label</source>
+        <translation>Titulus</translation>
+    </message>
+    <message>
+        <source>Message</source>
+        <translation>Nuntius</translation>
+    </message>
+    <message>
+        <source>(no label)</source>
+        <translation>(nullus titulus)</translation>
+    </message>
+    </context>
+<context>
+    <name>SendCoinsDialog</name>
+    <message>
+        <source>Send Coins</source>
+        <translation>Mitte Nummos</translation>
+    </message>
+    <message>
+        <source>Insufficient funds!</source>
+        <translation>Inopia nummorum</translation>
+    </message>
+    <message>
+        <source>Amount:</source>
+        <translation>Quantitas:</translation>
+    </message>
+    <message>
+        <source>Transaction Fee:</source>
+        <translation>Transactionis merces:</translation>
+    </message>
+    <message>
+        <source>Send to multiple recipients at once</source>
+        <translation>Mitte pluribus accipientibus simul</translation>
+    </message>
+    <message>
+        <source>Add &amp;Recipient</source>
+        <translation>Adde &amp;Accipientem</translation>
+    </message>
+    <message>
+        <source>Clear &amp;All</source>
+        <translation>Vacuefac &amp;Omnia</translation>
+    </message>
+    <message>
+        <source>Balance:</source>
+        <translation>Pendendum:</translation>
+    </message>
+    <message>
+        <source>Confirm the send action</source>
+        <translation>Confirma actionem mittendi</translation>
+    </message>
+    <message>
+        <source>S&amp;end</source>
+        <translation>&amp;Mitte</translation>
+    </message>
+    <message>
+        <source>Copy amount</source>
+        <translation>Copia quantitatem</translation>
+    </message>
+    <message>
+        <source>Transaction fee</source>
+        <translation>Transactionis merces</translation>
+    </message>
+    <message>
+        <source>Confirm send coins</source>
+        <translation>Confirma mittendum nummorum</translation>
+    </message>
+    <message>
+        <source>The amount to pay must be larger than 0.</source>
+        <translation>Oportet quantitatem ad pensandum maiorem quam 0 esse.</translation>
+    </message>
+    <message>
+        <source>The amount exceeds your balance.</source>
+        <translation>Quantitas est ultra quod habes.</translation>
+    </message>
+    <message>
+        <source>The total exceeds your balance when the %1 transaction fee is included.</source>
+        <translation>Quantitas est ultra quod habes cum merces transactionis %1 includitur.</translation>
+    </message>
+    <message>
+        <source>(no label)</source>
+        <translation>(nullus titulus)</translation>
+    </message>
+</context>
+<context>
+    <name>SendCoinsEntry</name>
+    <message>
+        <source>A&amp;mount:</source>
+        <translation>&amp;Quantitas:</translation>
+    </message>
+    <message>
+        <source>Pay &amp;To:</source>
+        <translation>Pensa &amp;Ad:</translation>
+    </message>
+    <message>
+        <source>&amp;Label:</source>
+        <translation>&amp;Titulus:</translation>
+    </message>
+    <message>
+        <source>Alt+A</source>
+        <translation>Alt+A</translation>
+    </message>
+    <message>
+        <source>Paste address from clipboard</source>
+        <translation>Glutina inscriptionem ex latibulo</translation>
+    </message>
+    <message>
+        <source>Alt+P</source>
+        <translation>Alt+P</translation>
+    </message>
+    <message>
+        <source>Message:</source>
+        <translation>Nuntius:</translation>
+    </message>
+    <message>
+        <source>Pay To:</source>
+        <translation>Pensa Ad:</translation>
+    </message>
+    </context>
+<context>
+    <name>ShutdownWindow</name>
+    </context>
+<context>
+    <name>SignVerifyMessageDialog</name>
+    <message>
+        <source>Signatures - Sign / Verify a Message</source>
+        <translation>Signationes - Signa / Verifica nuntium</translation>
+    </message>
+    <message>
+        <source>&amp;Sign Message</source>
+        <translation>&amp;Signa Nuntium</translation>
+    </message>
+    <message>
+        <source>Alt+A</source>
+        <translation>Alt+A</translation>
+    </message>
+    <message>
+        <source>Paste address from clipboard</source>
+        <translation>Glutina inscriptionem ex latibulo</translation>
+    </message>
+    <message>
+        <source>Alt+P</source>
+        <translation>Alt+P</translation>
+    </message>
+    <message>
+        <source>Enter the message you want to sign here</source>
+        <translation>Insere hic nuntium quod vis signare</translation>
+    </message>
+    <message>
+        <source>Signature</source>
+        <translation>Sig
