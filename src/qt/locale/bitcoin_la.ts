@@ -1379,4 +1379,39 @@
     </message>
     <message>
         <source>Transaction amount too small</source>
-        <translation>Magnitudo tra
+        <translation>Magnitudo transactionis nimis parva</translation>
+    </message>
+    <message>
+        <source>Transaction too large</source>
+        <translation>Transactio nimis magna</translation>
+    </message>
+    <message>
+        <source>Unknown network specified in -onlynet: '%s'</source>
+        <translation>Ignotum rete specificatum in -onlynet: '%s'</translation>
+    </message>
+    <message>
+        <source>Insufficient funds</source>
+        <translation>Inopia nummorum</translation>
+    </message>
+    <message>
+        <source>Loading block index...</source>
+        <translation>Legens indicem frustorum...</translation>
+    </message>
+    <message>
+        <source>Loading wallet...</source>
+        <translation>Legens cassidile...</translation>
+    </message>
+    <message>
+        <source>Cannot downgrade wallet</source>
+        <translation>Non posse cassidile regredi</translation>
+    </message>
+    <message>
+        <source>Rescanning...</source>
+        <translation>Iterum perlegens...</translation>
+    </message>
+    <message>
+        <source>Done loading</source>
+        <translation>Completo lengendi</translation>
+    </message>
+</context>
+</TS>
