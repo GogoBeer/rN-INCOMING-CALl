@@ -890,4 +890,247 @@
     </message>
     <message>
         <source>Signature</source>
-        <translation>Sig
+        <translation>Signatio</translation>
+    </message>
+    <message>
+        <source>Copy the current signature to the system clipboard</source>
+        <translation>Copia signationem in latibulum systematis</translation>
+    </message>
+    <message>
+        <source>Sign the message to prove you own this Bitcoin address</source>
+        <translation>Signa nuntium ut demonstres hanc inscriptionem Bitcoin a te possessa esse</translation>
+    </message>
+    <message>
+        <source>Sign &amp;Message</source>
+        <translation>Signa &amp;Nuntium</translation>
+    </message>
+    <message>
+        <source>Reset all sign message fields</source>
+        <translation>Reconstitue omnes campos signandi nuntii</translation>
+    </message>
+    <message>
+        <source>Clear &amp;All</source>
+        <translation>Vacuefac &amp;Omnia</translation>
+    </message>
+    <message>
+        <source>&amp;Verify Message</source>
+        <translation>&amp;Verifica Nuntium</translation>
+    </message>
+    <message>
+        <source>Verify the message to ensure it was signed with the specified Bitcoin address</source>
+        <translation>Verifica nuntium ut cures signatum esse cum specifica inscriptione Bitcoin</translation>
+    </message>
+    <message>
+        <source>Verify &amp;Message</source>
+        <translation>Verifica &amp;Nuntium</translation>
+    </message>
+    <message>
+        <source>Reset all verify message fields</source>
+        <translation>Reconstitue omnes campos verificandi nuntii</translation>
+    </message>
+    <message>
+        <source>Click "Sign Message" to generate signature</source>
+        <translation>Clicca "Signa Nuntium" ut signatio generetur</translation>
+    </message>
+    <message>
+        <source>The entered address is invalid.</source>
+        <translation>Inscriptio inserta non valida est.</translation>
+    </message>
+    <message>
+        <source>Please check the address and try again.</source>
+        <translation>Sodes inscriptionem proba et rursus conare.</translation>
+    </message>
+    <message>
+        <source>The entered address does not refer to a key.</source>
+        <translation>Inserta inscriptio clavem non refert.</translation>
+    </message>
+    <message>
+        <source>Wallet unlock was cancelled.</source>
+        <translation>Cassidilis reserare cancellatum est.</translation>
+    </message>
+    <message>
+        <source>Private key for the entered address is not available.</source>
+        <translation>Clavis privata absens est pro inserta inscriptione.</translation>
+    </message>
+    <message>
+        <source>Message signing failed.</source>
+        <translation>Nuntium signare abortum est.</translation>
+    </message>
+    <message>
+        <source>Message signed.</source>
+        <translation>Nuntius signatus.</translation>
+    </message>
+    <message>
+        <source>The signature could not be decoded.</source>
+        <translation>Signatio decodificari non potuit.</translation>
+    </message>
+    <message>
+        <source>Please check the signature and try again.</source>
+        <translation>Sodes signationem proba et rursus conare.</translation>
+    </message>
+    <message>
+        <source>The signature did not match the message digest.</source>
+        <translation>Signatio non convenit digesto nuntii</translation>
+    </message>
+    <message>
+        <source>Message verification failed.</source>
+        <translation>Nuntium verificare abortum est.</translation>
+    </message>
+    <message>
+        <source>Message verified.</source>
+        <translation>Nuntius verificatus.</translation>
+    </message>
+</context>
+<context>
+    <name>TrafficGraphWidget</name>
+    </context>
+<context>
+    <name>TransactionDesc</name>
+    <message>
+        <source>Open until %1</source>
+        <translation>Apertum donec %1</translation>
+    </message>
+    <message>
+        <source>%1/unconfirmed</source>
+        <translation>%1/non confirmata</translation>
+    </message>
+    <message>
+        <source>%1 confirmations</source>
+        <translation>%1 confirmationes</translation>
+    </message>
+    <message>
+        <source>Status</source>
+        <translation>Status</translation>
+    </message>
+    <message>
+        <source>Date</source>
+        <translation>Dies</translation>
+    </message>
+    <message>
+        <source>Source</source>
+        <translation>Fons</translation>
+    </message>
+    <message>
+        <source>Generated</source>
+        <translation>Generatum</translation>
+    </message>
+    <message>
+        <source>From</source>
+        <translation>Ab</translation>
+    </message>
+    <message>
+        <source>unknown</source>
+        <translation>ignotum</translation>
+    </message>
+    <message>
+        <source>To</source>
+        <translation>Ad</translation>
+    </message>
+    <message>
+        <source>own address</source>
+        <translation>inscriptio propria</translation>
+    </message>
+    <message>
+        <source>label</source>
+        <translation>titulus</translation>
+    </message>
+    <message>
+        <source>Credit</source>
+        <translation>Creditum</translation>
+    </message>
+    <message>
+        <source>not accepted</source>
+        <translation>non acceptum</translation>
+    </message>
+    <message>
+        <source>Debit</source>
+        <translation>Debitum</translation>
+    </message>
+    <message>
+        <source>Transaction fee</source>
+        <translation>Transactionis merces</translation>
+    </message>
+    <message>
+        <source>Net amount</source>
+        <translation>Cuncta quantitas</translation>
+    </message>
+    <message>
+        <source>Message</source>
+        <translation>Nuntius</translation>
+    </message>
+    <message>
+        <source>Comment</source>
+        <translation>Annotatio</translation>
+    </message>
+    <message>
+        <source>Transaction ID</source>
+        <translation>ID transactionis</translation>
+    </message>
+    <message>
+        <source>Debug information</source>
+        <translation>Informatio de debug</translation>
+    </message>
+    <message>
+        <source>Transaction</source>
+        <translation>Transactio</translation>
+    </message>
+    <message>
+        <source>Inputs</source>
+        <translation>Lectenda</translation>
+    </message>
+    <message>
+        <source>Amount</source>
+        <translation>Quantitas</translation>
+    </message>
+    <message>
+        <source>true</source>
+        <translation>verum</translation>
+    </message>
+    <message>
+        <source>false</source>
+        <translation>falsum</translation>
+    </message>
+</context>
+<context>
+    <name>TransactionDescDialog</name>
+    <message>
+        <source>This pane shows a detailed description of the transaction</source>
+        <translation>Haec tabula monstrat descriptionem verbosam transactionis</translation>
+    </message>
+    </context>
+<context>
+    <name>TransactionTableModel</name>
+    <message>
+        <source>Date</source>
+        <translation>Dies</translation>
+    </message>
+    <message>
+        <source>Type</source>
+        <translation>Typus</translation>
+    </message>
+    <message>
+        <source>Label</source>
+        <translation>Titulus</translation>
+    </message>
+    <message>
+        <source>Open until %1</source>
+        <translation>Apertum donec %1</translation>
+    </message>
+    <message>
+        <source>Confirmed (%1 confirmations)</source>
+        <translation>Confirmatum (%1 confirmationes)</translation>
+    </message>
+    <message>
+        <source>Generated but not accepted</source>
+        <translation>Generatum sed non acceptum</translation>
+    </message>
+    <message>
+        <source>Received with</source>
+        <translation>Acceptum cum</translation>
+    </message>
+    <message>
+        <source>Received from</source>
+        <translation>Acceptum ab</translation>
+    </message>
+    <message>
+     
