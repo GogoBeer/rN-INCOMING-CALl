@@ -1133,4 +1133,250 @@
         <translation>Acceptum ab</translation>
     </message>
     <message>
-     
+        <source>Sent to</source>
+        <translation>Missum ad</translation>
+    </message>
+    <message>
+        <source>Payment to yourself</source>
+        <translation>Pensitatio ad te ipsum</translation>
+    </message>
+    <message>
+        <source>Mined</source>
+        <translation>Fossa</translation>
+    </message>
+    <message>
+        <source>(n/a)</source>
+        <translation>(n/a)</translation>
+    </message>
+    <message>
+        <source>(no label)</source>
+        <translation>(nullus titulus)</translation>
+    </message>
+    <message>
+        <source>Transaction status. Hover over this field to show number of confirmations.</source>
+        <translation>Status transactionis.  Supervola cum mure ut monstretur numerus confirmationum.</translation>
+    </message>
+    <message>
+        <source>Date and time that the transaction was received.</source>
+        <translation>Dies et tempus quando transactio accepta est.</translation>
+    </message>
+    <message>
+        <source>Type of transaction.</source>
+        <translation>Typus transactionis.</translation>
+    </message>
+    <message>
+        <source>Amount removed from or added to balance.</source>
+        <translation>Quantitas remota ex pendendo aut addita ei.</translation>
+    </message>
+</context>
+<context>
+    <name>TransactionView</name>
+    <message>
+        <source>All</source>
+        <translation>Omne</translation>
+    </message>
+    <message>
+        <source>Today</source>
+        <translation>Hodie</translation>
+    </message>
+    <message>
+        <source>This week</source>
+        <translation>Hac hebdomade</translation>
+    </message>
+    <message>
+        <source>This month</source>
+        <translation>Hoc mense</translation>
+    </message>
+    <message>
+        <source>Last month</source>
+        <translation>Postremo mense</translation>
+    </message>
+    <message>
+        <source>This year</source>
+        <translation>Hoc anno</translation>
+    </message>
+    <message>
+        <source>Range...</source>
+        <translation>Intervallum...</translation>
+    </message>
+    <message>
+        <source>Received with</source>
+        <translation>Acceptum cum</translation>
+    </message>
+    <message>
+        <source>Sent to</source>
+        <translation>Missum ad</translation>
+    </message>
+    <message>
+        <source>To yourself</source>
+        <translation>Ad te ipsum</translation>
+    </message>
+    <message>
+        <source>Mined</source>
+        <translation>Fossa</translation>
+    </message>
+    <message>
+        <source>Other</source>
+        <translation>Alia</translation>
+    </message>
+    <message>
+        <source>Min amount</source>
+        <translation>Quantitas minima</translation>
+    </message>
+    <message>
+        <source>Copy address</source>
+        <translation>Copia inscriptionem</translation>
+    </message>
+    <message>
+        <source>Copy label</source>
+        <translation>Copia titulum</translation>
+    </message>
+    <message>
+        <source>Copy amount</source>
+        <translation>Copia quantitatem</translation>
+    </message>
+    <message>
+        <source>Copy transaction ID</source>
+        <translation>Copia transactionis ID</translation>
+    </message>
+    <message>
+        <source>Edit label</source>
+        <translation>Muta titulum</translation>
+    </message>
+    <message>
+        <source>Show transaction details</source>
+        <translation>Monstra particularia transactionis</translation>
+    </message>
+    <message>
+        <source>Comma separated file (*.csv)</source>
+        <translation>Comma Separata Plica (*.csv)</translation>
+    </message>
+    <message>
+        <source>Confirmed</source>
+        <translation>Confirmatum</translation>
+    </message>
+    <message>
+        <source>Date</source>
+        <translation>Dies</translation>
+    </message>
+    <message>
+        <source>Type</source>
+        <translation>Typus</translation>
+    </message>
+    <message>
+        <source>Label</source>
+        <translation>Titulus</translation>
+    </message>
+    <message>
+        <source>Address</source>
+        <translation>Inscriptio</translation>
+    </message>
+    <message>
+        <source>ID</source>
+        <translation>ID</translation>
+    </message>
+    <message>
+        <source>Range:</source>
+        <translation>Intervallum:</translation>
+    </message>
+    <message>
+        <source>to</source>
+        <translation>ad</translation>
+    </message>
+</context>
+<context>
+    <name>UnitDisplayStatusBarControl</name>
+    </context>
+<context>
+    <name>WalletController</name>
+    </context>
+<context>
+    <name>WalletFrame</name>
+    </context>
+<context>
+    <name>WalletModel</name>
+    <message>
+        <source>Send Coins</source>
+        <translation>Mitte Nummos</translation>
+    </message>
+    </context>
+<context>
+    <name>WalletView</name>
+    <message>
+        <source>&amp;Export</source>
+        <translation>&amp;Exporta</translation>
+    </message>
+    <message>
+        <source>Export the data in the current tab to a file</source>
+        <translation>Exporta data in hac tabella in plicam</translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation>Error</translation>
+    </message>
+    <message>
+        <source>Backup Wallet</source>
+        <translation>Conserva cassidile</translation>
+    </message>
+    <message>
+        <source>Wallet Data (*.dat)</source>
+        <translation>Data cassidilis (*.dat)</translation>
+    </message>
+    <message>
+        <source>Backup Failed</source>
+        <translation>Conservare abortum est.</translation>
+    </message>
+    <message>
+        <source>Backup Successful</source>
+        <translation>Successum in conservando</translation>
+    </message>
+    </context>
+<context>
+    <name>bitcoin-core</name>
+    <message>
+        <source>This is a pre-release test build - use at your own risk - do not use for mining or merchant applications</source>
+        <translation>Hoc est prae-dimittum experimentala aedes - utere eo periculo tuo proprio - nolite utere fodendo vel applicationibus mercatoriis</translation>
+    </message>
+    <message>
+        <source>Corrupted block database detected</source>
+        <translation>Corruptum databasum frustorum invenitur</translation>
+    </message>
+    <message>
+        <source>Do you want to rebuild the block database now?</source>
+        <translation>Visne reficere databasum frustorum iam?</translation>
+    </message>
+    <message>
+        <source>Error initializing block database</source>
+        <translation>Error initiando databasem frustorum</translation>
+    </message>
+    <message>
+        <source>Error initializing wallet database environment %s!</source>
+        <translation>Error initiando systematem databasi cassidilis %s!</translation>
+    </message>
+    <message>
+        <source>Error loading block database</source>
+        <translation>Error legendo frustorum databasem</translation>
+    </message>
+    <message>
+        <source>Error opening block database</source>
+        <translation>Error aperiendo databasum frustorum</translation>
+    </message>
+    <message>
+        <source>Failed to listen on any port. Use -listen=0 if you want this.</source>
+        <translation>Non potuisse auscultare in ulla porta.  Utere -listen=0 si hoc vis.</translation>
+    </message>
+    <message>
+        <source>Not enough file descriptors available.</source>
+        <translation>Inopia descriptorum plicarum.</translation>
+    </message>
+    <message>
+        <source>Verifying blocks...</source>
+        <translation>Verificante frusta...</translation>
+    </message>
+    <message>
+        <source>Signing transaction failed</source>
+        <translation>Signandum transactionis abortum est</translation>
+    </message>
+    <message>
+        <source>Transaction amount too small</source>
+        <translation>Magnitudo tra
