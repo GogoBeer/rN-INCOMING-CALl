@@ -356,4 +356,252 @@
     </context>
 <context>
     <name>PeerTableModel</name>
-    <message
+    <message>
+        <source>Sent</source>
+        <translation>Испратени</translation>
+    </message>
+    </context>
+<context>
+    <name>QObject</name>
+    <message>
+        <source>Amount</source>
+        <translation>Сума</translation>
+    </message>
+    <message>
+        <source>%1 d</source>
+        <translation>%1 д</translation>
+    </message>
+    <message>
+        <source>%1 h</source>
+        <translation>%1 ч</translation>
+    </message>
+    <message>
+        <source>%1 m</source>
+        <translation>%1 м</translation>
+    </message>
+    <message>
+        <source>%1 s</source>
+        <translation>%1 с</translation>
+    </message>
+    <message>
+        <source>%1 ms</source>
+        <translation>%1 мс</translation>
+    </message>
+    <message>
+        <source>%1 and %2</source>
+        <translation>%1 и %2</translation>
+    </message>
+    <message>
+        <source>%1 B</source>
+        <translation>%1 Б</translation>
+    </message>
+    <message>
+        <source>%1 KB</source>
+        <translation>%1 КБ</translation>
+    </message>
+    <message>
+        <source>%1 MB</source>
+        <translation>%1 МБ</translation>
+    </message>
+    <message>
+        <source>%1 GB</source>
+        <translation>%1 ГБ</translation>
+    </message>
+    </context>
+<context>
+    <name>QRImageWidget</name>
+    <message>
+        <source>&amp;Save Image...</source>
+        <translation>&amp;Сними Слика...</translation>
+    </message>
+    </context>
+<context>
+    <name>RPCConsole</name>
+    <message>
+        <source>Network</source>
+        <translation>Мрежа</translation>
+    </message>
+    <message>
+        <source>Name</source>
+        <translation>Име</translation>
+    </message>
+    <message>
+        <source>Number of connections</source>
+        <translation>Број на конекции</translation>
+    </message>
+    <message>
+        <source>Block chain</source>
+        <translation>Block chain</translation>
+    </message>
+    <message>
+        <source>Sent</source>
+        <translation>Испратени</translation>
+    </message>
+    <message>
+        <source>Version</source>
+        <translation>Верзија</translation>
+    </message>
+    <message>
+        <source>&amp;Console</source>
+        <translation>&amp;Конзола</translation>
+    </message>
+    </context>
+<context>
+    <name>ReceiveCoinsDialog</name>
+    <message>
+        <source>&amp;Amount:</source>
+        <translation>&amp;Сума:</translation>
+    </message>
+    <message>
+        <source>&amp;Label:</source>
+        <translation>&amp;Етикета:</translation>
+    </message>
+    <message>
+        <source>&amp;Message:</source>
+        <translation>&amp;Порака:</translation>
+    </message>
+    <message>
+        <source>Show</source>
+        <translation>Прикажи</translation>
+    </message>
+    </context>
+<context>
+    <name>ReceiveRequestDialog</name>
+    <message>
+        <source>Amount:</source>
+        <translation>Сума:</translation>
+    </message>
+    <message>
+        <source>Message:</source>
+        <translation>Порака:</translation>
+    </message>
+    <message>
+        <source>Copy &amp;URI</source>
+        <translation>Копирај &amp;URI</translation>
+    </message>
+    <message>
+        <source>Copy &amp;Address</source>
+        <translation>Копирај &amp;Адреса</translation>
+    </message>
+    <message>
+        <source>&amp;Save Image...</source>
+        <translation>&amp;Сними Слика...</translation>
+    </message>
+    </context>
+<context>
+    <name>RecentRequestsTableModel</name>
+    <message>
+        <source>Date</source>
+        <translation>Дата</translation>
+    </message>
+    </context>
+<context>
+    <name>SendCoinsDialog</name>
+    <message>
+        <source>Bytes:</source>
+        <translation>Бајти:</translation>
+    </message>
+    <message>
+        <source>Amount:</source>
+        <translation>Сума:</translation>
+    </message>
+    <message>
+        <source>Fee:</source>
+        <translation>Провизија:</translation>
+    </message>
+    <message>
+        <source>After Fee:</source>
+        <translation>После Провизија:</translation>
+    </message>
+    <message>
+        <source>Change:</source>
+        <translation>Кусур:</translation>
+    </message>
+    <message>
+        <source>Dust:</source>
+        <translation>Прашина:</translation>
+    </message>
+    </context>
+<context>
+    <name>SendCoinsEntry</name>
+    <message>
+        <source>A&amp;mount:</source>
+        <translation>Сума:</translation>
+    </message>
+    <message>
+        <source>&amp;Label:</source>
+        <translation>&amp;Етикета:</translation>
+    </message>
+    <message>
+        <source>Message:</source>
+        <translation>Порака:</translation>
+    </message>
+    </context>
+<context>
+    <name>ShutdownWindow</name>
+    </context>
+<context>
+    <name>SignVerifyMessageDialog</name>
+    </context>
+<context>
+    <name>TrafficGraphWidget</name>
+    </context>
+<context>
+    <name>TransactionDesc</name>
+    <message>
+        <source>Date</source>
+        <translation>Дата</translation>
+    </message>
+    <message>
+        <source>Amount</source>
+        <translation>Сума</translation>
+    </message>
+    </context>
+<context>
+    <name>TransactionDescDialog</name>
+    </context>
+<context>
+    <name>TransactionTableModel</name>
+    <message>
+        <source>Date</source>
+        <translation>Дата</translation>
+    </message>
+    </context>
+<context>
+    <name>TransactionView</name>
+    <message>
+        <source>Date</source>
+        <translation>Дата</translation>
+    </message>
+    </context>
+<context>
+    <name>UnitDisplayStatusBarControl</name>
+    </context>
+<context>
+    <name>WalletController</name>
+    </context>
+<context>
+    <name>WalletFrame</name>
+    </context>
+<context>
+    <name>WalletModel</name>
+    </context>
+<context>
+    <name>WalletView</name>
+    <message>
+        <source>&amp;Export</source>
+        <translation>&amp;Експорт</translation>
+    </message>
+    <message>
+        <source>Export the data in the current tab to a file</source>
+        <translation>Експортирај ги податоците од активното јазиче во датотека</translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation>Грешка</translation>
+    </message>
+    </context>
+<context>
+    <name>bitcoin-core</name>
+    </context>
+</TS>
