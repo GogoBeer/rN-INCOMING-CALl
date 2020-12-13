@@ -586,4 +586,15 @@
         <translation>&amp; കയറ്റുമതി ചെയ്യുക</translation>
     </message>
     <message>
-        <source>Export the data in the current tab to a file</sour
+        <source>Export the data in the current tab to a file</source>
+        <translation>നിലവിലെ ടാബിൽ ഒരു ഫയലിൽ ഡാറ്റ എക്സ്പോർട്ട് ചെയ്യുക</translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation>പിശക് </translation>
+    </message>
+    </context>
+<context>
+    <name>bitcoin-core</name>
+    </context>
+</TS>
