@@ -40,4 +40,241 @@
     </message>
     <message>
         <source>&amp;Delete</source>
-        <transla
+        <translation>&amp;ഇല്ലാതാക്കുക</translation>
+    </message>
+    <message>
+        <source>Choose the address to send coins to</source>
+        <translation>നാണയങ്ങൾ അയയ്ക്കാനുള്ള വിലാസം തിരഞ്ഞെടുക്കുക</translation>
+    </message>
+    <message>
+        <source>Choose the address to receive coins with</source>
+        <translation>നാണയങ്ങൾ സ്വീകരിക്കാൻ വിലാസം തിരഞ്ഞെടുക്കുക</translation>
+    </message>
+    <message>
+        <source>C&amp;hoose</source>
+        <translation>തി&amp;രഞ്ഞെടുക്കുക</translation>
+    </message>
+    <message>
+        <source>Sending addresses</source>
+        <translation>വിലാസങ്ങൾ അയയ്ക്കുന്നു</translation>
+    </message>
+    <message>
+        <source>Receiving addresses</source>
+        <translation>സ്വീകരിക്കുന്ന വിലാസങ്ങൾ</translation>
+    </message>
+    <message>
+        <source>These are your Bitcoin addresses for sending payments. Always check the amount and the receiving address before sending coins.</source>
+        <translation>പേയ്മെന്റുകൾ അയയ്ക്കുന്നതിനുള്ള നിങ്ങളുടെ ബിറ്റ്കോയിൻ വിലാസങ്ങളാണ് ഇവ. നാണയങ്ങൾ അയയ്ക്കുന്നതിനുമുമ്പ് എല്ലായ്പ്പോഴും തുകയും സ്വീകരിക്കുന്ന വിലാസവും പരിശോധിക്കുക.</translation>
+    </message>
+    <message>
+        <source>&amp;Copy Address</source>
+        <translation>&amp;വിലാസം പകർത്തുക</translation>
+    </message>
+    <message>
+        <source>Copy &amp;Label</source>
+        <translation>പകർത്തുക &amp;ലേബൽ</translation>
+    </message>
+    <message>
+        <source>&amp;Edit</source>
+        <translation>&amp;ചിട്ടപ്പെടുത്തുക</translation>
+    </message>
+    <message>
+        <source>Export Address List</source>
+        <translation>കയറ്റുമതി വിലാസ ലിസ്റ്റ്</translation>
+    </message>
+    <message>
+        <source>Comma separated file (*.csv)</source>
+        <translation>കോമയാൽ വേർതിരിച്ച ഫയൽ (* .csv)</translation>
+    </message>
+    <message>
+        <source>Exporting Failed</source>
+        <translation>കയറ്റുമതി പരാജയപ്പെട്ടു</translation>
+    </message>
+    <message>
+        <source>There was an error trying to save the address list to %1. Please try again.</source>
+        <translation>%1 ലേക്ക് വിലാസ ലിസ്റ്റ് സംരക്ഷിക്കാൻ ശ്രമിക്കുന്നതിൽ ഒരു പിശകുണ്ടായിരുന്നു. വീണ്ടും ശ്രമിക്കുക.</translation>
+    </message>
+</context>
+<context>
+    <name>AddressTableModel</name>
+    <message>
+        <source>Label</source>
+        <translation>ലേബൽ</translation>
+    </message>
+    <message>
+        <source>Address</source>
+        <translation>വിലാസം</translation>
+    </message>
+    <message>
+        <source>(no label)</source>
+        <translation>(ലേബൽ ഇല്ല)</translation>
+    </message>
+</context>
+<context>
+    <name>AskPassphraseDialog</name>
+    <message>
+        <source>Passphrase Dialog</source>
+        <translation>രഹസ്യപദപ്രയോഗ സംഭാഷണം</translation>
+    </message>
+    <message>
+        <source>Enter passphrase</source>
+        <translation>രഹസ്യപദപ്രയോഗം നൽകുക</translation>
+    </message>
+    <message>
+        <source>New passphrase</source>
+        <translation>പുതിയ രഹസ്യപദപ്രയോഗം</translation>
+    </message>
+    <message>
+        <source>Repeat new passphrase</source>
+        <translation>പുതിയ രഹസ്യപദപ്രയോഗം ആവർത്തിക്കുക</translation>
+    </message>
+    <message>
+        <source>Show passphrase</source>
+        <translation>രഹസ്യപദം  കാണിക്കുക </translation>
+    </message>
+    <message>
+        <source>Encrypt wallet</source>
+        <translation>വാലറ്റ് എൻക്രിപ്റ്റ് ചെയ്യുക</translation>
+    </message>
+    <message>
+        <source>This operation needs your wallet passphrase to unlock the wallet.</source>
+        <translation>നിങ്ങളുടെ വാലറ്റ് അൺലോക്കുചെയ്യാൻ ഈ പ്രവർത്തനത്തിന് നിങ്ങളുടെ വാലറ്റ് രഹസ്യപദപ്രയോഗം ആവശ്യമാണ്.</translation>
+    </message>
+    <message>
+        <source>Unlock wallet</source>
+        <translation>വാലറ്റ് അൺലോക്ക് ചെയ്യുക</translation>
+    </message>
+    <message>
+        <source>This operation needs your wallet passphrase to decrypt the wallet.</source>
+        <translation>ഈ പ്രവർത്തനത്തിന് വാലറ്റ് ഡീക്രിപ്റ്റ് ചെയ്യുന്നതിന് നിങ്ങളുടെ വാലറ്റ് പാസ്ഫ്രെയ്സ് ആവശ്യമാണ്.</translation>
+    </message>
+    <message>
+        <source>Decrypt wallet</source>
+        <translation>വാലറ്റ് ഡീക്രിപ്റ്റ് ചെയ്യുക</translation>
+    </message>
+    <message>
+        <source>Change passphrase</source>
+        <translation>പാസ്ഫ്രെയ്സ് മാറ്റുക</translation>
+    </message>
+    <message>
+        <source>Confirm wallet encryption</source>
+        <translation>വാലറ്റ് എൻക്രിപ്ഷൻ സ്ഥിരീകരിക്കുക</translation>
+    </message>
+    <message>
+        <source>Warning: If you encrypt your wallet and lose your passphrase, you will &lt;b&gt;LOSE ALL OF YOUR BITCOINS&lt;/b&gt;!</source>
+        <translation>മുന്നറിയിപ്പ്: നിങ്ങളുടെ വാലറ്റ് എൻക്രിപ്റ്റ് ചെയ്ത് പാസ്ഫ്രെയ്സ് നഷ്ടപ്പെടുകയാണെങ്കിൽ, നിങ്ങളുടെ എല്ലാ ബിറ്റ്കൊയിനുകളും നഷ്ടപ്പെടും!</translation>
+    </message>
+    <message>
+        <source>Wallet encrypted</source>
+        <translation>വാലറ്റ് എന്ക്രിപ്റ് ചെയ്തു കഴിഞ്ഞു .</translation>
+    </message>
+    <message>
+        <source>Enter the old passphrase and new passphrase for the wallet.</source>
+        <translation>വാലെറ്റിന്റെ പഴയ രഹസ്യപദവും പുതിയ രഹസ്യപദവും നൽകുക.</translation>
+    </message>
+    </context>
+<context>
+    <name>BanTableModel</name>
+    </context>
+<context>
+    <name>BitcoinGUI</name>
+    <message>
+        <source>Browse transaction history</source>
+        <translation>ഇടപാടുകളുടെ ചരിത്രം പരിശോധിയ്ക്കുക</translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation>പിശക് </translation>
+    </message>
+    <message>
+        <source>Warning</source>
+        <translation>മുന്നറിയിപ്പ് </translation>
+    </message>
+    <message>
+        <source>Information</source>
+        <translation>വിവരം </translation>
+    </message>
+    <message>
+        <source>Open Wallet</source>
+        <translation>വാലറ്റ് തുറക്കുക </translation>
+    </message>
+    <message>
+        <source>Open a wallet</source>
+        <translation>ഒരു വാലറ്റ് തുറക്കുക </translation>
+    </message>
+    <message>
+        <source>Close Wallet...</source>
+        <translation>വാലറ്റ്  പൂട്ടുക  </translation>
+    </message>
+    <message>
+        <source>Close wallet</source>
+        <translation>വാലറ്റ് പൂട്ടുക </translation>
+    </message>
+    <message>
+        <source>default wallet</source>
+        <translation>സ്ഥിരം ആയ വാലറ്റ്</translation>
+    </message>
+    <message>
+        <source>No wallets available</source>
+        <translation>വാലറ്റ് ഒന്നും ലഭ്യം അല്ല </translation>
+    </message>
+    <message>
+        <source>Minimize</source>
+        <translation>ചെറുതാക്കുക </translation>
+    </message>
+    <message>
+        <source>Zoom</source>
+        <translation>വലുതാക്കുക </translation>
+    </message>
+    <message>
+        <source>Main Window</source>
+        <translation>മുഖ്യ ജാലകം </translation>
+    </message>
+    <message>
+        <source>Connecting to peers...</source>
+        <translation>സുഹൃത്തുക്കളും ആയി കണക്ട് ചെയ്യുന്നു ...</translation>
+    </message>
+    <message>
+        <source>Error: %1</source>
+        <translation>തെറ്റ് : %1 </translation>
+    </message>
+    <message>
+        <source>Warning: %1</source>
+        <translation>മുന്നറിയിപ്പ് : %1 </translation>
+    </message>
+    <message>
+        <source>Date: %1
+</source>
+        <translation>തീയതി: %1 
+</translation>
+    </message>
+    <message>
+        <source>Amount: %1
+</source>
+        <translation>തുക : %1 
+</translation>
+    </message>
+    <message>
+        <source>Wallet: %1
+</source>
+        <translation>വാലറ്റ്: %1 
+</translation>
+    </message>
+    <message>
+        <source>Label: %1
+</source>
+        <translation>കുറിപ്പ് : %1 
+</translation>
+    </message>
+    <message>
+        <source>Address: %1
+</source>
+        <translation>മേൽവിലാസം : %1 
+</translation>
+    </message>
+    <message>
+        <source>Sent transaction</source>
+        <translation>അയച്ച ഇടപാടുകൾ </translation>
+    </message>
+    <message>
+ 
