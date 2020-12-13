@@ -277,4 +277,313 @@
         <translation>അയച്ച ഇടപാടുകൾ </translation>
     </message>
     <message>
- 
+        <source>Incoming transaction</source>
+        <translation>വരവ്വ് വെച്ച ഇടപാടുകൾ </translation>
+    </message>
+    </context>
+<context>
+    <name>CoinControlDialog</name>
+    <message>
+        <source>Coin Selection</source>
+        <translation>കോയിൻ തിരഞ്ഞെടുക്കൽ </translation>
+    </message>
+    <message>
+        <source>Quantity:</source>
+        <translation>നിര്‍ദ്ധിഷ്‌ടസംഖ്യ / അളവ് :</translation>
+    </message>
+    <message>
+        <source>Bytes:</source>
+        <translation>ബൈറ്റ്സ്:</translation>
+    </message>
+    <message>
+        <source>Amount:</source>
+        <translation>തുക:</translation>
+    </message>
+    <message>
+        <source>Fee:</source>
+        <translation>ഫീസ്‌ / പ്രതിഫലം :</translation>
+    </message>
+    <message>
+        <source>List mode</source>
+        <translation>പട്ടിക </translation>
+    </message>
+    <message>
+        <source>Amount</source>
+        <translation>തുക </translation>
+    </message>
+    <message>
+        <source>Received with label</source>
+        <translation>അടയാളത്തോടുകൂടി ലഭിച്ചു </translation>
+    </message>
+    <message>
+        <source>Received with address</source>
+        <translation>മേൽവിലാസത്തോടുകൂടി ലഭിച്ചു </translation>
+    </message>
+    <message>
+        <source>Date</source>
+        <translation>തീയതി </translation>
+    </message>
+    <message>
+        <source>Confirmations</source>
+        <translation>സ്ഥിതീകരണങ്ങൾ </translation>
+    </message>
+    <message>
+        <source>Confirmed</source>
+        <translation>സ്ഥിതീകരിച്ചു</translation>
+    </message>
+    <message>
+        <source>(no label)</source>
+        <translation>(ലേബൽ ഇല്ല)</translation>
+    </message>
+    </context>
+<context>
+    <name>CreateWalletActivity</name>
+    </context>
+<context>
+    <name>CreateWalletDialog</name>
+    <message>
+        <source>Create Wallet</source>
+        <translation>വാലറ്റ് / പണസഞ്ചി സൃഷ്ടിക്കുക :</translation>
+    </message>
+    </context>
+<context>
+    <name>EditAddressDialog</name>
+    </context>
+<context>
+    <name>FreespaceChecker</name>
+    <message>
+        <source>name</source>
+        <translation>നാമധേയം / പേര് </translation>
+    </message>
+    </context>
+<context>
+    <name>HelpMessageDialog</name>
+    </context>
+<context>
+    <name>Intro</name>
+    <message>
+        <source>Error</source>
+        <translation>പിശക് </translation>
+    </message>
+    </context>
+<context>
+    <name>ModalOverlay</name>
+    <message>
+        <source>Unknown...</source>
+        <translation>അജ്ഞാതമായ </translation>
+    </message>
+    <message>
+        <source>Progress</source>
+        <translation>പുരോഗതി</translation>
+    </message>
+    <message>
+        <source>calculating...</source>
+        <translation>കണക്കായ്ക്കിക്കൊണ്ടിരിക്കുന്നു</translation>
+    </message>
+    </context>
+<context>
+    <name>OpenURIDialog</name>
+    </context>
+<context>
+    <name>OpenWalletActivity</name>
+    <message>
+        <source>default wallet</source>
+        <translation>സ്ഥിരം ആയ വാലറ്റ്</translation>
+    </message>
+    </context>
+<context>
+    <name>OptionsDialog</name>
+    <message>
+        <source>Error</source>
+        <translation>പിശക് </translation>
+    </message>
+    </context>
+<context>
+    <name>OverviewPage</name>
+    <message>
+        <source>Available:</source>
+        <translation>ലഭ്യമായ</translation>
+    </message>
+    <message>
+        <source>Spendable:</source>
+        <translation>വിനിയോഗിക്കാവുന്നത് / ചെലവാക്കാവുന്നത് </translation>
+    </message>
+    <message>
+        <source>Recent transactions</source>
+        <translation>സമീപ കാല ഇടപാടുകൾ</translation>
+    </message>
+    </context>
+<context>
+    <name>PSBTOperationsDialog</name>
+    </context>
+<context>
+    <name>PaymentServer</name>
+    </context>
+<context>
+    <name>PeerTableModel</name>
+    </context>
+<context>
+    <name>QObject</name>
+    <message>
+        <source>Amount</source>
+        <translation>തുക </translation>
+    </message>
+    <message>
+        <source>Error: %1</source>
+        <translation>തെറ്റ് : %1 </translation>
+    </message>
+    </context>
+<context>
+    <name>QRImageWidget</name>
+    </context>
+<context>
+    <name>RPCConsole</name>
+    </context>
+<context>
+    <name>ReceiveCoinsDialog</name>
+    </context>
+<context>
+    <name>ReceiveRequestDialog</name>
+    <message>
+        <source>Amount:</source>
+        <translation>തുക:</translation>
+    </message>
+    </context>
+<context>
+    <name>RecentRequestsTableModel</name>
+    <message>
+        <source>Date</source>
+        <translation>തീയതി </translation>
+    </message>
+    <message>
+        <source>Label</source>
+        <translation>ലേബൽ</translation>
+    </message>
+    <message>
+        <source>(no label)</source>
+        <translation>(ലേബൽ ഇല്ല)</translation>
+    </message>
+    </context>
+<context>
+    <name>SendCoinsDialog</name>
+    <message>
+        <source>Quantity:</source>
+        <translation>നിര്‍ദ്ധിഷ്‌ടസംഖ്യ / അളവ് :</translation>
+    </message>
+    <message>
+        <source>Bytes:</source>
+        <translation>ബൈറ്റ്സ്:</translation>
+    </message>
+    <message>
+        <source>Amount:</source>
+        <translation>തുക:</translation>
+    </message>
+    <message>
+        <source>Fee:</source>
+        <translation>ഫീസ്‌ / പ്രതിഫലം :</translation>
+    </message>
+    <message>
+        <source>Payment request expired.</source>
+        <translation>പെയ്മെന്റിനുള്ള അഭ്യർത്ഥന  കാലഹരണപ്പെട്ടു പോയിരിക്കുന്നു. </translation>
+    </message>
+    <message>
+        <source>(no label)</source>
+        <translation>(ലേബൽ ഇല്ല)</translation>
+    </message>
+</context>
+<context>
+    <name>SendCoinsEntry</name>
+    </context>
+<context>
+    <name>ShutdownWindow</name>
+    </context>
+<context>
+    <name>SignVerifyMessageDialog</name>
+    </context>
+<context>
+    <name>TrafficGraphWidget</name>
+    </context>
+<context>
+    <name>TransactionDesc</name>
+    <message>
+        <source>Date</source>
+        <translation>തീയതി </translation>
+    </message>
+    <message>
+        <source>Amount</source>
+        <translation>തുക </translation>
+    </message>
+    </context>
+<context>
+    <name>TransactionDescDialog</name>
+    </context>
+<context>
+    <name>TransactionTableModel</name>
+    <message>
+        <source>Date</source>
+        <translation>തീയതി </translation>
+    </message>
+    <message>
+        <source>Label</source>
+        <translation>ലേബൽ</translation>
+    </message>
+    <message>
+        <source>(no label)</source>
+        <translation>(ലേബൽ ഇല്ല)</translation>
+    </message>
+    </context>
+<context>
+    <name>TransactionView</name>
+    <message>
+        <source>Comma separated file (*.csv)</source>
+        <translation>കോമയാൽ വേർതിരിച്ച ഫയൽ (* .csv)</translation>
+    </message>
+    <message>
+        <source>Confirmed</source>
+        <translation>സ്ഥിതീകരിച്ചു</translation>
+    </message>
+    <message>
+        <source>Date</source>
+        <translation>തീയതി </translation>
+    </message>
+    <message>
+        <source>Label</source>
+        <translation>ലേബൽ</translation>
+    </message>
+    <message>
+        <source>Address</source>
+        <translation>വിലാസം</translation>
+    </message>
+    <message>
+        <source>Exporting Failed</source>
+        <translation>കയറ്റുമതി പരാജയപ്പെട്ടു</translation>
+    </message>
+    </context>
+<context>
+    <name>UnitDisplayStatusBarControl</name>
+    </context>
+<context>
+    <name>WalletController</name>
+    <message>
+        <source>Close wallet</source>
+        <translation>വാലറ്റ് പൂട്ടുക </translation>
+    </message>
+    </context>
+<context>
+    <name>WalletFrame</name>
+    </context>
+<context>
+    <name>WalletModel</name>
+    <message>
+        <source>default wallet</source>
+        <translation>സ്ഥിരം ആയ വാലറ്റ്</translation>
+    </message>
+</context>
+<context>
+    <name>WalletView</name>
+    <message>
+        <source>&amp;Export</source>
+        <translation>&amp; കയറ്റുമതി ചെയ്യുക</translation>
+    </message>
+    <message>
+        <source>Export the data in the current tab to a file</sour
