@@ -812,4 +812,168 @@
     </message>
     <message>
         <source>Disable private keys for this wallet. Wallets with private keys disabled will have no private keys and cannot have an HD seed or imported private keys. This is ideal for watch-only wallets.</source>
-        <translation>Deaktiver private nøkler for denne lommeboke
+        <translation>Deaktiver private nøkler for denne lommeboken. Lommebøker med private nøkler er deaktivert vil ikke ha noen private nøkler og kan ikke ha en HD seed eller importerte private nøkler. Dette er ideelt for loomebøker som kun er klokker.</translation>
+    </message>
+    <message>
+        <source>Disable Private Keys</source>
+        <translation>Deaktiver Private Nøkler</translation>
+    </message>
+    <message>
+        <source>Make a blank wallet. Blank wallets do not initially have private keys or scripts. Private keys and addresses can be imported, or an HD seed can be set, at a later time.</source>
+        <translation>Lag en tom lommebok. Tomme lommebøker har i utgangspunktet ikke private nøkler eller skript. Private nøkler og adresser kan importeres, eller et HD- frø kan angis på et senere tidspunkt.</translation>
+    </message>
+    <message>
+        <source>Make Blank Wallet</source>
+        <translation>Lag Tom Lommebok</translation>
+    </message>
+    <message>
+        <source>Create</source>
+        <translation>Opprett</translation>
+    </message>
+</context>
+<context>
+    <name>EditAddressDialog</name>
+    <message>
+        <source>Edit Address</source>
+        <translation>Rediger adresse</translation>
+    </message>
+    <message>
+        <source>&amp;Label</source>
+        <translation>&amp;Merkelapp</translation>
+    </message>
+    <message>
+        <source>The label associated with this address list entry</source>
+        <translation>Merkelappen koblet til denne adresseliste oppføringen</translation>
+    </message>
+    <message>
+        <source>The address associated with this address list entry. This can only be modified for sending addresses.</source>
+        <translation>Adressen til denne oppføringen i adresseboken. Denne kan kun endres for utsendingsadresser.</translation>
+    </message>
+    <message>
+        <source>&amp;Address</source>
+        <translation>&amp;Adresse</translation>
+    </message>
+    <message>
+        <source>New sending address</source>
+        <translation>Ny utsendingsadresse</translation>
+    </message>
+    <message>
+        <source>Edit receiving address</source>
+        <translation>Rediger mottaksadresse</translation>
+    </message>
+    <message>
+        <source>Edit sending address</source>
+        <translation>Rediger utsendingsadresse</translation>
+    </message>
+    <message>
+        <source>The entered address "%1" is not a valid Bitcoin address.</source>
+        <translation>Den angitte adressen "%1" er ikke en gyldig Bitcoin-adresse.</translation>
+    </message>
+    <message>
+        <source>Address "%1" already exists as a receiving address with label "%2" and so cannot be added as a sending address.</source>
+        <translation>Adresse "%1" eksisterer allerede som en mottaksadresse merket "%2" og kan derfor ikke bli lagt til som en sendingsadresse.</translation>
+    </message>
+    <message>
+        <source>The entered address "%1" is already in the address book with label "%2".</source>
+        <translation>Den oppgitte adressen ''%1'' er allerede i adresseboken med etiketten ''%2''.</translation>
+    </message>
+    <message>
+        <source>Could not unlock wallet.</source>
+        <translation>Kunne ikke låse opp lommebok.</translation>
+    </message>
+    <message>
+        <source>New key generation failed.</source>
+        <translation>Generering av ny nøkkel feilet.</translation>
+    </message>
+</context>
+<context>
+    <name>FreespaceChecker</name>
+    <message>
+        <source>A new data directory will be created.</source>
+        <translation>En ny datamappe vil bli laget.</translation>
+    </message>
+    <message>
+        <source>name</source>
+        <translation>navn</translation>
+    </message>
+    <message>
+        <source>Directory already exists. Add %1 if you intend to create a new directory here.</source>
+        <translation>Mappe finnes allerede. Legg til %1 hvis du vil lage en ny mappe her.</translation>
+    </message>
+    <message>
+        <source>Path already exists, and is not a directory.</source>
+        <translation>Snarvei finnes allerede, og er ikke en mappe.</translation>
+    </message>
+    <message>
+        <source>Cannot create data directory here.</source>
+        <translation>Kan ikke lage datamappe her.</translation>
+    </message>
+</context>
+<context>
+    <name>HelpMessageDialog</name>
+    <message>
+        <source>version</source>
+        <translation>versjon</translation>
+    </message>
+    <message>
+        <source>About %1</source>
+        <translation>Om %1</translation>
+    </message>
+    <message>
+        <source>Command-line options</source>
+        <translation>Kommandolinjevalg</translation>
+    </message>
+</context>
+<context>
+    <name>Intro</name>
+    <message>
+        <source>Welcome</source>
+        <translation>Velkommen</translation>
+    </message>
+    <message>
+        <source>Welcome to %1.</source>
+        <translation>Velkommen til %1.</translation>
+    </message>
+    <message>
+        <source>As this is the first time the program is launched, you can choose where %1 will store its data.</source>
+        <translation>Siden dette er første gang programmet starter, kan du nå velge hvor %1 skal lagre sine data.</translation>
+    </message>
+    <message>
+        <source>When you click OK, %1 will begin to download and process the full %4 block chain (%2GB) starting with the earliest transactions in %3 when %4 initially launched.</source>
+        <translation>Når du klikker OK, vil %1 starte nedlasting og behandle hele den %4 blokkjeden (%2GB) fra de eldste transaksjonene i %3 når %4 først startet.</translation>
+    </message>
+    <message>
+        <source>Reverting this setting requires re-downloading the entire blockchain. It is faster to download the full chain first and prune it later. Disables some advanced features.</source>
+        <translation>Gjenoppretting av denne innstillingen krever at du laster ned hele blockchain på nytt. Det er raskere å laste ned hele kjeden først og beskjære den senere Deaktiver noen avanserte funksjoner.</translation>
+    </message>
+    <message>
+        <source>This initial synchronisation is very demanding, and may expose hardware problems with your computer that had previously gone unnoticed. Each time you run %1, it will continue downloading where it left off.</source>
+        <translation>Den initielle synkroniseringen er svært krevende, og kan forårsake problemer med maskinvaren i datamaskinen din som du tidligere ikke merket. Hver gang du kjører %1 vil den fortsette nedlastingen der den sluttet.</translation>
+    </message>
+    <message>
+        <source>If you have chosen to limit block chain storage (pruning), the historical data must still be downloaded and processed, but will be deleted afterward to keep your disk usage low.</source>
+        <translation>Hvis du har valgt å begrense blokkjedelagring (beskjæring), må historiske data fortsatt lastes ned og behandles, men de vil bli slettet etterpå for å holde bruken av lagringsplass lav.</translation>
+    </message>
+    <message>
+        <source>Use the default data directory</source>
+        <translation>Bruk standard datamappe</translation>
+    </message>
+    <message>
+        <source>Use a custom data directory:</source>
+        <translation>Bruk en egendefinert datamappe:</translation>
+    </message>
+    <message>
+        <source>Bitcoin</source>
+        <translation>Bitcoin</translation>
+    </message>
+    <message>
+        <source>Discard blocks after verification, except most recent %1 GB (prune)</source>
+        <translation>Kast blokker etter bekreftelse, bortsett fra de siste %1 GB (sviske)</translation>
+    </message>
+    <message>
+        <source>At least %1 GB of data will be stored in this directory, and it will grow over time.</source>
+        <translation>Minst %1 GB data vil bli lagret i denne mappen og den vil vokse over tid.</translation>
+    </message>
+    <message>
+        <source>Approximately %1 GB of data will be stored in this directory.</source>
+        <translation>Omtrent %1GB data vil bli
