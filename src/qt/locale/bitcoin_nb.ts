@@ -976,4 +976,180 @@
     </message>
     <message>
         <source>Approximately %1 GB of data will be stored in this directory.</source>
-        <translation>Omtrent %1GB data vil bli
+        <translation>Omtrent %1GB data vil bli lagret i denne mappen.</translation>
+    </message>
+    <message>
+        <source>%1 will download and store a copy of the Bitcoin block chain.</source>
+        <translation>%1 vil laste ned og lagre en kopi av Bitcoin blokkjeden.</translation>
+    </message>
+    <message>
+        <source>The wallet will also be stored in this directory.</source>
+        <translation>Lommeboken vil også bli lagret i denne mappen.</translation>
+    </message>
+    <message>
+        <source>Error: Specified data directory "%1" cannot be created.</source>
+        <translation>Feil: Den oppgitte datamappen "%1" kan ikke opprettes.</translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation>Feilmelding</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n GB of free space available</source>
+        <translation><numerusform>%n GB med ledig lagringsplass</numerusform><numerusform>%n GB med ledig lagringsplass</numerusform></translation>
+    </message>
+    <message numerus="yes">
+        <source>(of %n GB needed)</source>
+        <translation><numerusform>(av %n GB som trengs)</numerusform><numerusform>(av %n GB som trengs)</numerusform></translation>
+    </message>
+    </context>
+<context>
+    <name>ModalOverlay</name>
+    <message>
+        <source>Form</source>
+        <translation>Skjema</translation>
+    </message>
+    <message>
+        <source>Recent transactions may not yet be visible, and therefore your wallet's balance might be incorrect. This information will be correct once your wallet has finished synchronizing with the bitcoin network, as detailed below.</source>
+        <translation>Det kan hende nylige transaksjoner ikke vises enda, og at lommeboksaldoen dermed blir uriktig. Denne informasjonen vil rette seg når synkronisering av lommeboka mot bitcoin-nettverket er fullført, som anvist nedenfor.</translation>
+    </message>
+    <message>
+        <source>Attempting to spend bitcoins that are affected by not-yet-displayed transactions will not be accepted by the network.</source>
+        <translation>Forsøk på å bruke bitcoin som er påvirket av transaksjoner som ikke er vist enda godtas ikke av nettverket.</translation>
+    </message>
+    <message>
+        <source>Number of blocks left</source>
+        <translation>Antall gjenværende blokker</translation>
+    </message>
+    <message>
+        <source>Unknown...</source>
+        <translation>Ukjent...</translation>
+    </message>
+    <message>
+        <source>Last block time</source>
+        <translation>Tidspunkt for siste blokk</translation>
+    </message>
+    <message>
+        <source>Progress</source>
+        <translation>Fremgang</translation>
+    </message>
+    <message>
+        <source>Progress increase per hour</source>
+        <translation>Fremgangen stiger hver time</translation>
+    </message>
+    <message>
+        <source>calculating...</source>
+        <translation>kalkulerer...</translation>
+    </message>
+    <message>
+        <source>Estimated time left until synced</source>
+        <translation>Estimert gjenstående tid før ferdig synkronisert</translation>
+    </message>
+    <message>
+        <source>Hide</source>
+        <translation>Skjul</translation>
+    </message>
+    <message>
+        <source>Esc</source>
+        <translation>Esc</translation>
+    </message>
+    <message>
+        <source>%1 is currently syncing.  It will download headers and blocks from peers and validate them until reaching the tip of the block chain.</source>
+        <translation>%1 synkroniseres for øyeblikket. Den vil laste ned overskrifter og blokker fra jevnaldrende og validere dem til de når spissen av blokkjeden.</translation>
+    </message>
+    <message>
+        <source>Unknown. Syncing Headers (%1, %2%)...</source>
+        <translation>Ukjent.Synkroniser overskrifter (%1,%2%)...</translation>
+    </message>
+</context>
+<context>
+    <name>OpenURIDialog</name>
+    <message>
+        <source>Open bitcoin URI</source>
+        <translation>Åpne bitcoin URI</translation>
+    </message>
+    <message>
+        <source>URI:</source>
+        <translation>URI:</translation>
+    </message>
+</context>
+<context>
+    <name>OpenWalletActivity</name>
+    <message>
+        <source>Open wallet failed</source>
+        <translation>Åpne lommebok feilet</translation>
+    </message>
+    <message>
+        <source>Open wallet warning</source>
+        <translation>Advasel om åpen lommebok.</translation>
+    </message>
+    <message>
+        <source>default wallet</source>
+        <translation>standard lommebok</translation>
+    </message>
+    <message>
+        <source>Opening Wallet &lt;b&gt;%1&lt;/b&gt;...</source>
+        <translation>Åpner Lommebok &lt;b&gt;%1&lt;/b&gt;...</translation>
+    </message>
+</context>
+<context>
+    <name>OptionsDialog</name>
+    <message>
+        <source>Options</source>
+        <translation>Innstillinger</translation>
+    </message>
+    <message>
+        <source>&amp;Main</source>
+        <translation>&amp;Hoved</translation>
+    </message>
+    <message>
+        <source>Automatically start %1 after logging in to the system.</source>
+        <translation>Start %1 automatisk etter å ha logget inn på systemet.</translation>
+    </message>
+    <message>
+        <source>&amp;Start %1 on system login</source>
+        <translation>&amp;Start %1 ved systeminnlogging</translation>
+    </message>
+    <message>
+        <source>Size of &amp;database cache</source>
+        <translation>Størrelse på &amp;database hurtigbuffer</translation>
+    </message>
+    <message>
+        <source>Number of script &amp;verification threads</source>
+        <translation>Antall script &amp;verifikasjonstråder</translation>
+    </message>
+    <message>
+        <source>IP address of the proxy (e.g. IPv4: 127.0.0.1 / IPv6: ::1)</source>
+        <translation>IP-adressen til proxyen (f.eks. IPv4: 127.0.0.1 / IPv6: ::1)</translation>
+    </message>
+    <message>
+        <source>Shows if the supplied default SOCKS5 proxy is used to reach peers via this network type.</source>
+        <translation>Viser hvorvidt angitt SOCKS5-mellomtjener blir brukt for å nå noder via denne nettverkstypen.</translation>
+    </message>
+    <message>
+        <source>Hide the icon from the system tray.</source>
+        <translation>Skjul ikonet fra systemkurven.</translation>
+    </message>
+    <message>
+        <source>&amp;Hide tray icon</source>
+        <translation>&amp;Skjul systemkurvsikon</translation>
+    </message>
+    <message>
+        <source>Minimize instead of exit the application when the window is closed. When this option is enabled, the application will be closed only after selecting Exit in the menu.</source>
+        <translation>Minimer i stedet for å avslutte applikasjonen når vinduet lukkes. Når dette er valgt, vil applikasjonen avsluttes kun etter at Avslutte er valgt i menyen.</translation>
+    </message>
+    <message>
+        <source>Third party URLs (e.g. a block explorer) that appear in the transactions tab as context menu items. %s in the URL is replaced by transaction hash. Multiple URLs are separated by vertical bar |.</source>
+        <translation>Tredjepart URLer (f. eks. en blokkutforsker) som dukker opp i transaksjonsfanen som kontekst meny elementer. %s i URLen er erstattet med transaksjonen sin hash. Flere URLer er separert av en vertikal linje |.</translation>
+    </message>
+    <message>
+        <source>Open the %1 configuration file from the working directory.</source>
+        <translation>Åpne %1-oppsettsfila fra arbeidsmappen.</translation>
+    </message>
+    <message>
+        <source>Open Configuration File</source>
+        <translation>Åpne oppsettsfil</translation>
+    </message>
+    <message>
+        <source>Reset all client options to default.</source>
+        <translation>Tilbakestill alle kli
