@@ -350,4 +350,222 @@
         <translation>Synkroniserer Headers (%1%)...</translation>
     </message>
     <message>
-       
+        <source>Reindexing blocks on disk...</source>
+        <translation>Reindekserer blokker på disken</translation>
+    </message>
+    <message>
+        <source>Proxy is &lt;b&gt;enabled&lt;/b&gt;: %1</source>
+        <translation>Proxy er &lt;b&gt;slått på&lt;/b&gt;: %1</translation>
+    </message>
+    <message>
+        <source>Send coins to a Bitcoin address</source>
+        <translation>Send mynter til en Bitcoin adresse</translation>
+    </message>
+    <message>
+        <source>Backup wallet to another location</source>
+        <translation>Sikkerhetskopier lommeboken til en annen lokasjon</translation>
+    </message>
+    <message>
+        <source>Change the passphrase used for wallet encryption</source>
+        <translation>Endre passordsetningen for kryptering av lommeboken</translation>
+    </message>
+    <message>
+        <source>&amp;Verify message...</source>
+        <translation>&amp;Verifiser meldingen...</translation>
+    </message>
+    <message>
+        <source>&amp;Send</source>
+        <translation>&amp;Sende</translation>
+    </message>
+    <message>
+        <source>&amp;Receive</source>
+        <translation>&amp;Motta</translation>
+    </message>
+    <message>
+        <source>&amp;Show / Hide</source>
+        <translation>Vi&amp;s / Skjul</translation>
+    </message>
+    <message>
+        <source>Show or hide the main Window</source>
+        <translation>Vis, eller skjul, hovedvinduet</translation>
+    </message>
+    <message>
+        <source>Encrypt the private keys that belong to your wallet</source>
+        <translation>Krypter de private nøklene som tilhører lommeboken din</translation>
+    </message>
+    <message>
+        <source>Sign messages with your Bitcoin addresses to prove you own them</source>
+        <translation>Signer meldingene med Bitcoin adresse for å bevise at diu eier dem</translation>
+    </message>
+    <message>
+        <source>Verify messages to ensure they were signed with specified Bitcoin addresses</source>
+        <translation>Verifiser meldinger for å sikre at de ble signert med en angitt Bitcoin adresse</translation>
+    </message>
+    <message>
+        <source>&amp;File</source>
+        <translation>&amp;Fil</translation>
+    </message>
+    <message>
+        <source>&amp;Settings</source>
+        <translation>Inn&amp;stillinger</translation>
+    </message>
+    <message>
+        <source>&amp;Help</source>
+        <translation>&amp;Hjelp</translation>
+    </message>
+    <message>
+        <source>Tabs toolbar</source>
+        <translation>Hjelpelinje for fliker</translation>
+    </message>
+    <message>
+        <source>Request payments (generates QR codes and bitcoin: URIs)</source>
+        <translation>Be om betalinger (genererer QR-koder og bitcoin-URIer)</translation>
+    </message>
+    <message>
+        <source>Show the list of used sending addresses and labels</source>
+        <translation>Vis lista over brukte sendeadresser og merkelapper</translation>
+    </message>
+    <message>
+        <source>Show the list of used receiving addresses and labels</source>
+        <translation>Vis lista over brukte mottakeradresser og merkelapper</translation>
+    </message>
+    <message>
+        <source>&amp;Command-line options</source>
+        <translation>&amp;Kommandolinjealternativer</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n active connection(s) to Bitcoin network</source>
+        <translation><numerusform>%n aktiv tilkobling til Bitcoin nettverket</numerusform><numerusform>%n aktive tilkoblinger til Bitcoin nettverket</numerusform></translation>
+    </message>
+    <message>
+        <source>Indexing blocks on disk...</source>
+        <translation>Indekserer blokker på disken...</translation>
+    </message>
+    <message>
+        <source>Processing blocks on disk...</source>
+        <translation>Behandler blokker på disken…</translation>
+    </message>
+    <message numerus="yes">
+        <source>Processed %n block(s) of transaction history.</source>
+        <translation><numerusform>Har prosessert %n blokk av transaksjonshistorien</numerusform><numerusform>Har prosessert %n blokker av transaksjonshistorien</numerusform></translation>
+    </message>
+    <message>
+        <source>%1 behind</source>
+        <translation>%1 bak</translation>
+    </message>
+    <message>
+        <source>Last received block was generated %1 ago.</source>
+        <translation>Siste mottatte blokk ble generert for %1 siden.</translation>
+    </message>
+    <message>
+        <source>Transactions after this will not yet be visible.</source>
+        <translation>Transaksjoner etter dette vil ikke være synlige ennå.</translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation>Feilmelding</translation>
+    </message>
+    <message>
+        <source>Warning</source>
+        <translation>Advarsel</translation>
+    </message>
+    <message>
+        <source>Information</source>
+        <translation>Informasjon</translation>
+    </message>
+    <message>
+        <source>Up to date</source>
+        <translation>Oppdatert</translation>
+    </message>
+    <message>
+        <source>Node window</source>
+        <translation>Nodevindu</translation>
+    </message>
+    <message>
+        <source>Open node debugging and diagnostic console</source>
+        <translation>Åpne nodens konsoll for feilsøk og diagnostikk</translation>
+    </message>
+    <message>
+        <source>&amp;Sending addresses</source>
+        <translation>&amp;Avsender adresser</translation>
+    </message>
+    <message>
+        <source>&amp;Receiving addresses</source>
+        <translation>&amp;Mottaker adresser</translation>
+    </message>
+    <message>
+        <source>Open a bitcoin: URI</source>
+        <translation>Åpne en bitcoin: URI</translation>
+    </message>
+    <message>
+        <source>Open Wallet</source>
+        <translation>Åpne Lommebok</translation>
+    </message>
+    <message>
+        <source>Open a wallet</source>
+        <translation>Åpne en lommebok</translation>
+    </message>
+    <message>
+        <source>Close Wallet...</source>
+        <translation>Lukk Lommebok...</translation>
+    </message>
+    <message>
+        <source>Close wallet</source>
+        <translation>Lukk lommebok</translation>
+    </message>
+    <message>
+        <source>Show the %1 help message to get a list with possible Bitcoin command-line options</source>
+        <translation>Vis %1-hjelpemeldingen for å få en liste over mulige Bitcoin-kommandolinjealternativer</translation>
+    </message>
+    <message>
+        <source>default wallet</source>
+        <translation>standard lommebok</translation>
+    </message>
+    <message>
+        <source>No wallets available</source>
+        <translation>Ingen lommebøker tilgjengelig</translation>
+    </message>
+    <message>
+        <source>&amp;Window</source>
+        <translation>&amp;Vindu</translation>
+    </message>
+    <message>
+        <source>Minimize</source>
+        <translation>Minimer</translation>
+    </message>
+    <message>
+        <source>Zoom</source>
+        <translation>Zoom</translation>
+    </message>
+    <message>
+        <source>Main Window</source>
+        <translation>Hovedvindu</translation>
+    </message>
+    <message>
+        <source>%1 client</source>
+        <translation>%1-klient</translation>
+    </message>
+    <message>
+        <source>Connecting to peers...</source>
+        <translation>Kobler til peers...</translation>
+    </message>
+    <message>
+        <source>Catching up...</source>
+        <translation>Tar igjen…</translation>
+    </message>
+    <message>
+        <source>Error: %1</source>
+        <translation>Feil: %1</translation>
+    </message>
+    <message>
+        <source>Warning: %1</source>
+        <translation>Advarsel: %1</translation>
+    </message>
+    <message>
+        <source>Date: %1
+</source>
+        <translation>Dato: %1
+</translation>
+    </message>
+    <message>
+        <source>Amount: 
