@@ -1152,4 +1152,191 @@
     </message>
     <message>
         <source>Reset all client options to default.</source>
-        <translation>Tilbakestill alle kli
+        <translation>Tilbakestill alle klient valg til standard</translation>
+    </message>
+    <message>
+        <source>&amp;Reset Options</source>
+        <translation>&amp;Tilbakestill Instillinger</translation>
+    </message>
+    <message>
+        <source>&amp;Network</source>
+        <translation>&amp;Nettverk</translation>
+    </message>
+    <message>
+        <source>Disables some advanced features but all blocks will still be fully validated. Reverting this setting requires re-downloading the entire blockchain. Actual disk usage may be somewhat higher.</source>
+        <translation>Deaktiver noen avanserte funksjoner, men alle blokker vil fortsatt være fullglyldig. Gjenoppretting av denne innstillingen krever at du laster ned hele blockchain på nytt. Faktisk diskbruk kan være noe høvere.</translation>
+    </message>
+    <message>
+        <source>Prune &amp;block storage to</source>
+        <translation>Beskjær og blokker lagring til</translation>
+    </message>
+    <message>
+        <source>GB</source>
+        <translation>GB</translation>
+    </message>
+    <message>
+        <source>Reverting this setting requires re-downloading the entire blockchain.</source>
+        <translation>Gjenoppretting av denne innstillingen krever at du laster ned hele blockchain på nytt</translation>
+    </message>
+    <message>
+        <source>MiB</source>
+        <translation>MiB</translation>
+    </message>
+    <message>
+        <source>(0 = auto, &lt;0 = leave that many cores free)</source>
+        <translation>(0 = automatisk, &lt;0 = la så mange kjerner være ledig)</translation>
+    </message>
+    <message>
+        <source>W&amp;allet</source>
+        <translation>L&amp;ommebok</translation>
+    </message>
+    <message>
+        <source>Expert</source>
+        <translation>Ekspert</translation>
+    </message>
+    <message>
+        <source>Enable coin &amp;control features</source>
+        <translation>Aktiver &amp;myntkontroll funksjoner</translation>
+    </message>
+    <message>
+        <source>If you disable the spending of unconfirmed change, the change from a transaction cannot be used until that transaction has at least one confirmation. This also affects how your balance is computed.</source>
+        <translation>Hvis du sperrer for bruk av ubekreftet veksel, kan ikke vekselen fra transaksjonen bli brukt før transaksjonen har minimum en bekreftelse. Dette påvirker også hvordan balansen din blir beregnet.</translation>
+    </message>
+    <message>
+        <source>&amp;Spend unconfirmed change</source>
+        <translation>&amp;Bruk ubekreftet veksel</translation>
+    </message>
+    <message>
+        <source>Automatically open the Bitcoin client port on the router. This only works when your router supports UPnP and it is enabled.</source>
+        <translation>Åpne automatisk Bitcoin klientporten på ruteren. Dette virker kun om din ruter støtter UPnP og dette er påslått.</translation>
+    </message>
+    <message>
+        <source>Map port using &amp;UPnP</source>
+        <translation>Sett opp port ved hjelp av &amp;UPnP</translation>
+    </message>
+    <message>
+        <source>Accept connections from outside.</source>
+        <translation>Tillat tilkoblinger fra utsiden</translation>
+    </message>
+    <message>
+        <source>Allow incomin&amp;g connections</source>
+        <translation>Tillatt innkommend&amp;e tilkoblinger</translation>
+    </message>
+    <message>
+        <source>Connect to the Bitcoin network through a SOCKS5 proxy.</source>
+        <translation>Koble til Bitcoin-nettverket gjennom en SOCKS5 proxy.</translation>
+    </message>
+    <message>
+        <source>&amp;Connect through SOCKS5 proxy (default proxy):</source>
+        <translation>&amp;Koble til gjennom SOCKS5 proxy (standardvalg proxy):</translation>
+    </message>
+    <message>
+        <source>Proxy &amp;IP:</source>
+        <translation>Proxy &amp;IP:</translation>
+    </message>
+    <message>
+        <source>&amp;Port:</source>
+        <translation>&amp;Port:</translation>
+    </message>
+    <message>
+        <source>Port of the proxy (e.g. 9050)</source>
+        <translation>Proxyens port (f.eks. 9050)</translation>
+    </message>
+    <message>
+        <source>Used for reaching peers via:</source>
+        <translation>Brukt for å nå noder via:</translation>
+    </message>
+    <message>
+        <source>IPv4</source>
+        <translation>IPv4</translation>
+    </message>
+    <message>
+        <source>IPv6</source>
+        <translation>IPv6</translation>
+    </message>
+    <message>
+        <source>Tor</source>
+        <translation>Tor</translation>
+    </message>
+    <message>
+        <source>&amp;Window</source>
+        <translation>&amp;Vindu</translation>
+    </message>
+    <message>
+        <source>Show only a tray icon after minimizing the window.</source>
+        <translation>Vis kun ikon i systemkurv etter minimering av vinduet.</translation>
+    </message>
+    <message>
+        <source>&amp;Minimize to the tray instead of the taskbar</source>
+        <translation>&amp;Minimer til systemkurv istedenfor oppgavelinjen</translation>
+    </message>
+    <message>
+        <source>M&amp;inimize on close</source>
+        <translation>M&amp;inimer ved lukking</translation>
+    </message>
+    <message>
+        <source>&amp;Display</source>
+        <translation>&amp;Visning</translation>
+    </message>
+    <message>
+        <source>User Interface &amp;language:</source>
+        <translation>&amp;Språk for brukergrensesnitt</translation>
+    </message>
+    <message>
+        <source>The user interface language can be set here. This setting will take effect after restarting %1.</source>
+        <translation>Brukergrensesnittspråket kan endres her. Denne innstillingen trer i kraft etter omstart av %1.</translation>
+    </message>
+    <message>
+        <source>&amp;Unit to show amounts in:</source>
+        <translation>&amp;Enhet for visning av beløper:</translation>
+    </message>
+    <message>
+        <source>Choose the default subdivision unit to show in the interface and when sending coins.</source>
+        <translation>Velg standard delt enhet for visning i grensesnittet og for sending av bitcoins.</translation>
+    </message>
+    <message>
+        <source>Whether to show coin control features or not.</source>
+        <translation>Skal myntkontroll funksjoner vises eller ikke.</translation>
+    </message>
+    <message>
+        <source>&amp;Third party transaction URLs</source>
+        <translation>Tredjepart transaksjon URLer</translation>
+    </message>
+    <message>
+        <source>Options set in this dialog are overridden by the command line or in the configuration file:</source>
+        <translation>Alternativer som er satt i denne dialogboksen overstyres av kommandolinjen eller i konfigurasjonsfilen:</translation>
+    </message>
+    <message>
+        <source>&amp;OK</source>
+        <translation>&amp;OK</translation>
+    </message>
+    <message>
+        <source>&amp;Cancel</source>
+        <translation>&amp;Avbryt</translation>
+    </message>
+    <message>
+        <source>default</source>
+        <translation>standardverdi</translation>
+    </message>
+    <message>
+        <source>none</source>
+        <translation>ingen</translation>
+    </message>
+    <message>
+        <source>Confirm options reset</source>
+        <translation>Bekreft tilbakestilling av innstillinger</translation>
+    </message>
+    <message>
+        <source>Client restart required to activate changes.</source>
+        <translation>Omstart av klienten er nødvendig for å aktivere endringene.</translation>
+    </message>
+    <message>
+        <source>Client will be shut down. Do you want to proceed?</source>
+        <translation>Klienten vil bli lukket. Ønsker du å gå videre?</translation>
+    </message>
+    <message>
+        <source>Configuration options</source>
+        <translation>Oppsettsvalg</translation>
+    </message>
+    <message>
+        <source>The configuration file is used to specify advanced user options which override GUI settings. Addit
