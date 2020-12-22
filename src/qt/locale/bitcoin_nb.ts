@@ -1542,4 +1542,246 @@
         <translation>%1 m</translation>
     </message>
     <message>
-        <source>%1 s</s
+        <source>%1 s</source>
+        <translation>%1 s</translation>
+    </message>
+    <message>
+        <source>None</source>
+        <translation>Ingen</translation>
+    </message>
+    <message>
+        <source>N/A</source>
+        <translation>-</translation>
+    </message>
+    <message>
+        <source>%1 ms</source>
+        <translation>%1 ms</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n second(s)</source>
+        <translation><numerusform>%n sekund</numerusform><numerusform>%n sekunder</numerusform></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n minute(s)</source>
+        <translation><numerusform>%n minutt</numerusform><numerusform>%n minutter</numerusform></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n hour(s)</source>
+        <translation><numerusform>%n time</numerusform><numerusform>%n timer</numerusform></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n day(s)</source>
+        <translation><numerusform>%n dag</numerusform><numerusform>%n dager</numerusform></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n week(s)</source>
+        <translation><numerusform>%n uke</numerusform><numerusform>%n uker</numerusform></translation>
+    </message>
+    <message>
+        <source>%1 and %2</source>
+        <translation>%1 og %2</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n year(s)</source>
+        <translation><numerusform>%n år</numerusform><numerusform>%n år</numerusform></translation>
+    </message>
+    <message>
+        <source>%1 B</source>
+        <translation>%1 B</translation>
+    </message>
+    <message>
+        <source>%1 KB</source>
+        <translation>%1 KB</translation>
+    </message>
+    <message>
+        <source>%1 MB</source>
+        <translation>%1 MB</translation>
+    </message>
+    <message>
+        <source>%1 GB</source>
+        <translation>%1 GB</translation>
+    </message>
+    <message>
+        <source>Error: Specified data directory "%1" does not exist.</source>
+        <translation>Feil: Den spesifiserte datamappen "%1" finnes ikke.</translation>
+    </message>
+    <message>
+        <source>Error: %1</source>
+        <translation>Feil: %1</translation>
+    </message>
+    <message>
+        <source>%1 didn't yet exit safely...</source>
+        <translation>%1 har ikke avsluttet trygt enda…</translation>
+    </message>
+    <message>
+        <source>unknown</source>
+        <translation>ukjent</translation>
+    </message>
+</context>
+<context>
+    <name>QRImageWidget</name>
+    <message>
+        <source>&amp;Save Image...</source>
+        <translation>&amp;Lagre bilde...</translation>
+    </message>
+    <message>
+        <source>&amp;Copy Image</source>
+        <translation>&amp;Kopier bilde</translation>
+    </message>
+    <message>
+        <source>Resulting URI too long, try to reduce the text for label / message.</source>
+        <translation>Resulterende URI er for lang, prøv å redusere teksten for merkelapp / melding.</translation>
+    </message>
+    <message>
+        <source>Error encoding URI into QR Code.</source>
+        <translation>Feil ved koding av URI til QR-kode.</translation>
+    </message>
+    <message>
+        <source>QR code support not available.</source>
+        <translation>Støtte for QR kode ikke tilgjengelig.</translation>
+    </message>
+    <message>
+        <source>Save QR Code</source>
+        <translation>Lagre QR-kode</translation>
+    </message>
+    <message>
+        <source>PNG Image (*.png)</source>
+        <translation>PNG-bilde (*.png)</translation>
+    </message>
+</context>
+<context>
+    <name>RPCConsole</name>
+    <message>
+        <source>N/A</source>
+        <translation>-</translation>
+    </message>
+    <message>
+        <source>Client version</source>
+        <translation>Klientversjon</translation>
+    </message>
+    <message>
+        <source>&amp;Information</source>
+        <translation>&amp;Informasjon</translation>
+    </message>
+    <message>
+        <source>General</source>
+        <translation>Generelt</translation>
+    </message>
+    <message>
+        <source>Using BerkeleyDB version</source>
+        <translation>Bruker BerkeleyDB versjon</translation>
+    </message>
+    <message>
+        <source>Datadir</source>
+        <translation>Datamappe</translation>
+    </message>
+    <message>
+        <source>Blocksdir</source>
+        <translation>Blocksdir</translation>
+    </message>
+    <message>
+        <source>Startup time</source>
+        <translation>Oppstartstidspunkt</translation>
+    </message>
+    <message>
+        <source>Network</source>
+        <translation>Nettverk</translation>
+    </message>
+    <message>
+        <source>Name</source>
+        <translation>Navn</translation>
+    </message>
+    <message>
+        <source>Number of connections</source>
+        <translation>Antall tilkoblinger</translation>
+    </message>
+    <message>
+        <source>Block chain</source>
+        <translation>Blokkjeden</translation>
+    </message>
+    <message>
+        <source>Memory Pool</source>
+        <translation>Hukommelsespulje</translation>
+    </message>
+    <message>
+        <source>Current number of transactions</source>
+        <translation>Nåværende antall transaksjoner</translation>
+    </message>
+    <message>
+        <source>Memory usage</source>
+        <translation>Minnebruk</translation>
+    </message>
+    <message>
+        <source>Wallet: </source>
+        <translation>Lommebok:</translation>
+    </message>
+    <message>
+        <source>(none)</source>
+        <translation>(ingen)</translation>
+    </message>
+    <message>
+        <source>&amp;Reset</source>
+        <translation>&amp;Tilbakestill</translation>
+    </message>
+    <message>
+        <source>Received</source>
+        <translation>Mottatt</translation>
+    </message>
+    <message>
+        <source>Sent</source>
+        <translation>Sendt</translation>
+    </message>
+    <message>
+        <source>&amp;Peers</source>
+        <translation>&amp;Noder</translation>
+    </message>
+    <message>
+        <source>Banned peers</source>
+        <translation>Utestengte noder</translation>
+    </message>
+    <message>
+        <source>Select a peer to view detailed information.</source>
+        <translation>Velg en node for å vise detaljert informasjon.</translation>
+    </message>
+    <message>
+        <source>Direction</source>
+        <translation>Retning</translation>
+    </message>
+    <message>
+        <source>Version</source>
+        <translation>Versjon</translation>
+    </message>
+    <message>
+        <source>Starting Block</source>
+        <translation>Startblokk</translation>
+    </message>
+    <message>
+        <source>Synced Headers</source>
+        <translation>Synkroniserte Blokkhoder</translation>
+    </message>
+    <message>
+        <source>Synced Blocks</source>
+        <translation>Synkroniserte Blokker</translation>
+    </message>
+    <message>
+        <source>The mapped Autonomous System used for diversifying peer selection.</source>
+        <translation>Det kartlagte autonome systemet som brukes til å diversifisere valg av fagfeller.</translation>
+    </message>
+    <message>
+        <source>Mapped AS</source>
+        <translation>Kartlagt AS</translation>
+    </message>
+    <message>
+        <source>User Agent</source>
+        <translation>Brukeragent</translation>
+    </message>
+    <message>
+        <source>Node window</source>
+        <translation>Nodevindu</translation>
+    </message>
+    <message>
+        <source>Open the %1 debug log file from the current data directory. This can take a few seconds for large log files.</source>
+        <translation>Åpne %1-feilrettingsloggfila fra gjeldende datamappe. Dette kan ta et par sekunder for store loggfiler.</translation>
+    </message>
+    <message>
+        <source>Decrease fon
