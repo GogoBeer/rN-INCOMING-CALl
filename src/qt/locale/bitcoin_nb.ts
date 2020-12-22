@@ -2575,4 +2575,216 @@ Merk: Siden avgiften er beregnet per byte-basis, vil et gebyr på "100 satoshis 
     <message>
         <source>Clear &amp;All</source>
         <translation>Fjern &amp;Alt</translation>
-    </message
+    </message>
+    <message>
+        <source>&amp;Verify Message</source>
+        <translation>&amp;Verifiser Melding</translation>
+    </message>
+    <message>
+        <source>Enter the receiver's address, message (ensure you copy line breaks, spaces, tabs, etc. exactly) and signature below to verify the message. Be careful not to read more into the signature than what is in the signed message itself, to avoid being tricked by a man-in-the-middle attack. Note that this only proves the signing party receives with the address, it cannot prove sendership of any transaction!</source>
+        <translation>Skriv inn mottakerens adresse, melding (forsikre deg om at du kopier linjeskift, mellomrom, faner osv. nøyaktig) og underskrift nedenfor for å bekrefte meldingen. Vær forsiktig så du ikke leser mer ut av signaturen enn hva som er i den signerte meldingen i seg selv, for å unngå å bli lurt av et man-in-the-middle-angrep. Merk at dette bare beviser at den som signerer kan motta med adressen, dette beviser ikke hvem som har sendt transaksjoner!</translation>
+    </message>
+    <message>
+        <source>The Bitcoin address the message was signed with</source>
+        <translation>Bitcoin-adressen meldingen ble signert med</translation>
+    </message>
+    <message>
+        <source>The signed message to verify</source>
+        <translation>Den signerte meldingen for å bekfrefte</translation>
+    </message>
+    <message>
+        <source>The signature given when the message was signed</source>
+        <translation>signaturen som ble gitt da meldingen ble signert</translation>
+    </message>
+    <message>
+        <source>Verify the message to ensure it was signed with the specified Bitcoin address</source>
+        <translation>Verifiser meldingen for å være sikker på at den ble signert av den angitte Bitcoin-adressen</translation>
+    </message>
+    <message>
+        <source>Verify &amp;Message</source>
+        <translation>Verifiser &amp;Melding</translation>
+    </message>
+    <message>
+        <source>Reset all verify message fields</source>
+        <translation>Tilbakestill alle felter for meldingsverifikasjon</translation>
+    </message>
+    <message>
+        <source>Click "Sign Message" to generate signature</source>
+        <translation>Klikk "Signer melding" for å generere signatur</translation>
+    </message>
+    <message>
+        <source>The entered address is invalid.</source>
+        <translation>Innskrevet adresse er ugyldig.</translation>
+    </message>
+    <message>
+        <source>Please check the address and try again.</source>
+        <translation>Sjekk adressen og prøv igjen.</translation>
+    </message>
+    <message>
+        <source>The entered address does not refer to a key.</source>
+        <translation>Innskrevet adresse refererer ikke til noen nøkkel.</translation>
+    </message>
+    <message>
+        <source>Wallet unlock was cancelled.</source>
+        <translation>Opplåsning av lommebok ble avbrutt.</translation>
+    </message>
+    <message>
+        <source>No error</source>
+        <translation>Ingen feil</translation>
+    </message>
+    <message>
+        <source>Private key for the entered address is not available.</source>
+        <translation>Privat nøkkel for den angitte adressen er ikke tilgjengelig.</translation>
+    </message>
+    <message>
+        <source>Message signing failed.</source>
+        <translation>Signering av melding feilet.</translation>
+    </message>
+    <message>
+        <source>Message signed.</source>
+        <translation>Melding signert.</translation>
+    </message>
+    <message>
+        <source>The signature could not be decoded.</source>
+        <translation>Signaturen kunne ikke dekodes.</translation>
+    </message>
+    <message>
+        <source>Please check the signature and try again.</source>
+        <translation>Sjekk signaturen og prøv igjen.</translation>
+    </message>
+    <message>
+        <source>The signature did not match the message digest.</source>
+        <translation>Signaturen samsvarer ikke med meldingsporteføljen.</translation>
+    </message>
+    <message>
+        <source>Message verification failed.</source>
+        <translation>Meldingsverifiseringen mislyktes.</translation>
+    </message>
+    <message>
+        <source>Message verified.</source>
+        <translation>Melding bekreftet.</translation>
+    </message>
+</context>
+<context>
+    <name>TrafficGraphWidget</name>
+    <message>
+        <source>KB/s</source>
+        <translation>KB/s</translation>
+    </message>
+</context>
+<context>
+    <name>TransactionDesc</name>
+    <message numerus="yes">
+        <source>Open for %n more block(s)</source>
+        <translation><numerusform>Åpen for %n blokk til</numerusform><numerusform>Åpen for %n flere blokker</numerusform></translation>
+    </message>
+    <message>
+        <source>Open until %1</source>
+        <translation>Åpen til %1</translation>
+    </message>
+    <message>
+        <source>conflicted with a transaction with %1 confirmations</source>
+        <translation>gikk ikke overens med en transaksjon med %1 bekreftelser</translation>
+    </message>
+    <message>
+        <source>0/unconfirmed, %1</source>
+        <translation>0/ubekreftet, %1</translation>
+    </message>
+    <message>
+        <source>in memory pool</source>
+        <translation>i hukommelsespulje</translation>
+    </message>
+    <message>
+        <source>not in memory pool</source>
+        <translation>ikke i hukommelsespulje</translation>
+    </message>
+    <message>
+        <source>abandoned</source>
+        <translation>forlatt</translation>
+    </message>
+    <message>
+        <source>%1/unconfirmed</source>
+        <translation>%1/ubekreftet</translation>
+    </message>
+    <message>
+        <source>%1 confirmations</source>
+        <translation>%1 bekreftelser</translation>
+    </message>
+    <message>
+        <source>Status</source>
+        <translation>Status</translation>
+    </message>
+    <message>
+        <source>Date</source>
+        <translation>Dato</translation>
+    </message>
+    <message>
+        <source>Source</source>
+        <translation>Kilde</translation>
+    </message>
+    <message>
+        <source>Generated</source>
+        <translation>Generert</translation>
+    </message>
+    <message>
+        <source>From</source>
+        <translation>Fra</translation>
+    </message>
+    <message>
+        <source>unknown</source>
+        <translation>ukjent</translation>
+    </message>
+    <message>
+        <source>To</source>
+        <translation>Til</translation>
+    </message>
+    <message>
+        <source>own address</source>
+        <translation>egen adresse</translation>
+    </message>
+    <message>
+        <source>watch-only</source>
+        <translation>kun oppsyn</translation>
+    </message>
+    <message>
+        <source>label</source>
+        <translation>merkelapp</translation>
+    </message>
+    <message>
+        <source>Credit</source>
+        <translation>Kreditt</translation>
+    </message>
+    <message numerus="yes">
+        <source>matures in %n more block(s)</source>
+        <translation><numerusform>modner om %n blokk</numerusform><numerusform>modner om %n blokker</numerusform></translation>
+    </message>
+    <message>
+        <source>not accepted</source>
+        <translation>ikke akseptert</translation>
+    </message>
+    <message>
+        <source>Debit</source>
+        <translation>Debet</translation>
+    </message>
+    <message>
+        <source>Total debit</source>
+        <translation>Total debet</translation>
+    </message>
+    <message>
+        <source>Total credit</source>
+        <translation>Total kreditt</translation>
+    </message>
+    <message>
+        <source>Transaction fee</source>
+        <translation>Transaksjonsgebyr</translation>
+    </message>
+    <message>
+        <source>Net amount</source>
+        <translation>Nettobeløp</translation>
+    </message>
+    <message>
+        <source>Message</source>
+        <translation>Melding</translation>
+    </message>
+    <message>
+        <source>Comment</
