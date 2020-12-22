@@ -2396,3 +2396,183 @@ Merk: Siden avgiften er beregnet per byte-basis, vil et gebyr på "100 satoshis 
         <translation>Tidsavbrudd for betalingsforespørsel</translation>
     </message>
     <message numerus="yes">
+        <source>Estimated to begin confirmation within %n block(s).</source>
+        <translation><numerusform>Antatt bekreftelsesbegynnelse innen %n blokk.</numerusform><numerusform>Antatt bekreftelsesbegynnelse innen %n blokker.</numerusform></translation>
+    </message>
+    <message>
+        <source>Warning: Invalid Bitcoin address</source>
+        <translation>Advarsel Ugyldig bitcoin-adresse</translation>
+    </message>
+    <message>
+        <source>Warning: Unknown change address</source>
+        <translation>Advarsel: Ukjent vekslingsadresse</translation>
+    </message>
+    <message>
+        <source>Confirm custom change address</source>
+        <translation>Bekreft egendefinert vekslingsadresse</translation>
+    </message>
+    <message>
+        <source>The address you selected for change is not part of this wallet. Any or all funds in your wallet may be sent to this address. Are you sure?</source>
+        <translation>Adressen du valgte for veksling er ikke en del av denne lommeboka. Alle verdiene i din lommebok vil bli sendt til denne adressen. Er du sikker?</translation>
+    </message>
+    <message>
+        <source>(no label)</source>
+        <translation>(ingen beskrivelse)</translation>
+    </message>
+</context>
+<context>
+    <name>SendCoinsEntry</name>
+    <message>
+        <source>A&amp;mount:</source>
+        <translation>&amp;Beløp:</translation>
+    </message>
+    <message>
+        <source>Pay &amp;To:</source>
+        <translation>Betal &amp;Til:</translation>
+    </message>
+    <message>
+        <source>&amp;Label:</source>
+        <translation>&amp;Merkelapp:</translation>
+    </message>
+    <message>
+        <source>Choose previously used address</source>
+        <translation>Velg tidligere brukt adresse</translation>
+    </message>
+    <message>
+        <source>The Bitcoin address to send the payment to</source>
+        <translation>Bitcoin-adressen betalingen skal sendes til</translation>
+    </message>
+    <message>
+        <source>Alt+A</source>
+        <translation>Alt+A</translation>
+    </message>
+    <message>
+        <source>Paste address from clipboard</source>
+        <translation>Lim inn adresse fra utklippstavlen</translation>
+    </message>
+    <message>
+        <source>Alt+P</source>
+        <translation>Alt+P</translation>
+    </message>
+    <message>
+        <source>Remove this entry</source>
+        <translation>Fjern denne oppføringen</translation>
+    </message>
+    <message>
+        <source>The amount to send in the selected unit</source>
+        <translation>beløpet som skal sendes inn den valgte enheten.</translation>
+    </message>
+    <message>
+        <source>The fee will be deducted from the amount being sent. The recipient will receive less bitcoins than you enter in the amount field. If multiple recipients are selected, the fee is split equally.</source>
+        <translation>Gebyret vil bli trukket fra beløpet som blir sendt. Mottakeren vil motta mindre bitcoins enn det du skriver inn i beløpsfeltet. Hvis det er valgt flere mottakere, deles gebyret likt.</translation>
+    </message>
+    <message>
+        <source>S&amp;ubtract fee from amount</source>
+        <translation>T&amp;rekk fra gebyr fra beløp</translation>
+    </message>
+    <message>
+        <source>Use available balance</source>
+        <translation>Bruk tilgjengelig saldo</translation>
+    </message>
+    <message>
+        <source>Message:</source>
+        <translation>Melding:</translation>
+    </message>
+    <message>
+        <source>This is an unauthenticated payment request.</source>
+        <translation>Dette er en uautorisert betalingsetterspørring.</translation>
+    </message>
+    <message>
+        <source>This is an authenticated payment request.</source>
+        <translation>Dette er en autorisert betalingsetterspørring.</translation>
+    </message>
+    <message>
+        <source>Enter a label for this address to add it to the list of used addresses</source>
+        <translation>Skriv inn en merkelapp for denne adressen for å legge den til listen av brukte adresser</translation>
+    </message>
+    <message>
+        <source>A message that was attached to the bitcoin: URI which will be stored with the transaction for your reference. Note: This message will not be sent over the Bitcoin network.</source>
+        <translation>En melding som var tilknyttet bitcoinen: URI vil bli lagret med transaksjonen for din oversikt. Denne meldingen vil ikke bli sendt over Bitcoin-nettverket.</translation>
+    </message>
+    <message>
+        <source>Pay To:</source>
+        <translation>Betal Til:</translation>
+    </message>
+    <message>
+        <source>Memo:</source>
+        <translation>Memo:</translation>
+    </message>
+</context>
+<context>
+    <name>ShutdownWindow</name>
+    <message>
+        <source>%1 is shutting down...</source>
+        <translation>%1 lukker...</translation>
+    </message>
+    <message>
+        <source>Do not shut down the computer until this window disappears.</source>
+        <translation>Slå ikke av datamaskinen før dette vinduet forsvinner.</translation>
+    </message>
+</context>
+<context>
+    <name>SignVerifyMessageDialog</name>
+    <message>
+        <source>Signatures - Sign / Verify a Message</source>
+        <translation>Signaturer - Signer / Verifiser en Melding</translation>
+    </message>
+    <message>
+        <source>&amp;Sign Message</source>
+        <translation>&amp;Signer Melding</translation>
+    </message>
+    <message>
+        <source>You can sign messages/agreements with your addresses to prove you can receive bitcoins sent to them. Be careful not to sign anything vague or random, as phishing attacks may try to trick you into signing your identity over to them. Only sign fully-detailed statements you agree to.</source>
+        <translation>Du kan signere meldinger/avtaler med adresser for å bevise at du kan motta bitcoins sendt til dem. Vær forsiktig med å signere noe vagt eller tilfeldig, siden phishing-angrep kan prøve å lure deg til å signere din identitet over til dem. Bare signer fullt detaljerte utsagn som du er enig i.</translation>
+    </message>
+    <message>
+        <source>The Bitcoin address to sign the message with</source>
+        <translation>Bitcoin-adressen meldingen skal signeres med</translation>
+    </message>
+    <message>
+        <source>Choose previously used address</source>
+        <translation>Velg tidligere brukt adresse</translation>
+    </message>
+    <message>
+        <source>Alt+A</source>
+        <translation>Alt+A</translation>
+    </message>
+    <message>
+        <source>Paste address from clipboard</source>
+        <translation>Lim inn adresse fra utklippstavlen</translation>
+    </message>
+    <message>
+        <source>Alt+P</source>
+        <translation>Alt+P</translation>
+    </message>
+    <message>
+        <source>Enter the message you want to sign here</source>
+        <translation>Skriv inn meldingen du vil signere her</translation>
+    </message>
+    <message>
+        <source>Signature</source>
+        <translation>Signatur</translation>
+    </message>
+    <message>
+        <source>Copy the current signature to the system clipboard</source>
+        <translation>Kopier valgt signatur til utklippstavle</translation>
+    </message>
+    <message>
+        <source>Sign the message to prove you own this Bitcoin address</source>
+        <translation>Signer meldingen for å bevise at du eier denne Bitcoin-adressen</translation>
+    </message>
+    <message>
+        <source>Sign &amp;Message</source>
+        <translation>Signer &amp;Melding</translation>
+    </message>
+    <message>
+        <source>Reset all sign message fields</source>
+        <translation>Tilbakestill alle felter for meldingssignering</translation>
+    </message>
+    <message>
+        <source>Clear &amp;All</source>
+        <translation>Fjern &amp;Alt</translation>
+    </message
