@@ -1992,4 +1992,220 @@
     </message>
     <message>
         <source>Clear all fields of the form.</source>
-        <translation>Fjern alle f
+        <translation>Fjern alle felter fra skjemaet.</translation>
+    </message>
+    <message>
+        <source>Clear</source>
+        <translation>Fjern</translation>
+    </message>
+    <message>
+        <source>Native segwit addresses (aka Bech32 or BIP-173) reduce your transaction fees later on and offer better protection against typos, but old wallets don't support them. When unchecked, an address compatible with older wallets will be created instead.</source>
+        <translation>Innfødte segwit-adresser (også kalt Bech32 eller BIP-173) reduserer transaksjonsgebyrene senere og gir bedre beskyttelse mot skrivefeil, men gamle lommebøker støtter dem ikke. Når du ikke har merket av, opprettes en adresse som er kompatibel med eldre lommebøker.</translation>
+    </message>
+    <message>
+        <source>Generate native segwit (Bech32) address</source>
+        <translation>Generer nativ segwit (Bech32) adresse</translation>
+    </message>
+    <message>
+        <source>Requested payments history</source>
+        <translation>Etterspurt betalingshistorikk</translation>
+    </message>
+    <message>
+        <source>Show the selected request (does the same as double clicking an entry)</source>
+        <translation>Vis den valgte etterspørringen (gjør det samme som å dobbelklikke på en oppføring)</translation>
+    </message>
+    <message>
+        <source>Show</source>
+        <translation>Vis</translation>
+    </message>
+    <message>
+        <source>Remove the selected entries from the list</source>
+        <translation>Fjern de valgte oppføringene fra listen</translation>
+    </message>
+    <message>
+        <source>Remove</source>
+        <translation>Fjern</translation>
+    </message>
+    <message>
+        <source>Copy URI</source>
+        <translation>Kopier URI</translation>
+    </message>
+    <message>
+        <source>Copy label</source>
+        <translation>Kopiér merkelapp</translation>
+    </message>
+    <message>
+        <source>Copy message</source>
+        <translation>Kopier melding</translation>
+    </message>
+    <message>
+        <source>Copy amount</source>
+        <translation>Kopier beløp</translation>
+    </message>
+    <message>
+        <source>Could not unlock wallet.</source>
+        <translation>Kunne ikke låse opp lommebok.</translation>
+    </message>
+    </context>
+<context>
+    <name>ReceiveRequestDialog</name>
+    <message>
+        <source>Amount:</source>
+        <translation>Beløp:</translation>
+    </message>
+    <message>
+        <source>Label:</source>
+        <translation>Merkelapp:</translation>
+    </message>
+    <message>
+        <source>Message:</source>
+        <translation>Melding:</translation>
+    </message>
+    <message>
+        <source>Wallet:</source>
+        <translation>Lommebok:</translation>
+    </message>
+    <message>
+        <source>Copy &amp;URI</source>
+        <translation>Kopier &amp;URI</translation>
+    </message>
+    <message>
+        <source>Copy &amp;Address</source>
+        <translation>Kopier &amp;Adresse</translation>
+    </message>
+    <message>
+        <source>&amp;Save Image...</source>
+        <translation>&amp;Lagre Bilde...</translation>
+    </message>
+    <message>
+        <source>Request payment to %1</source>
+        <translation>Forespør betaling til %1</translation>
+    </message>
+    <message>
+        <source>Payment information</source>
+        <translation>Betalingsinformasjon</translation>
+    </message>
+</context>
+<context>
+    <name>RecentRequestsTableModel</name>
+    <message>
+        <source>Date</source>
+        <translation>Dato</translation>
+    </message>
+    <message>
+        <source>Label</source>
+        <translation>Beskrivelse</translation>
+    </message>
+    <message>
+        <source>Message</source>
+        <translation>Melding</translation>
+    </message>
+    <message>
+        <source>(no label)</source>
+        <translation>(ingen beskrivelse)</translation>
+    </message>
+    <message>
+        <source>(no message)</source>
+        <translation>(ingen melding)</translation>
+    </message>
+    <message>
+        <source>(no amount requested)</source>
+        <translation>(inget beløp forespurt)</translation>
+    </message>
+    <message>
+        <source>Requested</source>
+        <translation>Forespurt</translation>
+    </message>
+</context>
+<context>
+    <name>SendCoinsDialog</name>
+    <message>
+        <source>Send Coins</source>
+        <translation>Send Bitcoins</translation>
+    </message>
+    <message>
+        <source>Coin Control Features</source>
+        <translation>Myntkontroll Funksjoner</translation>
+    </message>
+    <message>
+        <source>Inputs...</source>
+        <translation>Inndata...</translation>
+    </message>
+    <message>
+        <source>automatically selected</source>
+        <translation>automatisk valgte</translation>
+    </message>
+    <message>
+        <source>Insufficient funds!</source>
+        <translation>Utilstrekkelige midler!</translation>
+    </message>
+    <message>
+        <source>Quantity:</source>
+        <translation>Mengde:</translation>
+    </message>
+    <message>
+        <source>Bytes:</source>
+        <translation>Bytes:</translation>
+    </message>
+    <message>
+        <source>Amount:</source>
+        <translation>Beløp:</translation>
+    </message>
+    <message>
+        <source>Fee:</source>
+        <translation>Gebyr:</translation>
+    </message>
+    <message>
+        <source>After Fee:</source>
+        <translation>Etter Gebyr:</translation>
+    </message>
+    <message>
+        <source>Change:</source>
+        <translation>Veksel:</translation>
+    </message>
+    <message>
+        <source>If this is activated, but the change address is empty or invalid, change will be sent to a newly generated address.</source>
+        <translation>Hvis dette er aktivert, men adressen for veksel er tom eller ugyldig, vil veksel bli sendt til en nylig generert adresse.</translation>
+    </message>
+    <message>
+        <source>Custom change address</source>
+        <translation>Egendefinert adresse for veksel</translation>
+    </message>
+    <message>
+        <source>Transaction Fee:</source>
+        <translation>Transaksjonsgebyr:</translation>
+    </message>
+    <message>
+        <source>Choose...</source>
+        <translation>Velg...</translation>
+    </message>
+    <message>
+        <source>Using the fallbackfee can result in sending a transaction that will take several hours or days (or never) to confirm. Consider choosing your fee manually or wait until you have validated the complete chain.</source>
+        <translation>Bruk av tilbakefallsgebyr kan medføre at en transaksjon tar flere timer eller dager, å fullføre, eller aldri gjør det. Overvei å velge et gebyr manuelt, eller vent til du har bekreftet hele kjeden.</translation>
+    </message>
+    <message>
+        <source>Warning: Fee estimation is currently not possible.</source>
+        <translation>Advarsel: Gebyroverslag er ikke tilgjengelig for tiden.</translation>
+    </message>
+    <message>
+        <source>Specify a custom fee per kB (1,000 bytes) of the transaction's virtual size.
+
+Note:  Since the fee is calculated on a per-byte basis, a fee of "100 satoshis per kB" for a transaction size of 500 bytes (half of 1 kB) would ultimately yield a fee of only 50 satoshis.</source>
+        <translation>Spesifiser en tilpasset avgift per kB (1000 byte) av transaksjonens virtuelle størrelse.
+
+Merk: Siden avgiften er beregnet per byte-basis, vil et gebyr på "100 satoshis per kB" for en transaksjonsstørrelse på 500 byte (halvparten av 1 kB) til slutt gi et gebyr på bare 50 satoshis.</translation>
+    </message>
+    <message>
+        <source>per kilobyte</source>
+        <translation>per kilobyte</translation>
+    </message>
+    <message>
+        <source>Hide</source>
+        <translation>Skjul</translation>
+    </message>
+    <message>
+        <source>Recommended:</source>
+        <translation>Anbefalt:</translation>
+    </message>
+    <message>
+        <source>Cus
