@@ -435,4 +435,251 @@
     </message>
     <message numerus="yes">
         <source>Processed %n block(s) of transaction history.</source>
-        <translation><numerusform>S-a procesat %n bloc din istoricul tranzacţiilor.</numerusform><numerusf
+        <translation><numerusform>S-a procesat %n bloc din istoricul tranzacţiilor.</numerusform><numerusform>S-au procesat %n blocuri din istoricul tranzacţiilor.</numerusform><numerusform>S-au procesat %n de blocuri din istoricul tranzacţiilor.</numerusform></translation>
+    </message>
+    <message>
+        <source>%1 behind</source>
+        <translation>%1 în urmă</translation>
+    </message>
+    <message>
+        <source>Last received block was generated %1 ago.</source>
+        <translation>Ultimul bloc recepţionat a fost generat acum %1.</translation>
+    </message>
+    <message>
+        <source>Transactions after this will not yet be visible.</source>
+        <translation>Tranzacţiile după aceasta nu vor fi vizibile încă.</translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation>Eroare</translation>
+    </message>
+    <message>
+        <source>Warning</source>
+        <translation>Avertisment</translation>
+    </message>
+    <message>
+        <source>Information</source>
+        <translation>Informaţie</translation>
+    </message>
+    <message>
+        <source>Up to date</source>
+        <translation>Actualizat</translation>
+    </message>
+    <message>
+        <source>Node window</source>
+        <translation>Fereastra nodului</translation>
+    </message>
+    <message>
+        <source>Open node debugging and diagnostic console</source>
+        <translation>Deschide consola pentru depanare şi diagnosticare a nodului</translation>
+    </message>
+    <message>
+        <source>&amp;Sending addresses</source>
+        <translation>&amp;Adresele de destinatie</translation>
+    </message>
+    <message>
+        <source>&amp;Receiving addresses</source>
+        <translation>&amp;Adresele de primire</translation>
+    </message>
+    <message>
+        <source>Open Wallet</source>
+        <translation>Deschide portofel</translation>
+    </message>
+    <message>
+        <source>Open a wallet</source>
+        <translation>Deschide un portofel</translation>
+    </message>
+    <message>
+        <source>Close Wallet...</source>
+        <translation>Inchide portofel...</translation>
+    </message>
+    <message>
+        <source>Close wallet</source>
+        <translation>Inchide portofel</translation>
+    </message>
+    <message>
+        <source>Show the %1 help message to get a list with possible Bitcoin command-line options</source>
+        <translation>Arată mesajul de ajutor %1 pentru a obţine o listă cu opţiunile posibile de linii de comandă Bitcoin</translation>
+    </message>
+    <message>
+        <source>default wallet</source>
+        <translation>portofel implicit</translation>
+    </message>
+    <message>
+        <source>No wallets available</source>
+        <translation>Niciun portofel disponibil</translation>
+    </message>
+    <message>
+        <source>&amp;Window</source>
+        <translation>&amp;Fereastră</translation>
+    </message>
+    <message>
+        <source>Minimize</source>
+        <translation>Minimizare</translation>
+    </message>
+    <message>
+        <source>Zoom</source>
+        <translation>Zoom</translation>
+    </message>
+    <message>
+        <source>Main Window</source>
+        <translation>Fereastra principală</translation>
+    </message>
+    <message>
+        <source>%1 client</source>
+        <translation>Client %1</translation>
+    </message>
+    <message>
+        <source>Connecting to peers...</source>
+        <translation>Se conecteaza cu alte noduri...</translation>
+    </message>
+    <message>
+        <source>Catching up...</source>
+        <translation>Se actualizează...</translation>
+    </message>
+    <message>
+        <source>Error: %1</source>
+        <translation>Eroare: %1</translation>
+    </message>
+    <message>
+        <source>Warning: %1</source>
+        <translation> Atenționare: %1</translation>
+    </message>
+    <message>
+        <source>Date: %1
+</source>
+        <translation>Data: %1
+</translation>
+    </message>
+    <message>
+        <source>Amount: %1
+</source>
+        <translation>Sumă: %1
+</translation>
+    </message>
+    <message>
+        <source>Wallet: %1
+</source>
+        <translation>Portofel: %1
+</translation>
+    </message>
+    <message>
+        <source>Type: %1
+</source>
+        <translation>Tip: %1
+</translation>
+    </message>
+    <message>
+        <source>Label: %1
+</source>
+        <translation>Etichetă: %1
+</translation>
+    </message>
+    <message>
+        <source>Address: %1
+</source>
+        <translation>Adresă: %1
+</translation>
+    </message>
+    <message>
+        <source>Sent transaction</source>
+        <translation>Tranzacţie expediată</translation>
+    </message>
+    <message>
+        <source>Incoming transaction</source>
+        <translation>Tranzacţie recepţionată</translation>
+    </message>
+    <message>
+        <source>HD key generation is &lt;b&gt;enabled&lt;/b&gt;</source>
+        <translation>Generarea de chei HD este &lt;b&gt;activata&lt;/b&gt;</translation>
+    </message>
+    <message>
+        <source>HD key generation is &lt;b&gt;disabled&lt;/b&gt;</source>
+        <translation>Generarea de chei HD este &lt;b&gt;dezactivata&lt;/b&gt;</translation>
+    </message>
+    <message>
+        <source>Private key &lt;b&gt;disabled&lt;/b&gt;</source>
+        <translation>Cheia privată &lt;b&gt;dezactivată&lt;/b&gt;</translation>
+    </message>
+    <message>
+        <source>Wallet is &lt;b&gt;encrypted&lt;/b&gt; and currently &lt;b&gt;unlocked&lt;/b&gt;</source>
+        <translation>Portofelul este &lt;b&gt;criptat&lt;/b&gt; iar în momentul de faţă este &lt;b&gt;deblocat&lt;/b&gt;</translation>
+    </message>
+    <message>
+        <source>Wallet is &lt;b&gt;encrypted&lt;/b&gt; and currently &lt;b&gt;locked&lt;/b&gt;</source>
+        <translation>Portofelul este &lt;b&gt;criptat&lt;/b&gt; iar în momentul de faţă este &lt;b&gt;blocat&lt;/b&gt;</translation>
+    </message>
+    </context>
+<context>
+    <name>CoinControlDialog</name>
+    <message>
+        <source>Coin Selection</source>
+        <translation>Selectarea monedei</translation>
+    </message>
+    <message>
+        <source>Quantity:</source>
+        <translation>Cantitate:</translation>
+    </message>
+    <message>
+        <source>Bytes:</source>
+        <translation>Octeţi:</translation>
+    </message>
+    <message>
+        <source>Amount:</source>
+        <translation>Sumă:</translation>
+    </message>
+    <message>
+        <source>Fee:</source>
+        <translation>Taxă:</translation>
+    </message>
+    <message>
+        <source>Dust:</source>
+        <translation>Praf:</translation>
+    </message>
+    <message>
+        <source>After Fee:</source>
+        <translation>După taxă:</translation>
+    </message>
+    <message>
+        <source>Change:</source>
+        <translation>Schimb:</translation>
+    </message>
+    <message>
+        <source>(un)select all</source>
+        <translation>(de)selectare tot</translation>
+    </message>
+    <message>
+        <source>Tree mode</source>
+        <translation>Mod arbore</translation>
+    </message>
+    <message>
+        <source>List mode</source>
+        <translation>Mod listă</translation>
+    </message>
+    <message>
+        <source>Amount</source>
+        <translation>Sumă</translation>
+    </message>
+    <message>
+        <source>Received with label</source>
+        <translation>Primite cu eticheta</translation>
+    </message>
+    <message>
+        <source>Received with address</source>
+        <translation>Primite cu adresa</translation>
+    </message>
+    <message>
+        <source>Date</source>
+        <translation>Data</translation>
+    </message>
+    <message>
+        <source>Confirmations</source>
+        <translation>Confirmări</translation>
+    </message>
+    <message>
+        <source>Confirmed</source>
+        <translation>Confirmat</translation>
+    </message>
+    <message>
+        <source>Copy address</source>
+        <translat
