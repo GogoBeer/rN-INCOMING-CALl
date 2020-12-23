@@ -3572,4 +3572,104 @@ Merk: Siden avgiften er beregnet per byte-basis, vil et gebyr på "100 satoshis 
         <translation>Transaksjonen er for liten</translation>
     </message>
     <message>
-        <sour
+        <source>Transaction too large</source>
+        <translation>Transaksjonen er for stor</translation>
+    </message>
+    <message>
+        <source>Unable to bind to %s on this computer (bind returned error %s)</source>
+        <translation>Kan ikke binde til %s på denne datamaskinen (binding returnerte feilen %s)</translation>
+    </message>
+    <message>
+        <source>Unable to generate initial keys</source>
+        <translation>Klarte ikke lage første nøkkel</translation>
+    </message>
+    <message>
+        <source>Verifying wallet(s)...</source>
+        <translation>Lommebokbekreftelse pågår…</translation>
+    </message>
+    <message>
+        <source>Warning: unknown new rules activated (versionbit %i)</source>
+        <translation>Advarsel: Ukjente nye regler aktivert (versionbit %i)</translation>
+    </message>
+    <message>
+        <source>-maxtxfee is set very high! Fees this large could be paid on a single transaction.</source>
+        <translation>-maxtxfee er satt veldig høyt! Så stort gebyr kan bli betalt ved en enkelt transaksjon.</translation>
+    </message>
+    <message>
+        <source>This is the transaction fee you may pay when fee estimates are not available.</source>
+        <translation>Dette er transaksjonsgebyret du kan betale når gebyranslag ikke er tilgjengelige.</translation>
+    </message>
+    <message>
+        <source>Total length of network version string (%i) exceeds maximum length (%i). Reduce the number or size of uacomments.</source>
+        <translation>Total lengde av nettverks-versionstreng (%i) er over maks lengde (%i). Reduser tallet eller størrelsen av uacomments.</translation>
+    </message>
+    <message>
+        <source>%s is set very high!</source>
+        <translation>%s er satt veldig høyt!</translation>
+    </message>
+    <message>
+        <source>Error loading wallet %s. Duplicate -wallet filename specified.</source>
+        <translation>Feil ved innlasting av lommeboka %s. Duplisert -wallet -filnavn angitt.</translation>
+    </message>
+    <message>
+        <source>Starting network threads...</source>
+        <translation>Starter nettverkstråder…</translation>
+    </message>
+    <message>
+        <source>The wallet will avoid paying less than the minimum relay fee.</source>
+        <translation>Lommeboka vil unngå å betale mindre enn minimumsstafettgebyret.</translation>
+    </message>
+    <message>
+        <source>This is the minimum transaction fee you pay on every transaction.</source>
+        <translation>Dette er minimumsgebyret du betaler for hver transaksjon.</translation>
+    </message>
+    <message>
+        <source>This is the transaction fee you will pay if you send a transaction.</source>
+        <translation>Dette er transaksjonsgebyret du betaler som forsender av transaksjon.</translation>
+    </message>
+    <message>
+        <source>Transaction amounts must not be negative</source>
+        <translation>Transaksjonsbeløpet kan ikke være negativt</translation>
+    </message>
+    <message>
+        <source>Transaction has too long of a mempool chain</source>
+        <translation>Transaksjonen har for lang hukommelsespuljekjede</translation>
+    </message>
+    <message>
+        <source>Transaction must have at least one recipient</source>
+        <translation>Transaksjonen må ha minst én mottaker</translation>
+    </message>
+    <message>
+        <source>Unknown network specified in -onlynet: '%s'</source>
+        <translation>Ukjent nettverk angitt i -onlynet '%s'</translation>
+    </message>
+    <message>
+        <source>Insufficient funds</source>
+        <translation>Utilstrekkelige midler</translation>
+    </message>
+    <message>
+        <source>Fee estimation failed. Fallbackfee is disabled. Wait a few blocks or enable -fallbackfee.</source>
+        <translation>Avgiftsberegning mislyktes. Fallbackfee er deaktivert. Vent et par blokker eller aktiver -fallbackfee.</translation>
+    </message>
+    <message>
+        <source>Loading block index...</source>
+        <translation>Laster blokkindeks...</translation>
+    </message>
+    <message>
+        <source>Loading wallet...</source>
+        <translation>Laster lommebok...</translation>
+    </message>
+    <message>
+        <source>Cannot downgrade wallet</source>
+        <translation>Kan ikke nedgradere lommebok</translation>
+    </message>
+    <message>
+        <source>Rescanning...</source>
+        <translation>Leser gjennom...</translation>
+    </message>
+    <message>
+        <source>Done loading</source>
+        <translation>Ferdig med lasting</translation>
+    </message>
+</context>
+</TS>
