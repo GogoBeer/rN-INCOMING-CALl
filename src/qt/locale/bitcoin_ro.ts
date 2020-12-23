@@ -231,4 +231,208 @@
         <translation>IP/Netmask</translation>
     </message>
     <message>
-        <source>Banned Until</s
+        <source>Banned Until</source>
+        <translation>Banat până la</translation>
+    </message>
+</context>
+<context>
+    <name>BitcoinGUI</name>
+    <message>
+        <source>Sign &amp;message...</source>
+        <translation>Semnează &amp;mesaj...</translation>
+    </message>
+    <message>
+        <source>Synchronizing with network...</source>
+        <translation>Se sincronizează cu reţeaua...</translation>
+    </message>
+    <message>
+        <source>&amp;Overview</source>
+        <translation>&amp;Imagine de ansamblu</translation>
+    </message>
+    <message>
+        <source>Show general overview of wallet</source>
+        <translation>Arată o stare generală de ansamblu a portofelului</translation>
+    </message>
+    <message>
+        <source>&amp;Transactions</source>
+        <translation>&amp;Tranzacţii</translation>
+    </message>
+    <message>
+        <source>Browse transaction history</source>
+        <translation>Răsfoire istoric tranzacţii</translation>
+    </message>
+    <message>
+        <source>E&amp;xit</source>
+        <translation>Ieşire</translation>
+    </message>
+    <message>
+        <source>Quit application</source>
+        <translation>Închide aplicaţia</translation>
+    </message>
+    <message>
+        <source>&amp;About %1</source>
+        <translation>&amp;Despre %1</translation>
+    </message>
+    <message>
+        <source>Show information about %1</source>
+        <translation>Arată informaţii despre %1</translation>
+    </message>
+    <message>
+        <source>About &amp;Qt</source>
+        <translation>Despre &amp;Qt</translation>
+    </message>
+    <message>
+        <source>Show information about Qt</source>
+        <translation>Arată informaţii despre Qt</translation>
+    </message>
+    <message>
+        <source>&amp;Options...</source>
+        <translation>&amp;Opţiuni...</translation>
+    </message>
+    <message>
+        <source>Modify configuration options for %1</source>
+        <translation>Modifică opţiunile de configurare pentru %1</translation>
+    </message>
+    <message>
+        <source>&amp;Encrypt Wallet...</source>
+        <translation>Cript&amp;ează portofelul...</translation>
+    </message>
+    <message>
+        <source>&amp;Backup Wallet...</source>
+        <translation>Face o copie de siguranţă a portofelului...</translation>
+    </message>
+    <message>
+        <source>&amp;Change Passphrase...</source>
+        <translation>S&amp;chimbă parola...</translation>
+    </message>
+    <message>
+        <source>Open &amp;URI...</source>
+        <translation>Deschide &amp;URI...</translation>
+    </message>
+    <message>
+        <source>Create Wallet...</source>
+        <translation>Crează portofel...</translation>
+    </message>
+    <message>
+        <source>Create a new wallet</source>
+        <translation>Crează un portofel nou</translation>
+    </message>
+    <message>
+        <source>Wallet:</source>
+        <translation>Portofel:</translation>
+    </message>
+    <message>
+        <source>Click to disable network activity.</source>
+        <translation>Click pentru a opri activitatea retelei.</translation>
+    </message>
+    <message>
+        <source>Network activity disabled.</source>
+        <translation>Activitatea retelei a fost oprita.</translation>
+    </message>
+    <message>
+        <source>Click to enable network activity again.</source>
+        <translation>Click pentu a porni activitatea retelei.</translation>
+    </message>
+    <message>
+        <source>Syncing Headers (%1%)...</source>
+        <translation>Se sincronizeaza Header-ele (%1%)...</translation>
+    </message>
+    <message>
+        <source>Reindexing blocks on disk...</source>
+        <translation>Se reindexează blocurile pe disc...</translation>
+    </message>
+    <message>
+        <source>Proxy is &lt;b&gt;enabled&lt;/b&gt;: %1</source>
+        <translation>Proxy este&lt;b&gt;activat&lt;/b&gt;:%1</translation>
+    </message>
+    <message>
+        <source>Send coins to a Bitcoin address</source>
+        <translation>Trimite monede către o adresă Bitcoin</translation>
+    </message>
+    <message>
+        <source>Backup wallet to another location</source>
+        <translation>Creează o copie de rezervă a portofelului într-o locaţie diferită</translation>
+    </message>
+    <message>
+        <source>Change the passphrase used for wallet encryption</source>
+        <translation>Schimbă fraza de acces folosită pentru criptarea portofelului</translation>
+    </message>
+    <message>
+        <source>&amp;Verify message...</source>
+        <translation>&amp;Verifică mesaj...</translation>
+    </message>
+    <message>
+        <source>&amp;Send</source>
+        <translation>Trimite</translation>
+    </message>
+    <message>
+        <source>&amp;Receive</source>
+        <translation>P&amp;rimeşte</translation>
+    </message>
+    <message>
+        <source>&amp;Show / Hide</source>
+        <translation>Arată/Ascunde</translation>
+    </message>
+    <message>
+        <source>Show or hide the main Window</source>
+        <translation>Arată sau ascunde fereastra principală</translation>
+    </message>
+    <message>
+        <source>Encrypt the private keys that belong to your wallet</source>
+        <translation>Criptează cheile private ale portofelului dvs.</translation>
+    </message>
+    <message>
+        <source>Sign messages with your Bitcoin addresses to prove you own them</source>
+        <translation>Semnaţi mesaje cu adresa dvs. Bitcoin pentru a dovedi că vă aparţin</translation>
+    </message>
+    <message>
+        <source>Verify messages to ensure they were signed with specified Bitcoin addresses</source>
+        <translation>Verificaţi mesaje pentru a vă asigura că au fost semnate cu adresa Bitcoin specificată</translation>
+    </message>
+    <message>
+        <source>&amp;File</source>
+        <translation>&amp;Fişier</translation>
+    </message>
+    <message>
+        <source>&amp;Settings</source>
+        <translation>&amp;Setări</translation>
+    </message>
+    <message>
+        <source>&amp;Help</source>
+        <translation>A&amp;jutor</translation>
+    </message>
+    <message>
+        <source>Tabs toolbar</source>
+        <translation>Bara de unelte</translation>
+    </message>
+    <message>
+        <source>Request payments (generates QR codes and bitcoin: URIs)</source>
+        <translation>Cereţi plăţi (generează coduri QR şi bitcoin-uri: URls)</translation>
+    </message>
+    <message>
+        <source>Show the list of used sending addresses and labels</source>
+        <translation>Arată lista de adrese trimise şi etichetele folosite.</translation>
+    </message>
+    <message>
+        <source>Show the list of used receiving addresses and labels</source>
+        <translation>Arată lista de adrese pentru primire şi etichetele</translation>
+    </message>
+    <message>
+        <source>&amp;Command-line options</source>
+        <translation>Opţiuni linie de &amp;comandă</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n active connection(s) to Bitcoin network</source>
+        <translation><numerusform>%n conexiune activă către reţeaua Bitcoin</numerusform><numerusform>%n conexiuni active către reţeaua Bitcoin</numerusform><numerusform>%n de conexiuni active către reţeaua Bitcoin</numerusform></translation>
+    </message>
+    <message>
+        <source>Indexing blocks on disk...</source>
+        <translation>Se indexează blocurile pe disc...</translation>
+    </message>
+    <message>
+        <source>Processing blocks on disk...</source>
+        <translation>Se proceseaza blocurile pe disc...</translation>
+    </message>
+    <message numerus="yes">
+        <source>Processed %n block(s) of transaction history.</source>
+        <translation><numerusform>S-a procesat %n bloc din istoricul tranzacţiilor.</numerusform><numerusf
