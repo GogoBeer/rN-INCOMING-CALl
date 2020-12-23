@@ -3255,4 +3255,147 @@ Merk: Siden avgiften er beregnet per byte-basis, vil et gebyr på "100 satoshis 
     </message>
     <message>
         <source>Prune configured below the minimum of %d MiB.  Please use a higher number.</source>
-        <translat
+        <translation>Beskjæringsmodus er konfigurert under minimum på %d MiB. Vennligst bruk et høyere nummer.</translation>
+    </message>
+    <message>
+        <source>Prune: last wallet synchronisation goes beyond pruned data. You need to -reindex (download the whole blockchain again in case of pruned node)</source>
+        <translation>Beskjæring: siste lommeboksynkronisering går utenfor beskjærte data. Du må bruke -reindex (laster ned hele blokkjeden igjen for beskjærte noder)</translation>
+    </message>
+    <message>
+        <source>Pruning blockstore...</source>
+        <translation>Beskjærer blokklageret...</translation>
+    </message>
+    <message>
+        <source>Unable to start HTTP server. See debug log for details.</source>
+        <translation>Kunne ikke starte HTTP-tjener. Se feilrettingslogg for detaljer.</translation>
+    </message>
+    <message>
+        <source>The %s developers</source>
+        <translation>%s-utviklerne</translation>
+    </message>
+    <message>
+        <source>Cannot obtain a lock on data directory %s. %s is probably already running.</source>
+        <translation>Kan ikke låse datamappen %s. %s kjører antagelig allerede.</translation>
+    </message>
+    <message>
+        <source>Cannot provide specific connections and have addrman find outgoing connections at the same.</source>
+        <translation>Kan ikke angi spesifikke tilkoblinger og ha addrman til å finne utgående tilkoblinger samtidig.</translation>
+    </message>
+    <message>
+        <source>Error reading %s! All keys read correctly, but transaction data or address book entries might be missing or incorrect.</source>
+        <translation>Feil under lesing av %s! Alle nøkler har blitt lest rett, men transaksjonsdata eller adressebokoppføringer kan mangle eller være uriktige.</translation>
+    </message>
+    <message>
+        <source>Please check that your computer's date and time are correct! If your clock is wrong, %s will not work properly.</source>
+        <translation>Sjekk at din datamaskins dato og klokke er stilt rett! Hvis klokka er feil, vil ikke %s fungere ordentlig.</translation>
+    </message>
+    <message>
+        <source>Please contribute if you find %s useful. Visit %s for further information about the software.</source>
+        <translation>Bidra hvis du finner %s nyttig. Besøk %s for mer informasjon om programvaren.</translation>
+    </message>
+    <message>
+        <source>The block database contains a block which appears to be from the future. This may be due to your computer's date and time being set incorrectly. Only rebuild the block database if you are sure that your computer's date and time are correct</source>
+        <translation>Blokkdatabasen inneholder en blokk som ser ut til å være fra fremtiden. Dette kan være fordi dato og tid på din datamaskin er satt feil. Gjenopprett kun blokkdatabasen når du er sikker på at dato og tid er satt riktig.</translation>
+    </message>
+    <message>
+        <source>This is a pre-release test build - use at your own risk - do not use for mining or merchant applications</source>
+        <translation>Dette er en testversjon i påvente av utgivelse - bruk på egen risiko - ikke for bruk til blokkutvinning eller i forretningsøyemed</translation>
+    </message>
+    <message>
+        <source>This is the transaction fee you may discard if change is smaller than dust at this level</source>
+        <translation>Dette er transaksjonsgebyret du kan se bort fra hvis vekslepengene utgjør mindre enn støv på dette nivået</translation>
+    </message>
+    <message>
+        <source>Unable to replay blocks. You will need to rebuild the database using -reindex-chainstate.</source>
+        <translation>Kan ikke spille av blokker igjen. Du må bygge opp igjen databasen ved bruk av -reindex-chainstate.</translation>
+    </message>
+    <message>
+        <source>Unable to rewind the database to a pre-fork state. You will need to redownload the blockchain</source>
+        <translation>Kan ikke spole tilbake databasen til en tilstand før forgreiningen. Du må laste ned blokkjeden igjen</translation>
+    </message>
+    <message>
+        <source>Warning: The network does not appear to fully agree! Some miners appear to be experiencing issues.</source>
+        <translation>Advarsel: Nettverket ser ikke ut til å være i overenstemmelse! Noen utvinnere ser ut til å ha problemer.</translation>
+    </message>
+    <message>
+        <source>Warning: We do not appear to fully agree with our peers! You may need to upgrade, or other nodes may need to upgrade.</source>
+        <translation>Advarsel: Vi ser ikke ut til å være i full overenstemmelse med våre likemenn! Du kan trenge å oppgradere, eller andre noder kan trenge å oppgradere.</translation>
+    </message>
+    <message>
+        <source>-maxmempool must be at least %d MB</source>
+        <translation>-maxmempool må være minst %d MB</translation>
+    </message>
+    <message>
+        <source>Cannot resolve -%s address: '%s'</source>
+        <translation>Kunne ikke slå opp -%s-adresse: "%s"</translation>
+    </message>
+    <message>
+        <source>Change index out of range</source>
+        <translation>Kjedeindeks utenfor rekkevidde</translation>
+    </message>
+    <message>
+        <source>Copyright (C) %i-%i</source>
+        <translation>Kopirett © %i-%i</translation>
+    </message>
+    <message>
+        <source>Corrupted block database detected</source>
+        <translation>Oppdaget korrupt blokkdatabase</translation>
+    </message>
+    <message>
+        <source>Could not find asmap file %s</source>
+        <translation>Kunne ikke finne asmap filen %s</translation>
+    </message>
+    <message>
+        <source>Could not parse asmap file %s</source>
+        <translation>Kunne ikke analysere asmap filen %s</translation>
+    </message>
+    <message>
+        <source>Do you want to rebuild the block database now?</source>
+        <translation>Ønsker du å gjenopprette blokkdatabasen nå?</translation>
+    </message>
+    <message>
+        <source>Error initializing block database</source>
+        <translation>Feil under initialisering av blokkdatabase</translation>
+    </message>
+    <message>
+        <source>Error initializing wallet database environment %s!</source>
+        <translation>Feil under oppstart av lommeboken sitt databasemiljø %s!</translation>
+    </message>
+    <message>
+        <source>Error loading %s</source>
+        <translation>Feil ved lasting av %s</translation>
+    </message>
+    <message>
+        <source>Error loading %s: Wallet corrupted</source>
+        <translation>Feil under innlasting av %s: Skadet lommebok</translation>
+    </message>
+    <message>
+        <source>Error loading %s: Wallet requires newer version of %s</source>
+        <translation>Feil under innlasting av %s: Lommeboka krever nyere versjon av %s</translation>
+    </message>
+    <message>
+        <source>Error loading block database</source>
+        <translation>Feil ved lasting av blokkdatabase</translation>
+    </message>
+    <message>
+        <source>Error opening block database</source>
+        <translation>Feil under åpning av blokkdatabase</translation>
+    </message>
+    <message>
+        <source>Failed to listen on any port. Use -listen=0 if you want this.</source>
+        <translation>Kunne ikke lytte på noen port. Bruk -listen=0 hvis det er dette du vil.</translation>
+    </message>
+    <message>
+        <source>Failed to rescan the wallet during initialization</source>
+        <translation>Klarte ikke gå igjennom lommeboken under oppstart</translation>
+    </message>
+    <message>
+        <source>Importing...</source>
+        <translation>Importerer...</translation>
+    </message>
+    <message>
+        <source>Incorrect or no genesis block found. Wrong datadir for network?</source>
+        <translation>Ugyldig eller ingen skaperblokk funnet. Feil datamappe for nettverk?</translation>
+    </message>
+    <message>
+        <source>Initi
