@@ -682,4 +682,214 @@
     </message>
     <message>
         <source>Copy address</source>
-        <translat
+        <translation>Copiază adresa</translation>
+    </message>
+    <message>
+        <source>Copy label</source>
+        <translation>Copiază eticheta</translation>
+    </message>
+    <message>
+        <source>Copy amount</source>
+        <translation>Copiază suma</translation>
+    </message>
+    <message>
+        <source>Copy transaction ID</source>
+        <translation>Copiază ID tranzacţie</translation>
+    </message>
+    <message>
+        <source>Lock unspent</source>
+        <translation>Blocare necheltuiţi</translation>
+    </message>
+    <message>
+        <source>Unlock unspent</source>
+        <translation>Deblocare necheltuiţi</translation>
+    </message>
+    <message>
+        <source>Copy quantity</source>
+        <translation>Copiază cantitea</translation>
+    </message>
+    <message>
+        <source>Copy fee</source>
+        <translation>Copiază taxa</translation>
+    </message>
+    <message>
+        <source>Copy after fee</source>
+        <translation>Copiază după taxă</translation>
+    </message>
+    <message>
+        <source>Copy bytes</source>
+        <translation>Copiază octeţi</translation>
+    </message>
+    <message>
+        <source>Copy dust</source>
+        <translation>Copiază praf</translation>
+    </message>
+    <message>
+        <source>Copy change</source>
+        <translation>Copiază rest</translation>
+    </message>
+    <message>
+        <source>(%1 locked)</source>
+        <translation>(%1 blocat)</translation>
+    </message>
+    <message>
+        <source>yes</source>
+        <translation>da</translation>
+    </message>
+    <message>
+        <source>no</source>
+        <translation>nu</translation>
+    </message>
+    <message>
+        <source>This label turns red if any recipient receives an amount smaller than the current dust threshold.</source>
+        <translation>Această etichetă devine roşie, dacă orice beneficiar primeşte o sumă mai mică decât pragul curent pentru praf.</translation>
+    </message>
+    <message>
+        <source>Can vary +/- %1 satoshi(s) per input.</source>
+        <translation>Poate varia +/- %1 satoshi pentru fiecare intrare.</translation>
+    </message>
+    <message>
+        <source>(no label)</source>
+        <translation>(fără etichetă)</translation>
+    </message>
+    <message>
+        <source>change from %1 (%2)</source>
+        <translation>restul de la %1 (%2)</translation>
+    </message>
+    <message>
+        <source>(change)</source>
+        <translation>(rest)</translation>
+    </message>
+</context>
+<context>
+    <name>CreateWalletActivity</name>
+    <message>
+        <source>Create wallet failed</source>
+        <translation>Crearea portofelului a eşuat</translation>
+    </message>
+    <message>
+        <source>Create wallet warning</source>
+        <translation>Atentionare la crearea portofelului</translation>
+    </message>
+</context>
+<context>
+    <name>CreateWalletDialog</name>
+    <message>
+        <source>Create Wallet</source>
+        <translation>Crează portofel</translation>
+    </message>
+    <message>
+        <source>Wallet Name</source>
+        <translation>Numele portofelului</translation>
+    </message>
+    <message>
+        <source>Encrypt the wallet. The wallet will be encrypted with a passphrase of your choice.</source>
+        <translation>Criptează portofelul. Portofelul va fi criptat cu fraza de acces aleasă.</translation>
+    </message>
+    <message>
+        <source>Encrypt Wallet</source>
+        <translation>Criptează portofelul.</translation>
+    </message>
+    <message>
+        <source>Disable private keys for this wallet. Wallets with private keys disabled will have no private keys and cannot have an HD seed or imported private keys. This is ideal for watch-only wallets.</source>
+        <translation>Dezactivează cheile private pentru acest portofel. Portofelele cu cheile private dezactivate nu vor avea chei private şi nu vor putea avea samanţă HD sau chei private importate. Ideal pentru portofele marcate doar pentru citire.</translation>
+    </message>
+    <message>
+        <source>Disable Private Keys</source>
+        <translation>Dezactivează cheile private</translation>
+    </message>
+    <message>
+        <source>Create</source>
+        <translation>Creează</translation>
+    </message>
+</context>
+<context>
+    <name>EditAddressDialog</name>
+    <message>
+        <source>Edit Address</source>
+        <translation>Editează adresa</translation>
+    </message>
+    <message>
+        <source>&amp;Label</source>
+        <translation>&amp;Etichetă</translation>
+    </message>
+    <message>
+        <source>The label associated with this address list entry</source>
+        <translation>Eticheta asociată cu această intrare din listă.</translation>
+    </message>
+    <message>
+        <source>The address associated with this address list entry. This can only be modified for sending addresses.</source>
+        <translation>Adresa asociată cu această adresă din listă. Aceasta poate fi modificată doar pentru adresele de trimitere.</translation>
+    </message>
+    <message>
+        <source>&amp;Address</source>
+        <translation>&amp;Adresă</translation>
+    </message>
+    <message>
+        <source>New sending address</source>
+        <translation>Noua adresă de trimitere</translation>
+    </message>
+    <message>
+        <source>Edit receiving address</source>
+        <translation>Editează adresa de primire</translation>
+    </message>
+    <message>
+        <source>Edit sending address</source>
+        <translation>Editează adresa de trimitere</translation>
+    </message>
+    <message>
+        <source>The entered address "%1" is not a valid Bitcoin address.</source>
+        <translation>Adresa introdusă "%1" nu este o adresă Bitcoin validă.</translation>
+    </message>
+    <message>
+        <source>Address "%1" already exists as a receiving address with label "%2" and so cannot be added as a sending address.</source>
+        <translation>Adresa "%1" exista deja ca si adresa de primire cu eticheta "%2" si deci nu poate fi folosita ca si adresa de trimitere.</translation>
+    </message>
+    <message>
+        <source>The entered address "%1" is already in the address book with label "%2".</source>
+        <translation>Adresa introdusa "%1" este deja in lista de adrese cu eticheta "%2"</translation>
+    </message>
+    <message>
+        <source>Could not unlock wallet.</source>
+        <translation>Portofelul nu a putut fi deblocat.</translation>
+    </message>
+    <message>
+        <source>New key generation failed.</source>
+        <translation>Generarea noii chei nu a reuşit.</translation>
+    </message>
+</context>
+<context>
+    <name>FreespaceChecker</name>
+    <message>
+        <source>A new data directory will be created.</source>
+        <translation>Va fi creat un nou dosar de date.</translation>
+    </message>
+    <message>
+        <source>name</source>
+        <translation>nume</translation>
+    </message>
+    <message>
+        <source>Directory already exists. Add %1 if you intend to create a new directory here.</source>
+        <translation>Dosarul deja există. Adaugă %1 dacă intenţionaţi să creaţi un nou dosar aici.</translation>
+    </message>
+    <message>
+        <source>Path already exists, and is not a directory.</source>
+        <translation>Calea deja există şi nu este un dosar.</translation>
+    </message>
+    <message>
+        <source>Cannot create data directory here.</source>
+        <translation>Nu se poate crea un dosar de date aici.</translation>
+    </message>
+</context>
+<context>
+    <name>HelpMessageDialog</name>
+    <message>
+        <source>version</source>
+        <translation>versiunea</translation>
+    </message>
+    <message>
+        <source>About %1</source>
+        <translation>Despre %1</translation>
+    </message>
+    <message>
+        <sou
