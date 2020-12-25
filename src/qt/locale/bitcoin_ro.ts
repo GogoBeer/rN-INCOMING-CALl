@@ -1221,3 +1221,199 @@
     <message>
         <source>&amp;Unit to show amounts in:</source>
         <translation>&amp;Unitatea de măsură pentru afişarea sumelor:</translation>
+    </message>
+    <message>
+        <source>Choose the default subdivision unit to show in the interface and when sending coins.</source>
+        <translation>Alegeţi subdiviziunea folosită la afişarea interfeţei şi la trimiterea de bitcoin.</translation>
+    </message>
+    <message>
+        <source>Whether to show coin control features or not.</source>
+        <translation>Arată controlul caracteristicilor monedei sau nu.</translation>
+    </message>
+    <message>
+        <source>&amp;Third party transaction URLs</source>
+        <translation>URL-uri tranzacţii &amp;terţe părţi</translation>
+    </message>
+    <message>
+        <source>&amp;OK</source>
+        <translation>&amp;OK</translation>
+    </message>
+    <message>
+        <source>&amp;Cancel</source>
+        <translation>Renunţă</translation>
+    </message>
+    <message>
+        <source>default</source>
+        <translation>iniţial</translation>
+    </message>
+    <message>
+        <source>none</source>
+        <translation>nimic</translation>
+    </message>
+    <message>
+        <source>Confirm options reset</source>
+        <translation>Confirmă resetarea opţiunilor</translation>
+    </message>
+    <message>
+        <source>Client restart required to activate changes.</source>
+        <translation>Este necesară repornirea clientului pentru a activa schimbările.</translation>
+    </message>
+    <message>
+        <source>Client will be shut down. Do you want to proceed?</source>
+        <translation>Clientul va fi închis. Doriţi să continuaţi?</translation>
+    </message>
+    <message>
+        <source>Configuration options</source>
+        <translation>Optiuni de configurare</translation>
+    </message>
+    <message>
+        <source>The configuration file is used to specify advanced user options which override GUI settings. Additionally, any command-line options will override this configuration file.</source>
+        <translation>Fisierul de configurare e folosit pentru a specifica optiuni utilizator avansate care modifica setarile din GUI. In plus orice optiune din linia de comanda va modifica acest fisier de configurare.</translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation>Eroare</translation>
+    </message>
+    <message>
+        <source>The configuration file could not be opened.</source>
+        <translation>Fisierul de configurare nu a putut fi deschis.</translation>
+    </message>
+    <message>
+        <source>This change would require a client restart.</source>
+        <translation>Această schimbare necesită o repornire a clientului.</translation>
+    </message>
+    <message>
+        <source>The supplied proxy address is invalid.</source>
+        <translation>Adresa bitcoin pe care aţi specificat-o nu este validă.</translation>
+    </message>
+</context>
+<context>
+    <name>OverviewPage</name>
+    <message>
+        <source>Form</source>
+        <translation>Form</translation>
+    </message>
+    <message>
+        <source>The displayed information may be out of date. Your wallet automatically synchronizes with the Bitcoin network after a connection is established, but this process has not completed yet.</source>
+        <translation>Informaţiile afişate pot fi neactualizate. Portofelul dvs. se sincronizează automat cu reţeaua Bitcoin după ce o conexiune este stabilită, dar acest proces nu a fost finalizat încă.</translation>
+    </message>
+    <message>
+        <source>Watch-only:</source>
+        <translation>Doar-supraveghere:</translation>
+    </message>
+    <message>
+        <source>Available:</source>
+        <translation>Disponibil:</translation>
+    </message>
+    <message>
+        <source>Your current spendable balance</source>
+        <translation>Balanţa dvs. curentă de cheltuieli</translation>
+    </message>
+    <message>
+        <source>Pending:</source>
+        <translation>În aşteptare:</translation>
+    </message>
+    <message>
+        <source>Total of transactions that have yet to be confirmed, and do not yet count toward the spendable balance</source>
+        <translation>Totalul tranzacţiilor care nu sunt confirmate încă şi care nu sunt încă adunate la balanţa de cheltuieli</translation>
+    </message>
+    <message>
+        <source>Immature:</source>
+        <translation>Nematurizat:</translation>
+    </message>
+    <message>
+        <source>Mined balance that has not yet matured</source>
+        <translation>Balanţa minata ce nu s-a maturizat încă</translation>
+    </message>
+    <message>
+        <source>Balances</source>
+        <translation>Balanţă</translation>
+    </message>
+    <message>
+        <source>Total:</source>
+        <translation>Total:</translation>
+    </message>
+    <message>
+        <source>Your current total balance</source>
+        <translation>Balanţa totală curentă</translation>
+    </message>
+    <message>
+        <source>Your current balance in watch-only addresses</source>
+        <translation>Soldul dvs. curent în adresele doar-supraveghere</translation>
+    </message>
+    <message>
+        <source>Spendable:</source>
+        <translation>Cheltuibil:</translation>
+    </message>
+    <message>
+        <source>Recent transactions</source>
+        <translation>Tranzacţii recente</translation>
+    </message>
+    <message>
+        <source>Unconfirmed transactions to watch-only addresses</source>
+        <translation>Tranzacţii neconfirmate la adresele doar-supraveghere</translation>
+    </message>
+    <message>
+        <source>Mined balance in watch-only addresses that has not yet matured</source>
+        <translation>Balanţă minată în adresele doar-supraveghere care nu s-a maturizat încă</translation>
+    </message>
+    <message>
+        <source>Current total balance in watch-only addresses</source>
+        <translation>Soldul dvs. total în adresele doar-supraveghere</translation>
+    </message>
+    </context>
+<context>
+    <name>PSBTOperationsDialog</name>
+    <message>
+        <source>Total Amount</source>
+        <translation>Suma totală</translation>
+    </message>
+    <message>
+        <source>or</source>
+        <translation>sau</translation>
+    </message>
+    </context>
+<context>
+    <name>PaymentServer</name>
+    <message>
+        <source>Payment request error</source>
+        <translation>Eroare la cererea de plată</translation>
+    </message>
+    <message>
+        <source>Cannot start bitcoin: click-to-pay handler</source>
+        <translation>Bitcoin nu poate porni: click-to-pay handler</translation>
+    </message>
+    <message>
+        <source>URI handling</source>
+        <translation>Gestionare URI</translation>
+    </message>
+    <message>
+        <source>'bitcoin://' is not a valid URI. Use 'bitcoin:' instead.</source>
+        <translation>'bitcoin://' nu este un URI valid. Folositi 'bitcoin:' in loc.</translation>
+    </message>
+    <message>
+        <source>Invalid payment address %1</source>
+        <translation>Adresă pentru plată invalidă %1</translation>
+    </message>
+    <message>
+        <source>URI cannot be parsed! This can be caused by an invalid Bitcoin address or malformed URI parameters.</source>
+        <translation>URI nu poate fi analizat! Acest lucru poate fi cauzat de o adresă Bitcoin invalidă sau parametri URI deformaţi.</translation>
+    </message>
+    <message>
+        <source>Payment request file handling</source>
+        <translation>Manipulare fişier cerere de plată</translation>
+    </message>
+</context>
+<context>
+    <name>PeerTableModel</name>
+    <message>
+        <source>User Agent</source>
+        <translation>Agent utilizator</translation>
+    </message>
+    <message>
+        <source>Node/Service</source>
+        <translation>Nod/Serviciu</translation>
+    </message>
+    <message>
+        <source>NodeId</source>
+   
