@@ -1416,4 +1416,247 @@
     </message>
     <message>
         <source>NodeId</source>
+        <translation>NodeID</translation>
+    </message>
+    <message>
+        <source>Ping</source>
+        <translation>Ping</translation>
+    </message>
+    <message>
+        <source>Sent</source>
+        <translation>Expediat</translation>
+    </message>
+    <message>
+        <source>Received</source>
+        <translation>Recepţionat</translation>
+    </message>
+</context>
+<context>
+    <name>QObject</name>
+    <message>
+        <source>Amount</source>
+        <translation>Cantitate</translation>
+    </message>
+    <message>
+        <source>Enter a Bitcoin address (e.g. %1)</source>
+        <translation>Introduceţi o adresă Bitcoin (de exemplu %1)</translation>
+    </message>
+    <message>
+        <source>%1 d</source>
+        <translation>%1 z</translation>
+    </message>
+    <message>
+        <source>%1 h</source>
+        <translation>%1 h</translation>
+    </message>
+    <message>
+        <source>%1 m</source>
+        <translation>%1 m</translation>
+    </message>
+    <message>
+        <source>%1 s</source>
+        <translation>%1 s</translation>
+    </message>
+    <message>
+        <source>None</source>
+        <translation>Niciuna</translation>
+    </message>
+    <message>
+        <source>N/A</source>
+        <translation>N/A</translation>
+    </message>
+    <message>
+        <source>%1 ms</source>
+        <translation>%1 ms</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n second(s)</source>
+        <translation><numerusform>%n secunda</numerusform><numerusform>%n secunde</numerusform><numerusform>%n secunde</numerusform></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n minute(s)</source>
+        <translation><numerusform>%n minut</numerusform><numerusform>%n minute</numerusform><numerusform>%n minute</numerusform></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n hour(s)</source>
+        <translation><numerusform>%n ora</numerusform><numerusform>%n ore</numerusform><numerusform>%n ore</numerusform></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n day(s)</source>
+        <translation><numerusform>%n zi</numerusform><numerusform>%n zile</numerusform><numerusform>%n zile</numerusform></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n week(s)</source>
+        <translation><numerusform>%n saptamana</numerusform><numerusform>%n saptamani</numerusform><numerusform>%n saptamani</numerusform></translation>
+    </message>
+    <message>
+        <source>%1 and %2</source>
+        <translation>%1 şi %2</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n year(s)</source>
+        <translation><numerusform>%n an</numerusform><numerusform>%n ani</numerusform><numerusform>%n ani</numerusform></translation>
+    </message>
+    <message>
+        <source>%1 B</source>
+        <translation>%1 B</translation>
+    </message>
+    <message>
+        <source>%1 KB</source>
+        <translation>%1 KB</translation>
+    </message>
+    <message>
+        <source>%1 MB</source>
+        <translation>%1 MB</translation>
+    </message>
+    <message>
+        <source>%1 GB</source>
+        <translation>%1 GB</translation>
+    </message>
+    <message>
+        <source>Error: Specified data directory "%1" does not exist.</source>
+        <translation>Eroare: Directorul de date specificat "%1" nu există.</translation>
+    </message>
+    <message>
+        <source>Error: Cannot parse configuration file: %1.</source>
+        <translation>Eroare: Nu se poate analiza fişierul de configuraţie: %1.</translation>
+    </message>
+    <message>
+        <source>Error: %1</source>
+        <translation>Eroare: %1</translation>
+    </message>
+    <message>
+        <source>%1 didn't yet exit safely...</source>
+        <translation>%1 nu a fost inchis in siguranta...</translation>
+    </message>
+    <message>
+        <source>unknown</source>
+        <translation>necunoscut</translation>
+    </message>
+</context>
+<context>
+    <name>QRImageWidget</name>
+    <message>
+        <source>&amp;Save Image...</source>
+        <translation>&amp;Salvează Imaginea...</translation>
+    </message>
+    <message>
+        <source>&amp;Copy Image</source>
+        <translation>&amp;Copiaza Imaginea</translation>
+    </message>
+    <message>
+        <source>Resulting URI too long, try to reduce the text for label / message.</source>
+        <translation>URI rezultat este prea lung, încearcă să reduci textul pentru etichetă / mesaj.</translation>
+    </message>
+    <message>
+        <source>Error encoding URI into QR Code.</source>
+        <translation>Eroare la codarea URl-ului în cod QR.</translation>
+    </message>
+    <message>
+        <source>Save QR Code</source>
+        <translation>Salvează codul QR</translation>
+    </message>
+    <message>
+        <source>PNG Image (*.png)</source>
+        <translation>Imagine de tip PNG (*.png)</translation>
+    </message>
+</context>
+<context>
+    <name>RPCConsole</name>
+    <message>
+        <source>N/A</source>
+        <translation>Nespecificat</translation>
+    </message>
+    <message>
+        <source>Client version</source>
+        <translation>Versiune client</translation>
+    </message>
+    <message>
+        <source>&amp;Information</source>
+        <translation>&amp;Informaţii</translation>
+    </message>
+    <message>
+        <source>General</source>
+        <translation>General</translation>
+    </message>
+    <message>
+        <source>Using BerkeleyDB version</source>
+        <translation>Foloseşte BerkeleyDB versiunea</translation>
+    </message>
+    <message>
+        <source>Datadir</source>
+        <translation>Dirdate</translation>
+    </message>
+    <message>
+        <source>Startup time</source>
+        <translation>Ora de pornire</translation>
+    </message>
+    <message>
+        <source>Network</source>
+        <translation>Reţea</translation>
+    </message>
+    <message>
+        <source>Name</source>
+        <translation>Nume</translation>
+    </message>
+    <message>
+        <source>Number of connections</source>
+        <translation>Numărul de conexiuni</translation>
+    </message>
+    <message>
+        <source>Block chain</source>
+        <translation>Lanţ de blocuri</translation>
+    </message>
+    <message>
+        <source>Memory Pool</source>
+        <translation>Pool Memorie</translation>
+    </message>
+    <message>
+        <source>Current number of transactions</source>
+        <translation>Numărul curent de tranzacţii</translation>
+    </message>
+    <message>
+        <source>Memory usage</source>
+        <translation>Memorie folosită</translation>
+    </message>
+    <message>
+        <source>Wallet: </source>
+        <translation>Portofel:</translation>
+    </message>
+    <message>
+        <source>(none)</source>
+        <translation>(nimic)</translation>
+    </message>
+    <message>
+        <source>&amp;Reset</source>
+        <translation>&amp;Resetare</translation>
+    </message>
+    <message>
+        <source>Received</source>
+        <translation>Recepţionat</translation>
+    </message>
+    <message>
+        <source>Sent</source>
+        <translation>Expediat</translation>
+    </message>
+    <message>
+        <source>&amp;Peers</source>
+        <translation>&amp;Parteneri</translation>
+    </message>
+    <message>
+        <source>Banned peers</source>
+        <translation>Terti banati</translation>
+    </message>
+    <message>
+        <source>Select a peer to view detailed information.</source>
+        <translation>Selectaţi un partener pentru a vedea informaţiile detaliate.</translation>
+    </message>
+    <message>
+        <source>Direction</source>
+        <translation>Direcţie</translation>
+    </message>
+    <message>
+        <source>Version</source>
+        <translation>Versiune</translation>
+    </message>
    
