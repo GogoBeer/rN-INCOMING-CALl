@@ -1876,4 +1876,215 @@
     </message>
     <message>
         <source>An optional amount to request. Leave this empty or zero to not request a specific amount.</source>
-        <translation>O sum
+        <translation>O sumă opţională de cerut. Lăsaţi gol sau zero pentru a nu cere o sumă anume.</translation>
+    </message>
+    <message>
+        <source>Clear all fields of the form.</source>
+        <translation>Curăţă toate cîmpurile formularului.</translation>
+    </message>
+    <message>
+        <source>Clear</source>
+        <translation>Curăţă</translation>
+    </message>
+    <message>
+        <source>Native segwit addresses (aka Bech32 or BIP-173) reduce your transaction fees later on and offer better protection against typos, but old wallets don't support them. When unchecked, an address compatible with older wallets will be created instead.</source>
+        <translation>Adresele native segwit (aka Bech32 sau BIP-173) vor reduce mai tarziu comisioanele de tranzactionare si vor oferi o mai buna protectie impotriva introducerii gresite, dar portofelele vechi nu sunt compatibile. Daca optiunea nu e bifata, se va crea o adresa compatibila cu portofelele vechi.</translation>
+    </message>
+    <message>
+        <source>Generate native segwit (Bech32) address</source>
+        <translation>Genereaza adresa nativa segwit (Bech32)</translation>
+    </message>
+    <message>
+        <source>Requested payments history</source>
+        <translation>Istoricul plăţilor cerute</translation>
+    </message>
+    <message>
+        <source>Show the selected request (does the same as double clicking an entry)</source>
+        <translation>Arată cererea selectată (acelaşi lucru ca şi dublu-clic pe o înregistrare)</translation>
+    </message>
+    <message>
+        <source>Show</source>
+        <translation>Arată</translation>
+    </message>
+    <message>
+        <source>Remove the selected entries from the list</source>
+        <translation>Înlătură intrările selectate din listă</translation>
+    </message>
+    <message>
+        <source>Remove</source>
+        <translation>Înlătură</translation>
+    </message>
+    <message>
+        <source>Copy URI</source>
+        <translation>Copiază URl</translation>
+    </message>
+    <message>
+        <source>Copy label</source>
+        <translation>Copiază eticheta</translation>
+    </message>
+    <message>
+        <source>Copy message</source>
+        <translation>Copiază mesajul</translation>
+    </message>
+    <message>
+        <source>Copy amount</source>
+        <translation>Copiază suma</translation>
+    </message>
+    <message>
+        <source>Could not unlock wallet.</source>
+        <translation>Portofelul nu a putut fi deblocat.</translation>
+    </message>
+    </context>
+<context>
+    <name>ReceiveRequestDialog</name>
+    <message>
+        <source>Amount:</source>
+        <translation>Sumă:</translation>
+    </message>
+    <message>
+        <source>Message:</source>
+        <translation>Mesaj:</translation>
+    </message>
+    <message>
+        <source>Wallet:</source>
+        <translation>Portofel:</translation>
+    </message>
+    <message>
+        <source>Copy &amp;URI</source>
+        <translation>Copiază &amp;URl</translation>
+    </message>
+    <message>
+        <source>Copy &amp;Address</source>
+        <translation>Copiază &amp;adresa</translation>
+    </message>
+    <message>
+        <source>&amp;Save Image...</source>
+        <translation>&amp;Salvează imaginea...</translation>
+    </message>
+    <message>
+        <source>Request payment to %1</source>
+        <translation>Cere plata pentru %1</translation>
+    </message>
+    <message>
+        <source>Payment information</source>
+        <translation>Informaţiile plată</translation>
+    </message>
+</context>
+<context>
+    <name>RecentRequestsTableModel</name>
+    <message>
+        <source>Date</source>
+        <translation>Data</translation>
+    </message>
+    <message>
+        <source>Label</source>
+        <translation>Etichetă</translation>
+    </message>
+    <message>
+        <source>Message</source>
+        <translation>Mesaj</translation>
+    </message>
+    <message>
+        <source>(no label)</source>
+        <translation>(fără etichetă)</translation>
+    </message>
+    <message>
+        <source>(no message)</source>
+        <translation>(nici un mesaj)</translation>
+    </message>
+    <message>
+        <source>(no amount requested)</source>
+        <translation>(nici o sumă solicitată)</translation>
+    </message>
+    <message>
+        <source>Requested</source>
+        <translation>Ceruta</translation>
+    </message>
+</context>
+<context>
+    <name>SendCoinsDialog</name>
+    <message>
+        <source>Send Coins</source>
+        <translation>Trimite monede</translation>
+    </message>
+    <message>
+        <source>Coin Control Features</source>
+        <translation>Caracteristici de control ale monedei</translation>
+    </message>
+    <message>
+        <source>Inputs...</source>
+        <translation>Intrări...</translation>
+    </message>
+    <message>
+        <source>automatically selected</source>
+        <translation>selecţie automată</translation>
+    </message>
+    <message>
+        <source>Insufficient funds!</source>
+        <translation>Fonduri insuficiente!</translation>
+    </message>
+    <message>
+        <source>Quantity:</source>
+        <translation>Cantitate:</translation>
+    </message>
+    <message>
+        <source>Bytes:</source>
+        <translation>Octeţi:</translation>
+    </message>
+    <message>
+        <source>Amount:</source>
+        <translation>Sumă:</translation>
+    </message>
+    <message>
+        <source>Fee:</source>
+        <translation>Comision:</translation>
+    </message>
+    <message>
+        <source>After Fee:</source>
+        <translation>După taxă:</translation>
+    </message>
+    <message>
+        <source>Change:</source>
+        <translation>Rest:</translation>
+    </message>
+    <message>
+        <source>If this is activated, but the change address is empty or invalid, change will be sent to a newly generated address.</source>
+        <translation>Dacă este activat, dar adresa de rest este goală sau nevalidă, restul va fi trimis la o adresă nou generată.</translation>
+    </message>
+    <message>
+        <source>Custom change address</source>
+        <translation>Adresă personalizată de rest</translation>
+    </message>
+    <message>
+        <source>Transaction Fee:</source>
+        <translation>Taxă tranzacţie:</translation>
+    </message>
+    <message>
+        <source>Choose...</source>
+        <translation>Alegeţi...</translation>
+    </message>
+    <message>
+        <source>Using the fallbackfee can result in sending a transaction that will take several hours or days (or never) to confirm. Consider choosing your fee manually or wait until you have validated the complete chain.</source>
+        <translation>Folosirea taxei implicite poate rezulta in trimiterea unei tranzactii care va dura cateva ore sau zile (sau niciodata) pentru a fi confirmata. Luati in considerare sa setati manual taxa sau asteptati pana ati validat complet lantul.</translation>
+    </message>
+    <message>
+        <source>Warning: Fee estimation is currently not possible.</source>
+        <translation>Avertisment: Estimarea comisionului nu s-a putut efectua.</translation>
+    </message>
+    <message>
+        <source>Specify a custom fee per kB (1,000 bytes) of the transaction's virtual size.
+
+Note:  Since the fee is calculated on a per-byte basis, a fee of "100 satoshis per kB" for a transaction size of 500 bytes (half of 1 kB) would ultimately yield a fee of only 50 satoshis.</source>
+        <translation>Specificati o taxa anume pe kB (1000 byte) din marimea virtuala a tranzactiei. 
+
+Nota: Cum taxa este calculata per byte, o taxa de "100 satoshi per kB" pentru o tranzactie de 500 byte (jumatate de kB) va produce o taxa de doar 50 satoshi.</translation>
+    </message>
+    <message>
+        <source>per kilobyte</source>
+        <translation>per kilooctet</translation>
+    </message>
+    <message>
+        <source>Hide</source>
+        <translation>Ascunde</translation>
+    </message>
+    <me
