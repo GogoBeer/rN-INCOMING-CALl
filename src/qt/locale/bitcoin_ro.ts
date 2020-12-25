@@ -1659,4 +1659,221 @@
         <source>Version</source>
         <translation>Versiune</translation>
     </message>
-   
+    <message>
+        <source>Starting Block</source>
+        <translation>Bloc de început</translation>
+    </message>
+    <message>
+        <source>Synced Headers</source>
+        <translation>Headere Sincronizate</translation>
+    </message>
+    <message>
+        <source>Synced Blocks</source>
+        <translation>Blocuri Sincronizate</translation>
+    </message>
+    <message>
+        <source>User Agent</source>
+        <translation>Agent utilizator</translation>
+    </message>
+    <message>
+        <source>Node window</source>
+        <translation>Fereastra nodului</translation>
+    </message>
+    <message>
+        <source>Open the %1 debug log file from the current data directory. This can take a few seconds for large log files.</source>
+        <translation>Deschide fişierul jurnal depanare %1 din directorul curent. Aceasta poate dura cateva secunde pentru fişierele mai mari.</translation>
+    </message>
+    <message>
+        <source>Decrease font size</source>
+        <translation>Micsoreaza fontul</translation>
+    </message>
+    <message>
+        <source>Increase font size</source>
+        <translation>Mareste fontul</translation>
+    </message>
+    <message>
+        <source>Services</source>
+        <translation>Servicii</translation>
+    </message>
+    <message>
+        <source>Connection Time</source>
+        <translation>Timp conexiune</translation>
+    </message>
+    <message>
+        <source>Last Send</source>
+        <translation>Ultima trimitere</translation>
+    </message>
+    <message>
+        <source>Last Receive</source>
+        <translation>Ultima primire</translation>
+    </message>
+    <message>
+        <source>Ping Time</source>
+        <translation>Timp ping</translation>
+    </message>
+    <message>
+        <source>The duration of a currently outstanding ping.</source>
+        <translation>Durata ping-ului intarziat.</translation>
+    </message>
+    <message>
+        <source>Ping Wait</source>
+        <translation>Asteptare ping</translation>
+    </message>
+    <message>
+        <source>Min Ping</source>
+        <translation>Min Ping</translation>
+    </message>
+    <message>
+        <source>Time Offset</source>
+        <translation>Diferenta timp</translation>
+    </message>
+    <message>
+        <source>Last block time</source>
+        <translation>Data ultimului bloc</translation>
+    </message>
+    <message>
+        <source>&amp;Open</source>
+        <translation>&amp;Deschide</translation>
+    </message>
+    <message>
+        <source>&amp;Console</source>
+        <translation>&amp;Consolă</translation>
+    </message>
+    <message>
+        <source>&amp;Network Traffic</source>
+        <translation>Trafic reţea</translation>
+    </message>
+    <message>
+        <source>Totals</source>
+        <translation>Totaluri</translation>
+    </message>
+    <message>
+        <source>In:</source>
+        <translation>Intrare:</translation>
+    </message>
+    <message>
+        <source>Out:</source>
+        <translation>Ieşire:</translation>
+    </message>
+    <message>
+        <source>Debug log file</source>
+        <translation>Fişier jurnal depanare</translation>
+    </message>
+    <message>
+        <source>Clear console</source>
+        <translation>Curăţă consola</translation>
+    </message>
+    <message>
+        <source>1 &amp;hour</source>
+        <translation>1 &amp;oră</translation>
+    </message>
+    <message>
+        <source>1 &amp;day</source>
+        <translation>1 &amp;zi</translation>
+    </message>
+    <message>
+        <source>1 &amp;week</source>
+        <translation>1 &amp;săptămână</translation>
+    </message>
+    <message>
+        <source>1 &amp;year</source>
+        <translation>1 &amp;an</translation>
+    </message>
+    <message>
+        <source>&amp;Disconnect</source>
+        <translation>&amp;Deconectare</translation>
+    </message>
+    <message>
+        <source>Ban for</source>
+        <translation>Interzicere pentru</translation>
+    </message>
+    <message>
+        <source>&amp;Unban</source>
+        <translation>&amp;Unban</translation>
+    </message>
+    <message>
+        <source>Welcome to the %1 RPC console.</source>
+        <translation>Bun venit la consola %1 RPC.</translation>
+    </message>
+    <message>
+        <source>Use up and down arrows to navigate history, and %1 to clear screen.</source>
+        <translation>Folosiţi săgetile sus şi jos pentru a naviga în istoric şi %1 pentru a curăţa ecranul.</translation>
+    </message>
+    <message>
+        <source>Type %1 for an overview of available commands.</source>
+        <translation>Tastati %1 pentru o recapitulare a comenzilor disponibile.</translation>
+    </message>
+    <message>
+        <source>For more information on using this console type %1.</source>
+        <translation>Pentru mai multe informatii despre folosirea acestei console tastati %1.</translation>
+    </message>
+    <message>
+        <source>WARNING: Scammers have been active, telling users to type commands here, stealing their wallet contents. Do not use this console without fully understanding the ramifications of a command.</source>
+        <translation>ATENTIONARE: Sunt excroci care instruiesc userii sa introduca aici comenzi, pentru a le fura continutul portofelelor. Nu folositi aceasta consolă fara a intelege pe deplin ramificatiile unei comenzi.</translation>
+    </message>
+    <message>
+        <source>Network activity disabled</source>
+        <translation>Activitatea retelei a fost oprita.</translation>
+    </message>
+    <message>
+        <source>Executing command without any wallet</source>
+        <translation>Executarea comenzii fara nici un portofel.</translation>
+    </message>
+    <message>
+        <source>Executing command using "%1" wallet</source>
+        <translation>Executarea comenzii folosind portofelul "%1"</translation>
+    </message>
+    <message>
+        <source>(node id: %1)</source>
+        <translation>(node id: %1)</translation>
+    </message>
+    <message>
+        <source>via %1</source>
+        <translation>via %1</translation>
+    </message>
+    <message>
+        <source>never</source>
+        <translation>niciodată</translation>
+    </message>
+    <message>
+        <source>Inbound</source>
+        <translation>Intrare</translation>
+    </message>
+    <message>
+        <source>Outbound</source>
+        <translation>Ieşire</translation>
+    </message>
+    <message>
+        <source>Unknown</source>
+        <translation>Necunoscut</translation>
+    </message>
+</context>
+<context>
+    <name>ReceiveCoinsDialog</name>
+    <message>
+        <source>&amp;Amount:</source>
+        <translation>Sum&amp;a:</translation>
+    </message>
+    <message>
+        <source>&amp;Label:</source>
+        <translation>&amp;Etichetă:</translation>
+    </message>
+    <message>
+        <source>&amp;Message:</source>
+        <translation>&amp;Mesaj:</translation>
+    </message>
+    <message>
+        <source>An optional message to attach to the payment request, which will be displayed when the request is opened. Note: The message will not be sent with the payment over the Bitcoin network.</source>
+        <translation>Un mesaj opţional de ataşat la cererea de plată, care va fi afişat cînd cererea este deschisă. Notă: Acest mesaj nu va fi trimis cu plata către reţeaua Bitcoin.</translation>
+    </message>
+    <message>
+        <source>An optional label to associate with the new receiving address.</source>
+        <translation>O etichetă opţională de asociat cu adresa de primire.</translation>
+    </message>
+    <message>
+        <source>Use this form to request payments. All fields are &lt;b&gt;optional&lt;/b&gt;.</source>
+        <translation>Foloseşte acest formular pentru a solicita plăţi. Toate cîmpurile sînt &lt;b&gt;opţionale&lt;/b&gt;.</translation>
+    </message>
+    <message>
+        <source>An optional amount to request. Leave this empty or zero to not request a specific amount.</source>
+        <translation>O sum
