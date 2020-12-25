@@ -2087,4 +2087,205 @@ Nota: Cum taxa este calculata per byte, o taxa de "100 satoshi per kB" pentru o 
         <source>Hide</source>
         <translation>Ascunde</translation>
     </message>
-    <me
+    <message>
+        <source>Recommended:</source>
+        <translation>Recomandat:</translation>
+    </message>
+    <message>
+        <source>Custom:</source>
+        <translation>Personalizat:</translation>
+    </message>
+    <message>
+        <source>(Smart fee not initialized yet. This usually takes a few blocks...)</source>
+        <translation>(Taxa smart nu este inca initializata. Aceasta poate dura cateva blocuri...)</translation>
+    </message>
+    <message>
+        <source>Send to multiple recipients at once</source>
+        <translation>Trimite simultan către mai mulţi destinatari</translation>
+    </message>
+    <message>
+        <source>Add &amp;Recipient</source>
+        <translation>Adaugă destinata&amp;r</translation>
+    </message>
+    <message>
+        <source>Clear all fields of the form.</source>
+        <translation>Şterge toate câmpurile formularului.</translation>
+    </message>
+    <message>
+        <source>Dust:</source>
+        <translation>Praf:</translation>
+    </message>
+    <message>
+        <source>Confirmation time target:</source>
+        <translation>Timp confirmare tinta:</translation>
+    </message>
+    <message>
+        <source>Enable Replace-By-Fee</source>
+        <translation>Autorizeaza Replace-By-Fee</translation>
+    </message>
+    <message>
+        <source>With Replace-By-Fee (BIP-125) you can increase a transaction's fee after it is sent. Without this, a higher fee may be recommended to compensate for increased transaction delay risk.</source>
+        <translation>Cu Replace-By-Fee (BIP-125) se poate creste taxa unei tranzactii dupa ce a fost trimisa. Fara aceasta optiune, o taxa mai mare e posibil sa fie recomandata pentru a compensa riscul crescut de intarziere a tranzactiei.</translation>
+    </message>
+    <message>
+        <source>Clear &amp;All</source>
+        <translation>Curăţă to&amp;ate</translation>
+    </message>
+    <message>
+        <source>Balance:</source>
+        <translation>Balanţă:</translation>
+    </message>
+    <message>
+        <source>Confirm the send action</source>
+        <translation>Confirmă operaţiunea de trimitere</translation>
+    </message>
+    <message>
+        <source>S&amp;end</source>
+        <translation>Trimit&amp;e</translation>
+    </message>
+    <message>
+        <source>Copy quantity</source>
+        <translation>Copiază cantitea</translation>
+    </message>
+    <message>
+        <source>Copy amount</source>
+        <translation>Copiază suma</translation>
+    </message>
+    <message>
+        <source>Copy fee</source>
+        <translation>Copiază taxa</translation>
+    </message>
+    <message>
+        <source>Copy after fee</source>
+        <translation>Copiază după taxă</translation>
+    </message>
+    <message>
+        <source>Copy bytes</source>
+        <translation>Copiază octeţi</translation>
+    </message>
+    <message>
+        <source>Copy dust</source>
+        <translation>Copiază praf</translation>
+    </message>
+    <message>
+        <source>Copy change</source>
+        <translation>Copiază rest</translation>
+    </message>
+    <message>
+        <source>%1 (%2 blocks)</source>
+        <translation>%1(%2 blocuri)</translation>
+    </message>
+    <message>
+        <source> from wallet '%1'</source>
+        <translation>din portofelul '%1'</translation>
+    </message>
+    <message>
+        <source>%1 to %2</source>
+        <translation>%1 la %2</translation>
+    </message>
+    <message>
+        <source>Are you sure you want to send?</source>
+        <translation>Sigur doriţi să trimiteţi?</translation>
+    </message>
+    <message>
+        <source>or</source>
+        <translation>sau</translation>
+    </message>
+    <message>
+        <source>You can increase the fee later (signals Replace-By-Fee, BIP-125).</source>
+        <translation>Puteti creste taxa mai tarziu (semnaleaza Replace-By-Fee, BIP-125).</translation>
+    </message>
+    <message>
+        <source>Please, review your transaction.</source>
+        <translation>Va rugam sa revizuiti tranzactia.</translation>
+    </message>
+    <message>
+        <source>Transaction fee</source>
+        <translation>Taxă tranzacţie</translation>
+    </message>
+    <message>
+        <source>Not signalling Replace-By-Fee, BIP-125.</source>
+        <translation>Nu se semnalizeaza Replace-By-Fee, BIP-125</translation>
+    </message>
+    <message>
+        <source>Total Amount</source>
+        <translation>Suma totală</translation>
+    </message>
+    <message>
+        <source>Confirm send coins</source>
+        <translation>Confirmă trimiterea monedelor</translation>
+    </message>
+    <message>
+        <source>The recipient address is not valid. Please recheck.</source>
+        <translation>Adresa destinatarului nu este validă. Rugăm să reverificaţi.</translation>
+    </message>
+    <message>
+        <source>The amount to pay must be larger than 0.</source>
+        <translation>Suma de plată trebuie să fie mai mare decît 0.</translation>
+    </message>
+    <message>
+        <source>The amount exceeds your balance.</source>
+        <translation>Suma depăşeşte soldul contului.</translation>
+    </message>
+    <message>
+        <source>The total exceeds your balance when the %1 transaction fee is included.</source>
+        <translation>Totalul depăşeşte soldul contului dacă se include şi plata taxei de %1.</translation>
+    </message>
+    <message>
+        <source>Duplicate address found: addresses should only be used once each.</source>
+        <translation>Adresă duplicat găsită: fiecare adresă ar trebui folosită o singură dată.</translation>
+    </message>
+    <message>
+        <source>Transaction creation failed!</source>
+        <translation>Creare tranzacţie nereuşită!</translation>
+    </message>
+    <message>
+        <source>A fee higher than %1 is considered an absurdly high fee.</source>
+        <translation>O taxă mai mare de %1 este considerată o taxă absurd de mare</translation>
+    </message>
+    <message>
+        <source>Payment request expired.</source>
+        <translation>Cerere de plată expirata</translation>
+    </message>
+    <message numerus="yes">
+        <source>Estimated to begin confirmation within %n block(s).</source>
+        <translation><numerusform>Se estimeaza inceperea confirmarii in %n bloc.</numerusform><numerusform>Se estimeaza inceperea confirmarii in %n blocuri.</numerusform><numerusform>Se estimeaza inceperea confirmarii in %n blocuri.</numerusform></translation>
+    </message>
+    <message>
+        <source>Warning: Invalid Bitcoin address</source>
+        <translation>Atenţie: Adresa bitcoin nevalidă!</translation>
+    </message>
+    <message>
+        <source>Warning: Unknown change address</source>
+        <translation>Atenţie: Adresă de rest necunoscută</translation>
+    </message>
+    <message>
+        <source>Confirm custom change address</source>
+        <translation>Confirmati adresa personalizata de rest</translation>
+    </message>
+    <message>
+        <source>The address you selected for change is not part of this wallet. Any or all funds in your wallet may be sent to this address. Are you sure?</source>
+        <translation>Adresa selectata pentru rest nu face parte din acest portofel. Orice suma, sau intreaga suma din portofel poate fi trimisa la aceasta adresa. Sunteti sigur?</translation>
+    </message>
+    <message>
+        <source>(no label)</source>
+        <translation>(fără etichetă)</translation>
+    </message>
+</context>
+<context>
+    <name>SendCoinsEntry</name>
+    <message>
+        <source>A&amp;mount:</source>
+        <translation>Su&amp;mă:</translation>
+    </message>
+    <message>
+        <source>Pay &amp;To:</source>
+        <translation>Plăteşte că&amp;tre:</translation>
+    </message>
+    <message>
+        <source>&amp;Label:</source>
+        <translation>&amp;Etichetă:</translation>
+    </message>
+    <message>
+        <source>Choose previously used address</source>
+        <translation>
