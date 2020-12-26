@@ -2665,3 +2665,247 @@ Nota: Cum taxa este calculata per byte, o taxa de "100 satoshi per kB" pentru o 
     <message>
         <source>Inputs</source>
         <translation>Intrări</translation>
+    </message>
+    <message>
+        <source>Amount</source>
+        <translation>Cantitate</translation>
+    </message>
+    <message>
+        <source>true</source>
+        <translation>adevărat</translation>
+    </message>
+    <message>
+        <source>false</source>
+        <translation>fals</translation>
+    </message>
+</context>
+<context>
+    <name>TransactionDescDialog</name>
+    <message>
+        <source>This pane shows a detailed description of the transaction</source>
+        <translation>Acest panou arată o descriere detaliată a tranzacţiei</translation>
+    </message>
+    <message>
+        <source>Details for %1</source>
+        <translation>Detalii pentru %1</translation>
+    </message>
+</context>
+<context>
+    <name>TransactionTableModel</name>
+    <message>
+        <source>Date</source>
+        <translation>Data</translation>
+    </message>
+    <message>
+        <source>Type</source>
+        <translation>Tip</translation>
+    </message>
+    <message>
+        <source>Label</source>
+        <translation>Etichetă</translation>
+    </message>
+    <message numerus="yes">
+        <source>Open for %n more block(s)</source>
+        <translation><numerusform>Deschis pentru încă %n bloc</numerusform><numerusform>Deschis pentru încă %n blocuri</numerusform><numerusform>Deschis pentru încă %n bloc(uri)</numerusform></translation>
+    </message>
+    <message>
+        <source>Open until %1</source>
+        <translation>Deschis pînă la %1</translation>
+    </message>
+    <message>
+        <source>Unconfirmed</source>
+        <translation>Neconfirmat</translation>
+    </message>
+    <message>
+        <source>Abandoned</source>
+        <translation>Abandonat</translation>
+    </message>
+    <message>
+        <source>Confirming (%1 of %2 recommended confirmations)</source>
+        <translation>Confirmare (%1 din %2 confirmari recomandate)</translation>
+    </message>
+    <message>
+        <source>Confirmed (%1 confirmations)</source>
+        <translation>Confirmat (%1 confirmari)</translation>
+    </message>
+    <message>
+        <source>Conflicted</source>
+        <translation>În conflict</translation>
+    </message>
+    <message>
+        <source>Immature (%1 confirmations, will be available after %2)</source>
+        <translation>Imatur (%1 confirmari, va fi disponibil după %2)</translation>
+    </message>
+    <message>
+        <source>Generated but not accepted</source>
+        <translation>Generat dar neacceptat</translation>
+    </message>
+    <message>
+        <source>Received with</source>
+        <translation>Recepţionat cu</translation>
+    </message>
+    <message>
+        <source>Received from</source>
+        <translation>Primit de la</translation>
+    </message>
+    <message>
+        <source>Sent to</source>
+        <translation>Trimis către</translation>
+    </message>
+    <message>
+        <source>Payment to yourself</source>
+        <translation>Plată către dvs.</translation>
+    </message>
+    <message>
+        <source>Mined</source>
+        <translation>Minat</translation>
+    </message>
+    <message>
+        <source>watch-only</source>
+        <translation>doar-supraveghere</translation>
+    </message>
+    <message>
+        <source>(n/a)</source>
+        <translation>(indisponibil)</translation>
+    </message>
+    <message>
+        <source>(no label)</source>
+        <translation>(fără etichetă)</translation>
+    </message>
+    <message>
+        <source>Transaction status. Hover over this field to show number of confirmations.</source>
+        <translation>Starea tranzacţiei. Treceţi cu mouse-ul peste acest cîmp pentru afişarea numărului de confirmari.</translation>
+    </message>
+    <message>
+        <source>Date and time that the transaction was received.</source>
+        <translation>Data şi ora la care a fost recepţionată tranzacţia.</translation>
+    </message>
+    <message>
+        <source>Type of transaction.</source>
+        <translation>Tipul tranzacţiei.</translation>
+    </message>
+    <message>
+        <source>Whether or not a watch-only address is involved in this transaction.</source>
+        <translation>Indiferent dacă sau nu o adresa doar-suăpraveghere este implicată în această tranzacţie.</translation>
+    </message>
+    <message>
+        <source>User-defined intent/purpose of the transaction.</source>
+        <translation>Intentie/scop al tranzactie definit de user.</translation>
+    </message>
+    <message>
+        <source>Amount removed from or added to balance.</source>
+        <translation>Suma extrasă sau adăugată la sold.</translation>
+    </message>
+</context>
+<context>
+    <name>TransactionView</name>
+    <message>
+        <source>All</source>
+        <translation>Toate</translation>
+    </message>
+    <message>
+        <source>Today</source>
+        <translation>Astăzi</translation>
+    </message>
+    <message>
+        <source>This week</source>
+        <translation>Saptamana aceasta</translation>
+    </message>
+    <message>
+        <source>This month</source>
+        <translation>Luna aceasta</translation>
+    </message>
+    <message>
+        <source>Last month</source>
+        <translation>Luna trecuta</translation>
+    </message>
+    <message>
+        <source>This year</source>
+        <translation>Anul acesta</translation>
+    </message>
+    <message>
+        <source>Range...</source>
+        <translation>Interval...</translation>
+    </message>
+    <message>
+        <source>Received with</source>
+        <translation>Recepţionat cu</translation>
+    </message>
+    <message>
+        <source>Sent to</source>
+        <translation>Trimis către</translation>
+    </message>
+    <message>
+        <source>To yourself</source>
+        <translation>Către dvs.</translation>
+    </message>
+    <message>
+        <source>Mined</source>
+        <translation>Minat</translation>
+    </message>
+    <message>
+        <source>Other</source>
+        <translation>Altele</translation>
+    </message>
+    <message>
+        <source>Enter address, transaction id, or label to search</source>
+        <translation>Introduceți adresa, ID-ul tranzacției, sau eticheta pentru a căuta</translation>
+    </message>
+    <message>
+        <source>Min amount</source>
+        <translation>Suma minimă</translation>
+    </message>
+    <message>
+        <source>Abandon transaction</source>
+        <translation>Abandoneaza tranzacţia</translation>
+    </message>
+    <message>
+        <source>Increase transaction fee</source>
+        <translation>Cresteti comisionul pentru tranzacţie</translation>
+    </message>
+    <message>
+        <source>Copy address</source>
+        <translation>Copiază adresa</translation>
+    </message>
+    <message>
+        <source>Copy label</source>
+        <translation>Copiază eticheta</translation>
+    </message>
+    <message>
+        <source>Copy amount</source>
+        <translation>Copiază suma</translation>
+    </message>
+    <message>
+        <source>Copy transaction ID</source>
+        <translation>Copiază ID tranzacţie</translation>
+    </message>
+    <message>
+        <source>Copy raw transaction</source>
+        <translation>Copiază tranzacţia bruta</translation>
+    </message>
+    <message>
+        <source>Copy full transaction details</source>
+        <translation>Copiaza toate detaliile tranzacţiei</translation>
+    </message>
+    <message>
+        <source>Edit label</source>
+        <translation>Editează eticheta</translation>
+    </message>
+    <message>
+        <source>Show transaction details</source>
+        <translation>Arată detaliile tranzacţiei</translation>
+    </message>
+    <message>
+        <source>Export Transaction History</source>
+        <translation>Export istoric tranzacţii</translation>
+    </message>
+    <message>
+        <source>Comma separated file (*.csv)</source>
+        <translation>Fisier .csv cu separator - virgula</translation>
+    </message>
+    <message>
+        <source>Confirmed</source>
+        <translation>Confirmat</translation>
+    </message>
+    <message>
+     
