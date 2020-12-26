@@ -2449,4 +2449,219 @@ Nota: Cum taxa este calculata per byte, o taxa de "100 satoshi per kB" pentru o 
         <translation>Resetează toate cîmpurile mesajelor semnate</translation>
     </message>
     <message>
-        <source>Click "Sign Message" to generate signature</sourc
+        <source>Click "Sign Message" to generate signature</source>
+        <translation>Faceţi clic pe "Semneaza msaj" pentru a genera semnătura</translation>
+    </message>
+    <message>
+        <source>The entered address is invalid.</source>
+        <translation>Adresa introdusă este invalidă.</translation>
+    </message>
+    <message>
+        <source>Please check the address and try again.</source>
+        <translation>Vă rugăm verificaţi adresa şi încercaţi din nou.</translation>
+    </message>
+    <message>
+        <source>The entered address does not refer to a key.</source>
+        <translation>Adresa introdusă nu se referă la o cheie.</translation>
+    </message>
+    <message>
+        <source>Wallet unlock was cancelled.</source>
+        <translation>Deblocarea portofelului a fost anulata.</translation>
+    </message>
+    <message>
+        <source>Private key for the entered address is not available.</source>
+        <translation>Cheia privată pentru adresa introdusă nu este disponibila.</translation>
+    </message>
+    <message>
+        <source>Message signing failed.</source>
+        <translation>Semnarea mesajului nu a reuşit.</translation>
+    </message>
+    <message>
+        <source>Message signed.</source>
+        <translation>Mesaj semnat.</translation>
+    </message>
+    <message>
+        <source>The signature could not be decoded.</source>
+        <translation>Semnatura nu a putut fi decodată.</translation>
+    </message>
+    <message>
+        <source>Please check the signature and try again.</source>
+        <translation>Vă rugăm verificaţi semnătura şi încercaţi din nou.</translation>
+    </message>
+    <message>
+        <source>The signature did not match the message digest.</source>
+        <translation>Semnatura nu se potriveşte cu mesajul.</translation>
+    </message>
+    <message>
+        <source>Message verification failed.</source>
+        <translation>Verificarea mesajului nu a reuşit.</translation>
+    </message>
+    <message>
+        <source>Message verified.</source>
+        <translation>Mesaj verificat.</translation>
+    </message>
+</context>
+<context>
+    <name>TrafficGraphWidget</name>
+    <message>
+        <source>KB/s</source>
+        <translation>KB/s</translation>
+    </message>
+</context>
+<context>
+    <name>TransactionDesc</name>
+    <message numerus="yes">
+        <source>Open for %n more block(s)</source>
+        <translation><numerusform>Deschis pentru inca un bloc</numerusform><numerusform>Deschis pentru inca %n blocuri</numerusform><numerusform>Deschis pentru inca %n blocuri</numerusform></translation>
+    </message>
+    <message>
+        <source>Open until %1</source>
+        <translation>Deschis pînă la %1</translation>
+    </message>
+    <message>
+        <source>conflicted with a transaction with %1 confirmations</source>
+        <translation>in conflict cu o tranzactie cu %1 confirmari</translation>
+    </message>
+    <message>
+        <source>0/unconfirmed, %1</source>
+        <translation>0/neconfirmat, %1</translation>
+    </message>
+    <message>
+        <source>in memory pool</source>
+        <translation>in memory pool</translation>
+    </message>
+    <message>
+        <source>not in memory pool</source>
+        <translation>nu e in memory pool</translation>
+    </message>
+    <message>
+        <source>abandoned</source>
+        <translation>abandonat</translation>
+    </message>
+    <message>
+        <source>%1/unconfirmed</source>
+        <translation>%1/neconfirmat</translation>
+    </message>
+    <message>
+        <source>%1 confirmations</source>
+        <translation>%1 confirmări</translation>
+    </message>
+    <message>
+        <source>Status</source>
+        <translation>Stare</translation>
+    </message>
+    <message>
+        <source>Date</source>
+        <translation>Data</translation>
+    </message>
+    <message>
+        <source>Source</source>
+        <translation>Sursa</translation>
+    </message>
+    <message>
+        <source>Generated</source>
+        <translation>Generat</translation>
+    </message>
+    <message>
+        <source>From</source>
+        <translation>De la</translation>
+    </message>
+    <message>
+        <source>unknown</source>
+        <translation>necunoscut</translation>
+    </message>
+    <message>
+        <source>To</source>
+        <translation>Către</translation>
+    </message>
+    <message>
+        <source>own address</source>
+        <translation>adresa proprie</translation>
+    </message>
+    <message>
+        <source>watch-only</source>
+        <translation>doar-supraveghere</translation>
+    </message>
+    <message>
+        <source>label</source>
+        <translation>etichetă</translation>
+    </message>
+    <message>
+        <source>Credit</source>
+        <translation>Credit</translation>
+    </message>
+    <message numerus="yes">
+        <source>matures in %n more block(s)</source>
+        <translation><numerusform>se matureaza intr-un bloc</numerusform><numerusform>se matureaza in %n blocuri</numerusform><numerusform>se matureaza in %n blocuri</numerusform></translation>
+    </message>
+    <message>
+        <source>not accepted</source>
+        <translation>neacceptat</translation>
+    </message>
+    <message>
+        <source>Debit</source>
+        <translation>Debit</translation>
+    </message>
+    <message>
+        <source>Total debit</source>
+        <translation>Total debit</translation>
+    </message>
+    <message>
+        <source>Total credit</source>
+        <translation>Total credit</translation>
+    </message>
+    <message>
+        <source>Transaction fee</source>
+        <translation>Taxă tranzacţie</translation>
+    </message>
+    <message>
+        <source>Net amount</source>
+        <translation>Suma netă</translation>
+    </message>
+    <message>
+        <source>Message</source>
+        <translation>Mesaj</translation>
+    </message>
+    <message>
+        <source>Comment</source>
+        <translation>Comentariu</translation>
+    </message>
+    <message>
+        <source>Transaction ID</source>
+        <translation>ID tranzacţie</translation>
+    </message>
+    <message>
+        <source>Transaction total size</source>
+        <translation>Dimensiune totala tranzacţie</translation>
+    </message>
+    <message>
+        <source>Transaction virtual size</source>
+        <translation>Dimensiune virtuala a tranzactiei</translation>
+    </message>
+    <message>
+        <source>Output index</source>
+        <translation>Index debit</translation>
+    </message>
+    <message>
+        <source> (Certificate was not verified)</source>
+        <translation>(Certificatul nu a fost verificat)</translation>
+    </message>
+    <message>
+        <source>Merchant</source>
+        <translation>Comerciant</translation>
+    </message>
+    <message>
+        <source>Generated coins must mature %1 blocks before they can be spent. When you generated this block, it was broadcast to the network to be added to the block chain. If it fails to get into the chain, its state will change to "not accepted" and it won't be spendable. This may occasionally happen if another node generates a block within a few seconds of yours.</source>
+        <translation>Monedele generate se pot cheltui doar dupa inca %1 blocuri.  După ce a fost generat, s-a propagat în reţea, urmând să fie adăugat in blockchain.  Dacă nu poate fi inclus in lanţ, starea sa va deveni "neacceptat" si nu va putea fi folosit la tranzacţii.  Acest fenomen se întâmplă atunci cand un alt nod a generat un bloc la o diferenţa de câteva secunde.</translation>
+    </message>
+    <message>
+        <source>Debug information</source>
+        <translation>Informaţii pentru depanare</translation>
+    </message>
+    <message>
+        <source>Transaction</source>
+        <translation>Tranzacţie</translation>
+    </message>
+    <message>
+        <source>Inputs</source>
+        <translation>Intrări</translation>
