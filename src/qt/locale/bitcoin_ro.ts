@@ -2908,4 +2908,206 @@ Nota: Cum taxa este calculata per byte, o taxa de "100 satoshi per kB" pentru o 
         <translation>Confirmat</translation>
     </message>
     <message>
-     
+        <source>Watch-only</source>
+        <translation>Doar-supraveghere</translation>
+    </message>
+    <message>
+        <source>Date</source>
+        <translation>Data</translation>
+    </message>
+    <message>
+        <source>Type</source>
+        <translation>Tip</translation>
+    </message>
+    <message>
+        <source>Label</source>
+        <translation>Etichetă</translation>
+    </message>
+    <message>
+        <source>Address</source>
+        <translation>Adresă</translation>
+    </message>
+    <message>
+        <source>ID</source>
+        <translation>ID</translation>
+    </message>
+    <message>
+        <source>Exporting Failed</source>
+        <translation>Exportarea a eșuat</translation>
+    </message>
+    <message>
+        <source>There was an error trying to save the transaction history to %1.</source>
+        <translation>S-a produs o eroare la salvarea istoricului tranzacţiilor la %1.</translation>
+    </message>
+    <message>
+        <source>Exporting Successful</source>
+        <translation>Export reuşit</translation>
+    </message>
+    <message>
+        <source>The transaction history was successfully saved to %1.</source>
+        <translation>Istoricul tranzacţiilor a fost salvat cu succes la %1.</translation>
+    </message>
+    <message>
+        <source>Range:</source>
+        <translation>Interval:</translation>
+    </message>
+    <message>
+        <source>to</source>
+        <translation>către</translation>
+    </message>
+</context>
+<context>
+    <name>UnitDisplayStatusBarControl</name>
+    <message>
+        <source>Unit to show amounts in. Click to select another unit.</source>
+        <translation>Unitatea în care sînt arătate sumele. Faceţi clic pentru a selecta o altă unitate.</translation>
+    </message>
+</context>
+<context>
+    <name>WalletController</name>
+    <message>
+        <source>Close wallet</source>
+        <translation>Inchide portofel</translation>
+    </message>
+    </context>
+<context>
+    <name>WalletFrame</name>
+    <message>
+        <source>Create a new wallet</source>
+        <translation>Crează un portofel nou</translation>
+    </message>
+</context>
+<context>
+    <name>WalletModel</name>
+    <message>
+        <source>Send Coins</source>
+        <translation>Trimite monede</translation>
+    </message>
+    <message>
+        <source>Fee bump error</source>
+        <translation>Eroare in cresterea taxei</translation>
+    </message>
+    <message>
+        <source>Increasing transaction fee failed</source>
+        <translation>Cresterea comisionului pentru tranzactie a esuat.</translation>
+    </message>
+    <message>
+        <source>Do you want to increase the fee?</source>
+        <translation>Doriti sa cresteti taxa de tranzactie?</translation>
+    </message>
+    <message>
+        <source>Current fee:</source>
+        <translation>Comision curent:</translation>
+    </message>
+    <message>
+        <source>Increase:</source>
+        <translation>Crestere:</translation>
+    </message>
+    <message>
+        <source>New fee:</source>
+        <translation>Noul comision:</translation>
+    </message>
+    <message>
+        <source>Confirm fee bump</source>
+        <translation>Confirma cresterea comisionului</translation>
+    </message>
+    <message>
+        <source>Can't sign transaction.</source>
+        <translation>Nu s-a reuşit semnarea tranzacţiei</translation>
+    </message>
+    <message>
+        <source>Could not commit transaction</source>
+        <translation>Tranzactia nu a putut fi consemnata.</translation>
+    </message>
+    <message>
+        <source>default wallet</source>
+        <translation>portofel implicit</translation>
+    </message>
+</context>
+<context>
+    <name>WalletView</name>
+    <message>
+        <source>&amp;Export</source>
+        <translation>&amp;Export</translation>
+    </message>
+    <message>
+        <source>Export the data in the current tab to a file</source>
+        <translation>Exportă datele din tab-ul curent într-un fişier</translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation>Eroare</translation>
+    </message>
+    <message>
+        <source>Backup Wallet</source>
+        <translation>Backup portofelul electronic</translation>
+    </message>
+    <message>
+        <source>Wallet Data (*.dat)</source>
+        <translation>Date portofel (*.dat)</translation>
+    </message>
+    <message>
+        <source>Backup Failed</source>
+        <translation>Backup esuat</translation>
+    </message>
+    <message>
+        <source>There was an error trying to save the wallet data to %1.</source>
+        <translation>S-a produs o eroare la salvarea datelor portofelului la %1.</translation>
+    </message>
+    <message>
+        <source>Backup Successful</source>
+        <translation>Backup efectuat cu succes</translation>
+    </message>
+    <message>
+        <source>The wallet data was successfully saved to %1.</source>
+        <translation>Datele portofelului s-au salvat cu succes la %1.</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Anulare</translation>
+    </message>
+</context>
+<context>
+    <name>bitcoin-core</name>
+    <message>
+        <source>Distributed under the MIT software license, see the accompanying file %s or %s</source>
+        <translation>Distribuit sub licenţa de programe MIT, vezi fişierul însoţitor %s sau %s</translation>
+    </message>
+    <message>
+        <source>Prune configured below the minimum of %d MiB.  Please use a higher number.</source>
+        <translation>Reductia e configurata sub minimul de %d MiB. Rugam folositi un numar mai mare.</translation>
+    </message>
+    <message>
+        <source>Prune: last wallet synchronisation goes beyond pruned data. You need to -reindex (download the whole blockchain again in case of pruned node)</source>
+        <translation>Reductie: ultima sincronizare merge dincolo de datele reductiei. Trebuie sa faceti -reindex (sa descarcati din nou intregul blockchain in cazul unui nod redus)</translation>
+    </message>
+    <message>
+        <source>Pruning blockstore...</source>
+        <translation>Reductie blockstore...</translation>
+    </message>
+    <message>
+        <source>Unable to start HTTP server. See debug log for details.</source>
+        <translation>Imposibil de pornit serverul HTTP. Pentru detalii vezi logul de depanare.</translation>
+    </message>
+    <message>
+        <source>The %s developers</source>
+        <translation>Dezvoltatorii %s</translation>
+    </message>
+    <message>
+        <source>Cannot obtain a lock on data directory %s. %s is probably already running.</source>
+        <translation>Nu se poate obține o blocare a directorului de date %s. %s probabil rulează deja.</translation>
+    </message>
+    <message>
+        <source>Cannot provide specific connections and have addrman find outgoing connections at the same.</source>
+        <translation>Nu se pot furniza conexiuni specifice in acelasi timp in care addrman este folosit pentru a gasi conexiuni de iesire.</translation>
+    </message>
+    <message>
+        <source>Error reading %s! All keys read correctly, but transaction data or address book entries might be missing or incorrect.</source>
+        <translation>Eroare la citirea %s! Toate cheile sînt citite corect, dar datele tranzactiei sau anumite intrări din agenda sînt incorecte sau lipsesc.</translation>
+    </message>
+    <message>
+        <source>Please check that your computer's date and time are correct! If your clock is wrong, %s will not work properly.</source>
+        <translation>Vă rugăm verificaţi dacă data/timpul calculatorului dvs. sînt corecte! Dacă ceasul calcultorului este gresit, %s nu va funcţiona corect.</translation>
+    </message>
+    <message>
+        <source>Please contribute if you find %s
