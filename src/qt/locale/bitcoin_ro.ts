@@ -3259,4 +3259,161 @@ Nota: Cum taxa este calculata per byte, o taxa de "100 satoshi per kB" pentru o 
     </message>
     <message>
         <source>Replaying blocks...</source>
-        <translation>Se reiau bl
+        <translation>Se reiau blocurile...</translation>
+    </message>
+    <message>
+        <source>Rewinding blocks...</source>
+        <translation>Se deruleaza blocurile...</translation>
+    </message>
+    <message>
+        <source>The source code is available from %s.</source>
+        <translation>Codul sursa este disponibil la %s.</translation>
+    </message>
+    <message>
+        <source>Transaction fee and change calculation failed</source>
+        <translation>Calcului taxei de tranzactie si a restului a esuat.</translation>
+    </message>
+    <message>
+        <source>Unable to bind to %s on this computer. %s is probably already running.</source>
+        <translation>Nu se poate efectua legatura la %s pe acest computer. %s probabil ruleaza deja.</translation>
+    </message>
+    <message>
+        <source>Unable to generate keys</source>
+        <translation>Nu s-au putut genera cheile</translation>
+    </message>
+    <message>
+        <source>Unsupported logging category %s=%s.</source>
+        <translation>Categoria de logging %s=%s nu este suportata.</translation>
+    </message>
+    <message>
+        <source>Upgrading UTXO database</source>
+        <translation>Actualizarea bazei de date UTXO</translation>
+    </message>
+    <message>
+        <source>User Agent comment (%s) contains unsafe characters.</source>
+        <translation>Comentariul (%s) al Agentului Utilizator contine caractere nesigure.</translation>
+    </message>
+    <message>
+        <source>Verifying blocks...</source>
+        <translation>Se verifică blocurile...</translation>
+    </message>
+    <message>
+        <source>Wallet needed to be rewritten: restart %s to complete</source>
+        <translation>Portofelul trebuie rescris: reporneşte %s pentru finalizare</translation>
+    </message>
+    <message>
+        <source>Error: Listening for incoming connections failed (listen returned error %s)</source>
+        <translation>Eroare: Ascultarea conexiunilor de intrare nu a reuşit (ascultarea a reurnat eroarea %s)</translation>
+    </message>
+    <message>
+        <source>Invalid amount for -maxtxfee=&lt;amount&gt;: '%s' (must be at least the minrelay fee of %s to prevent stuck transactions)</source>
+        <translation>Sumă nevalidă pentru -maxtxfee=&lt;amount&gt;: '%s' (trebuie să fie cel puţin taxa minrelay de %s pentru a preveni blocarea tranzactiilor)</translation>
+    </message>
+    <message>
+        <source>The transaction amount is too small to send after the fee has been deducted</source>
+        <translation>Suma tranzactiei este prea mica pentru a fi trimisa dupa ce se scade taxa.</translation>
+    </message>
+    <message>
+        <source>You need to rebuild the database using -reindex to go back to unpruned mode.  This will redownload the entire blockchain</source>
+        <translation>Trebuie reconstruita intreaga baza de date folosind -reindex pentru a va intoarce la modul non-redus. Aceasta va determina descarcarea din nou a intregului blockchain</translation>
+    </message>
+    <message>
+        <source>Error reading from database, shutting down.</source>
+        <translation>Eroare la citirea bazei de date. Oprire.</translation>
+    </message>
+    <message>
+        <source>Error upgrading chainstate database</source>
+        <translation>Eroare la actualizarea bazei de date chainstate</translation>
+    </message>
+    <message>
+        <source>Invalid -onion address or hostname: '%s'</source>
+        <translation>Adresa sau hostname -onion invalide: '%s'</translation>
+    </message>
+    <message>
+        <source>Invalid -proxy address or hostname: '%s'</source>
+        <translation>Adresa sau hostname -proxy invalide: '%s'</translation>
+    </message>
+    <message>
+        <source>Invalid amount for -paytxfee=&lt;amount&gt;: '%s' (must be at least %s)</source>
+        <translation>Sumă nevalidă pentru -paytxfee=&lt;suma&gt;: '%s' (trebuie să fie cel puţin %s)</translation>
+    </message>
+    <message>
+        <source>Invalid netmask specified in -whitelist: '%s'</source>
+        <translation>Mască reţea nevalidă specificată în -whitelist: '%s'</translation>
+    </message>
+    <message>
+        <source>Need to specify a port with -whitebind: '%s'</source>
+        <translation>Trebuie să specificaţi un port cu -whitebind: '%s'</translation>
+    </message>
+    <message>
+        <source>Reducing -maxconnections from %d to %d, because of system limitations.</source>
+        <translation>Se micsoreaza -maxconnections de la %d la %d, datorita limitarilor de sistem.</translation>
+    </message>
+    <message>
+        <source>Signing transaction failed</source>
+        <translation>Nu s-a reuşit semnarea tranzacţiei</translation>
+    </message>
+    <message>
+        <source>Specified -walletdir "%s" does not exist</source>
+        <translation>Nu exista -walletdir "%s" specificat</translation>
+    </message>
+    <message>
+        <source>Specified -walletdir "%s" is a relative path</source>
+        <translation>-walletdir "%s" specificat este o cale relativa</translation>
+    </message>
+    <message>
+        <source>Specified -walletdir "%s" is not a directory</source>
+        <translation>-walletdir "%s" specificat nu este un director</translation>
+    </message>
+    <message>
+        <source>The transaction amount is too small to pay the fee</source>
+        <translation>Suma tranzactiei este prea mica pentru plata taxei</translation>
+    </message>
+    <message>
+        <source>This is experimental software.</source>
+        <translation>Acesta este un program experimental.</translation>
+    </message>
+    <message>
+        <source>Transaction amount too small</source>
+        <translation>Suma tranzacţionată este prea mică</translation>
+    </message>
+    <message>
+        <source>Transaction too large</source>
+        <translation>Tranzacţie prea mare</translation>
+    </message>
+    <message>
+        <source>Unable to bind to %s on this computer (bind returned error %s)</source>
+        <translation>Nu se poate lega la %s pe acest calculator. (Legarea a întors eroarea %s)</translation>
+    </message>
+    <message>
+        <source>Unable to generate initial keys</source>
+        <translation>Nu s-au putut genera cheile initiale</translation>
+    </message>
+    <message>
+        <source>Verifying wallet(s)...</source>
+        <translation>Se verifică portofelul(ele)...</translation>
+    </message>
+    <message>
+        <source>Warning: unknown new rules activated (versionbit %i)</source>
+        <translation>Atentie: se activeaza reguli noi necunoscute (versionbit %i)</translation>
+    </message>
+    <message>
+        <source>-maxtxfee is set very high! Fees this large could be paid on a single transaction.</source>
+        <translation>-maxtxfee este setata foarte sus! Se pot plati taxe de aceasta marime pe o singura tranzactie.</translation>
+    </message>
+    <message>
+        <source>This is the transaction fee you may pay when fee estimates are not available.</source>
+        <translation>Aceasta este taxa de tranzactie pe care este posibil sa o platiti daca estimarile de taxe nu sunt disponibile.</translation>
+    </message>
+    <message>
+        <source>Total length of network version string (%i) exceeds maximum length (%i). Reduce the number or size of uacomments.</source>
+        <translation>Lungimea totala a sirului versiunii retelei (%i) depaseste lungimea maxima (%i). Reduceti numarul sa dimensiunea uacomments.</translation>
+    </message>
+    <message>
+        <source>%s is set very high!</source>
+        <translation>%s este setata foarte sus!</translation>
+    </message>
+    <message>
+        <source>Error loading wallet %s. Duplicate -wallet filename specified.</source>
+        <translation>Eroare la incarcarea portofelului %s. Este specificat un fisier -wallet duplicat.</translation>
+    </messa
