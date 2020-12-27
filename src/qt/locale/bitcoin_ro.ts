@@ -3416,4 +3416,74 @@ Nota: Cum taxa este calculata per byte, o taxa de "100 satoshi per kB" pentru o 
     <message>
         <source>Error loading wallet %s. Duplicate -wallet filename specified.</source>
         <translation>Eroare la incarcarea portofelului %s. Este specificat un fisier -wallet duplicat.</translation>
-    </messa
+    </message>
+    <message>
+        <source>Starting network threads...</source>
+        <translation>Se pornesc threadurile retelei...</translation>
+    </message>
+    <message>
+        <source>The wallet will avoid paying less than the minimum relay fee.</source>
+        <translation>Portofelul va evita sa plateasca mai putin decat minimul taxei de retransmisie.</translation>
+    </message>
+    <message>
+        <source>This is the minimum transaction fee you pay on every transaction.</source>
+        <translation>Acesta este minimum de taxa de tranzactie care va fi platit la fiecare tranzactie.</translation>
+    </message>
+    <message>
+        <source>This is the transaction fee you will pay if you send a transaction.</source>
+        <translation>Aceasta este taxa de tranzactie pe care o platiti cand trimiteti o tranzactie.</translation>
+    </message>
+    <message>
+        <source>Transaction amounts must not be negative</source>
+        <translation>Sumele tranzactionate nu pot fi negative</translation>
+    </message>
+    <message>
+        <source>Transaction has too long of a mempool chain</source>
+        <translation>Tranzacţia are o  lungime prea mare in lantul mempool</translation>
+    </message>
+    <message>
+        <source>Transaction must have at least one recipient</source>
+        <translation>Tranzactia trebuie sa aiba cel putin un destinatar</translation>
+    </message>
+    <message>
+        <source>Unknown network specified in -onlynet: '%s'</source>
+        <translation>Reţeaua specificată în -onlynet este necunoscută: '%s'</translation>
+    </message>
+    <message>
+        <source>Insufficient funds</source>
+        <translation>Fonduri insuficiente</translation>
+    </message>
+    <message>
+        <source>Fee estimation failed. Fallbackfee is disabled. Wait a few blocks or enable -fallbackfee.</source>
+        <translation>Estimarea taxei a esuat. Taxa implicita este dezactivata. Asteptati cateva blocuri, sau activati -fallbackfee.</translation>
+    </message>
+    <message>
+        <source>Warning: Private keys detected in wallet {%s} with disabled private keys</source>
+        <translation>Atentie: S-au detectat chei private in portofelul {%s} cu cheile private dezactivate</translation>
+    </message>
+    <message>
+        <source>Cannot write to data directory '%s'; check permissions.</source>
+        <translation>Nu se poate scrie in directorul de date '%s"; verificati permisiunile.</translation>
+    </message>
+    <message>
+        <source>Loading block index...</source>
+        <translation>Încărcare index bloc...</translation>
+    </message>
+    <message>
+        <source>Loading wallet...</source>
+        <translation>Încărcare portofel...</translation>
+    </message>
+    <message>
+        <source>Cannot downgrade wallet</source>
+        <translation>Nu se poate retrograda portofelul</translation>
+    </message>
+    <message>
+        <source>Rescanning...</source>
+        <translation>Rescanare...</translation>
+    </message>
+    <message>
+        <source>Done loading</source>
+        <translation>Încărcare terminată</translation>
+    </message>
+</context>
+</TS>
