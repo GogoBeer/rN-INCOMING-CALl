@@ -3110,4 +3110,153 @@ Nota: Cum taxa este calculata per byte, o taxa de "100 satoshi per kB" pentru o 
         <translation>Vă rugăm verificaţi dacă data/timpul calculatorului dvs. sînt corecte! Dacă ceasul calcultorului este gresit, %s nu va funcţiona corect.</translation>
     </message>
     <message>
-        <source>Please contribute if you find %s
+        <source>Please contribute if you find %s useful. Visit %s for further information about the software.</source>
+        <translation>Va rugam sa contribuiti daca apreciati ca %s va este util. Vizitati %s pentru mai multe informatii despre software.</translation>
+    </message>
+    <message>
+        <source>The block database contains a block which appears to be from the future. This may be due to your computer's date and time being set incorrectly. Only rebuild the block database if you are sure that your computer's date and time are correct</source>
+        <translation>Baza de date a blocurilor contine un bloc ce pare a fi din viitor. Acest lucru poate fi cauzat de setarea incorecta a datei si orei in computerul dvs. Reconstruiti baza de date a blocurilor doar daca sunteti sigur ca data si ora calculatorului dvs sunt corecte.</translation>
+    </message>
+    <message>
+        <source>This is a pre-release test build - use at your own risk - do not use for mining or merchant applications</source>
+        <translation>Aceasta este o versiune de test preliminară - vă asumaţi riscul folosind-o - nu folosiţi pentru minerit sau aplicaţiile comercianţilor</translation>
+    </message>
+    <message>
+        <source>This is the transaction fee you may discard if change is smaller than dust at this level</source>
+        <translation>Aceasta este taxa de tranzactie la care puteti renunta daca restul este mai mic decat praful la acest nivel.</translation>
+    </message>
+    <message>
+        <source>Unable to replay blocks. You will need to rebuild the database using -reindex-chainstate.</source>
+        <translation>Imposibil de refacut blocurile. Va trebui sa reconstruiti baza de date folosind -reindex-chainstate.</translation>
+    </message>
+    <message>
+        <source>Unable to rewind the database to a pre-fork state. You will need to redownload the blockchain</source>
+        <translation>Imposibil de a readuce baza de date la statusul pre-fork. Va trebui redescarcat blockchainul.</translation>
+    </message>
+    <message>
+        <source>Warning: The network does not appear to fully agree! Some miners appear to be experiencing issues.</source>
+        <translation>Atenţie: Reţeaua nu pare să fie de acord în totalitate! Aparent nişte mineri au probleme.</translation>
+    </message>
+    <message>
+        <source>Warning: We do not appear to fully agree with our peers! You may need to upgrade, or other nodes may need to upgrade.</source>
+        <translation>Atenţie: Aparent, nu sîntem de acord cu toţi partenerii noştri! Va trebui să faceţi o actualizare, sau alte noduri necesită actualizare.</translation>
+    </message>
+    <message>
+        <source>-maxmempool must be at least %d MB</source>
+        <translation>-maxmempool trebuie sa fie macar %d MB</translation>
+    </message>
+    <message>
+        <source>Cannot resolve -%s address: '%s'</source>
+        <translation>Nu se poate rezolva adresa -%s: '%s'</translation>
+    </message>
+    <message>
+        <source>Change index out of range</source>
+        <translation>Indexul de schimbare este iesit din parametrii</translation>
+    </message>
+    <message>
+        <source>Copyright (C) %i-%i</source>
+        <translation>Copyright (C) %i-%i</translation>
+    </message>
+    <message>
+        <source>Corrupted block database detected</source>
+        <translation>Bloc defect din baza de date detectat</translation>
+    </message>
+    <message>
+        <source>Do you want to rebuild the block database now?</source>
+        <translation>Doriţi să reconstruiţi baza de date blocuri acum?</translation>
+    </message>
+    <message>
+        <source>Error initializing block database</source>
+        <translation>Eroare la iniţializarea bazei de date de blocuri</translation>
+    </message>
+    <message>
+        <source>Error initializing wallet database environment %s!</source>
+        <translation>Eroare la iniţializarea mediului de bază de date a portofelului %s!</translation>
+    </message>
+    <message>
+        <source>Error loading %s</source>
+        <translation>Eroare la încărcarea %s</translation>
+    </message>
+    <message>
+        <source>Error loading %s: Private keys can only be disabled during creation</source>
+        <translation>Eroare la incarcarea %s: Cheile private pot fi dezactivate doar in momentul crearii</translation>
+    </message>
+    <message>
+        <source>Error loading %s: Wallet corrupted</source>
+        <translation>Eroare la încărcarea %s: Portofel corupt</translation>
+    </message>
+    <message>
+        <source>Error loading %s: Wallet requires newer version of %s</source>
+        <translation>Eroare la încărcarea %s: Portofelul are nevoie de o versiune %s mai nouă</translation>
+    </message>
+    <message>
+        <source>Error loading block database</source>
+        <translation>Eroare la încărcarea bazei de date de blocuri</translation>
+    </message>
+    <message>
+        <source>Error opening block database</source>
+        <translation>Eroare la deschiderea bazei de date de blocuri</translation>
+    </message>
+    <message>
+        <source>Failed to listen on any port. Use -listen=0 if you want this.</source>
+        <translation>Nu s-a reuşit ascultarea pe orice port. Folosiţi -listen=0 dacă vreţi asta.</translation>
+    </message>
+    <message>
+        <source>Failed to rescan the wallet during initialization</source>
+        <translation>Rescanarea portofelului in timpul initializarii a esuat.</translation>
+    </message>
+    <message>
+        <source>Importing...</source>
+        <translation>Import...</translation>
+    </message>
+    <message>
+        <source>Incorrect or no genesis block found. Wrong datadir for network?</source>
+        <translation>Incorect sau nici un bloc de geneza găsit. Directorul de retea greşit?</translation>
+    </message>
+    <message>
+        <source>Initialization sanity check failed. %s is shutting down.</source>
+        <translation>Nu s-a reuşit iniţierea verificării sănătăţii. %s se inchide.</translation>
+    </message>
+    <message>
+        <source>Invalid amount for -%s=&lt;amount&gt;: '%s'</source>
+        <translation>Sumă nevalidă pentru -%s=&lt;amount&gt;: '%s'</translation>
+    </message>
+    <message>
+        <source>Invalid amount for -discardfee=&lt;amount&gt;: '%s'</source>
+        <translation>Sumă nevalidă pentru -discardfee=&lt;amount&gt;: '%s'</translation>
+    </message>
+    <message>
+        <source>Invalid amount for -fallbackfee=&lt;amount&gt;: '%s'</source>
+        <translation>Suma nevalidă pentru -fallbackfee=&lt;amount&gt;: '%s'</translation>
+    </message>
+    <message>
+        <source>Specified blocks directory "%s" does not exist.</source>
+        <translation>Directorul de blocuri "%s" specificat nu exista.</translation>
+    </message>
+    <message>
+        <source>Upgrading txindex database</source>
+        <translation>Actualizarea bazei de date txindex</translation>
+    </message>
+    <message>
+        <source>Loading P2P addresses...</source>
+        <translation>Încărcare adrese P2P...</translation>
+    </message>
+    <message>
+        <source>Loading banlist...</source>
+        <translation>Încărcare banlist...</translation>
+    </message>
+    <message>
+        <source>Not enough file descriptors available.</source>
+        <translation>Nu sînt destule descriptoare disponibile.</translation>
+    </message>
+    <message>
+        <source>Prune cannot be configured with a negative value.</source>
+        <translation>Reductia nu poate fi configurata cu o valoare negativa.</translation>
+    </message>
+    <message>
+        <source>Prune mode is incompatible with -txindex.</source>
+        <translation>Modul redus este incompatibil cu -txindex.</translation>
+    </message>
+    <message>
+        <source>Replaying blocks...</source>
+        <translation>Se reiau bl
