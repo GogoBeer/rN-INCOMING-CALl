@@ -599,4 +599,205 @@
     <message>
         <source>Confirmed</source>
         <translation>Przituplowany</translation>
-    
+    </message>
+    <message>
+        <source>Copy address</source>
+        <translation>Kopiyruj adresã</translation>
+    </message>
+    <message>
+        <source>Copy label</source>
+        <translation>Kopiyruj etyketã</translation>
+    </message>
+    <message>
+        <source>Copy amount</source>
+        <translation>Kopiyruj kwotã</translation>
+    </message>
+    <message>
+        <source>Copy transaction ID</source>
+        <translation>Kopiyruj ID transakcyje</translation>
+    </message>
+    <message>
+        <source>Lock unspent</source>
+        <translation>Zaszperuj niywydane</translation>
+    </message>
+    <message>
+        <source>Unlock unspent</source>
+        <translation>Ôdszperuj niywydane</translation>
+    </message>
+    <message>
+        <source>Copy quantity</source>
+        <translation>Kopiyruj wielość</translation>
+    </message>
+    <message>
+        <source>Copy fee</source>
+        <translation>Kopiyruj ôpłŏckã</translation>
+    </message>
+    <message>
+        <source>Copy after fee</source>
+        <translation>Kopiyruj wielość po ôpłŏcce</translation>
+    </message>
+    <message>
+        <source>Copy bytes</source>
+        <translation>Kopiyruj wielość bajtōw</translation>
+    </message>
+    <message>
+        <source>Copy dust</source>
+        <translation>Kopiyruj sztaub</translation>
+    </message>
+    <message>
+        <source>Copy change</source>
+        <translation>Kopiyruj wydŏwkã</translation>
+    </message>
+    <message>
+        <source>(%1 locked)</source>
+        <translation>(%1 zaszperowane)</translation>
+    </message>
+    <message>
+        <source>yes</source>
+        <translation>ja</translation>
+    </message>
+    <message>
+        <source>no</source>
+        <translation>niy</translation>
+    </message>
+    <message>
+        <source>This label turns red if any recipient receives an amount smaller than the current dust threshold.</source>
+        <translation>Ta etyketa stŏwŏ sie czyrwōnŏ jeźli keryś z ôdbiyrŏczy dostŏwŏ kwotã myńszõ aniżeli terŏźny prōg sztaubu.</translation>
+    </message>
+    <message>
+        <source>Can vary +/- %1 satoshi(s) per input.</source>
+        <translation>Chwiyrŏ sie +/- %1 satoshi na wchōd.</translation>
+    </message>
+    <message>
+        <source>(no label)</source>
+        <translation>(chyba etykety)</translation>
+    </message>
+    <message>
+        <source>change from %1 (%2)</source>
+        <translation>wydŏwka z %1 (%2)</translation>
+    </message>
+    <message>
+        <source>(change)</source>
+        <translation>(wydŏwka)</translation>
+    </message>
+</context>
+<context>
+    <name>CreateWalletActivity</name>
+    </context>
+<context>
+    <name>CreateWalletDialog</name>
+    </context>
+<context>
+    <name>EditAddressDialog</name>
+    <message>
+        <source>Edit Address</source>
+        <translation>Edytuj adresã</translation>
+    </message>
+    <message>
+        <source>&amp;Label</source>
+        <translation>&amp;Etyketa</translation>
+    </message>
+    <message>
+        <source>The label associated with this address list entry</source>
+        <translation>Etyketa ôbwiōnzanŏ z tym wpisym na wykŏzie adres</translation>
+    </message>
+    <message>
+        <source>The address associated with this address list entry. This can only be modified for sending addresses.</source>
+        <translation>Ta adresa je ôbwiōnzanŏ z wpisym na wykŏzie adres. Może być zmodyfikowany jyno dlŏ adres posyłajōncych.</translation>
+    </message>
+    <message>
+        <source>&amp;Address</source>
+        <translation>&amp;Adresa</translation>
+    </message>
+    <message>
+        <source>New sending address</source>
+        <translation>Nowŏ adresa posyłaniŏ</translation>
+    </message>
+    <message>
+        <source>Edit receiving address</source>
+        <translation>Edytuj adresã ôdbiōru</translation>
+    </message>
+    <message>
+        <source>Edit sending address</source>
+        <translation>Edytuj adresã posyłaniŏ</translation>
+    </message>
+    <message>
+        <source>The entered address "%1" is not a valid Bitcoin address.</source>
+        <translation>Wkludzōnŏ adresa "%1" niyma nŏleżnōm adresōm Bitcoin.</translation>
+    </message>
+    <message>
+        <source>Address "%1" already exists as a receiving address with label "%2" and so cannot be added as a sending address.</source>
+        <translation>Adresa "%1" już je za adresã ôdbiorczõ z etyketōm "%2" i bez to niy idzie jeji przidać za adresã nadŏwcy.</translation>
+    </message>
+    <message>
+        <source>The entered address "%1" is already in the address book with label "%2".</source>
+        <translation>Wkludzōnŏ adresa "%1" już je w ksiōnżce adres z ôpisym "%2".</translation>
+    </message>
+    <message>
+        <source>Could not unlock wallet.</source>
+        <translation>Niy idzie było ôdszperować portmanyja.</translation>
+    </message>
+    <message>
+        <source>New key generation failed.</source>
+        <translation>Gynerowanie nowego klucza niy podarziło sie.</translation>
+    </message>
+</context>
+<context>
+    <name>FreespaceChecker</name>
+    <message>
+        <source>A new data directory will be created.</source>
+        <translation>Bydzie zrychtowany nowy folder danych.</translation>
+    </message>
+    <message>
+        <source>name</source>
+        <translation>miano</translation>
+    </message>
+    <message>
+        <source>Directory already exists. Add %1 if you intend to create a new directory here.</source>
+        <translation>Katalog już je. Przidej %1 jeźli mŏsz zastrojynie zrychtować tukej nowy katalog.</translation>
+    </message>
+    <message>
+        <source>Cannot create data directory here.</source>
+        <translation>Niy idzie było tukej zrychtować folderu datōw.</translation>
+    </message>
+</context>
+<context>
+    <name>HelpMessageDialog</name>
+    <message>
+        <source>version</source>
+        <translation>wersyjŏ</translation>
+    </message>
+    <message>
+        <source>About %1</source>
+        <translation>Ô %1</translation>
+    </message>
+    <message>
+        <source>Command-line options</source>
+        <translation>Ôpcyje piski nakŏzań</translation>
+    </message>
+</context>
+<context>
+    <name>Intro</name>
+    <message>
+        <source>Welcome</source>
+        <translation>Witej</translation>
+    </message>
+    <message>
+        <source>Welcome to %1.</source>
+        <translation>Witej w %1.</translation>
+    </message>
+    <message>
+        <source>As this is the first time the program is launched, you can choose where %1 will store its data.</source>
+        <translation>Pōniywŏż je to piyrsze sztartniyńcie programu, możesz ôbrać kaj %1 bydzie spamiyntować swoje daty.</translation>
+    </message>
+    <message>
+        <source>When you click OK, %1 will begin to download and process the full %4 block chain (%2GB) starting with the earliest transactions in %3 when %4 initially launched.</source>
+        <translation>Kej naciśniesz OK, %1 zacznie pobiyrać i przetwŏrzać cołkõ %4 keta blokōw (%2GB) przi zaczynaniu ôd piyrszych transakcyji w %3 kej %4 ôstoł sztartniynty.</translation>
+    </message>
+    <message>
+        <source>This initial synchronisation is very demanding, and may expose hardware problems with your computer that had previously gone unnoticed. Each time you run %1, it will continue downloading where it left off.</source>
+        <translation>Wstympnŏ synchrōnizacyjŏ je barzo wymŏgajōncŏ i może wyzdradzić wczaśnij niyzaôbserwowane niyprzileżytości sprzyntowe. Za kożdym sztartniyńciym %1 sebiyranie bydzie kōntynuowane ôd placu w kerym ôstało zastawiōne.</translation>
+    </message>
+    <message>
+        <source>If you have chosen to limit block chain storage (pruning), the historical data must still be downloaded and processed, but will be deleted afterward to keep your disk usage low.</source>
+        <translation>Jeźli ôbrołś ôpcyjõ ukrōcyniŏ spamiyntowaniŏ kety blokōw (przicinanie) daty historyczne cołki czas bydōm musiały być sebrane i
