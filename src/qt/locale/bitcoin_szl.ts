@@ -800,4 +800,183 @@
     </message>
     <message>
         <source>If you have chosen to limit block chain storage (pruning), the historical data must still be downloaded and processed, but will be deleted afterward to keep your disk usage low.</source>
-        <translation>Jeźli ôbrołś ôpcyjõ ukrōcyniŏ spamiyntowaniŏ kety blokōw (przicinanie) daty historyczne cołki czas bydōm musiały być sebrane i
+        <translation>Jeźli ôbrołś ôpcyjõ ukrōcyniŏ spamiyntowaniŏ kety blokōw (przicinanie) daty historyczne cołki czas bydōm musiały być sebrane i przetworzōne, jednak po tym ôstanõ wychrōniōne coby ôgraniczyć użycie dysku.</translation>
+    </message>
+    <message>
+        <source>Use the default data directory</source>
+        <translation>Użyj wychodnego folderu datōw</translation>
+    </message>
+    <message>
+        <source>Use a custom data directory:</source>
+        <translation>Użyj ôbranego folderu datōw</translation>
+    </message>
+    <message>
+        <source>Bitcoin</source>
+        <translation>Bitcoin</translation>
+    </message>
+    <message>
+        <source>At least %1 GB of data will be stored in this directory, and it will grow over time.</source>
+        <translation>Co nojmynij %1 GB datōw ôstanie spamiyntane w tym katalogu, daty te bydōm z czasym corŏz srogsze.</translation>
+    </message>
+    <message>
+        <source>Approximately %1 GB of data will be stored in this directory.</source>
+        <translation>Kole %1 GB datōw ôstanie spamiyntane w tym katalogu.</translation>
+    </message>
+    <message>
+        <source>%1 will download and store a copy of the Bitcoin block chain.</source>
+        <translation>%1 sebiere i spamiyntŏ kopijõ kety blokōw Bitcoin.</translation>
+    </message>
+    <message>
+        <source>The wallet will also be stored in this directory.</source>
+        <translation>Portmanyj tyż ôstanie spamiyntany w tym katalogu.</translation>
+    </message>
+    <message>
+        <source>Error: Specified data directory "%1" cannot be created.</source>
+        <translation>Feler: podany folder datōw "%1" niy mōg ôstać zrychtowany.</translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation>Feler</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n GB of free space available</source>
+        <translation><numerusform>%n GB swobodnego placu dostympne</numerusform><numerusform>%n GB swobodnego placu dostympne</numerusform><numerusform>%n GB swobodnego placu dostympne</numerusform></translation>
+    </message>
+    <message numerus="yes">
+        <source>(of %n GB needed)</source>
+        <translation><numerusform>(z %n GB przidajnego)</numerusform><numerusform>(z %n GB przidajnych)</numerusform><numerusform>(z %n GB przidajnych)</numerusform></translation>
+    </message>
+    </context>
+<context>
+    <name>ModalOverlay</name>
+    <message>
+        <source>Form</source>
+        <translation>Formular</translation>
+    </message>
+    <message>
+        <source>Recent transactions may not yet be visible, and therefore your wallet's balance might be incorrect. This information will be correct once your wallet has finished synchronizing with the bitcoin network, as detailed below.</source>
+        <translation>Świyże transakcyje mogōm niy być jeszcze widzialne, a tedyć saldo portmanyja może być niynŏleżne. Te detale bydōm nŏleżne, kej portmanyj zakōńczy synchrōnizacyjõ z necym bitcoin, zgodnie z miyniōnym ôpisym.</translation>
+    </message>
+    <message>
+        <source>Attempting to spend bitcoins that are affected by not-yet-displayed transactions will not be accepted by the network.</source>
+        <translation>Prōba wydaniŏ bitcoinōw kere niy sōm jeszcze wyświytlōne za transakcyjŏ ôstanie ôdciepniyntŏ bez nec.</translation>
+    </message>
+    <message>
+        <source>Number of blocks left</source>
+        <translation>Ôstało blokōw</translation>
+    </message>
+    <message>
+        <source>Unknown...</source>
+        <translation>Niyznōme...</translation>
+    </message>
+    <message>
+        <source>Last block time</source>
+        <translation>Czŏs ôstatnigo bloku</translation>
+    </message>
+    <message>
+        <source>Progress</source>
+        <translation>Postymp</translation>
+    </message>
+    <message>
+        <source>Progress increase per hour</source>
+        <translation>Przirost postympu na godzinã</translation>
+    </message>
+    <message>
+        <source>calculating...</source>
+        <translation>ôbliczanie...</translation>
+    </message>
+    <message>
+        <source>Estimated time left until synced</source>
+        <translation>Przewidowany czŏs abszlusu synchrōnizacyje</translation>
+    </message>
+    <message>
+        <source>Hide</source>
+        <translation>Skryj</translation>
+    </message>
+    </context>
+<context>
+    <name>OpenURIDialog</name>
+    <message>
+        <source>URI:</source>
+        <translation>URI:</translation>
+    </message>
+</context>
+<context>
+    <name>OpenWalletActivity</name>
+    <message>
+        <source>default wallet</source>
+        <translation>wychodny portmanyj</translation>
+    </message>
+    </context>
+<context>
+    <name>OptionsDialog</name>
+    <message>
+        <source>Options</source>
+        <translation>Ôpcyje</translation>
+    </message>
+    <message>
+        <source>&amp;Main</source>
+        <translation>&amp;Bazowe</translation>
+    </message>
+    <message>
+        <source>Automatically start %1 after logging in to the system.</source>
+        <translation>Autōmatycznie sztartnij %1 po wlogowaniu do systymu.</translation>
+    </message>
+    <message>
+        <source>&amp;Start %1 on system login</source>
+        <translation>&amp;Sztartuj %1 w czasie logowaniŏ do systymu</translation>
+    </message>
+    <message>
+        <source>Size of &amp;database cache</source>
+        <translation>Srogość bufōra bazy datōw</translation>
+    </message>
+    <message>
+        <source>Number of script &amp;verification threads</source>
+        <translation>Wielość wōntkōw &amp;weryfikacyje skryptu</translation>
+    </message>
+    <message>
+        <source>IP address of the proxy (e.g. IPv4: 127.0.0.1 / IPv6: ::1)</source>
+        <translation>Adresa IP proxy (bp. IPv4: 127.0.0.1 / IPv6: ::1)</translation>
+    </message>
+    <message>
+        <source>Minimize instead of exit the application when the window is closed. When this option is enabled, the application will be closed only after selecting Exit in the menu.</source>
+        <translation>Minimalizuje zamiast zakōńczyć fungowanie aplikacyje przi zawiyraniu ôkna. Kej ta ôpcyjŏ je zapuszczonŏ, aplikacyjŏ zakōńczy fungowanie po ôbraniu Zawrzij w myni.</translation>
+    </message>
+    <message>
+        <source>Open the %1 configuration file from the working directory.</source>
+        <translation>Ôdewrzij %1 zbiōr kōnfiguracyje z czynnego katalogu.</translation>
+    </message>
+    <message>
+        <source>Open Configuration File</source>
+        <translation>Ôdewrzij zbiōr kōnfiguracyje</translation>
+    </message>
+    <message>
+        <source>Reset all client options to default.</source>
+        <translation>Prziwrōć wszyjske wychodne ustawiyniŏ klijynta.</translation>
+    </message>
+    <message>
+        <source>&amp;Reset Options</source>
+        <translation>&amp;Resetuj Ôpcyje</translation>
+    </message>
+    <message>
+        <source>&amp;Network</source>
+        <translation>&amp;Nec</translation>
+    </message>
+    <message>
+        <source>Disables some advanced features but all blocks will still be fully validated. Reverting this setting requires re-downloading the entire blockchain. Actual disk usage may be somewhat higher.</source>
+        <translation>Zastawiŏ niykere moderne funkcyje, ale wszyjske bloki durch bydōm w połni wybadowane. Cŏfniyńcie tego nasztalowaniŏ fołdruje pōnownego sebraniŏ cołkij kety blokōw. Istne spotrzebowanie dysku może być cosikej wyższe.</translation>
+    </message>
+    <message>
+        <source>Prune &amp;block storage to</source>
+        <translation>Przitnij skłŏd &amp;blokōw do</translation>
+    </message>
+    <message>
+        <source>GB</source>
+        <translation>GB</translation>
+    </message>
+    <message>
+        <source>Reverting this setting requires re-downloading the entire blockchain.</source>
+        <translation>Cŏfniyńcie tego ustawiyniŏ fołdruje pōnownego sebraniŏ cołkij kety blokōw.</translation>
+    </message>
+    <message>
+        <source>(0 = auto, &lt;0 = leave that many cores free)</sour
