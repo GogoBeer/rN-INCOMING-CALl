@@ -979,4 +979,242 @@
         <translation>Cŏfniyńcie tego ustawiyniŏ fołdruje pōnownego sebraniŏ cołkij kety blokōw.</translation>
     </message>
     <message>
-        <source>(0 = auto, &lt;0 = leave that many cores free)</sour
+        <source>(0 = auto, &lt;0 = leave that many cores free)</source>
+        <translation>(0 = autōmatycznie, &lt;0 = ôstŏw tela swobodnych drzyni)</translation>
+    </message>
+    <message>
+        <source>W&amp;allet</source>
+        <translation>Portm&amp;anyj</translation>
+    </message>
+    <message>
+        <source>Expert</source>
+        <translation>Ekspert</translation>
+    </message>
+    <message>
+        <source>Enable coin &amp;control features</source>
+        <translation>Zapuść funkcyje kōntroli mōnet</translation>
+    </message>
+    <message>
+        <source>If you disable the spending of unconfirmed change, the change from a transaction cannot be used until that transaction has at least one confirmation. This also affects how your balance is computed.</source>
+        <translation>Jeźli zastawisz możebność wydaniŏ niyprzituplikowanyj wydanej wydŏwki, wydŏwka z transakcyje niy bydzie mogła ôstać użytŏ, podwiela ta transakcyjŏ niy bydzie miała nojmynij jednego przituplowaniŏ. To tyż mŏ wpływ na porachowanie Twojigo salda.</translation>
+    </message>
+    <message>
+        <source>&amp;Spend unconfirmed change</source>
+        <translation>&amp;Wydej niyprzituplowanõ wydŏwkã</translation>
+    </message>
+    <message>
+        <source>Automatically open the Bitcoin client port on the router. This only works when your router supports UPnP and it is enabled.</source>
+        <translation>Autōmatycznie ôdewrzij port klijynta Bitcoin na routerze. Ta ôpcyjŏ funguje ino jeźli twōj router podpiyrŏ UPnP i je ôno zapuszczone.</translation>
+    </message>
+    <message>
+        <source>Map port using &amp;UPnP</source>
+        <translation>Mapuj port przi używaniu &amp;UPnP</translation>
+    </message>
+    <message>
+        <source>Accept connections from outside.</source>
+        <translation>Akceptuj skuplowania ôd zewnōntrz.</translation>
+    </message>
+    <message>
+        <source>Allow incomin&amp;g connections</source>
+        <translation>Zwōl na skuplowania przichodzōnce</translation>
+    </message>
+    <message>
+        <source>Connect to the Bitcoin network through a SOCKS5 proxy.</source>
+        <translation>Skupluj sie z necym Bitcoin bez SOCKS5 proxy.</translation>
+    </message>
+    <message>
+        <source>&amp;Connect through SOCKS5 proxy (default proxy):</source>
+        <translation>&amp;Skupluj bez proxy SOCKS5 (wychodne proxy):</translation>
+    </message>
+    <message>
+        <source>Proxy &amp;IP:</source>
+        <translation>Proxy &amp;IP:</translation>
+    </message>
+    <message>
+        <source>&amp;Port:</source>
+        <translation>&amp;Port:</translation>
+    </message>
+    <message>
+        <source>Port of the proxy (e.g. 9050)</source>
+        <translation>Port ôd proxy (bp. 9050)</translation>
+    </message>
+    <message>
+        <source>IPv4</source>
+        <translation>IPv4</translation>
+    </message>
+    <message>
+        <source>IPv6</source>
+        <translation>IPv6</translation>
+    </message>
+    <message>
+        <source>Tor</source>
+        <translation>Tor</translation>
+    </message>
+    <message>
+        <source>&amp;Window</source>
+        <translation>Ô&amp;kno</translation>
+    </message>
+    <message>
+        <source>User Interface &amp;language:</source>
+        <translation>Gŏdka &amp;używŏcza:</translation>
+    </message>
+    <message>
+        <source>The user interface language can be set here. This setting will take effect after restarting %1.</source>
+        <translation>Idzie sam nasztalować gŏdka interfejsu używŏcza. Nasztalowanie prziniesie skutki po resztarcie %1.</translation>
+    </message>
+    <message>
+        <source>&amp;OK</source>
+        <translation>&amp;OK</translation>
+    </message>
+    <message>
+        <source>&amp;Cancel</source>
+        <translation>&amp;Pociep</translation>
+    </message>
+    <message>
+        <source>default</source>
+        <translation>wychodny</translation>
+    </message>
+    <message>
+        <source>none</source>
+        <translation>żŏdyn</translation>
+    </message>
+    <message>
+        <source>Configuration options</source>
+        <translation>Ôpcyje kōnfiguracyje</translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation>Feler</translation>
+    </message>
+    </context>
+<context>
+    <name>OverviewPage</name>
+    <message>
+        <source>Form</source>
+        <translation>Formular</translation>
+    </message>
+    <message>
+        <source>The displayed information may be out of date. Your wallet automatically synchronizes with the Bitcoin network after a connection is established, but this process has not completed yet.</source>
+        <translation>Wyświytlanŏ informacyjŏ może być niyterŏźnŏ. Twōj portmanyj synchrōnizuje sie autōmatycznie z necym bitcoin zarŏz po tym, jak zrychtowane je skuplowanie, ale proces tyn niy ôstoł jeszcze skōńczōny.</translation>
+    </message>
+    <message>
+        <source>Available:</source>
+        <translation>Dostympne:</translation>
+    </message>
+    <message>
+        <source>Pending:</source>
+        <translation>Czekajōnce:</translation>
+    </message>
+    <message>
+        <source>Balances</source>
+        <translation>Salda</translation>
+    </message>
+    <message>
+        <source>Total:</source>
+        <translation>Cuzamyn:</translation>
+    </message>
+    <message>
+        <source>Your current total balance</source>
+        <translation>Twoje terŏźne saldo</translation>
+    </message>
+    </context>
+<context>
+    <name>PSBTOperationsDialog</name>
+    <message>
+        <source>or</source>
+        <translation>abo</translation>
+    </message>
+    </context>
+<context>
+    <name>PaymentServer</name>
+    <message>
+        <source>Payment request error</source>
+        <translation>Feler żōndaniŏ płatu</translation>
+    </message>
+    <message>
+        <source>URI handling</source>
+        <translation>Bedynōng URI</translation>
+    </message>
+    <message>
+        <source>'bitcoin://' is not a valid URI. Use 'bitcoin:' instead.</source>
+        <translation>'bitcoin://' to niyma nŏleżne URI. Użyj 'bitcoin:'.</translation>
+    </message>
+    </context>
+<context>
+    <name>PeerTableModel</name>
+    <message>
+        <source>User Agent</source>
+        <translation>Agynt Używŏcza</translation>
+    </message>
+    <message>
+        <source>Ping</source>
+        <translation>Ping</translation>
+    </message>
+    <message>
+        <source>Received</source>
+        <translation>Ôdebrane</translation>
+    </message>
+</context>
+<context>
+    <name>QObject</name>
+    <message>
+        <source>Amount</source>
+        <translation>Kwota</translation>
+    </message>
+    <message>
+        <source>Enter a Bitcoin address (e.g. %1)</source>
+        <translation>Wkludź adresã Bitcoin (bp. %1)</translation>
+    </message>
+    <message>
+        <source>%1 d</source>
+        <translation>%1 d</translation>
+    </message>
+    <message>
+        <source>%1 h</source>
+        <translation>%1 h</translation>
+    </message>
+    <message>
+        <source>%1 m</source>
+        <translation>%1 m</translation>
+    </message>
+    <message>
+        <source>%1 s</source>
+        <translation>%1 s</translation>
+    </message>
+    <message>
+        <source>N/A</source>
+        <translation>N/A</translation>
+    </message>
+    <message>
+        <source>%1 ms</source>
+        <translation>%1 ms</translation>
+    </message>
+    <message>
+        <source>%1 B</source>
+        <translation>%1 B</translation>
+    </message>
+    <message>
+        <source>%1 KB</source>
+        <translation>%1 KB</translation>
+    </message>
+    <message>
+        <source>%1 MB</source>
+        <translation>%1 MB</translation>
+    </message>
+    <message>
+        <source>%1 GB</source>
+        <translation>%1 GB</translation>
+    </message>
+    <message>
+        <source>Error: %1</source>
+        <translation>Feler: %1</translation>
+    </message>
+    <message>
+        <source>unknown</source>
+        <translation>niyznōme</translation>
+    </message>
+</context>
+<context>
+    <name>QRImageWidget</name>
+    <message>
+        <source>&amp;Save Image...</source
