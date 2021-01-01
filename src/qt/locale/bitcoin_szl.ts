@@ -169,4 +169,202 @@
     </message>
     <message>
         <source>Wallet encrypted</source>
-        <translation>Portmanyj zaszyfrowan
+        <translation>Portmanyj zaszyfrowany</translation>
+    </message>
+    <message>
+        <source>IMPORTANT: Any previous backups you have made of your wallet file should be replaced with the newly generated, encrypted wallet file. For security reasons, previous backups of the unencrypted wallet file will become useless as soon as you start using the new, encrypted wallet.</source>
+        <translation>WŎŻNE: Wszyjske wykōnane wczaśnij kopije zbioru portmanyja winny być umiyniōne na nowe, szyfrowane zbiory. Z powodōw bezpiyczyństwa, piyrwyjsze kopije niyszyfrowanych zbiorōw portmanyja stōnõ sie bezużyteczne jak ino zaczniesz używać nowego, szyfrowanego portmanyja.</translation>
+    </message>
+    <message>
+        <source>Wallet encryption failed</source>
+        <translation>Zaszyfrowanie portmanyja niy podarziło sie</translation>
+    </message>
+    <message>
+        <source>Wallet encryption failed due to an internal error. Your wallet was not encrypted.</source>
+        <translation>Zaszyfrowanie portmanyja niy podarziło sie bez wnyntrzny feler. Twōj portmanyj niy ôstoł zaszyfrowany.</translation>
+    </message>
+    <message>
+        <source>The supplied passphrases do not match.</source>
+        <translation>Podane hasła niy sōm take same.</translation>
+    </message>
+    <message>
+        <source>Wallet unlock failed</source>
+        <translation>Ôdszperowanie portmanyja niy podarziło sie</translation>
+    </message>
+    <message>
+        <source>The passphrase entered for the wallet decryption was incorrect.</source>
+        <translation>Wkludzōne hasło do ôdszyfrowaniŏ portmanyja je niynŏleżne.</translation>
+    </message>
+    <message>
+        <source>Wallet decryption failed</source>
+        <translation>Ôdszyfrowanie portmanyja niy podarziło sie</translation>
+    </message>
+    <message>
+        <source>Wallet passphrase was successfully changed.</source>
+        <translation>Hasło do portmanyja ôstało sprŏwnie pōmiyniōne.</translation>
+    </message>
+    <message>
+        <source>Warning: The Caps Lock key is on!</source>
+        <translation>Pozōr: Caps Lock je zapuszczōny!</translation>
+    </message>
+</context>
+<context>
+    <name>BanTableModel</name>
+    <message>
+        <source>IP/Netmask</source>
+        <translation>IP/Maska necu</translation>
+    </message>
+    <message>
+        <source>Banned Until</source>
+        <translation>Szpera do</translation>
+    </message>
+</context>
+<context>
+    <name>BitcoinGUI</name>
+    <message>
+        <source>Sign &amp;message...</source>
+        <translation>Szkryftnij &amp;wiadōmość</translation>
+    </message>
+    <message>
+        <source>Synchronizing with network...</source>
+        <translation>Synchrōnizacyjŏ z necym...</translation>
+    </message>
+    <message>
+        <source>&amp;Overview</source>
+        <translation>&amp;Podsumowanie</translation>
+    </message>
+    <message>
+        <source>Show general overview of wallet</source>
+        <translation>Pokazuje ôgōlny widok portmanyja</translation>
+    </message>
+    <message>
+        <source>&amp;Transactions</source>
+        <translation>&amp;Transakcyje</translation>
+    </message>
+    <message>
+        <source>Browse transaction history</source>
+        <translation>Przeglōndej historyjõ transakcyji</translation>
+    </message>
+    <message>
+        <source>E&amp;xit</source>
+        <translation>&amp;Zakōńcz</translation>
+    </message>
+    <message>
+        <source>Quit application</source>
+        <translation>Zawrzij aplikacyjõ</translation>
+    </message>
+    <message>
+        <source>&amp;About %1</source>
+        <translation>&amp;Ô %1</translation>
+    </message>
+    <message>
+        <source>Show information about %1</source>
+        <translation>Pokŏż informacyje ô %1</translation>
+    </message>
+    <message>
+        <source>About &amp;Qt</source>
+        <translation>Ô &amp;Qt</translation>
+    </message>
+    <message>
+        <source>Show information about Qt</source>
+        <translation>Pokŏż informacyje ô Qt</translation>
+    </message>
+    <message>
+        <source>&amp;Options...</source>
+        <translation>Ô&amp;pcyje...</translation>
+    </message>
+    <message>
+        <source>Modify configuration options for %1</source>
+        <translation>Zmiyń ôpcyje kōnfiguracyje dlŏ %1</translation>
+    </message>
+    <message>
+        <source>&amp;Encrypt Wallet...</source>
+        <translation>&amp;Zaszyfruj Portmanyj...</translation>
+    </message>
+    <message>
+        <source>&amp;Backup Wallet...</source>
+        <translation>Zrychtuj kopijõ ibrycznõ</translation>
+    </message>
+    <message>
+        <source>&amp;Change Passphrase...</source>
+        <translation>Pōmiyń &amp;hasło</translation>
+    </message>
+    <message>
+        <source>Open &amp;URI...</source>
+        <translation>Ôdewrzij &amp;URI...</translation>
+    </message>
+    <message>
+        <source>Wallet:</source>
+        <translation>Portmanyj:</translation>
+    </message>
+    <message>
+        <source>Click to disable network activity.</source>
+        <translation>Kliknij coby zastawić aktywność necowõ.</translation>
+    </message>
+    <message>
+        <source>Network activity disabled.</source>
+        <translation>Aktywność necowŏ ôstała zastawiōnŏ.</translation>
+    </message>
+    <message>
+        <source>Click to enable network activity again.</source>
+        <translation>Kliknij, coby zaś zapuścić aktywność necowõ.</translation>
+    </message>
+    <message>
+        <source>Syncing Headers (%1%)...</source>
+        <translation>Synchrōnizowanie nŏgōwkōw (%1%)...</translation>
+    </message>
+    <message>
+        <source>Reindexing blocks on disk...</source>
+        <translation>Pōnowne indeksowanie blokōw na dysku...</translation>
+    </message>
+    <message>
+        <source>Proxy is &lt;b&gt;enabled&lt;/b&gt;: %1</source>
+        <translation>Proxy je &lt;b&gt;zapuszczone&lt;/b&gt;: %1</translation>
+    </message>
+    <message>
+        <source>Send coins to a Bitcoin address</source>
+        <translation>Poślij mōnety na adresã Bitcoin</translation>
+    </message>
+    <message>
+        <source>Backup wallet to another location</source>
+        <translation>Ibryczny portmanyj w inkszyj lokalizacyje</translation>
+    </message>
+    <message>
+        <source>Change the passphrase used for wallet encryption</source>
+        <translation>Pōmiyń hasło użyte do szyfrowaniŏ portmanyja</translation>
+    </message>
+    <message>
+        <source>&amp;Verify message...</source>
+        <translation>&amp;Weryfikuj wiadōmość...</translation>
+    </message>
+    <message>
+        <source>&amp;Send</source>
+        <translation>&amp;Poślij</translation>
+    </message>
+    <message>
+        <source>&amp;Receive</source>
+        <translation>Ôd&amp;bier</translation>
+    </message>
+    <message>
+        <source>&amp;Show / Hide</source>
+        <translation>Pokŏż / &amp;Skryj</translation>
+    </message>
+    <message>
+        <source>Show or hide the main Window</source>
+        <translation>Pokazuje abo skrywŏ bazowe ôkno</translation>
+    </message>
+    <message>
+        <source>Encrypt the private keys that belong to your wallet</source>
+        <translation>Szyfruj klucze prywatne, kere sōm we twojim portmanyju</translation>
+    </message>
+    <message>
+        <source>Sign messages with your Bitcoin addresses to prove you own them</source>
+        <translation>Podpisz wiadōmości swojōm adresōm coby dowiyść jejich posiadanie</translation>
+    </message>
+    <message>
+        <source>Verify messages to ensure they were signed with specified Bitcoin addresses</source>
+        <translation>Zweryfikuj wiadōmość, coby wejzdrzeć sie, iże ôstała podpisanŏ podanōm adresōm Bitcoin.</translation>
+    </message>
+    <message>
+        <source>&amp;File</source>
+        <translation>&amp;Zbiōr</tra
