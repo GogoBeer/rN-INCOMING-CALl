@@ -367,4 +367,236 @@
     </message>
     <message>
         <source>&amp;File</source>
-        <translation>&amp;Zbiōr</tra
+        <translation>&amp;Zbiōr</translation>
+    </message>
+    <message>
+        <source>&amp;Settings</source>
+        <translation>&amp;Nasztalowania</translation>
+    </message>
+    <message>
+        <source>&amp;Help</source>
+        <translation>Pō&amp;moc</translation>
+    </message>
+    <message>
+        <source>Tabs toolbar</source>
+        <translation>Lajsta szkart</translation>
+    </message>
+    <message>
+        <source>Request payments (generates QR codes and bitcoin: URIs)</source>
+        <translation>Żōndej płatu (gyneruje kod QR jak tyż URI bitcoin:)</translation>
+    </message>
+    <message>
+        <source>Show the list of used sending addresses and labels</source>
+        <translation>Pokŏż wykŏz adres i etyket użytych do posyłaniŏ</translation>
+    </message>
+    <message>
+        <source>Show the list of used receiving addresses and labels</source>
+        <translation>Pokŏż wykŏz adres i etyket użytych do ôdbiyraniŏ</translation>
+    </message>
+    <message>
+        <source>&amp;Command-line options</source>
+        <translation>Ôp&amp;cyje piski nakŏzań</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n active connection(s) to Bitcoin network</source>
+        <translation><numerusform>%n aktywne połōnczynie do necu Bitcoin</numerusform><numerusform>%n aktywnych połōnczyń do necu Bitcoin</numerusform><numerusform>%n aktywnych skuplowań do necu Bitcoin</numerusform></translation>
+    </message>
+    <message>
+        <source>Indexing blocks on disk...</source>
+        <translation>Indeksowanie blokōw na dysku...</translation>
+    </message>
+    <message>
+        <source>Processing blocks on disk...</source>
+        <translation>Przetwŏrzanie blokōw na dysku...</translation>
+    </message>
+    <message numerus="yes">
+        <source>Processed %n block(s) of transaction history.</source>
+        <translation><numerusform>Przetworzōno %n blok historyji transakcyji.</numerusform><numerusform>Przetworzōno %n blokōw historyji transakcyji.</numerusform><numerusform>Przetworzōno %n blokōw historyji transakcyji.</numerusform></translation>
+    </message>
+    <message>
+        <source>%1 behind</source>
+        <translation>%1 za</translation>
+    </message>
+    <message>
+        <source>Last received block was generated %1 ago.</source>
+        <translation>Ôstatni dostany blok ôstoł wygynerowany %1 tymu.</translation>
+    </message>
+    <message>
+        <source>Transactions after this will not yet be visible.</source>
+        <translation>Transakcyje po tym mōmyncie niy bydōm jeszcze widzialne.</translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation>Feler</translation>
+    </message>
+    <message>
+        <source>Warning</source>
+        <translation>Pozōr</translation>
+    </message>
+    <message>
+        <source>Information</source>
+        <translation>Informacyjŏ</translation>
+    </message>
+    <message>
+        <source>Up to date</source>
+        <translation>Terŏźny</translation>
+    </message>
+    <message>
+        <source>&amp;Sending addresses</source>
+        <translation>&amp;Adresy posyłaniŏ</translation>
+    </message>
+    <message>
+        <source>Show the %1 help message to get a list with possible Bitcoin command-line options</source>
+        <translation>Pokŏż pōmoc %1 coby zobŏczyć wykŏz wszyjskich ôpcyji piski nakŏzań.</translation>
+    </message>
+    <message>
+        <source>default wallet</source>
+        <translation>wychodny portmanyj</translation>
+    </message>
+    <message>
+        <source>&amp;Window</source>
+        <translation>Ô&amp;kno</translation>
+    </message>
+    <message>
+        <source>%1 client</source>
+        <translation>%1 klijynt</translation>
+    </message>
+    <message>
+        <source>Catching up...</source>
+        <translation>Trwŏ synchrōnizacyjŏ...</translation>
+    </message>
+    <message>
+        <source>Error: %1</source>
+        <translation>Feler: %1</translation>
+    </message>
+    <message>
+        <source>Date: %1
+</source>
+        <translation>Datōm: %1
+</translation>
+    </message>
+    <message>
+        <source>Amount: %1
+</source>
+        <translation>Kwota: %1
+</translation>
+    </message>
+    <message>
+        <source>Wallet: %1
+</source>
+        <translation>Portmanyj: %1
+</translation>
+    </message>
+    <message>
+        <source>Type: %1
+</source>
+        <translation>Zorta: %1
+</translation>
+    </message>
+    <message>
+        <source>Label: %1
+</source>
+        <translation>Etyketa: %1
+</translation>
+    </message>
+    <message>
+        <source>Address: %1
+</source>
+        <translation>Adresa: %1
+</translation>
+    </message>
+    <message>
+        <source>Sent transaction</source>
+        <translation>Transakcyjŏ wysłanŏ</translation>
+    </message>
+    <message>
+        <source>Incoming transaction</source>
+        <translation>Transakcyjŏ przichodzōncŏ</translation>
+    </message>
+    <message>
+        <source>HD key generation is &lt;b&gt;enabled&lt;/b&gt;</source>
+        <translation>Gynerowanie kluczy HD je &lt;b&gt;zapuszczone&lt;/b&gt;</translation>
+    </message>
+    <message>
+        <source>HD key generation is &lt;b&gt;disabled&lt;/b&gt;</source>
+        <translation>Gynerowanie kluczy HD je &lt;b&gt;zastawiōne&lt;/b&gt;</translation>
+    </message>
+    <message>
+        <source>Wallet is &lt;b&gt;encrypted&lt;/b&gt; and currently &lt;b&gt;unlocked&lt;/b&gt;</source>
+        <translation>Portmanyj je &lt;b&gt;zaszyfrowany&lt;/b&gt; i terŏźnie &lt;b&gt;ôdszperowany&lt;/b&gt;</translation>
+    </message>
+    <message>
+        <source>Wallet is &lt;b&gt;encrypted&lt;/b&gt; and currently &lt;b&gt;locked&lt;/b&gt;</source>
+        <translation>Portmanyj je &lt;b&gt;zaszyfrowany&lt;/b&gt; i terŏźnie &lt;b&gt;zaszperowany&lt;/b&gt;</translation>
+    </message>
+    </context>
+<context>
+    <name>CoinControlDialog</name>
+    <message>
+        <source>Coin Selection</source>
+        <translation>Ôbiōr mōnet</translation>
+    </message>
+    <message>
+        <source>Quantity:</source>
+        <translation>Wielość:</translation>
+    </message>
+    <message>
+        <source>Bytes:</source>
+        <translation>Bajtōw:</translation>
+    </message>
+    <message>
+        <source>Amount:</source>
+        <translation>Kwota:</translation>
+    </message>
+    <message>
+        <source>Fee:</source>
+        <translation>Ôpłŏcka:</translation>
+    </message>
+    <message>
+        <source>Dust:</source>
+        <translation>Sztaub:</translation>
+    </message>
+    <message>
+        <source>After Fee:</source>
+        <translation>Po ôpłŏcce:</translation>
+    </message>
+    <message>
+        <source>Change:</source>
+        <translation>Wydŏwka:</translation>
+    </message>
+    <message>
+        <source>(un)select all</source>
+        <translation>Zaznacz/Ôdznacz wszyjsko</translation>
+    </message>
+    <message>
+        <source>Tree mode</source>
+        <translation>Tryb strōma</translation>
+    </message>
+    <message>
+        <source>List mode</source>
+        <translation>Tryb wykŏzu</translation>
+    </message>
+    <message>
+        <source>Amount</source>
+        <translation>Kwota</translation>
+    </message>
+    <message>
+        <source>Received with label</source>
+        <translation>Ôdebrane z etyketōm</translation>
+    </message>
+    <message>
+        <source>Received with address</source>
+        <translation>Ôdebrane z adresōm</translation>
+    </message>
+    <message>
+        <source>Date</source>
+        <translation>Datōm</translation>
+    </message>
+    <message>
+        <source>Confirmations</source>
+        <translation>Przituplowania</translation>
+    </message>
+    <message>
+        <source>Confirmed</source>
+        <translation>Przituplowany</translation>
+    
