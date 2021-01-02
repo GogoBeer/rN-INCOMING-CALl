@@ -1450,4 +1450,268 @@
     </message>
     <message>
         <source>(no label)</source>
-        <translation>(chyba etykety)</translatio
+        <translation>(chyba etykety)</translation>
+    </message>
+    </context>
+<context>
+    <name>SendCoinsDialog</name>
+    <message>
+        <source>Send Coins</source>
+        <translation>Poślij mōnety</translation>
+    </message>
+    <message>
+        <source>Quantity:</source>
+        <translation>Wielość:</translation>
+    </message>
+    <message>
+        <source>Bytes:</source>
+        <translation>Bajtōw:</translation>
+    </message>
+    <message>
+        <source>Amount:</source>
+        <translation>Kwota:</translation>
+    </message>
+    <message>
+        <source>Fee:</source>
+        <translation>Ôpłŏcka:</translation>
+    </message>
+    <message>
+        <source>After Fee:</source>
+        <translation>Po ôpłŏcce:</translation>
+    </message>
+    <message>
+        <source>Change:</source>
+        <translation>Wydŏwka:</translation>
+    </message>
+    <message>
+        <source>Choose...</source>
+        <translation>Ôbier...</translation>
+    </message>
+    <message>
+        <source>Warning: Fee estimation is currently not possible.</source>
+        <translation>Pozōr: Ôszacowanie ôpłŏcki za transakcyje je aktualnie niymożebne.</translation>
+    </message>
+    <message>
+        <source>per kilobyte</source>
+        <translation>na kilobajt</translation>
+    </message>
+    <message>
+        <source>Hide</source>
+        <translation>Skryj</translation>
+    </message>
+    <message>
+        <source>Recommended:</source>
+        <translation>Doradzane:</translation>
+    </message>
+    <message>
+        <source>Custom:</source>
+        <translation>Włŏsne:</translation>
+    </message>
+    <message>
+        <source>Dust:</source>
+        <translation>Sztaub:</translation>
+    </message>
+    <message>
+        <source>Balance:</source>
+        <translation>Saldo:</translation>
+    </message>
+    <message>
+        <source>Copy quantity</source>
+        <translation>Kopiyruj wielość</translation>
+    </message>
+    <message>
+        <source>Copy amount</source>
+        <translation>Kopiyruj kwotã</translation>
+    </message>
+    <message>
+        <source>Copy fee</source>
+        <translation>Kopiyruj ôpłŏckã</translation>
+    </message>
+    <message>
+        <source>Copy after fee</source>
+        <translation>Kopiyruj wielość po ôpłŏcce</translation>
+    </message>
+    <message>
+        <source>Copy bytes</source>
+        <translation>Kopiyruj wielość bajtōw</translation>
+    </message>
+    <message>
+        <source>Copy dust</source>
+        <translation>Kopiyruj sztaub</translation>
+    </message>
+    <message>
+        <source>Copy change</source>
+        <translation>Kopiyruj wydŏwkã</translation>
+    </message>
+    <message>
+        <source>%1 (%2 blocks)</source>
+        <translation>%1 (%2 blokōw)</translation>
+    </message>
+    <message>
+        <source>or</source>
+        <translation>abo</translation>
+    </message>
+    <message>
+        <source>Transaction creation failed!</source>
+        <translation>Utworzynie transakcyje niy podarziło sie!</translation>
+    </message>
+    <message>
+        <source>Warning: Invalid Bitcoin address</source>
+        <translation>Pozōr: niynŏleżnŏ adresa Bitcoin</translation>
+    </message>
+    <message>
+        <source>Warning: Unknown change address</source>
+        <translation>Pozōr: Niyznōmŏ adresa wydŏwki</translation>
+    </message>
+    <message>
+        <source>(no label)</source>
+        <translation>(chyba etykety)</translation>
+    </message>
+</context>
+<context>
+    <name>SendCoinsEntry</name>
+    <message>
+        <source>&amp;Label:</source>
+        <translation>&amp;Etyketa:</translation>
+    </message>
+    <message>
+        <source>The Bitcoin address to send the payment to</source>
+        <translation>Adresa Bitcoin, na kerõ chcesz posłać płat</translation>
+    </message>
+    <message>
+        <source>Alt+A</source>
+        <translation>Alt+A</translation>
+    </message>
+    <message>
+        <source>Alt+P</source>
+        <translation>Alt+P</translation>
+    </message>
+    <message>
+        <source>Use available balance</source>
+        <translation>Użyj dostympnego salda</translation>
+    </message>
+    <message>
+        <source>Message:</source>
+        <translation>Wiadōmość:</translation>
+    </message>
+    <message>
+        <source>A message that was attached to the bitcoin: URI which will be stored with the transaction for your reference. Note: This message will not be sent over the Bitcoin network.</source>
+        <translation>Wiadōmość, kerŏ ôstała prziwstōnŏ do URI bitcoin:, kerŏ bydzie przechowowanŏ z transakcyjōm w cylach informacyjnych. Napōmniynie: Ta wiadōmość niy bydzie rozszyrzowanŏ w necu Bitcoin.</translation>
+    </message>
+    </context>
+<context>
+    <name>ShutdownWindow</name>
+    </context>
+<context>
+    <name>SignVerifyMessageDialog</name>
+    <message>
+        <source>Signatures - Sign / Verify a Message</source>
+        <translation>Szkryfki - Podpisz / Zweryfikuj Wiadōmość</translation>
+    </message>
+    <message>
+        <source>&amp;Sign Message</source>
+        <translation>&amp;Szkryftnij Wiadōmość</translation>
+    </message>
+    <message>
+        <source>Alt+A</source>
+        <translation>Alt+A</translation>
+    </message>
+    <message>
+        <source>Alt+P</source>
+        <translation>Alt+P</translation>
+    </message>
+    <message>
+        <source>Sign &amp;Message</source>
+        <translation>Szkryftnij &amp;Wiadōmość</translation>
+    </message>
+    <message>
+        <source>&amp;Verify Message</source>
+        <translation>&amp;Weryfikuj Wiadōmość</translation>
+    </message>
+    <message>
+        <source>Message signing failed.</source>
+        <translation>Szkryftniyńcie wiadōmości niy podarziło sie.</translation>
+    </message>
+    <message>
+        <source>Message signed.</source>
+        <translation>Wiadōmość szkryftniyntŏ.</translation>
+    </message>
+    <message>
+        <source>Message verification failed.</source>
+        <translation>Weryfikacyjŏ wiadōmości niy podarziła sie.</translation>
+    </message>
+    </context>
+<context>
+    <name>TrafficGraphWidget</name>
+    <message>
+        <source>KB/s</source>
+        <translation>KB/s</translation>
+    </message>
+</context>
+<context>
+    <name>TransactionDesc</name>
+    <message>
+        <source>Status</source>
+        <translation>Sztatus</translation>
+    </message>
+    <message>
+        <source>Date</source>
+        <translation>Datōm</translation>
+    </message>
+    <message>
+        <source>Source</source>
+        <translation>Źrōdło</translation>
+    </message>
+    <message>
+        <source>From</source>
+        <translation>Z</translation>
+    </message>
+    <message>
+        <source>unknown</source>
+        <translation>niyznōme</translation>
+    </message>
+    <message>
+        <source>To</source>
+        <translation>Do</translation>
+    </message>
+    <message>
+        <source>label</source>
+        <translation>etyketa</translation>
+    </message>
+    <message>
+        <source>Message</source>
+        <translation>Wiadōmość</translation>
+    </message>
+    <message>
+        <source>Comment</source>
+        <translation>Kōmyntŏrz</translation>
+    </message>
+    <message>
+        <source>Transaction</source>
+        <translation>Transakcyjŏ</translation>
+    </message>
+    <message>
+        <source>Amount</source>
+        <translation>Kwota</translation>
+    </message>
+    </context>
+<context>
+    <name>TransactionDescDialog</name>
+    </context>
+<context>
+    <name>TransactionTableModel</name>
+    <message>
+        <source>Date</source>
+        <translation>Datōm</translation>
+    </message>
+    <message>
+        <source>Type</source>
+        <translation>Zorta</translation>
+    </message>
+    <message>
+        <source>Label</source>
+        <translation>Etyketa</translation>
+    </message>
+    <message>
+        <source>Received with</source>
+        <translation>Ô
