@@ -1217,4 +1217,237 @@
 <context>
     <name>QRImageWidget</name>
     <message>
-        <source>&amp;Save Image...</source
+        <source>&amp;Save Image...</source>
+        <translation>&amp;Spamiyntej Ôbrŏzek</translation>
+    </message>
+    <message>
+        <source>&amp;Copy Image</source>
+        <translation>&amp;Kopiyruj Ôbrŏzek</translation>
+    </message>
+    <message>
+        <source>Save QR Code</source>
+        <translation>Spamiyntej kod QR</translation>
+    </message>
+    <message>
+        <source>PNG Image (*.png)</source>
+        <translation>Ôbrŏzek PNG (*.png)</translation>
+    </message>
+</context>
+<context>
+    <name>RPCConsole</name>
+    <message>
+        <source>N/A</source>
+        <translation>N/A</translation>
+    </message>
+    <message>
+        <source>Client version</source>
+        <translation>Wersyjŏ klijynta</translation>
+    </message>
+    <message>
+        <source>Using BerkeleyDB version</source>
+        <translation>Używanie wersyje BerkeleyDB</translation>
+    </message>
+    <message>
+        <source>Datadir</source>
+        <translation>Katalog datōw</translation>
+    </message>
+    <message>
+        <source>Startup time</source>
+        <translation>Czŏs sztartniyńciŏ</translation>
+    </message>
+    <message>
+        <source>Network</source>
+        <translation>Nec</translation>
+    </message>
+    <message>
+        <source>Name</source>
+        <translation>Miano</translation>
+    </message>
+    <message>
+        <source>Number of connections</source>
+        <translation>Wielość skuplowań</translation>
+    </message>
+    <message>
+        <source>Block chain</source>
+        <translation>Keta blokōw</translation>
+    </message>
+    <message>
+        <source>Current number of transactions</source>
+        <translation>Terŏźniŏ wielość transakcyji</translation>
+    </message>
+    <message>
+        <source>Wallet: </source>
+        <translation>Portmanyj:</translation>
+    </message>
+    <message>
+        <source>Received</source>
+        <translation>Ôdebrane</translation>
+    </message>
+    <message>
+        <source>Direction</source>
+        <translation>Richtōng</translation>
+    </message>
+    <message>
+        <source>Version</source>
+        <translation>Wersyjŏ</translation>
+    </message>
+    <message>
+        <source>User Agent</source>
+        <translation>Agynt Używŏcza</translation>
+    </message>
+    <message>
+        <source>Services</source>
+        <translation>Usugi</translation>
+    </message>
+    <message>
+        <source>Connection Time</source>
+        <translation>Czŏs Skuplowaniŏ</translation>
+    </message>
+    <message>
+        <source>Last block time</source>
+        <translation>Czas ôstatnigo bloku</translation>
+    </message>
+    <message>
+        <source>&amp;Open</source>
+        <translation>Ô&amp;dewrzij</translation>
+    </message>
+    <message>
+        <source>&amp;Network Traffic</source>
+        <translation>&amp;Ruch necowy</translation>
+    </message>
+    <message>
+        <source>In:</source>
+        <translation>Wchōd:</translation>
+    </message>
+    <message>
+        <source>Out:</source>
+        <translation>Wychōd:</translation>
+    </message>
+    <message>
+        <source>1 &amp;day</source>
+        <translation>1 &amp;dziyń</translation>
+    </message>
+    <message>
+        <source>&amp;Disconnect</source>
+        <translation>Ô&amp;dkupluj</translation>
+    </message>
+    <message>
+        <source>Welcome to the %1 RPC console.</source>
+        <translation>Witej w %1 kōnsoli RPC.</translation>
+    </message>
+    <message>
+        <source>WARNING: Scammers have been active, telling users to type commands here, stealing their wallet contents. Do not use this console without fully understanding the ramifications of a command.</source>
+        <translation>POZŌR: Machlyrze namŏwiajōm do wpisowaniŏ tukej roztōmajtych nakŏzań coby porwać portmanyj. Niy używej tyj kōnsole bez połnego zrozumiyniŏ wpisowanych nakŏzań.</translation>
+    </message>
+    <message>
+        <source>Network activity disabled</source>
+        <translation>Aktywność necowŏ zastawiōnŏ</translation>
+    </message>
+    <message>
+        <source>never</source>
+        <translation>nikej</translation>
+    </message>
+    <message>
+        <source>Inbound</source>
+        <translation>Wchodowy</translation>
+    </message>
+    <message>
+        <source>Outbound</source>
+        <translation>Wychodowy</translation>
+    </message>
+    </context>
+<context>
+    <name>ReceiveCoinsDialog</name>
+    <message>
+        <source>&amp;Label:</source>
+        <translation>&amp;Etyketa:</translation>
+    </message>
+    <message>
+        <source>An optional message to attach to the payment request, which will be displayed when the request is opened. Note: The message will not be sent with the payment over the Bitcoin network.</source>
+        <translation>Ôpcyjōnalnŏ wiadōmość do prziwstōniŏ do żōndaniŏ płatu, kerŏ bydzie wyświytlanŏ, kej żōndanie ôstanie ôdewrzōne. Napōmniynie: wiadōmość ta niy ôstanie wysłanŏ z płatym w nec Bitcoin.</translation>
+    </message>
+    <message>
+        <source>Clear</source>
+        <translation>Wypucuj</translation>
+    </message>
+    <message>
+        <source>Native segwit addresses (aka Bech32 or BIP-173) reduce your transaction fees later on and offer better protection against typos, but old wallets don't support them. When unchecked, an address compatible with older wallets will be created instead.</source>
+        <translation>Natywne adresy segwit (aka Bech32 abo BIP-173) zmyńszajōm niyskorzij twoje ôpłŏcki za transakcyje i dadzōm lepsze zabezpieczynie przed chybami, ale stare portmanyje jejich niy podpiyrajōm. Jeźli ôdznaczōne, zrychtowanŏ ôstanie adresa kōmpatybilnŏ ze starszymi portmanyjami.</translation>
+    </message>
+    <message>
+        <source>Show</source>
+        <translation>Pokŏż</translation>
+    </message>
+    <message>
+        <source>Remove</source>
+        <translation>Wychrōń</translation>
+    </message>
+    <message>
+        <source>Copy URI</source>
+        <translation>Kopiyruj URI</translation>
+    </message>
+    <message>
+        <source>Copy label</source>
+        <translation>Kopiyruj etyketã</translation>
+    </message>
+    <message>
+        <source>Copy message</source>
+        <translation>Kopiyruj wiadōmość</translation>
+    </message>
+    <message>
+        <source>Copy amount</source>
+        <translation>Kopiyruj kwotã</translation>
+    </message>
+    <message>
+        <source>Could not unlock wallet.</source>
+        <translation>Niy idzie było ôdszperować portmanyja.</translation>
+    </message>
+    </context>
+<context>
+    <name>ReceiveRequestDialog</name>
+    <message>
+        <source>Amount:</source>
+        <translation>Kwota:</translation>
+    </message>
+    <message>
+        <source>Message:</source>
+        <translation>Wiadōmość:</translation>
+    </message>
+    <message>
+        <source>Wallet:</source>
+        <translation>Portmanyj:</translation>
+    </message>
+    <message>
+        <source>Copy &amp;URI</source>
+        <translation>Kopiyruj &amp;URI</translation>
+    </message>
+    <message>
+        <source>Copy &amp;Address</source>
+        <translation>Kopiyruj &amp;Adresã</translation>
+    </message>
+    <message>
+        <source>&amp;Save Image...</source>
+        <translation>&amp;Spamiyntej Ôbrozek</translation>
+    </message>
+    <message>
+        <source>Payment information</source>
+        <translation>Informacyje ô płacie</translation>
+    </message>
+</context>
+<context>
+    <name>RecentRequestsTableModel</name>
+    <message>
+        <source>Date</source>
+        <translation>Datōm</translation>
+    </message>
+    <message>
+        <source>Label</source>
+        <translation>Etyketa</translation>
+    </message>
+    <message>
+        <source>Message</source>
+        <translation>Wiadōmość</translation>
+    </message>
+    <message>
+        <source>(no label)</source>
+        <translation>(chyba etykety)</translatio
