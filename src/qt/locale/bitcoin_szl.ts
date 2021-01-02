@@ -1714,4 +1714,236 @@
     </message>
     <message>
         <source>Received with</source>
-        <translation>Ô
+        <translation>Ôdebrane z</translation>
+    </message>
+    <message>
+        <source>Received from</source>
+        <translation>Ôdebrane ôd</translation>
+    </message>
+    <message>
+        <source>Payment to yourself</source>
+        <translation>Płat do siebie</translation>
+    </message>
+    <message>
+        <source>(no label)</source>
+        <translation>(chyba etykety)</translation>
+    </message>
+    </context>
+<context>
+    <name>TransactionView</name>
+    <message>
+        <source>All</source>
+        <translation>Wszyjske</translation>
+    </message>
+    <message>
+        <source>Today</source>
+        <translation>Dzisiej</translation>
+    </message>
+    <message>
+        <source>Received with</source>
+        <translation>Ôdebrane z</translation>
+    </message>
+    <message>
+        <source>Other</source>
+        <translation>Inksze</translation>
+    </message>
+    <message>
+        <source>Enter address, transaction id, or label to search</source>
+        <translation>Wkludź adresa, idyntyfikatōr transakcyje abo etyketã coby wyszukać</translation>
+    </message>
+    <message>
+        <source>Copy address</source>
+        <translation>Kopiyruj adresã</translation>
+    </message>
+    <message>
+        <source>Copy label</source>
+        <translation>Kopiyruj etyketã</translation>
+    </message>
+    <message>
+        <source>Copy amount</source>
+        <translation>Kopiyruj kwotã</translation>
+    </message>
+    <message>
+        <source>Copy transaction ID</source>
+        <translation>Kopiyruj ID transakcyje</translation>
+    </message>
+    <message>
+        <source>Edit label</source>
+        <translation>Edytuj etyketa</translation>
+    </message>
+    <message>
+        <source>Comma separated file (*.csv)</source>
+        <translation>Zbiōr *.CSV (dane rozdzielane kōmami)</translation>
+    </message>
+    <message>
+        <source>Confirmed</source>
+        <translation>Przituplowany</translation>
+    </message>
+    <message>
+        <source>Date</source>
+        <translation>Datōm</translation>
+    </message>
+    <message>
+        <source>Type</source>
+        <translation>Zorta</translation>
+    </message>
+    <message>
+        <source>Label</source>
+        <translation>Etyketa</translation>
+    </message>
+    <message>
+        <source>Address</source>
+        <translation>Adresa</translation>
+    </message>
+    <message>
+        <source>ID</source>
+        <translation>ID</translation>
+    </message>
+    <message>
+        <source>Exporting Failed</source>
+        <translation>Eksportowanie niy podarziło sie</translation>
+    </message>
+    <message>
+        <source>to</source>
+        <translation>do</translation>
+    </message>
+</context>
+<context>
+    <name>UnitDisplayStatusBarControl</name>
+    </context>
+<context>
+    <name>WalletController</name>
+    </context>
+<context>
+    <name>WalletFrame</name>
+    </context>
+<context>
+    <name>WalletModel</name>
+    <message>
+        <source>Send Coins</source>
+        <translation>Poślij mōnety</translation>
+    </message>
+    <message>
+        <source>New fee:</source>
+        <translation>Nowŏ ôpłŏcka:</translation>
+    </message>
+    <message>
+        <source>default wallet</source>
+        <translation>wychodny portmanyj</translation>
+    </message>
+</context>
+<context>
+    <name>WalletView</name>
+    <message>
+        <source>&amp;Export</source>
+        <translation>&amp;Eksportuj</translation>
+    </message>
+    <message>
+        <source>Export the data in the current tab to a file</source>
+        <translation>Eksportuj dane z aktywnyj szkarty do zbioru</translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation>Feler</translation>
+    </message>
+    <message>
+        <source>Backup Failed</source>
+        <translation>Backup niy podarził sie</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Pociep</translation>
+    </message>
+</context>
+<context>
+    <name>bitcoin-core</name>
+    <message>
+        <source>The %s developers</source>
+        <translation>Twōrcy %s</translation>
+    </message>
+    <message>
+        <source>Warning: The network does not appear to fully agree! Some miners appear to be experiencing issues.</source>
+        <translation>Pozōr: Nec niy wydŏwŏ sie w połni zgodliwy! Niykerzi grubiŏrze wydajōm sie doświadczać niyprzileżytości.</translation>
+    </message>
+    <message>
+        <source>Copyright (C) %i-%i</source>
+        <translation>Copyright (C) %i-%i</translation>
+    </message>
+    <message>
+        <source>Error loading %s</source>
+        <translation>Feler wgrŏwaniŏ %s</translation>
+    </message>
+    <message>
+        <source>Error loading %s: Private keys can only be disabled during creation</source>
+        <translation>Feler wgrŏwaniŏ %s: Klucze prywatne mogōm być zastawiōne ino w czasie tworzyniŏ</translation>
+    </message>
+    <message>
+        <source>Error loading %s: Wallet corrupted</source>
+        <translation>Feler wgrŏwaniŏ %s: Portmanyj poprzniōny</translation>
+    </message>
+    <message>
+        <source>Error loading %s: Wallet requires newer version of %s</source>
+        <translation>Feler wgrŏwaniŏ %s: Portmanyj fołdruje nowszyj wersyje %s</translation>
+    </message>
+    <message>
+        <source>Error loading block database</source>
+        <translation>Feler wgrŏwaniŏ bazy blokōw</translation>
+    </message>
+    <message>
+        <source>Loading P2P addresses...</source>
+        <translation>Wgrŏwanie adres P2P...</translation>
+    </message>
+    <message>
+        <source>Loading banlist...</source>
+        <translation>Wgrŏwanie wykŏzu zaszperowanych...</translation>
+    </message>
+    <message>
+        <source>Unsupported logging category %s=%s.</source>
+        <translation>Niypodpiyranŏ kategoryjŏ registrowaniŏ %s=%s.</translation>
+    </message>
+    <message>
+        <source>Verifying blocks...</source>
+        <translation>Weryfikacyjŏ blokōw...</translation>
+    </message>
+    <message>
+        <source>Error: Disk space is low for %s</source>
+        <translation>Feler: Za mało wolnego placu na dysku dlŏ %s</translation>
+    </message>
+    <message>
+        <source>Signing transaction failed</source>
+        <translation>Szkryftniyńcie transakcyji niy podarziło sie</translation>
+    </message>
+    <message>
+        <source>This is experimental software.</source>
+        <translation>To je eksperymyntalny softwer.</translation>
+    </message>
+    <message>
+        <source>Transaction too large</source>
+        <translation>Transakcyjŏ za srogŏ</translation>
+    </message>
+    <message>
+        <source>Verifying wallet(s)...</source>
+        <translation>Weryfikacyjŏ portmanyja(ōw)...</translation>
+    </message>
+    <message>
+        <source>Warning: unknown new rules activated (versionbit %i)</source>
+        <translation>Pozōr: aktywowano było niyznōme nowe prawidła (versionbit %i)</translation>
+    </message>
+    <message>
+        <source>Total length of network version string (%i) exceeds maximum length (%i). Reduce the number or size of uacomments.</source>
+        <translation>Imyntnŏ dugość kety wersyje (%i) przekrŏczŏ maksymalnõ dopuszczalnõ dugość (%i). Zmyńsz wielość abo miara parametra uacomment.</translation>
+    </message>
+    <message>
+        <source>Error loading wallet %s. Duplicate -wallet filename specified.</source>
+        <translation>Feler w czasie wgrŏwaniŏ portmanyja %s. Podanŏ tuplowane miano zbioru w -wallet.</translation>
+    </message>
+    <message>
+        <source>Starting network threads...</source>
+        <translation>Sztartowanie wōntkōw necowych...</translation>
+    </message>
+    <message>
+        <source>Unknown network specified in -onlynet: '%s'</source>
+        <translation>Niyznōmy nec ôkryślōny w -onlynet: '%s'</translation>
+    </message>
+    <message>
+       
