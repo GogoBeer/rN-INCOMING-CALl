@@ -1946,4 +1946,24 @@
         <translation>Niyznōmy nec ôkryślōny w -onlynet: '%s'</translation>
     </message>
     <message>
-       
+        <source>Warning: Private keys detected in wallet {%s} with disabled private keys</source>
+        <translation>Pozōr: Wykryto było klucze prywatne w portmanyju {%s} kery mŏ zastawiōne klucze prywatne</translation>
+    </message>
+    <message>
+        <source>Loading block index...</source>
+        <translation>Wgrŏwanie indeksu blokōw...</translation>
+    </message>
+    <message>
+        <source>Loading wallet...</source>
+        <translation>Wgrŏwanie portmanyja...</translation>
+    </message>
+    <message>
+        <source>Rescanning...</source>
+        <translation>Pōnowne skanowanie</translation>
+    </message>
+    <message>
+        <source>Done loading</source>
+        <translation>Wgrŏwanie zakōńczōne</translation>
+    </message>
+</context>
+</TS>
