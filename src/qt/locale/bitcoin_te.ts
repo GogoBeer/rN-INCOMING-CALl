@@ -94,4 +94,262 @@
         <translation>ఎగుమతి విఫలమయ్యింది</translation>
     </message>
     <message>
-        <source>There was an error trying to save the address list to %1. Please try again.</
+        <source>There was an error trying to save the address list to %1. Please try again.</source>
+        <translation>చిరునామా పట్టికను %1 లోనికి ప్రోదుపరుచుటలో లోపము. మరుల ప్రయత్నించి చుడండి.</translation>
+    </message>
+</context>
+<context>
+    <name>AddressTableModel</name>
+    <message>
+        <source>Label</source>
+        <translation>ఉల్లాకు</translation>
+    </message>
+    <message>
+        <source>Address</source>
+        <translation>చిరునామా</translation>
+    </message>
+    <message>
+        <source>(no label)</source>
+        <translation>( ఉల్లాకు లేదు )</translation>
+    </message>
+</context>
+<context>
+    <name>AskPassphraseDialog</name>
+    <message>
+        <source>Passphrase Dialog</source>
+        <translation>సంకేతపదము డైలాగ్</translation>
+    </message>
+    <message>
+        <source>Enter passphrase</source>
+        <translation>సంకేతపదము చేర్చండి</translation>
+    </message>
+    <message>
+        <source>New passphrase</source>
+        <translation>క్రొత్త సంకేతపదము</translation>
+    </message>
+    <message>
+        <source>Repeat new passphrase</source>
+        <translation>క్రొత్త సంకేతపదము మరలా ఇవ్వండి</translation>
+    </message>
+    <message>
+        <source>Show passphrase</source>
+        <translation>సంకేతపదమును చూపించు</translation>
+    </message>
+    <message>
+        <source>Encrypt wallet</source>
+        <translation>వాలెట్‌ను గుప్తీకరించండి</translation>
+    </message>
+    <message>
+        <source>This operation needs your wallet passphrase to unlock the wallet.</source>
+        <translation>ఈ ఆపరేషన్‌కు వాలెట్‌ను అన్‌లాక్ చేయడానికి మీ వాలెట్ పాస్‌ఫ్రేజ్ అవసరం.</translation>
+    </message>
+    <message>
+        <source>Unlock wallet</source>
+        <translation>వాలెట్ అన్లాక్</translation>
+    </message>
+    <message>
+        <source>This operation needs your wallet passphrase to decrypt the wallet.</source>
+        <translation>ఈ ఆపరేషన్‌కు వాలెట్‌ను డీక్రిప్ట్ చేయడానికి మీ వాలెట్ పాస్‌ఫ్రేజ్ అవసరం.</translation>
+    </message>
+    <message>
+        <source>Decrypt wallet</source>
+        <translation>డీక్రిప్ట్ వాలెట్</translation>
+    </message>
+    <message>
+        <source>Change passphrase</source>
+        <translation>పాస్‌ఫ్రేజ్‌ని మార్చండి</translation>
+    </message>
+    <message>
+        <source>Confirm wallet encryption</source>
+        <translation>వాలెట్ గుప్తీకరణను నిర్ధారించండి</translation>
+    </message>
+    <message>
+        <source>Warning: If you encrypt your wallet and lose your passphrase, you will &lt;b&gt;LOSE ALL OF YOUR BITCOINS&lt;/b&gt;!</source>
+        <translation>హెచ్చరిక: మీ జోలెని సంకేతపరిచి మీ సంకేతపదము కోల్పోతే, &lt;b&gt;మీ బిట్‌కాయిన్లు అన్నీ కోల్పోతారు&lt;/b&gt;</translation>
+    </message>
+    <message>
+        <source>Are you sure you wish to encrypt your wallet?</source>
+        <translation>మీరు ఖచ్చితంగా మీ జోలెని సంకేతపరచాలని కోరుకుంటున్నారా?</translation>
+    </message>
+    <message>
+        <source>Wallet encrypted</source>
+        <translation>జోలె సంకేతపరబడింది</translation>
+    </message>
+    <message>
+        <source>Enter the new passphrase for the wallet.&lt;br/&gt;Please use a passphrase of &lt;b&gt;ten or more random characters&lt;/b&gt;, or &lt;b&gt;eight or more words&lt;/b&gt;.</source>
+        <translation>వాలెట్ కోసం క్రొత్త పాస్‌ఫ్రేజ్‌ని నమోదు చేయండి.&lt;br/&gt; దయచేసి &lt;b&gt;పది లేదా అంతకంటే ఎక్కువ యాదృచ్ఛిక అక్షరాల&lt;/b&gt; పాస్‌ఫ్రేజ్‌ని లేదా &lt;b&gt;ఎనిమిది లేదా అంతకంటే ఎక్కువ పదాలను ఉపయోగించండి.&lt;/b&gt;</translation>
+    </message>
+    <message>
+        <source>Enter the old passphrase and new passphrase for the wallet.</source>
+        <translation>Enter the old passphrase and new passphrase for the wallet.</translation>
+    </message>
+    <message>
+        <source>Remember that encrypting your wallet cannot fully protect your bitcoins from being stolen by malware infecting your computer.</source>
+        <translation>మీ వాలెట్‌ను గుప్తీకరించడం వల్ల మీ కంప్యూటర్‌కు హాని కలిగించే మాల్వేర్ దొంగిలించకుండా మీ బిట్‌కాయిన్‌లను పూర్తిగా రక్షించలేమని గుర్తుంచుకోండి.</translation>
+    </message>
+    <message>
+        <source>Wallet to be encrypted</source>
+        <translation>ఎన్క్రిప్ట్ చేయవలసిన వాలెట్</translation>
+    </message>
+    <message>
+        <source>Your wallet is about to be encrypted. </source>
+        <translation>మీ వాలెట్ గుప్తీకరించబోతోంది.</translation>
+    </message>
+    <message>
+        <source>Wallet encryption failed</source>
+        <translation>జోలె సంకేతపరచడం విఫలమయ్యింది</translation>
+    </message>
+    </context>
+<context>
+    <name>BanTableModel</name>
+    </context>
+<context>
+    <name>BitcoinGUI</name>
+    <message>
+        <source>E&amp;xit</source>
+        <translation>నిష్క్రమించు</translation>
+    </message>
+    <message>
+        <source>&amp;Send</source>
+        <translation>పంపు</translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation>లోపం</translation>
+    </message>
+    <message>
+        <source>Warning</source>
+        <translation>హెచ్చరిక</translation>
+    </message>
+    <message>
+        <source>Information</source>
+        <translation>వర్తమానము</translation>
+    </message>
+    <message>
+        <source>Up to date</source>
+        <translation>తాజాగా ఉంది</translation>
+    </message>
+    <message>
+        <source>Connecting to peers...</source>
+        <translation>తోటివాళ్లతో అనుసంధానం కుదురుస్తుంది</translation>
+    </message>
+    </context>
+<context>
+    <name>CoinControlDialog</name>
+    <message>
+        <source>Coin Selection</source>
+        <translation>నాణెం ఎంపిక</translation>
+    </message>
+    <message>
+        <source>Quantity:</source>
+        <translation>పరిమాణం</translation>
+    </message>
+    <message>
+        <source>Date</source>
+        <translation>తేదీ</translation>
+    </message>
+    <message>
+        <source>(no label)</source>
+        <translation>( ఉల్లాకు లేదు )</translation>
+    </message>
+    </context>
+<context>
+    <name>CreateWalletActivity</name>
+    </context>
+<context>
+    <name>CreateWalletDialog</name>
+    </context>
+<context>
+    <name>EditAddressDialog</name>
+    </context>
+<context>
+    <name>FreespaceChecker</name>
+    </context>
+<context>
+    <name>HelpMessageDialog</name>
+    </context>
+<context>
+    <name>Intro</name>
+    <message>
+        <source>Bitcoin</source>
+        <translation>బిట్కోయిన్</translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation>లోపం</translation>
+    </message>
+    </context>
+<context>
+    <name>ModalOverlay</name>
+    </context>
+<context>
+    <name>OpenURIDialog</name>
+    </context>
+<context>
+    <name>OpenWalletActivity</name>
+    </context>
+<context>
+    <name>OptionsDialog</name>
+    <message>
+        <source>Error</source>
+        <translation>లోపం</translation>
+    </message>
+    </context>
+<context>
+    <name>OverviewPage</name>
+    </context>
+<context>
+    <name>PSBTOperationsDialog</name>
+    </context>
+<context>
+    <name>PaymentServer</name>
+    </context>
+<context>
+    <name>PeerTableModel</name>
+    </context>
+<context>
+    <name>QObject</name>
+    <message>
+        <source>unknown</source>
+        <translation>తెలియదు</translation>
+    </message>
+</context>
+<context>
+    <name>QRImageWidget</name>
+    </context>
+<context>
+    <name>RPCConsole</name>
+    </context>
+<context>
+    <name>ReceiveCoinsDialog</name>
+    </context>
+<context>
+    <name>ReceiveRequestDialog</name>
+    </context>
+<context>
+    <name>RecentRequestsTableModel</name>
+    <message>
+        <source>Date</source>
+        <translation>తేదీ</translation>
+    </message>
+    <message>
+        <source>Label</source>
+        <translation>ఉల్లాకు</translation>
+    </message>
+    <message>
+        <source>Message</source>
+        <translation>సందేశం</translation>
+    </message>
+    <message>
+        <source>(no label)</source>
+        <translation>( ఉల్లాకు లేదు )</translation>
+    </message>
+    </context>
+<context>
+    <name>SendCoinsDialog</name>
+    <message>
+        <source>Quantity:</source>
+        <translation>పరిమాణం</translation>
+    </message>
+    <message>
+        <s
