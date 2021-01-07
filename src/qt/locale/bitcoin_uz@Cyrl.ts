@@ -1252,4 +1252,267 @@
         <translation>Солиқ:</translation>
     </message>
     <message>
-        <source>Aft
+        <source>After Fee:</source>
+        <translation>Солиқдан сўнг:</translation>
+    </message>
+    <message>
+        <source>Change:</source>
+        <translation>Ўзгартириш:</translation>
+    </message>
+    <message>
+        <source>If this is activated, but the change address is empty or invalid, change will be sent to a newly generated address.</source>
+        <translation>Агар бу фаоллаштирилса, аммо ўзгартирилган манзил бўл ёки нотўғри бўлса, ўзгариш янги яратилган манзилга жўнатилади.</translation>
+    </message>
+    <message>
+        <source>Custom change address</source>
+        <translation>Бошқа ўзгартирилган манзил</translation>
+    </message>
+    <message>
+        <source>Transaction Fee:</source>
+        <translation>Ўтказма тўлови</translation>
+    </message>
+    <message>
+        <source>Choose...</source>
+        <translation>Танлов</translation>
+    </message>
+    <message>
+        <source>per kilobyte</source>
+        <translation>Хар килобайтига</translation>
+    </message>
+    <message>
+        <source>Recommended:</source>
+        <translation>Тавсия этилган</translation>
+    </message>
+    <message>
+        <source>Send to multiple recipients at once</source>
+        <translation>Бирданига бир нечта қабул қилувчиларга жўнатиш</translation>
+    </message>
+    <message>
+        <source>Clear all fields of the form.</source>
+        <translation>Шаклнинг барча майдончаларини тозалаш</translation>
+    </message>
+    <message>
+        <source>Dust:</source>
+        <translation>Ахлат қутиси:</translation>
+    </message>
+    <message>
+        <source>Clear &amp;All</source>
+        <translation>Барчасини &amp; Тозалаш</translation>
+    </message>
+    <message>
+        <source>Balance:</source>
+        <translation>Баланс</translation>
+    </message>
+    <message>
+        <source>Confirm the send action</source>
+        <translation>Жўнатиш амалини тасдиқлаш</translation>
+    </message>
+    <message>
+        <source>S&amp;end</source>
+        <translation>Жў&amp;натиш</translation>
+    </message>
+    <message>
+        <source>Copy quantity</source>
+        <translation>Нусха сони</translation>
+    </message>
+    <message>
+        <source>Copy amount</source>
+        <translation>Кийматни нусхала</translation>
+    </message>
+    <message>
+        <source>Copy fee</source>
+        <translation>Нусха солиғи</translation>
+    </message>
+    <message>
+        <source>Copy after fee</source>
+        <translation>Нусха солиқдан сўнг</translation>
+    </message>
+    <message>
+        <source>Copy bytes</source>
+        <translation>Нусха байти</translation>
+    </message>
+    <message>
+        <source>Copy dust</source>
+        <translation>Нусха чангги</translation>
+    </message>
+    <message>
+        <source>Copy change</source>
+        <translation>Нусха қайтими</translation>
+    </message>
+    <message>
+        <source>%1 to %2</source>
+        <translation>%1 дан %2</translation>
+    </message>
+    <message>
+        <source>Are you sure you want to send?</source>
+        <translation>Жўнатишни хоҳлашингизга ишончингиз комилми?</translation>
+    </message>
+    <message>
+        <source>or</source>
+        <translation>ёки</translation>
+    </message>
+    <message>
+        <source>Transaction fee</source>
+        <translation>Ўтказма тўлови</translation>
+    </message>
+    <message>
+        <source>Confirm send coins</source>
+        <translation>Тангалар жўнаишни тасдиқлаш</translation>
+    </message>
+    <message>
+        <source>The amount to pay must be larger than 0.</source>
+        <translation>Тўлов миқдори 0. дан катта бўлиши керак. </translation>
+    </message>
+    <message>
+        <source>Warning: Invalid Bitcoin address</source>
+        <translation>Диққат: Нотўғр Bitcoin манзили</translation>
+    </message>
+    <message>
+        <source>Warning: Unknown change address</source>
+        <translation>Диққат: Номаълум ўзгариш манзили</translation>
+    </message>
+    <message>
+        <source>(no label)</source>
+        <translation>(Ёрлиқ мавжуд эмас)</translation>
+    </message>
+</context>
+<context>
+    <name>SendCoinsEntry</name>
+    <message>
+        <source>A&amp;mount:</source>
+        <translation>&amp;Миқдори:</translation>
+    </message>
+    <message>
+        <source>Pay &amp;To:</source>
+        <translation>&amp;Тўлов олувчи:</translation>
+    </message>
+    <message>
+        <source>&amp;Label:</source>
+        <translation>&amp;Ёрлиқ:</translation>
+    </message>
+    <message>
+        <source>Choose previously used address</source>
+        <translation>Олдин фойдаланилган манзилни танла</translation>
+    </message>
+    <message>
+        <source>Alt+A</source>
+        <translation>Alt+A</translation>
+    </message>
+    <message>
+        <source>Paste address from clipboard</source>
+        <translation>Клипбоарддан манзилни қўйиш</translation>
+    </message>
+    <message>
+        <source>Alt+P</source>
+        <translation>Alt+P</translation>
+    </message>
+    <message>
+        <source>Message:</source>
+        <translation>Хабар</translation>
+    </message>
+    <message>
+        <source>Pay To:</source>
+        <translation>Тўлов олувчи:</translation>
+    </message>
+    </context>
+<context>
+    <name>ShutdownWindow</name>
+    </context>
+<context>
+    <name>SignVerifyMessageDialog</name>
+    <message>
+        <source>Choose previously used address</source>
+        <translation>Олдин фойдаланилган манзилни танла</translation>
+    </message>
+    <message>
+        <source>Alt+A</source>
+        <translation>Alt+A</translation>
+    </message>
+    <message>
+        <source>Paste address from clipboard</source>
+        <translation>Клипбоарддан манзилни қўйиш</translation>
+    </message>
+    <message>
+        <source>Alt+P</source>
+        <translation>Alt+P</translation>
+    </message>
+    <message>
+        <source>Signature</source>
+        <translation>Имзо</translation>
+    </message>
+    <message>
+        <source>Clear &amp;All</source>
+        <translation>Барчасини &amp; Тозалаш</translation>
+    </message>
+    <message>
+        <source>Message verified.</source>
+        <translation>Хабар тасдиқланди.</translation>
+    </message>
+</context>
+<context>
+    <name>TrafficGraphWidget</name>
+    </context>
+<context>
+    <name>TransactionDesc</name>
+    <message>
+        <source>Open until %1</source>
+        <translation>%1 гача очиш</translation>
+    </message>
+    <message>
+        <source>%1/unconfirmed</source>
+        <translation>%1/тасдиқланмади</translation>
+    </message>
+    <message>
+        <source>%1 confirmations</source>
+        <translation>%1 тасдиқлашлар</translation>
+    </message>
+    <message>
+        <source>Date</source>
+        <translation>Сана</translation>
+    </message>
+    <message>
+        <source>Source</source>
+        <translation>Манба</translation>
+    </message>
+    <message>
+        <source>Generated</source>
+        <translation>Яратилган</translation>
+    </message>
+    <message>
+        <source>From</source>
+        <translation>Дан</translation>
+    </message>
+    <message>
+        <source>unknown</source>
+        <translation>Номаълум</translation>
+    </message>
+    <message>
+        <source>To</source>
+        <translation>Га</translation>
+    </message>
+    <message>
+        <source>own address</source>
+        <translation>ўз манзили</translation>
+    </message>
+    <message>
+        <source>label</source>
+        <translation>ёрлиқ</translation>
+    </message>
+    <message>
+        <source>Credit</source>
+        <translation>Кредит (қарз)</translation>
+    </message>
+    <message>
+        <source>not accepted</source>
+        <translation>қабул қилинмади</translation>
+    </message>
+    <message>
+        <source>Transaction fee</source>
+        <translation>Ўтказма тўлови</translation>
+    </message>
+    <message>
+        <source>Net amount</source>
+        <translation>Умумий миқдор</translation>
+    </message>
+    <message>
+        <sou
