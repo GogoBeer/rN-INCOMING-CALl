@@ -296,4 +296,234 @@
     <message>
         <source>&amp;Send</source>
         <translation>&amp;Жўнатиш</translation>
-    </mes
+    </message>
+    <message>
+        <source>&amp;Receive</source>
+        <translation>&amp;Қабул қилиш</translation>
+    </message>
+    <message>
+        <source>&amp;Show / Hide</source>
+        <translation>&amp;Кўрсатиш / Яшириш</translation>
+    </message>
+    <message>
+        <source>Show or hide the main Window</source>
+        <translation>Асосий ойнани кўрсатиш ёки яшириш</translation>
+    </message>
+    <message>
+        <source>Encrypt the private keys that belong to your wallet</source>
+        <translation>Ҳамёнингизга тегишли махфий калитларни кодлаш</translation>
+    </message>
+    <message>
+        <source>Sign messages with your Bitcoin addresses to prove you own them</source>
+        <translation>Bitcoin манзилидан унинг эгаси эканлигингизни исботлаш учун хабарлар ёзинг</translation>
+    </message>
+    <message>
+        <source>Verify messages to ensure they were signed with specified Bitcoin addresses</source>
+        <translation>Хабарларни махсус Bitcoin манзилларингиз билан ёзилганлигига ишонч ҳосил қилиш учун уларни тасдиқланг</translation>
+    </message>
+    <message>
+        <source>&amp;File</source>
+        <translation>&amp;Файл</translation>
+    </message>
+    <message>
+        <source>&amp;Settings</source>
+        <translation>&amp; Созламалар</translation>
+    </message>
+    <message>
+        <source>&amp;Help</source>
+        <translation>&amp;Ёрдам</translation>
+    </message>
+    <message>
+        <source>Tabs toolbar</source>
+        <translation>Ички ойналар асбоблар панели</translation>
+    </message>
+    <message>
+        <source>Request payments (generates QR codes and bitcoin: URIs)</source>
+        <translation>Тўловлар (QR кодлари ва bitcoin ёрдамида яратишлар: URI’лар) сўраш</translation>
+    </message>
+    <message>
+        <source>Show the list of used sending addresses and labels</source>
+        <translation>Фойдаланилган жўнатилган манзиллар ва ёрлиқлар рўйхатини кўрсатиш</translation>
+    </message>
+    <message>
+        <source>Show the list of used receiving addresses and labels</source>
+        <translation>Фойдаланилган қабул қилинган манзиллар ва ёрлиқлар рўйхатини кўрсатиш</translation>
+    </message>
+    <message>
+        <source>&amp;Command-line options</source>
+        <translation>&amp;Буйруқлар сатри мосламалари</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n active connection(s) to Bitcoin network</source>
+        <translation><numerusform>%n та Bitcoin тармоғига фаол уланиш мавжуд</numerusform></translation>
+    </message>
+    <message>
+        <source>%1 behind</source>
+        <translation>%1 орқада</translation>
+    </message>
+    <message>
+        <source>Last received block was generated %1 ago.</source>
+        <translation>Сўнги қабул қилинган блок %1 олдин яратилган.</translation>
+    </message>
+    <message>
+        <source>Transactions after this will not yet be visible.</source>
+        <translation>Бундан кейинги пул ўтказмалари кўринмайдиган бўлади.</translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation>Хатолик</translation>
+    </message>
+    <message>
+        <source>Warning</source>
+        <translation>Диққат</translation>
+    </message>
+    <message>
+        <source>Information</source>
+        <translation>Маълумот</translation>
+    </message>
+    <message>
+        <source>Up to date</source>
+        <translation>Янгиланган</translation>
+    </message>
+    <message>
+        <source>&amp;Window</source>
+        <translation>&amp;Ойна</translation>
+    </message>
+    <message>
+        <source>Minimize</source>
+        <translation>Камайтириш</translation>
+    </message>
+    <message>
+        <source>Catching up...</source>
+        <translation>Банд қилинмоқда...</translation>
+    </message>
+    <message>
+        <source>Sent transaction</source>
+        <translation>Жўнатилган операция</translation>
+    </message>
+    <message>
+        <source>Incoming transaction</source>
+        <translation>Кирувчи операция</translation>
+    </message>
+    <message>
+        <source>Wallet is &lt;b&gt;encrypted&lt;/b&gt; and currently &lt;b&gt;unlocked&lt;/b&gt;</source>
+        <translation>Ҳамён &lt;b&gt;кодланган&lt;/b&gt; ва вақтинча &lt;b&gt;қулфдан чиқарилган&lt;/b&gt;</translation>
+    </message>
+    <message>
+        <source>Wallet is &lt;b&gt;encrypted&lt;/b&gt; and currently &lt;b&gt;locked&lt;/b&gt;</source>
+        <translation>Ҳамён &lt;b&gt;кодланган&lt;/b&gt; ва вақтинча &lt;b&gt;қулфланган&lt;/b&gt;</translation>
+    </message>
+    </context>
+<context>
+    <name>CoinControlDialog</name>
+    <message>
+        <source>Quantity:</source>
+        <translation>Сони:</translation>
+    </message>
+    <message>
+        <source>Bytes:</source>
+        <translation>Байт:</translation>
+    </message>
+    <message>
+        <source>Amount:</source>
+        <translation>Миқдори:</translation>
+    </message>
+    <message>
+        <source>Fee:</source>
+        <translation>Солиқ:</translation>
+    </message>
+    <message>
+        <source>Dust:</source>
+        <translation>Ахлат қутиси:</translation>
+    </message>
+    <message>
+        <source>After Fee:</source>
+        <translation>Солиқдан сўнг:</translation>
+    </message>
+    <message>
+        <source>Change:</source>
+        <translation>Ўзгартириш:</translation>
+    </message>
+    <message>
+        <source>(un)select all</source>
+        <translation>барчасини танаш (бекор қилиш)</translation>
+    </message>
+    <message>
+        <source>Tree mode</source>
+        <translation>Дарахт усулида</translation>
+    </message>
+    <message>
+        <source>List mode</source>
+        <translation>Рўйхат усулида</translation>
+    </message>
+    <message>
+        <source>Amount</source>
+        <translation>Миқдори</translation>
+    </message>
+    <message>
+        <source>Date</source>
+        <translation>Сана</translation>
+    </message>
+    <message>
+        <source>Confirmations</source>
+        <translation>Тасдиқлашлар</translation>
+    </message>
+    <message>
+        <source>Confirmed</source>
+        <translation>Тасдиқланди</translation>
+    </message>
+    <message>
+        <source>Copy address</source>
+        <translation>Манзилни нусхалаш</translation>
+    </message>
+    <message>
+        <source>Copy label</source>
+        <translation>Ёрликни нусхала</translation>
+    </message>
+    <message>
+        <source>Copy amount</source>
+        <translation>Кийматни нусхала</translation>
+    </message>
+    <message>
+        <source>Copy transaction ID</source>
+        <translation>Ўтказам рақамидан нусха олиш</translation>
+    </message>
+    <message>
+        <source>Lock unspent</source>
+        <translation>Сарфланмаганларни қулфлаш</translation>
+    </message>
+    <message>
+        <source>Unlock unspent</source>
+        <translation>Сарфланмаганларни қулфдан чиқариш</translation>
+    </message>
+    <message>
+        <source>Copy quantity</source>
+        <translation>Нусха сони</translation>
+    </message>
+    <message>
+        <source>Copy fee</source>
+        <translation>Нусха солиғи</translation>
+    </message>
+    <message>
+        <source>Copy after fee</source>
+        <translation>Нусха солиқдан сўнг</translation>
+    </message>
+    <message>
+        <source>Copy bytes</source>
+        <translation>Нусха байти</translation>
+    </message>
+    <message>
+        <source>Copy dust</source>
+        <translation>Нусха чангги</translation>
+    </message>
+    <message>
+        <source>Copy change</source>
+        <translation>Нусха қайтими</translation>
+    </message>
+    <message>
+        <source>(%1 locked)</source>
+        <translation>(%1 қулфланган)</translation>
+    </message>
+    <message>
+        <source>yes</source>
+    
