@@ -526,4 +526,233 @@
     </message>
     <message>
         <source>yes</source>
-    
+        <translation>ҳа</translation>
+    </message>
+    <message>
+        <source>no</source>
+        <translation>йўқ</translation>
+    </message>
+    <message>
+        <source>Can vary +/- %1 satoshi(s) per input.</source>
+        <translation>Ҳар бир кирим +/- %1 сатоши(лар) билан ўзгариши мумкин.</translation>
+    </message>
+    <message>
+        <source>(no label)</source>
+        <translation>(Ёрлиқ мавжуд эмас)</translation>
+    </message>
+    <message>
+        <source>change from %1 (%2)</source>
+        <translation>%1 (%2)дан ўзгартириш</translation>
+    </message>
+    <message>
+        <source>(change)</source>
+        <translation>(ўзгартириш)</translation>
+    </message>
+</context>
+<context>
+    <name>CreateWalletActivity</name>
+    </context>
+<context>
+    <name>CreateWalletDialog</name>
+    </context>
+<context>
+    <name>EditAddressDialog</name>
+    <message>
+        <source>Edit Address</source>
+        <translation>Манзилларни таҳрирлаш</translation>
+    </message>
+    <message>
+        <source>&amp;Label</source>
+        <translation>&amp;Ёрлик</translation>
+    </message>
+    <message>
+        <source>The label associated with this address list entry</source>
+        <translation>Ёрлиқ ушбу манзилар рўйхати ёзуви билан боғланган</translation>
+    </message>
+    <message>
+        <source>The address associated with this address list entry. This can only be modified for sending addresses.</source>
+        <translation>Манзил ушбу манзиллар рўйхати ёзуви билан боғланган. Уни фақат жўнатиладиган манзиллар учун ўзгартирса бўлади.</translation>
+    </message>
+    <message>
+        <source>&amp;Address</source>
+        <translation>&amp;Манзил</translation>
+    </message>
+    <message>
+        <source>New sending address</source>
+        <translation>Янги жунатилувчи манзил</translation>
+    </message>
+    <message>
+        <source>Edit receiving address</source>
+        <translation>Кабул килувчи манзилни тахрирлаш</translation>
+    </message>
+    <message>
+        <source>Edit sending address</source>
+        <translation>Жунатилувчи манзилни тахрирлаш</translation>
+    </message>
+    <message>
+        <source>The entered address "%1" is not a valid Bitcoin address.</source>
+        <translation>Киритилган "%1" манзили тўғри Bitcoin манзили эмас.</translation>
+    </message>
+    <message>
+        <source>Could not unlock wallet.</source>
+        <translation>Ҳамён қулфдан чиқмади.</translation>
+    </message>
+    <message>
+        <source>New key generation failed.</source>
+        <translation>Янги калит яратиш амалга ошмади.</translation>
+    </message>
+</context>
+<context>
+    <name>FreespaceChecker</name>
+    <message>
+        <source>A new data directory will be created.</source>
+        <translation>Янги маълумотлар директорияси яратилади.</translation>
+    </message>
+    <message>
+        <source>name</source>
+        <translation>номи</translation>
+    </message>
+    <message>
+        <source>Directory already exists. Add %1 if you intend to create a new directory here.</source>
+        <translation>Директория аллақачон мавжуд. Агар бу ерда янги директория яратмоқчи бўлсангиз, %1 қўшинг.</translation>
+    </message>
+    <message>
+        <source>Path already exists, and is not a directory.</source>
+        <translation>Йўл аллақачон мавжуд. У директория эмас.</translation>
+    </message>
+    <message>
+        <source>Cannot create data directory here.</source>
+        <translation>Маълумотлар директориясини бу ерда яратиб бўлмайди..</translation>
+    </message>
+</context>
+<context>
+    <name>HelpMessageDialog</name>
+    <message>
+        <source>version</source>
+        <translation>версияси</translation>
+    </message>
+    <message>
+        <source>Command-line options</source>
+        <translation>Буйруқлар сатри мосламалари</translation>
+    </message>
+</context>
+<context>
+    <name>Intro</name>
+    <message>
+        <source>Welcome</source>
+        <translation>Хуш келибсиз</translation>
+    </message>
+    <message>
+        <source>Use the default data directory</source>
+        <translation>Стандарт маълумотлар директориясидан фойдаланиш</translation>
+    </message>
+    <message>
+        <source>Use a custom data directory:</source>
+        <translation>Бошқа маълумотлар директориясида фойдаланинг:</translation>
+    </message>
+    <message>
+        <source>Bitcoin</source>
+        <translation>Bitcoin</translation>
+    </message>
+    <message>
+        <source>Error: Specified data directory "%1" cannot be created.</source>
+        <translation>Хато: кўрсатилган "%1" маълумотлар директориясини яратиб бўлмайди.</translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation>Хатолик</translation>
+    </message>
+    </context>
+<context>
+    <name>ModalOverlay</name>
+    <message>
+        <source>Form</source>
+        <translation>Шакл</translation>
+    </message>
+    <message>
+        <source>Last block time</source>
+        <translation>Сўнгги блок вақти</translation>
+    </message>
+    </context>
+<context>
+    <name>OpenURIDialog</name>
+    <message>
+        <source>URI:</source>
+        <translation>URI:</translation>
+    </message>
+</context>
+<context>
+    <name>OpenWalletActivity</name>
+    </context>
+<context>
+    <name>OptionsDialog</name>
+    <message>
+        <source>Options</source>
+        <translation>Танламалар</translation>
+    </message>
+    <message>
+        <source>&amp;Main</source>
+        <translation>&amp;Асосий</translation>
+    </message>
+    <message>
+        <source>Size of &amp;database cache</source>
+        <translation>&amp;Маълумотлар базаси кеши</translation>
+    </message>
+    <message>
+        <source>Number of script &amp;verification threads</source>
+        <translation>Мавзуларни &amp;тўғрилаш скрипти миқдори</translation>
+    </message>
+    <message>
+        <source>IP address of the proxy (e.g. IPv4: 127.0.0.1 / IPv6: ::1)</source>
+        <translation>Прокси IP манзили (масалан: IPv4: 127.0.0.1 / IPv6: ::1)</translation>
+    </message>
+    <message>
+        <source>&amp;Network</source>
+        <translation>Тармоқ</translation>
+    </message>
+    <message>
+        <source>W&amp;allet</source>
+        <translation>Ҳамён</translation>
+    </message>
+    <message>
+        <source>Proxy &amp;IP:</source>
+        <translation>Прокси &amp;IP рақами:</translation>
+    </message>
+    <message>
+        <source>&amp;Port:</source>
+        <translation>&amp;Порт:</translation>
+    </message>
+    <message>
+        <source>Port of the proxy (e.g. 9050)</source>
+        <translation>Прокси порти (e.g. 9050)</translation>
+    </message>
+    <message>
+        <source>&amp;Window</source>
+        <translation>&amp;Ойна</translation>
+    </message>
+    <message>
+        <source>Show only a tray icon after minimizing the window.</source>
+        <translation>Ойна йиғилгандан сўнг фақат трэй нишончаси кўрсатилсин.</translation>
+    </message>
+    <message>
+        <source>&amp;Minimize to the tray instead of the taskbar</source>
+        <translation>Манзиллар панели ўрнига трэйни &amp;йиғиш</translation>
+    </message>
+    <message>
+        <source>M&amp;inimize on close</source>
+        <translation>Ёпишда й&amp;иғиш</translation>
+    </message>
+    <message>
+        <source>&amp;Display</source>
+        <translation>&amp;Кўрсатиш</translation>
+    </message>
+    <message>
+        <source>User Interface &amp;language:</source>
+        <translation>Фойдаланувчи интерфейси &amp;тили:</translation>
+    </message>
+    <message>
+        <source>&amp;Unit to show amounts in:</source>
+        <translation>Миқдорларни кўрсатиш учун &amp;қисм:</translation>
+    </message>
+    <message>
+        <source>&amp;
