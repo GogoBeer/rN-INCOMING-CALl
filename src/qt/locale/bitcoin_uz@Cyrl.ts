@@ -755,4 +755,250 @@
         <translation>Миқдорларни кўрсатиш учун &amp;қисм:</translation>
     </message>
     <message>
-        <source>&amp;
+        <source>&amp;OK</source>
+        <translation>&amp;OK</translation>
+    </message>
+    <message>
+        <source>&amp;Cancel</source>
+        <translation>&amp;Бекор қилиш</translation>
+    </message>
+    <message>
+        <source>default</source>
+        <translation>стандарт</translation>
+    </message>
+    <message>
+        <source>none</source>
+        <translation>йўқ</translation>
+    </message>
+    <message>
+        <source>Confirm options reset</source>
+        <translation>Тасдиқлаш танловларини рад қилиш</translation>
+    </message>
+    <message>
+        <source>Client restart required to activate changes.</source>
+        <translation>Ўзгаришлар амалга ошиши учун мижозни қайта ишга тушириш талаб қилинади.</translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation>Хатолик</translation>
+    </message>
+    <message>
+        <source>This change would require a client restart.</source>
+        <translation>Ушбу ўзгариш мижозни қайтадан ишга туширишни талаб қилади.</translation>
+    </message>
+    <message>
+        <source>The supplied proxy address is invalid.</source>
+        <translation>Келтирилган прокси манзили ишламайди.</translation>
+    </message>
+</context>
+<context>
+    <name>OverviewPage</name>
+    <message>
+        <source>Form</source>
+        <translation>Шакл</translation>
+    </message>
+    <message>
+        <source>The displayed information may be out of date. Your wallet automatically synchronizes with the Bitcoin network after a connection is established, but this process has not completed yet.</source>
+        <translation>Кўрсатилган маълумот эскирган бўлиши мумкин. Ҳамёнингиз алоқа ўрнатилгандан сўнг Bitcoin тармоқ билан автоматик тарзда синхронланади, аммо жараён ҳалигача тугалланмади.</translation>
+    </message>
+    <message>
+        <source>Watch-only:</source>
+        <translation>Фақат кўришга</translation>
+    </message>
+    <message>
+        <source>Available:</source>
+        <translation>Мавжуд:</translation>
+    </message>
+    <message>
+        <source>Your current spendable balance</source>
+        <translation>Жорий сарфланадиган балансингиз</translation>
+    </message>
+    <message>
+        <source>Pending:</source>
+        <translation>Кутилмоқда:</translation>
+    </message>
+    <message>
+        <source>Total of transactions that have yet to be confirmed, and do not yet count toward the spendable balance</source>
+        <translation>Жами ўтказмалар ҳозиргача тасдиқланган ва сафланадиган баланс томонга ҳали ҳам ҳисобланмади</translation>
+    </message>
+    <message>
+        <source>Immature:</source>
+        <translation>Тайёр эмас:</translation>
+    </message>
+    <message>
+        <source>Mined balance that has not yet matured</source>
+        <translation>Миналаштирилган баланс ҳалигача тайёр эмас</translation>
+    </message>
+    <message>
+        <source>Balances</source>
+        <translation>Баланслар</translation>
+    </message>
+    <message>
+        <source>Total:</source>
+        <translation>Жами:</translation>
+    </message>
+    <message>
+        <source>Your current total balance</source>
+        <translation>Жорий умумий балансингиз</translation>
+    </message>
+    <message>
+        <source>Your current balance in watch-only addresses</source>
+        <translation>Жорий балансингиз фақат кўринадиган манзилларда</translation>
+    </message>
+    <message>
+        <source>Spendable:</source>
+        <translation>Сарфланадиган:</translation>
+    </message>
+    <message>
+        <source>Recent transactions</source>
+        <translation>Сўнгги пул ўтказмалари</translation>
+    </message>
+    <message>
+        <source>Unconfirmed transactions to watch-only addresses</source>
+        <translation>Тасдиқланмаган ўтказмалар-фақат манзилларини кўриш</translation>
+    </message>
+    <message>
+        <source>Current total balance in watch-only addresses</source>
+        <translation>Жорий умумий баланс фақат кўринадиган манзилларда</translation>
+    </message>
+    </context>
+<context>
+    <name>PSBTOperationsDialog</name>
+    <message>
+        <source>or</source>
+        <translation>ёки</translation>
+    </message>
+    </context>
+<context>
+    <name>PaymentServer</name>
+    <message>
+        <source>Payment request error</source>
+        <translation>Тўлов сўрови хато</translation>
+    </message>
+    <message>
+        <source>URI handling</source>
+        <translation>URI осилиб қолмоқда</translation>
+    </message>
+    <message>
+        <source>Invalid payment address %1</source>
+        <translation>Нотўғри тўлов манзили %1</translation>
+    </message>
+    </context>
+<context>
+    <name>PeerTableModel</name>
+    <message>
+        <source>User Agent</source>
+        <translation>Фойдаланувчи вакил</translation>
+    </message>
+    </context>
+<context>
+    <name>QObject</name>
+    <message>
+        <source>Amount</source>
+        <translation>Миқдори</translation>
+    </message>
+    <message>
+        <source>Enter a Bitcoin address (e.g. %1)</source>
+        <translation>Bitcoin манзилини киритинг (масалан.  %1)</translation>
+    </message>
+    <message>
+        <source>%1 m</source>
+        <translation>%1 д</translation>
+    </message>
+    <message>
+        <source>%1 s</source>
+        <translation>%1 с</translation>
+    </message>
+    <message>
+        <source>None</source>
+        <translation>Йўқ</translation>
+    </message>
+    <message>
+        <source>N/A</source>
+        <translation>Тўғри келмайди</translation>
+    </message>
+    <message>
+        <source>%1 ms</source>
+        <translation>%1 мс</translation>
+    </message>
+    <message>
+        <source>%1 and %2</source>
+        <translation>%1 ва %2</translation>
+    </message>
+    <message>
+        <source>%1 B</source>
+        <translation>%1 Б</translation>
+    </message>
+    <message>
+        <source>%1 KB</source>
+        <translation>%1 КБ</translation>
+    </message>
+    <message>
+        <source>%1 MB</source>
+        <translation>%1 МБ</translation>
+    </message>
+    <message>
+        <source>%1 GB</source>
+        <translation>%1 ГБ</translation>
+    </message>
+    <message>
+        <source>unknown</source>
+        <translation>Номаълум</translation>
+    </message>
+</context>
+<context>
+    <name>QRImageWidget</name>
+    <message>
+        <source>&amp;Save Image...</source>
+        <translation>Расмни &amp;сақлаш</translation>
+    </message>
+    <message>
+        <source>&amp;Copy Image</source>
+        <translation>Расмдан &amp;нусха олиш</translation>
+    </message>
+    <message>
+        <source>Save QR Code</source>
+        <translation>QR кодни сақлаш</translation>
+    </message>
+    <message>
+        <source>PNG Image (*.png)</source>
+        <translation>PNG расм (*.png)</translation>
+    </message>
+</context>
+<context>
+    <name>RPCConsole</name>
+    <message>
+        <source>N/A</source>
+        <translation>Тўғри келмайди</translation>
+    </message>
+    <message>
+        <source>Client version</source>
+        <translation>Мижоз номи</translation>
+    </message>
+    <message>
+        <source>&amp;Information</source>
+        <translation>&amp;Маълумот</translation>
+    </message>
+    <message>
+        <source>General</source>
+        <translation>Асосий</translation>
+    </message>
+    <message>
+        <source>Using BerkeleyDB version</source>
+        <translation>Фойдаланилаётган BerkeleyDB версияси</translation>
+    </message>
+    <message>
+        <source>Startup time</source>
+        <translation>Бошланиш вақти</translation>
+    </message>
+    <message>
+        <source>Network</source>
+        <translation>Тармоқ</translation>
+    </message>
+    <message>
+        <source>Name</source>
+        <translation>Ном</translation>
+    </message>
+    <message>
+        <source>&amp;Peers</source>
+        <translation>&amp;Уламлар</transl
