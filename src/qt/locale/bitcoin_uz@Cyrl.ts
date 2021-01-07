@@ -1001,4 +1001,255 @@
     </message>
     <message>
         <source>&amp;Peers</source>
-        <translation>&amp;Уламлар</transl
+        <translation>&amp;Уламлар</translation>
+    </message>
+    <message>
+        <source>Select a peer to view detailed information.</source>
+        <translation>Батафсил маълумотларни кўриш учун уламни танланг.</translation>
+    </message>
+    <message>
+        <source>Direction</source>
+        <translation>Йўналиш</translation>
+    </message>
+    <message>
+        <source>Version</source>
+        <translation>Версия</translation>
+    </message>
+    <message>
+        <source>User Agent</source>
+        <translation>Фойдаланувчи вакил</translation>
+    </message>
+    <message>
+        <source>Services</source>
+        <translation>Хизматлар</translation>
+    </message>
+    <message>
+        <source>Connection Time</source>
+        <translation>Уланиш вақти</translation>
+    </message>
+    <message>
+        <source>Last Send</source>
+        <translation>Сўнгги жўнатилган</translation>
+    </message>
+    <message>
+        <source>Last Receive</source>
+        <translation>Сўнгги қабул қилинган</translation>
+    </message>
+    <message>
+        <source>Ping Time</source>
+        <translation>Ping вақти</translation>
+    </message>
+    <message>
+        <source>Last block time</source>
+        <translation>Сўнгги блок вақти</translation>
+    </message>
+    <message>
+        <source>&amp;Open</source>
+        <translation>&amp;Очиш</translation>
+    </message>
+    <message>
+        <source>&amp;Console</source>
+        <translation>&amp;Терминал</translation>
+    </message>
+    <message>
+        <source>&amp;Network Traffic</source>
+        <translation>&amp;Тармоқ трафиги</translation>
+    </message>
+    <message>
+        <source>Totals</source>
+        <translation>Жами</translation>
+    </message>
+    <message>
+        <source>In:</source>
+        <translation>Ичига:</translation>
+    </message>
+    <message>
+        <source>Out:</source>
+        <translation>Ташқарига:</translation>
+    </message>
+    <message>
+        <source>Debug log file</source>
+        <translation>Тузатиш журнали файли</translation>
+    </message>
+    <message>
+        <source>Clear console</source>
+        <translation>Терминални тозалаш</translation>
+    </message>
+    <message>
+        <source>via %1</source>
+        <translation>%1 орқали</translation>
+    </message>
+    <message>
+        <source>never</source>
+        <translation>ҳеч қачон</translation>
+    </message>
+    <message>
+        <source>Inbound</source>
+        <translation>Ички йўналиш</translation>
+    </message>
+    <message>
+        <source>Outbound</source>
+        <translation>Ташқи йўналиш</translation>
+    </message>
+    <message>
+        <source>Unknown</source>
+        <translation>Номаълум</translation>
+    </message>
+</context>
+<context>
+    <name>ReceiveCoinsDialog</name>
+    <message>
+        <source>&amp;Amount:</source>
+        <translation>&amp;Миқдор:</translation>
+    </message>
+    <message>
+        <source>&amp;Label:</source>
+        <translation>&amp;Ёрлиқ:</translation>
+    </message>
+    <message>
+        <source>&amp;Message:</source>
+        <translation>&amp;Хабар:</translation>
+    </message>
+    <message>
+        <source>An optional label to associate with the new receiving address.</source>
+        <translation>Янги қабул қилинаётган манзил билан боғланган танланадиган ёрлиқ.</translation>
+    </message>
+    <message>
+        <source>Use this form to request payments. All fields are &lt;b&gt;optional&lt;/b&gt;.</source>
+        <translation>Ушбу сўровдан тўловларни сўраш учун фойдаланинг. Барча майдонлар &lt;b&gt;мажбурий эмас&lt;/b&gt;.</translation>
+    </message>
+    <message>
+        <source>An optional amount to request. Leave this empty or zero to not request a specific amount.</source>
+        <translation>Хоҳланган миқдор сўрови. Кўрсатилган миқдорни сўраш учун буни бўш ёки ноль қолдиринг.</translation>
+    </message>
+    <message>
+        <source>Clear all fields of the form.</source>
+        <translation>Шаклнинг барча майдончаларини тозалаш</translation>
+    </message>
+    <message>
+        <source>Clear</source>
+        <translation>Тозалаш</translation>
+    </message>
+    <message>
+        <source>Requested payments history</source>
+        <translation>Сўралган тўлов тарихи</translation>
+    </message>
+    <message>
+        <source>Show the selected request (does the same as double clicking an entry)</source>
+        <translation>Танланган сўровни кўрсатиш (икки марта босилганда ҳам бир хил амал бажарилсин)</translation>
+    </message>
+    <message>
+        <source>Show</source>
+        <translation>Кўрсатиш</translation>
+    </message>
+    <message>
+        <source>Remove the selected entries from the list</source>
+        <translation>Танланганларни рўйхатдан ўчириш</translation>
+    </message>
+    <message>
+        <source>Remove</source>
+        <translation>Ўчириш</translation>
+    </message>
+    <message>
+        <source>Copy label</source>
+        <translation>Ёрликни нусхала</translation>
+    </message>
+    <message>
+        <source>Copy message</source>
+        <translation>Хабарни нусхала</translation>
+    </message>
+    <message>
+        <source>Copy amount</source>
+        <translation>Кийматни нусхала</translation>
+    </message>
+    <message>
+        <source>Could not unlock wallet.</source>
+        <translation>Ҳамён қулфдан чиқмади.</translation>
+    </message>
+    </context>
+<context>
+    <name>ReceiveRequestDialog</name>
+    <message>
+        <source>Amount:</source>
+        <translation>Миқдори:</translation>
+    </message>
+    <message>
+        <source>Message:</source>
+        <translation>Хабар</translation>
+    </message>
+    <message>
+        <source>Copy &amp;Address</source>
+        <translation>Нусҳалаш &amp; Манзил</translation>
+    </message>
+    <message>
+        <source>&amp;Save Image...</source>
+        <translation>Расмни &amp;сақлаш</translation>
+    </message>
+    <message>
+        <source>Request payment to %1</source>
+        <translation> %1 дан Тўловни сўраш</translation>
+    </message>
+    <message>
+        <source>Payment information</source>
+        <translation>Тўлов маълумоти</translation>
+    </message>
+</context>
+<context>
+    <name>RecentRequestsTableModel</name>
+    <message>
+        <source>Date</source>
+        <translation>Сана</translation>
+    </message>
+    <message>
+        <source>Label</source>
+        <translation>Ёрлиқ</translation>
+    </message>
+    <message>
+        <source>Message</source>
+        <translation>Хабар</translation>
+    </message>
+    <message>
+        <source>(no label)</source>
+        <translation>(Ёрлиқ мавжуд эмас)</translation>
+    </message>
+    <message>
+        <source>(no message)</source>
+        <translation>(Хабар йўқ)</translation>
+    </message>
+    </context>
+<context>
+    <name>SendCoinsDialog</name>
+    <message>
+        <source>Send Coins</source>
+        <translation>Тангаларни жунат</translation>
+    </message>
+    <message>
+        <source>Coin Control Features</source>
+        <translation>Танга бошқаруви ҳусусиятлари</translation>
+    </message>
+    <message>
+        <source>automatically selected</source>
+        <translation>автоматик тарзда танланган</translation>
+    </message>
+    <message>
+        <source>Insufficient funds!</source>
+        <translation>Кам миқдор</translation>
+    </message>
+    <message>
+        <source>Quantity:</source>
+        <translation>Сони:</translation>
+    </message>
+    <message>
+        <source>Bytes:</source>
+        <translation>Байт:</translation>
+    </message>
+    <message>
+        <source>Amount:</source>
+        <translation>Миқдори:</translation>
+    </message>
+    <message>
+        <source>Fee:</source>
+        <translation>Солиқ:</translation>
+    </message>
+    <message>
+        <source>Aft
