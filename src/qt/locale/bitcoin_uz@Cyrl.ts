@@ -1784,4 +1784,34 @@
     </message>
     <message>
         <source>Export the data in the current tab to a file</source>
-        <translat
+        <translation>Жорий ички ойна ичидаги маълумотларни файлга экспорт қилиш</translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation>Хатолик</translation>
+    </message>
+    </context>
+<context>
+    <name>bitcoin-core</name>
+    <message>
+        <source>Insufficient funds</source>
+        <translation>Кам миқдор</translation>
+    </message>
+    <message>
+        <source>Loading block index...</source>
+        <translation>Тўсиқ индекси юкланмоқда...</translation>
+    </message>
+    <message>
+        <source>Loading wallet...</source>
+        <translation>Ҳамён юкланмоқда...</translation>
+    </message>
+    <message>
+        <source>Rescanning...</source>
+        <translation>Қайта текшириб чиқилмоқда...</translation>
+    </message>
+    <message>
+        <source>Done loading</source>
+        <translation>Юклаш тайёр</translation>
+    </message>
+</context>
+</TS>
