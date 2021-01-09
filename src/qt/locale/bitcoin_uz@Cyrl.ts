@@ -1515,4 +1515,273 @@
         <translation>Умумий миқдор</translation>
     </message>
     <message>
-        <sou
+        <source>Message</source>
+        <translation>Хабар</translation>
+    </message>
+    <message>
+        <source>Comment</source>
+        <translation>Шарҳ</translation>
+    </message>
+    <message>
+        <source>Transaction ID</source>
+        <translation>ID</translation>
+    </message>
+    <message>
+        <source>Merchant</source>
+        <translation>Савдо</translation>
+    </message>
+    <message>
+        <source>Transaction</source>
+        <translation>Ўтказма</translation>
+    </message>
+    <message>
+        <source>Amount</source>
+        <translation>Миқдори</translation>
+    </message>
+    <message>
+        <source>true</source>
+        <translation>рост</translation>
+    </message>
+    <message>
+        <source>false</source>
+        <translation>ёлғон</translation>
+    </message>
+</context>
+<context>
+    <name>TransactionDescDialog</name>
+    <message>
+        <source>This pane shows a detailed description of the transaction</source>
+        <translation>Ушбу ойна операциянинг батафсил таърифини кўрсатади</translation>
+    </message>
+    </context>
+<context>
+    <name>TransactionTableModel</name>
+    <message>
+        <source>Date</source>
+        <translation>Сана</translation>
+    </message>
+    <message>
+        <source>Type</source>
+        <translation>Тури</translation>
+    </message>
+    <message>
+        <source>Label</source>
+        <translation>Ёрлиқ</translation>
+    </message>
+    <message>
+        <source>Open until %1</source>
+        <translation>%1 гача очиш</translation>
+    </message>
+    <message>
+        <source>Unconfirmed</source>
+        <translation>Тасдиқланмаган</translation>
+    </message>
+    <message>
+        <source>Confirmed (%1 confirmations)</source>
+        <translation>Тасдиқланди (%1 та тасдиқ)</translation>
+    </message>
+    <message>
+        <source>Generated but not accepted</source>
+        <translation>Яратилди, аммо қабул қилинмади</translation>
+    </message>
+    <message>
+        <source>Received with</source>
+        <translation>Ёрдамида қабул қилиш</translation>
+    </message>
+    <message>
+        <source>Received from</source>
+        <translation>Дан қабул қилиш</translation>
+    </message>
+    <message>
+        <source>Sent to</source>
+        <translation>Жўнатиш</translation>
+    </message>
+    <message>
+        <source>Payment to yourself</source>
+        <translation>Ўзингизга тўлов</translation>
+    </message>
+    <message>
+        <source>Mined</source>
+        <translation>Фойда</translation>
+    </message>
+    <message>
+        <source>(n/a)</source>
+        <translation>(қ/қ)</translation>
+    </message>
+    <message>
+        <source>(no label)</source>
+        <translation>(Ёрлиқ мавжуд эмас)</translation>
+    </message>
+    <message>
+        <source>Transaction status. Hover over this field to show number of confirmations.</source>
+        <translation>Ўтказма ҳолати. Ушбу майдон бўйлаб тасдиқлашлар сонини кўрсатиш.</translation>
+    </message>
+    <message>
+        <source>Date and time that the transaction was received.</source>
+        <translation>Ўтказма қабул қилинган сана ва вақт.</translation>
+    </message>
+    <message>
+        <source>Type of transaction.</source>
+        <translation>Пул ўтказмаси тури</translation>
+    </message>
+    <message>
+        <source>Amount removed from or added to balance.</source>
+        <translation>Миқдор ўчирилган ёки балансга қўшилган.</translation>
+    </message>
+</context>
+<context>
+    <name>TransactionView</name>
+    <message>
+        <source>All</source>
+        <translation>Барча</translation>
+    </message>
+    <message>
+        <source>Today</source>
+        <translation>Бугун</translation>
+    </message>
+    <message>
+        <source>This week</source>
+        <translation>Шу ҳафта</translation>
+    </message>
+    <message>
+        <source>This month</source>
+        <translation>Шу ой</translation>
+    </message>
+    <message>
+        <source>Last month</source>
+        <translation>Ўтган хафта</translation>
+    </message>
+    <message>
+        <source>This year</source>
+        <translation>Шу йил</translation>
+    </message>
+    <message>
+        <source>Range...</source>
+        <translation>Оралиқ...</translation>
+    </message>
+    <message>
+        <source>Received with</source>
+        <translation>Ёрдамида қабул қилиш</translation>
+    </message>
+    <message>
+        <source>Sent to</source>
+        <translation>Жўнатиш</translation>
+    </message>
+    <message>
+        <source>To yourself</source>
+        <translation>Ўзингизга</translation>
+    </message>
+    <message>
+        <source>Mined</source>
+        <translation>Фойда</translation>
+    </message>
+    <message>
+        <source>Other</source>
+        <translation>Бошка</translation>
+    </message>
+    <message>
+        <source>Min amount</source>
+        <translation>Мин қиймат</translation>
+    </message>
+    <message>
+        <source>Copy address</source>
+        <translation>Манзилни нусхалаш</translation>
+    </message>
+    <message>
+        <source>Copy label</source>
+        <translation>Ёрликни нусхала</translation>
+    </message>
+    <message>
+        <source>Copy amount</source>
+        <translation>Кийматни нусхала</translation>
+    </message>
+    <message>
+        <source>Copy transaction ID</source>
+        <translation>Ўтказам рақамидан нусха олиш</translation>
+    </message>
+    <message>
+        <source>Edit label</source>
+        <translation>Ёрликни тахрирлаш</translation>
+    </message>
+    <message>
+        <source>Show transaction details</source>
+        <translation>Ўтказма тафсилотларини кўрсатиш </translation>
+    </message>
+    <message>
+        <source>Export Transaction History</source>
+        <translation>Ўтказмалар тарихини экспорт қилиш</translation>
+    </message>
+    <message>
+        <source>Comma separated file (*.csv)</source>
+        <translation>Вергул билан ажратилган файл (*.csv)</translation>
+    </message>
+    <message>
+        <source>Confirmed</source>
+        <translation>Тасдиқланди</translation>
+    </message>
+    <message>
+        <source>Watch-only</source>
+        <translation>Фақат кўришга</translation>
+    </message>
+    <message>
+        <source>Date</source>
+        <translation>Сана</translation>
+    </message>
+    <message>
+        <source>Type</source>
+        <translation>Тури</translation>
+    </message>
+    <message>
+        <source>Label</source>
+        <translation>Ёрлиқ</translation>
+    </message>
+    <message>
+        <source>Address</source>
+        <translation>Манзил</translation>
+    </message>
+    <message>
+        <source>ID</source>
+        <translation>ID</translation>
+    </message>
+    <message>
+        <source>Exporting Failed</source>
+        <translation>Экспорт қилиб бўлмади</translation>
+    </message>
+    <message>
+        <source>The transaction history was successfully saved to %1.</source>
+        <translation>Ўтказмалар тарихи %1 га муваффаққиятли сақланди.</translation>
+    </message>
+    <message>
+        <source>Range:</source>
+        <translation>Оралиқ:</translation>
+    </message>
+    <message>
+        <source>to</source>
+        <translation>Кимга</translation>
+    </message>
+</context>
+<context>
+    <name>UnitDisplayStatusBarControl</name>
+    </context>
+<context>
+    <name>WalletController</name>
+    </context>
+<context>
+    <name>WalletFrame</name>
+    </context>
+<context>
+    <name>WalletModel</name>
+    <message>
+        <source>Send Coins</source>
+        <translation>Тангаларни жунат</translation>
+    </message>
+    </context>
+<context>
+    <name>WalletView</name>
+    <message>
+        <source>&amp;Export</source>
+        <translation>&amp;Экспорт</translation>
+    </message>
+    <message>
+        <source>Export the data in the current tab to a file</source>
+        <translat
