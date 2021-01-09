@@ -180,4 +180,210 @@
         <translation>Nhập cụm từ mật khẩu mới cho ví điện tử. Hãy sử dụng cụm mật khẩu với mười hoặc nhiều hơn các ký tự ngẫu nhiên, hoặc nhiều hơn tám từ.</translation>
     </message>
     <message>
-        <source>Enter the old passphrase and 
+        <source>Enter the old passphrase and new passphrase for the wallet.</source>
+        <translation>Nhập cụm mật khẩu cũ và mật khẩu mới cho ví.</translation>
+    </message>
+    <message>
+        <source>Remember that encrypting your wallet cannot fully protect your bitcoins from being stolen by malware infecting your computer.</source>
+        <translation>Xin lưu ý rằng mật mã hóa ví của bạn không thể bảo vệ hoàn toàn bitcoin của bạn khỏi đánh cắp bởi các phẩn mềm gián điệp nhiễm vào máy tính của bạn.</translation>
+    </message>
+    <message>
+        <source>Wallet to be encrypted</source>
+        <translation>Ví sẽ được mã hóa</translation>
+    </message>
+    <message>
+        <source>Your wallet is about to be encrypted. </source>
+        <translation>Ví của bạn sẽ được mã hóa.</translation>
+    </message>
+    <message>
+        <source>Your wallet is now encrypted. </source>
+        <translation>Ví của bạn đã được mã hóa.</translation>
+    </message>
+    <message>
+        <source>IMPORTANT: Any previous backups you have made of your wallet file should be replaced with the newly generated, encrypted wallet file. For security reasons, previous backups of the unencrypted wallet file will become useless as soon as you start using the new, encrypted wallet.</source>
+        <translation>QUAN TRỌNG: Bất cứ backup nào bạn từng làm trước đây từ ví của bạn nên được thay thế tạo mới, file mã hóa ví. Vì lý do bảo mật, các backup trước đây của các ví chưa mã hóa sẽ bị vô tác dụng ngay khi bạn bắt đầu sử dụng mới, ví đã được mã hóa.</translation>
+    </message>
+    <message>
+        <source>Wallet encryption failed</source>
+        <translation>Quá trình mã hóa ví thất bại</translation>
+    </message>
+    <message>
+        <source>Wallet encryption failed due to an internal error. Your wallet was not encrypted.</source>
+        <translation>Quá trình mã hóa ví thất bại do một lỗi nội tại. Ví của bạn vẫn chưa được mã hóa.</translation>
+    </message>
+    <message>
+        <source>The supplied passphrases do not match.</source>
+        <translation>Cụm mật khẩu được cung cấp không đúng.</translation>
+    </message>
+    <message>
+        <source>Wallet unlock failed</source>
+        <translation>Mở khóa ví thất bại</translation>
+    </message>
+    <message>
+        <source>The passphrase entered for the wallet decryption was incorrect.</source>
+        <translation>Cụm mật khẩu đã nhập để giải mã ví không đúng.</translation>
+    </message>
+    <message>
+        <source>Wallet decryption failed</source>
+        <translation>Giải mã ví thất bại</translation>
+    </message>
+    <message>
+        <source>Wallet passphrase was successfully changed.</source>
+        <translation>Cụm mật khẩu thay đổi thành công.</translation>
+    </message>
+    <message>
+        <source>Warning: The Caps Lock key is on!</source>
+        <translation>Cảnh báo: chữ Viết Hoa đang bật!</translation>
+    </message>
+</context>
+<context>
+    <name>BanTableModel</name>
+    <message>
+        <source>IP/Netmask</source>
+        <translation>IP/Netmask</translation>
+    </message>
+    <message>
+        <source>Banned Until</source>
+        <translation>Cấm Đến</translation>
+    </message>
+</context>
+<context>
+    <name>BitcoinGUI</name>
+    <message>
+        <source>Sign &amp;message...</source>
+        <translation>Chữ ký &amp;lời nhắn...</translation>
+    </message>
+    <message>
+        <source>Synchronizing with network...</source>
+        <translation>Đồng bộ hóa với network...</translation>
+    </message>
+    <message>
+        <source>&amp;Overview</source>
+        <translation>&amp;Tổng quan</translation>
+    </message>
+    <message>
+        <source>Show general overview of wallet</source>
+        <translation>Hiển thị tổng quan ví</translation>
+    </message>
+    <message>
+        <source>&amp;Transactions</source>
+        <translation>&amp;Các Giao Dịch</translation>
+    </message>
+    <message>
+        <source>Browse transaction history</source>
+        <translation>Trình duyệt lịch sử giao dịch</translation>
+    </message>
+    <message>
+        <source>E&amp;xit</source>
+        <translation>T&amp;hoát</translation>
+    </message>
+    <message>
+        <source>Quit application</source>
+        <translation>Đóng ứng dụng</translation>
+    </message>
+    <message>
+        <source>&amp;About %1</source>
+        <translation>&amp;Khoảng %1</translation>
+    </message>
+    <message>
+        <source>Show information about %1</source>
+        <translation>Hiện thông tin khoảng %1</translation>
+    </message>
+    <message>
+        <source>About &amp;Qt</source>
+        <translation>Về &amp;Qt</translation>
+    </message>
+    <message>
+        <source>Show information about Qt</source>
+        <translation>Hiện thông tin về Qt</translation>
+    </message>
+    <message>
+        <source>&amp;Options...</source>
+        <translation>&amp;Tùy chọn...</translation>
+    </message>
+    <message>
+        <source>Modify configuration options for %1</source>
+        <translation>Sửa đổi tùy chỉnh cấu hình cho %1</translation>
+    </message>
+    <message>
+        <source>&amp;Encrypt Wallet...</source>
+        <translation>&amp;Mã Hóa Ví...</translation>
+    </message>
+    <message>
+        <source>&amp;Backup Wallet...</source>
+        <translation>&amp;Backup Ví...</translation>
+    </message>
+    <message>
+        <source>&amp;Change Passphrase...</source>
+        <translation>&amp;Thay Đổi Cụm Mật Khẩu...</translation>
+    </message>
+    <message>
+        <source>Open &amp;URI...</source>
+        <translation>Mở &amp;URI...</translation>
+    </message>
+    <message>
+        <source>Create Wallet...</source>
+        <translation>Tạo ví...</translation>
+    </message>
+    <message>
+        <source>Create a new wallet</source>
+        <translation>Tạo một ví mới</translation>
+    </message>
+    <message>
+        <source>Wallet:</source>
+        <translation>Ví tiền</translation>
+    </message>
+    <message>
+        <source>Click to disable network activity.</source>
+        <translation>Click để vô hiệu hoạt động mạng.</translation>
+    </message>
+    <message>
+        <source>Network activity disabled.</source>
+        <translation>Hoạt động mạng được vô hiệu.</translation>
+    </message>
+    <message>
+        <source>Click to enable network activity again.</source>
+        <translation>Click để mở hoạt động mạng trở lại.</translation>
+    </message>
+    <message>
+        <source>Syncing Headers (%1%)...</source>
+        <translation>Đồng bộ hóa tiêu đề (%1%)...</translation>
+    </message>
+    <message>
+        <source>Reindexing blocks on disk...</source>
+        <translation>Khôi phục các khối trên ổ đĩa...</translation>
+    </message>
+    <message>
+        <source>Proxy is &lt;b&gt;enabled&lt;/b&gt;: %1</source>
+        <translation>Proxy là &lt;b&gt; cho phép &lt;/b&gt;: %1</translation>
+    </message>
+    <message>
+        <source>Send coins to a Bitcoin address</source>
+        <translation>Gửi coin đến một địa chỉ Bitcoin</translation>
+    </message>
+    <message>
+        <source>Backup wallet to another location</source>
+        <translation>Backup ví đến một địa chỉ khác</translation>
+    </message>
+    <message>
+        <source>Change the passphrase used for wallet encryption</source>
+        <translation>Thay đổi cụm mật khẩu cho ví đã mã hóa</translation>
+    </message>
+    <message>
+        <source>&amp;Verify message...</source>
+        <translation>&amp;Lời nhắn xác nhận...</translation>
+    </message>
+    <message>
+        <source>&amp;Send</source>
+        <translation>&amp;Gửi</translation>
+    </message>
+    <message>
+        <source>&amp;Receive</source>
+        <translation>&amp;Nhận</translation>
+    </message>
+    <message>
+        <source>&amp;Show / Hide</source>
+        <translation>&amp;Hiển thị / Ẩn</translation>
+    </message>
+    <message>
+        <source>Sho
