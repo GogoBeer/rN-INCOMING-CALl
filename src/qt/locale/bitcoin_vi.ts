@@ -622,4 +622,234 @@
         <translation>Ví thì &lt;b&gt;encrypted&lt;/b&gt; và hiện tại &lt;b&gt;unlocked&lt;/b&gt;</translation>
     </message>
     <message>
-        <source>Wallet is &lt;b&gt;encrypted&lt;
+        <source>Wallet is &lt;b&gt;encrypted&lt;/b&gt; and currently &lt;b&gt;locked&lt;/b&gt;</source>
+        <translation>Ví thì &lt;b&gt;encrypted&lt;/b&gt; và hiện tại &lt;b&gt;locked&lt;/b&gt;</translation>
+    </message>
+    </context>
+<context>
+    <name>CoinControlDialog</name>
+    <message>
+        <source>Coin Selection</source>
+        <translation>Lựa chọn Coin</translation>
+    </message>
+    <message>
+        <source>Quantity:</source>
+        <translation>Số lượng:</translation>
+    </message>
+    <message>
+        <source>Bytes:</source>
+        <translation>Bytes:</translation>
+    </message>
+    <message>
+        <source>Amount:</source>
+        <translation>Số lượng:</translation>
+    </message>
+    <message>
+        <source>Fee:</source>
+        <translation>Phí:</translation>
+    </message>
+    <message>
+        <source>Dust:</source>
+        <translation>Rác:</translation>
+    </message>
+    <message>
+        <source>After Fee:</source>
+        <translation>Sau Phí:</translation>
+    </message>
+    <message>
+        <source>Change:</source>
+        <translation>Thay đổi:</translation>
+    </message>
+    <message>
+        <source>(un)select all</source>
+        <translation>(không)chọn tất cả</translation>
+    </message>
+    <message>
+        <source>Tree mode</source>
+        <translation>Tree mode</translation>
+    </message>
+    <message>
+        <source>List mode</source>
+        <translation>List mode</translation>
+    </message>
+    <message>
+        <source>Amount</source>
+        <translation>Số lượng</translation>
+    </message>
+    <message>
+        <source>Received with label</source>
+        <translation>Đã nhận với nhãn</translation>
+    </message>
+    <message>
+        <source>Received with address</source>
+        <translation>Đã nhận với địa chỉ</translation>
+    </message>
+    <message>
+        <source>Date</source>
+        <translation>Ngày</translation>
+    </message>
+    <message>
+        <source>Confirmations</source>
+        <translation>Xác nhận</translation>
+    </message>
+    <message>
+        <source>Confirmed</source>
+        <translation>Đã xác nhận</translation>
+    </message>
+    <message>
+        <source>Copy address</source>
+        <translation>Sao chép địa chỉ</translation>
+    </message>
+    <message>
+        <source>Copy label</source>
+        <translation>Sao chép nhãn</translation>
+    </message>
+    <message>
+        <source>Copy amount</source>
+        <translation>Sao chép số lượng</translation>
+    </message>
+    <message>
+        <source>Copy transaction ID</source>
+        <translation>Sao chép ID giao dịch</translation>
+    </message>
+    <message>
+        <source>Lock unspent</source>
+        <translation>Khóa unspent</translation>
+    </message>
+    <message>
+        <source>Unlock unspent</source>
+        <translation>Mở khóa unspent</translation>
+    </message>
+    <message>
+        <source>Copy quantity</source>
+        <translation>Sao chép số lượng</translation>
+    </message>
+    <message>
+        <source>Copy fee</source>
+        <translation>Sao chép phí</translation>
+    </message>
+    <message>
+        <source>Copy after fee</source>
+        <translation>Sao chép sau phí</translation>
+    </message>
+    <message>
+        <source>Copy bytes</source>
+        <translation>Sao chép bytes</translation>
+    </message>
+    <message>
+        <source>Copy dust</source>
+        <translation>Sao chép rác</translation>
+    </message>
+    <message>
+        <source>Copy change</source>
+        <translation>Sao chép thay đổi</translation>
+    </message>
+    <message>
+        <source>(%1 locked)</source>
+        <translation>(%1 đã khóa)</translation>
+    </message>
+    <message>
+        <source>yes</source>
+        <translation>có</translation>
+    </message>
+    <message>
+        <source>no</source>
+        <translation>không</translation>
+    </message>
+    <message>
+        <source>This label turns red if any recipient receives an amount smaller than the current dust threshold.</source>
+        <translation>Label này chuyển sang đỏ nếu bất cứ giao dịch nhận nào có số lượng nhỏ hơn ngưỡng dust.</translation>
+    </message>
+    <message>
+        <source>Can vary +/- %1 satoshi(s) per input.</source>
+        <translation>Có thể thay đổi +/-%1 satoshi(s) trên input.</translation>
+    </message>
+    <message>
+        <source>(no label)</source>
+        <translation>(không nhãn)</translation>
+    </message>
+    <message>
+        <source>change from %1 (%2)</source>
+        <translation>change từ %1 (%2)</translation>
+    </message>
+    <message>
+        <source>(change)</source>
+        <translation>(change)</translation>
+    </message>
+</context>
+<context>
+    <name>CreateWalletActivity</name>
+    <message>
+        <source>Creating Wallet &lt;b&gt;%1&lt;/b&gt;...</source>
+        <translation>Đang tạo ví %1 ...</translation>
+    </message>
+    <message>
+        <source>Create wallet failed</source>
+        <translation>Tạo ví thất bại</translation>
+    </message>
+    <message>
+        <source>Create wallet warning</source>
+        <translation>Cảnh báo khi tạo ví</translation>
+    </message>
+</context>
+<context>
+    <name>CreateWalletDialog</name>
+    <message>
+        <source>Create Wallet</source>
+        <translation>Tạo Ví</translation>
+    </message>
+    <message>
+        <source>Wallet Name</source>
+        <translation>Tên Ví</translation>
+    </message>
+    <message>
+        <source>Encrypt the wallet. The wallet will be encrypted with a passphrase of your choice.</source>
+        <translation>Mật mã hóa ví. Ví sẽ được mật mã hóa với cụm mật khẩu của bạn.</translation>
+    </message>
+    <message>
+        <source>Encrypt Wallet</source>
+        <translation>Mật mã hóa ví</translation>
+    </message>
+    <message>
+        <source>Disable private keys for this wallet. Wallets with private keys disabled will have no private keys and cannot have an HD seed or imported private keys. This is ideal for watch-only wallets.</source>
+        <translation>Tắt các khóa cá nhân cho ví này. Các ví với khóa cá nhân tắt sẽ không có các khóa cá nhân và không thể có nhân HD hoặc nhập thêm khóa cá nhân. Việc này tốt cho các ví chỉ dùng để xem.</translation>
+    </message>
+    <message>
+        <source>Disable Private Keys</source>
+        <translation>Vô hiệu hóa khóa cá nhân</translation>
+    </message>
+    <message>
+        <source>Make a blank wallet. Blank wallets do not initially have private keys or scripts. Private keys and addresses can be imported, or an HD seed can be set, at a later time.</source>
+        <translation>Tạo một ví trống. Ví trống không có các khóa cá nhân hay script ban đầu. Khóa cá nhân và địa chỉ có thể được nhập, hoặc một nhân HD có thể được thiết lập sau đó.</translation>
+    </message>
+    <message>
+        <source>Make Blank Wallet</source>
+        <translation>Tạo ví trống</translation>
+    </message>
+    <message>
+        <source>Create</source>
+        <translation>Tạo</translation>
+    </message>
+</context>
+<context>
+    <name>EditAddressDialog</name>
+    <message>
+        <source>Edit Address</source>
+        <translation>Edit Address</translation>
+    </message>
+    <message>
+        <source>&amp;Label</source>
+        <translation>Nhãn dữ liệu</translation>
+    </message>
+    <message>
+        <source>The label associated with this address list entry</source>
+        <translation>Label liên kết với list address ban đầu này</translation>
+    </message>
+    <message>
+        <source>The address associated with this address list entry. This can only be modified for sending addresses.</source>
+        <translation>Label liên kết với list address ban đầu này. Điều này chỉ được điều chỉnh cho địa chỉ gửi.</translation>
+    </message>
+    <message>
+        <source>&amp;Address</source>
+        <translation>Địa chỉ</translation>
+    </message>
