@@ -853,3 +853,166 @@
         <source>&amp;Address</source>
         <translation>Địa chỉ</translation>
     </message>
+    <message>
+        <source>New sending address</source>
+        <translation>Address đang gửi mới</translation>
+    </message>
+    <message>
+        <source>Edit receiving address</source>
+        <translation>Edit address đang nhận</translation>
+    </message>
+    <message>
+        <source>Edit sending address</source>
+        <translation>Edit address đang gửi</translation>
+    </message>
+    <message>
+        <source>The entered address "%1" is not a valid Bitcoin address.</source>
+        <translation>Address đã nhập "%1" không valid Bitcoin address.</translation>
+    </message>
+    <message>
+        <source>Address "%1" already exists as a receiving address with label "%2" and so cannot be added as a sending address.</source>
+        <translation>Địa chỉ "%1" đã tồn tại như địa chỉ nhận với nhãn "%2" và vì vậy không thể thêm như là địa chỉ gửi.</translation>
+    </message>
+    <message>
+        <source>The entered address "%1" is already in the address book with label "%2".</source>
+        <translation>Địa chỉ  nhập "%1" đã có trong sổ địa chỉ với nhãn "%2".</translation>
+    </message>
+    <message>
+        <source>Could not unlock wallet.</source>
+        <translation>Không thể unlock wallet.</translation>
+    </message>
+    <message>
+        <source>New key generation failed.</source>
+        <translation>Khởi tạo key mới thất bại.</translation>
+    </message>
+</context>
+<context>
+    <name>FreespaceChecker</name>
+    <message>
+        <source>A new data directory will be created.</source>
+        <translation>Một danh mục dữ liệu mới sẽ được tạo.</translation>
+    </message>
+    <message>
+        <source>name</source>
+        <translation>tên</translation>
+    </message>
+    <message>
+        <source>Directory already exists. Add %1 if you intend to create a new directory here.</source>
+        <translation>Danh mục đã tồn tại. Thêm %1 nếu bạn dự định creat một danh mục mới ở đây.</translation>
+    </message>
+    <message>
+        <source>Path already exists, and is not a directory.</source>
+        <translation>Path đã tồn tại, và không là danh mục.</translation>
+    </message>
+    <message>
+        <source>Cannot create data directory here.</source>
+        <translation>Không thể create dữ liệu danh mục tại đây.</translation>
+    </message>
+</context>
+<context>
+    <name>HelpMessageDialog</name>
+    <message>
+        <source>version</source>
+        <translation>phiên bản</translation>
+    </message>
+    <message>
+        <source>About %1</source>
+        <translation>About %1</translation>
+    </message>
+    <message>
+        <source>Command-line options</source>
+        <translation>Command-line options</translation>
+    </message>
+</context>
+<context>
+    <name>Intro</name>
+    <message>
+        <source>Welcome</source>
+        <translation>Welcome</translation>
+    </message>
+    <message>
+        <source>Welcome to %1.</source>
+        <translation>Welcome to %1.</translation>
+    </message>
+    <message>
+        <source>As this is the first time the program is launched, you can choose where %1 will store its data.</source>
+        <translation>Đây là lần đầu chương trình khởi chạy, bạn có thể chọn nơi %1 sẽ lưu trữ data.</translation>
+    </message>
+    <message>
+        <source>When you click OK, %1 will begin to download and process the full %4 block chain (%2GB) starting with the earliest transactions in %3 when %4 initially launched.</source>
+        <translation>Khi bạn click OK, %1 sẽ bắt đầu download và process the full %4 block chain (%2GB) starting with the earliest transactions in %3 when %4 initially launched.</translation>
+    </message>
+    <message>
+        <source>Reverting this setting requires re-downloading the entire blockchain. It is faster to download the full chain first and prune it later. Disables some advanced features.</source>
+        <translation>Đảo ngược lại thiết lập này yêu cầu download lại toàn bộ blockchain. Download toàn bộ blockchain trước và loại nó sau đó sẽ nhanh hơn. Vô hiệu hóa một số tính năng nâng cao.</translation>
+    </message>
+    <message>
+        <source>This initial synchronisation is very demanding, and may expose hardware problems with your computer that had previously gone unnoticed. Each time you run %1, it will continue downloading where it left off.</source>
+        <translation>Đồng bộ hóa ban đầu này rất đòi hỏi, và có thể phơi bày các sự cố về phần cứng với máy tính của bạn trước đó đã không được chú ý. Mỗi khi bạn chạy %1, nó sẽ tiếp tục tải về nơi nó dừng lại.</translation>
+    </message>
+    <message>
+        <source>If you have chosen to limit block chain storage (pruning), the historical data must still be downloaded and processed, but will be deleted afterward to keep your disk usage low.</source>
+        <translation>Nếu bạn đã chọn giới hạn block chain lưu trữ (pruning),dữ liệu lịch sử vẫn phải được tải xuống và xử lý, nhưng sẽ bị xóa sau đó để giữ cho việc sử dụng đĩa của bạn ở mức usage thấp.</translation>
+    </message>
+    <message>
+        <source>Use the default data directory</source>
+        <translation>Sử dụng default danh mục đa ta</translation>
+    </message>
+    <message>
+        <source>Use a custom data directory:</source>
+        <translation>Sử dụng custom danh mục data:</translation>
+    </message>
+    <message>
+        <source>Bitcoin</source>
+        <translation>Bitcoin</translation>
+    </message>
+    <message>
+        <source>At least %1 GB of data will be stored in this directory, and it will grow over time.</source>
+        <translation>Ít nhất %1 GB data sẽ được trữ tại danh mục này, và nó sẽ lớn theo thời gian.</translation>
+    </message>
+    <message>
+        <source>Approximately %1 GB of data will be stored in this directory.</source>
+        <translation>Gần đúng %1 GB of data sẽ được lưu giữ trong danh mục này.</translation>
+    </message>
+    <message>
+        <source>%1 will download and store a copy of the Bitcoin block chain.</source>
+        <translation>%1 sẽ download và lưu trữ một bản copy của Bitcoin block chain.</translation>
+    </message>
+    <message>
+        <source>The wallet will also be stored in this directory.</source>
+        <translation>Wallet sẽ cùng được lưu giữ trong danh mục này.</translation>
+    </message>
+    <message>
+        <source>Error: Specified data directory "%1" cannot be created.</source>
+        <translation>Error: Danh mục data xác định "%1" không thể được tạo.</translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation>Lỗi</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n GB of free space available</source>
+        <translation><numerusform>%n GB of free space available</numerusform></translation>
+    </message>
+    <message numerus="yes">
+        <source>(of %n GB needed)</source>
+        <translation><numerusform>(of %n GB cần thiết)</numerusform></translation>
+    </message>
+    <message numerus="yes">
+        <source>(%n GB needed for full chain)</source>
+        <translation><numerusform>(%n GB cần cho toàn blockchain)</numerusform></translation>
+    </message>
+</context>
+<context>
+    <name>ModalOverlay</name>
+    <message>
+        <source>Form</source>
+        <translation>Form</translation>
+    </message>
+    <message>
+        <source>Recent transactions may not yet be visible, and therefore your wallet's balance might be incorrect. This information will be correct once your wallet has finished synchronizing with the bitcoin network, as detailed below.</source>
+        <translation>Giao dịch gần đây có thể chưa được hiển thị, và vì vậy số dư wallet của bạn có thể không dúng. Thông tin này sẽ được làm đúng khi wallet hoàn thành đồng bộ với bitcoin network, như chi tiết bên dưới.</translation>
+    </message>
+    <message>
+        <source>Attempting to spend bitcoins that are affected by not-yet-displayed transactions will not be accepted by the network.</source>
+        <translation>Cố gắng spend các bitcoins bị 
