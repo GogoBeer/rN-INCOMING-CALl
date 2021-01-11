@@ -1015,4 +1015,189 @@
     </message>
     <message>
         <source>Attempting to spend bitcoins that are affected by not-yet-displayed transactions will not be accepted by the network.</source>
-        <translation>Cố gắng spend các bitcoins bị 
+        <translation>Cố gắng spend các bitcoins bị ảnh hưởng bởi các giao dịch chưa được hiển thị sẽ không được chấp nhận bởi mạng.</translation>
+    </message>
+    <message>
+        <source>Number of blocks left</source>
+        <translation>Số của blocks còn lại</translation>
+    </message>
+    <message>
+        <source>Unknown...</source>
+        <translation>Unknown...</translation>
+    </message>
+    <message>
+        <source>Last block time</source>
+        <translation>Thời gian block cuối cùng</translation>
+    </message>
+    <message>
+        <source>Progress</source>
+        <translation>Tiến độ</translation>
+    </message>
+    <message>
+        <source>Progress increase per hour</source>
+        <translation>Tiến độ tăng mỗi giờ</translation>
+    </message>
+    <message>
+        <source>calculating...</source>
+        <translation>Đang tính...</translation>
+    </message>
+    <message>
+        <source>Estimated time left until synced</source>
+        <translation>Ước tính thời gian còn lại đến khi đồng bộ</translation>
+    </message>
+    <message>
+        <source>Hide</source>
+        <translation>Ẩn</translation>
+    </message>
+    <message>
+        <source>Esc</source>
+        <translation>Esc</translation>
+    </message>
+    <message>
+        <source>%1 is currently syncing.  It will download headers and blocks from peers and validate them until reaching the tip of the block chain.</source>
+        <translation>%1 đang được đồng bộ. Header và block sẽ được download từ các nốt lân cận và thẩm định tới khi đạt đỉnh của blockchain.</translation>
+    </message>
+    <message>
+        <source>Unknown. Syncing Headers (%1, %2%)...</source>
+        <translation>Không biết. Đang đồng bộ Headers (%1, %2%)...</translation>
+    </message>
+</context>
+<context>
+    <name>OpenURIDialog</name>
+    <message>
+        <source>Open bitcoin URI</source>
+        <translation>Mở bitcoin URI</translation>
+    </message>
+    <message>
+        <source>URI:</source>
+        <translation>URI:</translation>
+    </message>
+</context>
+<context>
+    <name>OpenWalletActivity</name>
+    <message>
+        <source>Open wallet failed</source>
+        <translation>Mở ví thất bại</translation>
+    </message>
+    <message>
+        <source>Open wallet warning</source>
+        <translation>Mở ví cảnh báo</translation>
+    </message>
+    <message>
+        <source>default wallet</source>
+        <translation>ví mặc định</translation>
+    </message>
+    <message>
+        <source>Opening Wallet &lt;b&gt;%1&lt;/b&gt;...</source>
+        <translation>Đang mở ví &lt;b&gt; %1&lt;/b&gt;...</translation>
+    </message>
+</context>
+<context>
+    <name>OptionsDialog</name>
+    <message>
+        <source>Options</source>
+        <translation>Tùy chỉnh</translation>
+    </message>
+    <message>
+        <source>&amp;Main</source>
+        <translation>&amp;Chính</translation>
+    </message>
+    <message>
+        <source>Automatically start %1 after logging in to the system.</source>
+        <translation>Tự động bắt đầu %1 sau khi đăng nhập vào system.</translation>
+    </message>
+    <message>
+        <source>&amp;Start %1 on system login</source>
+        <translation>&amp;Bắt đầu %1 trên đăng nhập system</translation>
+    </message>
+    <message>
+        <source>Size of &amp;database cache</source>
+        <translation>Size of &amp;database cache</translation>
+    </message>
+    <message>
+        <source>Number of script &amp;verification threads</source>
+        <translation>Number of script &amp;verification threads</translation>
+    </message>
+    <message>
+        <source>IP address of the proxy (e.g. IPv4: 127.0.0.1 / IPv6: ::1)</source>
+        <translation>IP address of the proxy (e.g. IPv4: 127.0.0.1 / IPv6: ::1)</translation>
+    </message>
+    <message>
+        <source>Shows if the supplied default SOCKS5 proxy is used to reach peers via this network type.</source>
+        <translation>Hiển thị nếu cung cấp default SOCKS5 proxy is used to reach peers via this network type.</translation>
+    </message>
+    <message>
+        <source>Hide the icon from the system tray.</source>
+        <translation>Ẩn biểu tượng ở khay hệ thống</translation>
+    </message>
+    <message>
+        <source>&amp;Hide tray icon</source>
+        <translation>&amp;Ẩn biểu tượng khay</translation>
+    </message>
+    <message>
+        <source>Minimize instead of exit the application when the window is closed. When this option is enabled, the application will be closed only after selecting Exit in the menu.</source>
+        <translation>Minimize thay vì thoát khỏi ứng dụng khi cửa sổ đóng lại. Khi bật tùy chọn này, ứng dụng sẽ chỉ được đóng sau khi chọn Exit trong menu.</translation>
+    </message>
+    <message>
+        <source>Third party URLs (e.g. a block explorer) that appear in the transactions tab as context menu items. %s in the URL is replaced by transaction hash. Multiple URLs are separated by vertical bar |.</source>
+        <translation>Bên thứ ba URLs (e.g. a block explorer) xuất hiện trong thẻ giao dịch như context menu items. %s in the URL thì được thay thế bởi transaction hash. Multiple URLs are separated by vertical bar |.</translation>
+    </message>
+    <message>
+        <source>Open the %1 configuration file from the working directory.</source>
+        <translation>Mở %1 configuration file từ danh mục làm việc working directory.</translation>
+    </message>
+    <message>
+        <source>Open Configuration File</source>
+        <translation>Mở File cấu hình</translation>
+    </message>
+    <message>
+        <source>Reset all client options to default.</source>
+        <translation>Reset tất cả client options to default.</translation>
+    </message>
+    <message>
+        <source>&amp;Reset Options</source>
+        <translation>&amp;Reset Tùy chọn</translation>
+    </message>
+    <message>
+        <source>&amp;Network</source>
+        <translation>&amp;Network</translation>
+    </message>
+    <message>
+        <source>Disables some advanced features but all blocks will still be fully validated. Reverting this setting requires re-downloading the entire blockchain. Actual disk usage may be somewhat higher.</source>
+        <translation>Tăt một số tính năng nâng cao nhưng tất cả các khối vẫn tiếp tục được xác nhận đầy đủ. Hoàn nguyên cài đặt này yêu cầu tải xuống lại toàn bộ blockchain. Sử dụng dung lượng đĩa lưu trữ thực tế có thể cao hơn một chút.</translation>
+    </message>
+    <message>
+        <source>Prune &amp;block storage to</source>
+        <translation>Cắt tỉa và lưu trữ khối tới</translation>
+    </message>
+    <message>
+        <source>GB</source>
+        <translation>GB</translation>
+    </message>
+    <message>
+        <source>Reverting this setting requires re-downloading the entire blockchain.</source>
+        <translation>Hoàn nguyên cài đặt này yêu cầu tải xuống lại toàn bộ blockchain.</translation>
+    </message>
+    <message>
+        <source>MiB</source>
+        <translation>MiB</translation>
+    </message>
+    <message>
+        <source>(0 = auto, &lt;0 = leave that many cores free)</source>
+        <translation>(0 = auto, &lt;0 = leave that many cores free)</translation>
+    </message>
+    <message>
+        <source>W&amp;allet</source>
+        <translation>W&amp;allet</translation>
+    </message>
+    <message>
+        <source>Expert</source>
+        <translation>Expert</translation>
+    </message>
+    <message>
+        <source>Enable coin &amp;control features</source>
+        <translation>Enable coin &amp;control features</translation>
+    </message>
+    <message>
+        <source>If you disable the spending of unconfirmed change, the change from a transaction cannot be used until that transaction has at least one confirmation. This also affects how your balance is computed.</source>
+        <translation>If you disable the spending of unconfirmed change, the change from a transaction cannot be used until that transaction has at least one confirmation. This also affects how your bal
