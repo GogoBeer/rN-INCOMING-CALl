@@ -1389,4 +1389,229 @@
         <source>Total of transactions that have yet to be confirmed, and do not yet count toward the spendable balance</source>
         <translation>Tất cả giao dịch vẫn chưa được confirmed, và chưa tính vào số dư có thể chi tiêu</translation>
     </message>
-    <messa
+    <message>
+        <source>Immature:</source>
+        <translation>Chưa hoàn thiện:</translation>
+    </message>
+    <message>
+        <source>Mined balance that has not yet matured</source>
+        <translation>Mined balance chưa matured hẳn</translation>
+    </message>
+    <message>
+        <source>Balances</source>
+        <translation>Số dư</translation>
+    </message>
+    <message>
+        <source>Total:</source>
+        <translation>Tổng cộng:</translation>
+    </message>
+    <message>
+        <source>Your current total balance</source>
+        <translation>Tổng số dư hiện tại</translation>
+    </message>
+    <message>
+        <source>Your current balance in watch-only addresses</source>
+        <translation>Số dư hiện tại trong địa chỉ watch-only</translation>
+    </message>
+    <message>
+        <source>Spendable:</source>
+        <translation>Có thể sử dụng</translation>
+    </message>
+    <message>
+        <source>Recent transactions</source>
+        <translation>Giao dịch gần đây</translation>
+    </message>
+    <message>
+        <source>Unconfirmed transactions to watch-only addresses</source>
+        <translation>Giao dịch chưa được xác nhận đến watch-only addresses</translation>
+    </message>
+    <message>
+        <source>Mined balance in watch-only addresses that has not yet matured</source>
+        <translation>Mined số dư trong watch-only address chưa matured hẳn</translation>
+    </message>
+    <message>
+        <source>Current total balance in watch-only addresses</source>
+        <translation>Tổng số dư hiện tại trong watch-only addresses</translation>
+    </message>
+    </context>
+<context>
+    <name>PSBTOperationsDialog</name>
+    <message>
+        <source>Total Amount</source>
+        <translation>Tổng số</translation>
+    </message>
+    <message>
+        <source>or</source>
+        <translation>hoặc</translation>
+    </message>
+    </context>
+<context>
+    <name>PaymentServer</name>
+    <message>
+        <source>Payment request error</source>
+        <translation>Payment request error</translation>
+    </message>
+    <message>
+        <source>Cannot start bitcoin: click-to-pay handler</source>
+        <translation>Không thể khởi tạo bitcoin: click-to-pay handler</translation>
+    </message>
+    <message>
+        <source>URI handling</source>
+        <translation>URI handling</translation>
+    </message>
+    <message>
+        <source>'bitcoin://' is not a valid URI. Use 'bitcoin:' instead.</source>
+        <translation>'bitcoin://' không khả dụng URI. Dùng thay vì 'bitcoin:' .</translation>
+    </message>
+    <message>
+        <source>Cannot process payment request because BIP70 is not supported.</source>
+        <translation>Không thể tiến hần yêu cầu giao dịch vì BIP70 không được hỗ trợ.</translation>
+    </message>
+    <message>
+        <source>Due to widespread security flaws in BIP70 it's strongly recommended that any merchant instructions to switch wallets be ignored.</source>
+        <translation>Do lỗ hổng bảo mật lan rộng của BIP70, bạn được khuyến cáo mạnh mẽ rằng bất kỳ hướng dẫn thương mại để chuyển ví đều bị bỏ qua.</translation>
+    </message>
+    <message>
+        <source>If you are receiving this error you should request the merchant provide a BIP21 compatible URI.</source>
+        <translation>Nếu bạn nhận được lỗi này, bạn nên yêu cầu của hàng cung cấp một BIP21 tương thích URI.</translation>
+    </message>
+    <message>
+        <source>Invalid payment address %1</source>
+        <translation>Invalid payment address %1</translation>
+    </message>
+    <message>
+        <source>URI cannot be parsed! This can be caused by an invalid Bitcoin address or malformed URI parameters.</source>
+        <translation>URI không thể phân tích cú pháp! Đây có thể gây nên bởi invalid Bitcoin address hoặc URI không đúng định dạng tham số.</translation>
+    </message>
+    <message>
+        <source>Payment request file handling</source>
+        <translation>Payment request file đang xử lý</translation>
+    </message>
+</context>
+<context>
+    <name>PeerTableModel</name>
+    <message>
+        <source>User Agent</source>
+        <translation>User Đặc Vụ</translation>
+    </message>
+    <message>
+        <source>Node/Service</source>
+        <translation>Node/Dịch vụ</translation>
+    </message>
+    <message>
+        <source>NodeId</source>
+        <translation>NodeID</translation>
+    </message>
+    <message>
+        <source>Ping</source>
+        <translation>Ping</translation>
+    </message>
+    <message>
+        <source>Sent</source>
+        <translation>Gửi</translation>
+    </message>
+    <message>
+        <source>Received</source>
+        <translation>Nhận</translation>
+    </message>
+</context>
+<context>
+    <name>QObject</name>
+    <message>
+        <source>Amount</source>
+        <translation>Số lượng</translation>
+    </message>
+    <message>
+        <source>Enter a Bitcoin address (e.g. %1)</source>
+        <translation>Nhập một Bitcoin address (e.g. %1)</translation>
+    </message>
+    <message>
+        <source>%1 d</source>
+        <translation>%1 d</translation>
+    </message>
+    <message>
+        <source>%1 h</source>
+        <translation>%1 giờ</translation>
+    </message>
+    <message>
+        <source>%1 m</source>
+        <translation>%1 phút</translation>
+    </message>
+    <message>
+        <source>%1 s</source>
+        <translation>%1 giây</translation>
+    </message>
+    <message>
+        <source>None</source>
+        <translation>None</translation>
+    </message>
+    <message>
+        <source>N/A</source>
+        <translation>N/A</translation>
+    </message>
+    <message>
+        <source>%1 ms</source>
+        <translation>%1 ms</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n second(s)</source>
+        <translation><numerusform>%n giây</numerusform></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n minute(s)</source>
+        <translation><numerusform>%n phút</numerusform></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n hour(s)</source>
+        <translation><numerusform>%n giờ</numerusform></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n day(s)</source>
+        <translation><numerusform>%n ngày</numerusform></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n week(s)</source>
+        <translation><numerusform>%n tuần</numerusform></translation>
+    </message>
+    <message>
+        <source>%1 and %2</source>
+        <translation>%1 và %2</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n year(s)</source>
+        <translation><numerusform>%n năm</numerusform></translation>
+    </message>
+    <message>
+        <source>%1 B</source>
+        <translation>%1 B</translation>
+    </message>
+    <message>
+        <source>%1 KB</source>
+        <translation>%1 KB</translation>
+    </message>
+    <message>
+        <source>%1 MB</source>
+        <translation>%1 MB</translation>
+    </message>
+    <message>
+        <source>%1 GB</source>
+        <translation>%1 GB</translation>
+    </message>
+    <message>
+        <source>Error: Specified data directory "%1" does not exist.</source>
+        <translation>Error: Xác định data directory "%1" không tồn tại.</translation>
+    </message>
+    <message>
+        <source>Error: Cannot parse configuration file: %1.</source>
+        <translation>Lỗi: không thể  phân giải tệp cài đặt cấu hình: %1.</translation>
+    </message>
+    <message>
+        <source>Error: %1</source>
+        <translation>Error: %1</translation>
+    </message>
+    <message>
+        <source>%1 didn't yet exit safely...</source>
+        <translation>%1 vẫn chưa thoát an toàn...</translation>
+    </message>
+    <message>
+        <source>unknown</source
