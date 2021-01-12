@@ -1614,4 +1614,247 @@
         <translation>%1 vẫn chưa thoát an toàn...</translation>
     </message>
     <message>
-        <source>unknown</source
+        <source>unknown</source>
+        <translation>unknown</translation>
+    </message>
+</context>
+<context>
+    <name>QRImageWidget</name>
+    <message>
+        <source>&amp;Save Image...</source>
+        <translation>&amp;Lưu ảnh...</translation>
+    </message>
+    <message>
+        <source>&amp;Copy Image</source>
+        <translation>&amp;Sao chép ảnh</translation>
+    </message>
+    <message>
+        <source>Resulting URI too long, try to reduce the text for label / message.</source>
+        <translation>Đang tính toán URI quá dài, cố gắng giảm text cho label / message.</translation>
+    </message>
+    <message>
+        <source>Error encoding URI into QR Code.</source>
+        <translation>Error đang mã hóa URI đến QR Code.</translation>
+    </message>
+    <message>
+        <source>QR code support not available.</source>
+        <translation>Sự hổ trợ mã QR không sẵn có</translation>
+    </message>
+    <message>
+        <source>Save QR Code</source>
+        <translation>Lưu QR Code</translation>
+    </message>
+    <message>
+        <source>PNG Image (*.png)</source>
+        <translation>PNG Image (*.png)</translation>
+    </message>
+</context>
+<context>
+    <name>RPCConsole</name>
+    <message>
+        <source>N/A</source>
+        <translation>N/A</translation>
+    </message>
+    <message>
+        <source>Client version</source>
+        <translation>Client version</translation>
+    </message>
+    <message>
+        <source>&amp;Information</source>
+        <translation>&amp;Thông tin</translation>
+    </message>
+    <message>
+        <source>General</source>
+        <translation>Tổng thể</translation>
+    </message>
+    <message>
+        <source>Using BerkeleyDB version</source>
+        <translation>Sử dụng phiên bản BerkeleyDB</translation>
+    </message>
+    <message>
+        <source>Datadir</source>
+        <translation>Datadir</translation>
+    </message>
+    <message>
+        <source>To specify a non-default location of the data directory use the '%1' option.</source>
+        <translation>Để chỉ ra một nơi không mặt định của thư mục dữ liệu hãy dùng tùy chọn '%1'</translation>
+    </message>
+    <message>
+        <source>Blocksdir</source>
+        <translation>Thư mục chứa các khối Blocksdir</translation>
+    </message>
+    <message>
+        <source>To specify a non-default location of the blocks directory use the '%1' option.</source>
+        <translation>Để chỉ ra một nơi không mặt định của thư mục các khối hãy dùng tùy chọn '%1'</translation>
+    </message>
+    <message>
+        <source>Startup time</source>
+        <translation>Startup lúc</translation>
+    </message>
+    <message>
+        <source>Network</source>
+        <translation>Mạng</translation>
+    </message>
+    <message>
+        <source>Name</source>
+        <translation>Tên</translation>
+    </message>
+    <message>
+        <source>Number of connections</source>
+        <translation>Số lượng connections</translation>
+    </message>
+    <message>
+        <source>Block chain</source>
+        <translation>Block chain</translation>
+    </message>
+    <message>
+        <source>Memory Pool</source>
+        <translation>Pool Bộ Nhớ</translation>
+    </message>
+    <message>
+        <source>Current number of transactions</source>
+        <translation>Số giao dịch hiện tại</translation>
+    </message>
+    <message>
+        <source>Memory usage</source>
+        <translation>Bộ nhớ usage</translation>
+    </message>
+    <message>
+        <source>Wallet: </source>
+        <translation>Ví :</translation>
+    </message>
+    <message>
+        <source>(none)</source>
+        <translation>(không)</translation>
+    </message>
+    <message>
+        <source>&amp;Reset</source>
+        <translation>&amp;Reset</translation>
+    </message>
+    <message>
+        <source>Received</source>
+        <translation>Nhận</translation>
+    </message>
+    <message>
+        <source>Sent</source>
+        <translation>Gửi</translation>
+    </message>
+    <message>
+        <source>&amp;Peers</source>
+        <translation>&amp;Peers</translation>
+    </message>
+    <message>
+        <source>Banned peers</source>
+        <translation>Bị khóa peers</translation>
+    </message>
+    <message>
+        <source>Select a peer to view detailed information.</source>
+        <translation>Chọn một peer để xem thông tin chi tiết.</translation>
+    </message>
+    <message>
+        <source>Direction</source>
+        <translation>Direction</translation>
+    </message>
+    <message>
+        <source>Version</source>
+        <translation>Phiên bản</translation>
+    </message>
+    <message>
+        <source>Starting Block</source>
+        <translation>Block Bắt Đầu</translation>
+    </message>
+    <message>
+        <source>Synced Headers</source>
+        <translation>Headers đã được đồng bộ</translation>
+    </message>
+    <message>
+        <source>Synced Blocks</source>
+        <translation>Blocks đã được đồng bộ</translation>
+    </message>
+    <message>
+        <source>The mapped Autonomous System used for diversifying peer selection.</source>
+        <translation>Hệ thống tự động ánh xạ được sử dụng để đa dạng hóa lựa chọn ngang hàng.</translation>
+    </message>
+    <message>
+        <source>Mapped AS</source>
+        <translation>AS đã được map</translation>
+    </message>
+    <message>
+        <source>User Agent</source>
+        <translation>User đặc vụ</translation>
+    </message>
+    <message>
+        <source>Node window</source>
+        <translation>Cửa sổ node</translation>
+    </message>
+    <message>
+        <source>Open the %1 debug log file from the current data directory. This can take a few seconds for large log files.</source>
+        <translation>Mở cái %1 debug log file từ danh mục dữ liệu hiện tại. Điều này cần vài giây cho large log files.</translation>
+    </message>
+    <message>
+        <source>Decrease font size</source>
+        <translation>Giảm font size</translation>
+    </message>
+    <message>
+        <source>Increase font size</source>
+        <translation>Tăng font size</translation>
+    </message>
+    <message>
+        <source>Services</source>
+        <translation>Dịch vụ</translation>
+    </message>
+    <message>
+        <source>Connection Time</source>
+        <translation>Connection Thời Gian</translation>
+    </message>
+    <message>
+        <source>Last Send</source>
+        <translation>Gửi Sau Cùng</translation>
+    </message>
+    <message>
+        <source>Last Receive</source>
+        <translation>Nhận Sau Cùng</translation>
+    </message>
+    <message>
+        <source>Ping Time</source>
+        <translation>Ping Time</translation>
+    </message>
+    <message>
+        <source>The duration of a currently outstanding ping.</source>
+        <translation>Thời hạn của một ping hiện đang nổi trội.</translation>
+    </message>
+    <message>
+        <source>Ping Wait</source>
+        <translation>Ping Chờ</translation>
+    </message>
+    <message>
+        <source>Min Ping</source>
+        <translation>Ping Nhỏ Nhất</translation>
+    </message>
+    <message>
+        <source>Time Offset</source>
+        <translation>Thời gian Offset</translation>
+    </message>
+    <message>
+        <source>Last block time</source>
+        <translation>Thời gian block cuối cùng</translation>
+    </message>
+    <message>
+        <source>&amp;Open</source>
+        <translation>&amp;Open</translation>
+    </message>
+    <message>
+        <source>&amp;Console</source>
+        <translation>&amp;BangDieuKhien</translation>
+    </message>
+    <message>
+        <source>&amp;Network Traffic</source>
+        <translation>&amp;Network Traffic</translation>
+    </message>
+    <message>
+        <source>Totals</source>
+        <translation>Totals</translation>
+    </message>
+    <message>
+        <source>In:</source>
+        <tran
