@@ -2042,4 +2042,207 @@
         <source>Copy label</source>
         <translation>Sao chép nhãn</translation>
     </message>
-    <messa
+    <message>
+        <source>Copy message</source>
+        <translation>Sao chép tin nhắn</translation>
+    </message>
+    <message>
+        <source>Copy amount</source>
+        <translation>Sao chép số lượng</translation>
+    </message>
+    <message>
+        <source>Could not unlock wallet.</source>
+        <translation>Không thể unlock wallet.</translation>
+    </message>
+    </context>
+<context>
+    <name>ReceiveRequestDialog</name>
+    <message>
+        <source>Amount:</source>
+        <translation>Số lượng:</translation>
+    </message>
+    <message>
+        <source>Message:</source>
+        <translation>Tin nhắn:</translation>
+    </message>
+    <message>
+        <source>Wallet:</source>
+        <translation>Ví tiền</translation>
+    </message>
+    <message>
+        <source>Copy &amp;URI</source>
+        <translation>Sao chép &amp;URI</translation>
+    </message>
+    <message>
+        <source>Copy &amp;Address</source>
+        <translation>Sao chép địa chỉ</translation>
+    </message>
+    <message>
+        <source>&amp;Save Image...</source>
+        <translation>&amp;Lưu ảnh...</translation>
+    </message>
+    <message>
+        <source>Request payment to %1</source>
+        <translation>Request payment đến %1</translation>
+    </message>
+    <message>
+        <source>Payment information</source>
+        <translation>Payment thông tin</translation>
+    </message>
+</context>
+<context>
+    <name>RecentRequestsTableModel</name>
+    <message>
+        <source>Date</source>
+        <translation>Ngày</translation>
+    </message>
+    <message>
+        <source>Label</source>
+        <translation>Nhãn</translation>
+    </message>
+    <message>
+        <source>Message</source>
+        <translation>Tin nhắn</translation>
+    </message>
+    <message>
+        <source>(no label)</source>
+        <translation>(không nhãn)</translation>
+    </message>
+    <message>
+        <source>(no message)</source>
+        <translation>(no tin nhắn)</translation>
+    </message>
+    <message>
+        <source>(no amount requested)</source>
+        <translation>(không amount yêu cầu)</translation>
+    </message>
+    <message>
+        <source>Requested</source>
+        <translation>Đã yêu cầu</translation>
+    </message>
+</context>
+<context>
+    <name>SendCoinsDialog</name>
+    <message>
+        <source>Send Coins</source>
+        <translation>Gửi Coins</translation>
+    </message>
+    <message>
+        <source>Coin Control Features</source>
+        <translation>Coin Control Tính-năng</translation>
+    </message>
+    <message>
+        <source>Inputs...</source>
+        <translation>Đang nhập...</translation>
+    </message>
+    <message>
+        <source>automatically selected</source>
+        <translation>được chọn một cách hoàn toàn tự động</translation>
+    </message>
+    <message>
+        <source>Insufficient funds!</source>
+        <translation>Không đủ tiền kìa!</translation>
+    </message>
+    <message>
+        <source>Quantity:</source>
+        <translation>Số lượng:</translation>
+    </message>
+    <message>
+        <source>Bytes:</source>
+        <translation>Bytes:</translation>
+    </message>
+    <message>
+        <source>Amount:</source>
+        <translation>Số lượng:</translation>
+    </message>
+    <message>
+        <source>Fee:</source>
+        <translation>Phí:</translation>
+    </message>
+    <message>
+        <source>After Fee:</source>
+        <translation>Sau Phí:</translation>
+    </message>
+    <message>
+        <source>Change:</source>
+        <translation>Thay đổi:</translation>
+    </message>
+    <message>
+        <source>If this is activated, but the change address is empty or invalid, change will be sent to a newly generated address.</source>
+        <translation>Nếu cái này được bật, nhưng việc change address thì trống hoặc invalid, change sẽ được gửi cho một address vừa được tạo mới.</translation>
+    </message>
+    <message>
+        <source>Custom change address</source>
+        <translation>Custom change address</translation>
+    </message>
+    <message>
+        <source>Transaction Fee:</source>
+        <translation>Transaction Fee:</translation>
+    </message>
+    <message>
+        <source>Choose...</source>
+        <translation>Chọn...</translation>
+    </message>
+    <message>
+        <source>Using the fallbackfee can result in sending a transaction that will take several hours or days (or never) to confirm. Consider choosing your fee manually or wait until you have validated the complete chain.</source>
+        <translation>Sử dụng fallbackfee có thể dẫn đến hết quả đang gửi một transaction mà nó sẽ mất hàng giờ hoặc ngày (hoặc chẳng bao giờ) được confirm. Suy nghĩ chọn fee của bạn bình thường hoặc chờ cho đến khi validated hoàn thành chain.</translation>
+    </message>
+    <message>
+        <source>Warning: Fee estimation is currently not possible.</source>
+        <translation>Warning: Fee ước tính hiện tại không khả thi.</translation>
+    </message>
+    <message>
+        <source>Specify a custom fee per kB (1,000 bytes) of the transaction's virtual size.
+
+Note:  Since the fee is calculated on a per-byte basis, a fee of "100 satoshis per kB" for a transaction size of 500 bytes (half of 1 kB) would ultimately yield a fee of only 50 satoshis.</source>
+        <translation>Chỉ định một khoản phí tùy chỉnh cho mỗi kB (1.000 byte) kích thước ảo của giao dịch.
+
+Lưu ý: Vì phí được tính trên cơ sở mỗi byte, nên phí "100 satoshi trên mỗi kB" cho kích thước giao dịch là 500 byte (một nửa của 1 kB) cuối cùng sẽ mang lại một khoản phí chỉ 50 satoshi.</translation>
+    </message>
+    <message>
+        <source>per kilobyte</source>
+        <translation>trên mỗi kilobyte</translation>
+    </message>
+    <message>
+        <source>Hide</source>
+        <translation>Ẩn</translation>
+    </message>
+    <message>
+        <source>Recommended:</source>
+        <translation>Khuyên dùng:</translation>
+    </message>
+    <message>
+        <source>Custom:</source>
+        <translation>Custom:</translation>
+    </message>
+    <message>
+        <source>(Smart fee not initialized yet. This usually takes a few blocks...)</source>
+        <translation>(Thông minh fee vẫn chưa được khởi tạo. Điều này thường mất vài blocks...)</translation>
+    </message>
+    <message>
+        <source>Send to multiple recipients at once</source>
+        <translation>Gửi đến tập thể người nhận một lần</translation>
+    </message>
+    <message>
+        <source>Add &amp;Recipient</source>
+        <translation>Add &amp;Recipient</translation>
+    </message>
+    <message>
+        <source>Clear all fields of the form.</source>
+        <translation>Xóa hết các khoảng trống của form.</translation>
+    </message>
+    <message>
+        <source>Dust:</source>
+        <translation>Rác:</translation>
+    </message>
+    <message>
+        <source>Hide transaction fee settings</source>
+        <translation>Ẩn cài đặt phí giao dịch</translation>
+    </message>
+    <message>
+        <source>When there is less transaction volume than space in the blocks, miners as well as relaying nodes may enforce a minimum fee. Paying only this minimum fee is just fine, but be aware that this can result in a never confirming transaction once there is more demand for bitcoin transactions than the network can process.</source>
+        <translation>Khi có khối lượng giao dịch ít hơn chổ trống trong các khối, các nhà đào mỏ cũng như các nút chuyển tiếp có thể thực thi chỉ với một khoản phí tối thiểu. Chỉ trả khoản phí tối thiểu này là tốt, nhưng lưu ý rằng điều này có thể dẫn đến một giao dịch không bao giờ xác nhận một khi có nhu cầu giao dịch bitcoin nhiều hơn khả năng mạng có thể xử lý.</translation>
+    </message>
+    <message>
+        <source>A too low fee might result in a never confirming transaction (read the tooltip)</source>
+        <translation>Một khoản phí quá thấp có thể dẫn đến một
