@@ -2245,4 +2245,211 @@ Lưu ý: Vì phí được tính trên cơ sở mỗi byte, nên phí "100 satos
     </message>
     <message>
         <source>A too low fee might result in a never confirming transaction (read the tooltip)</source>
-        <translation>Một khoản phí quá thấp có thể dẫn đến một
+        <translation>Một khoản phí quá thấp có thể dẫn đến một giao dịch không bao giờ xác nhận (đọc chú giải công cụ)</translation>
+    </message>
+    <message>
+        <source>Confirmation time target:</source>
+        <translation>Thời gian xác nhận đối tượng:</translation>
+    </message>
+    <message>
+        <source>Enable Replace-By-Fee</source>
+        <translation>Kích hoạt  Phí thay thế</translation>
+    </message>
+    <message>
+        <source>With Replace-By-Fee (BIP-125) you can increase a transaction's fee after it is sent. Without this, a higher fee may be recommended to compensate for increased transaction delay risk.</source>
+        <translation>Với Phí thay thế (BIP-125), bạn có thể tăng phí giao dịch sau khi được gửi. Nếu không có điều này, một khoản phí cao hơn có thể được đề xuất để bù đắp cho rủi ro chậm trễ giao dịch tăng lên.</translation>
+    </message>
+    <message>
+        <source>Clear &amp;All</source>
+        <translation>Clear &amp;All</translation>
+    </message>
+    <message>
+        <source>Balance:</source>
+        <translation>Số dư:</translation>
+    </message>
+    <message>
+        <source>Confirm the send action</source>
+        <translation>Confirm hành động gửi</translation>
+    </message>
+    <message>
+        <source>S&amp;end</source>
+        <translation>S&amp;end</translation>
+    </message>
+    <message>
+        <source>Copy quantity</source>
+        <translation>Sao chép số lượng</translation>
+    </message>
+    <message>
+        <source>Copy amount</source>
+        <translation>Sao chép số lượng</translation>
+    </message>
+    <message>
+        <source>Copy fee</source>
+        <translation>Sao chép phí</translation>
+    </message>
+    <message>
+        <source>Copy after fee</source>
+        <translation>Sao chép sau phí</translation>
+    </message>
+    <message>
+        <source>Copy bytes</source>
+        <translation>Sao chép bytes</translation>
+    </message>
+    <message>
+        <source>Copy dust</source>
+        <translation>Sao chép rác</translation>
+    </message>
+    <message>
+        <source>Copy change</source>
+        <translation>Sao chép thay đổi</translation>
+    </message>
+    <message>
+        <source>%1 (%2 blocks)</source>
+        <translation>%1 (%2 blocks)</translation>
+    </message>
+    <message>
+        <source>Cr&amp;eate Unsigned</source>
+        <translation>Cr&amp;eate không được ký</translation>
+    </message>
+    <message>
+        <source>Creates a Partially Signed Bitcoin Transaction (PSBT) for use with e.g. an offline %1 wallet, or a PSBT-compatible hardware wallet.</source>
+        <translation>Tạo Giao dịch Bitcoin được ký một phần (PSBT) để sử dụng với các dạng như: ví ngoại tuyến %1 hoặc ví phần cứng tương thích PSBT.</translation>
+    </message>
+    <message>
+        <source> from wallet '%1'</source>
+        <translation>từ ví  '%1'</translation>
+    </message>
+    <message>
+        <source>%1 to '%2'</source>
+        <translation>%1 tới '%2'</translation>
+    </message>
+    <message>
+        <source>%1 to %2</source>
+        <translation>%1 đến%2</translation>
+    </message>
+    <message>
+        <source>Do you want to draft this transaction?</source>
+        <translation>Bạn có muốn tạo tạm thời dao dịch này?</translation>
+    </message>
+    <message>
+        <source>Are you sure you want to send?</source>
+        <translation>Bạn chắc chắn muốn gửi chứ?</translation>
+    </message>
+    <message>
+        <source>or</source>
+        <translation>hoặc</translation>
+    </message>
+    <message>
+        <source>You can increase the fee later (signals Replace-By-Fee, BIP-125).</source>
+        <translation>Bạn có thể tăng phí sau khi gửi( với tín hiệu Phí Thay Thế, BIP-125)</translation>
+    </message>
+    <message>
+        <source>Please, review your transaction.</source>
+        <translation>Làm ơn xem xét đánh giá giao dịch của bạn.</translation>
+    </message>
+    <message>
+        <source>Transaction fee</source>
+        <translation>Transaction fee</translation>
+    </message>
+    <message>
+        <source>Not signalling Replace-By-Fee, BIP-125.</source>
+        <translation>Không có tín hiệu Phí Thay Thế, BIP-125.</translation>
+    </message>
+    <message>
+        <source>Total Amount</source>
+        <translation>Tổng số</translation>
+    </message>
+    <message>
+        <source>To review recipient list click "Show Details..."</source>
+        <translation>Để xem nhận xét người nhận, nhấn "Xem chi tiết..."</translation>
+    </message>
+    <message>
+        <source>Confirm send coins</source>
+        <translation>Confirm gửi coins</translation>
+    </message>
+    <message>
+        <source>Confirm transaction proposal</source>
+        <translation>Xác nhận đề xuất giao dịch</translation>
+    </message>
+    <message>
+        <source>Send</source>
+        <translation>Gửi</translation>
+    </message>
+    <message>
+        <source>Watch-only balance:</source>
+        <translation>Số dư chỉ xem:</translation>
+    </message>
+    <message>
+        <source>The recipient address is not valid. Please recheck.</source>
+        <translation>Địa chỉ người nhận address thì không valid. Kiểm tra lại đi.</translation>
+    </message>
+    <message>
+        <source>The amount to pay must be larger than 0.</source>
+        <translation>Giả trị để pay cần phải lớn hơn 0.</translation>
+    </message>
+    <message>
+        <source>The amount exceeds your balance.</source>
+        <translation>Số tiền vượt quá số dư của bạn.</translation>
+    </message>
+    <message>
+        <source>The total exceeds your balance when the %1 transaction fee is included.</source>
+        <translation>Tổng số lớn hơn số dư của bạn khi %1 transaction fee được tính vào.</translation>
+    </message>
+    <message>
+        <source>Duplicate address found: addresses should only be used once each.</source>
+        <translation>Trùng address được tìm thấy: địa chỉ chỉ nên được dùng một lần.</translation>
+    </message>
+    <message>
+        <source>Transaction creation failed!</source>
+        <translation>Transaction khởi tạo thất bại!</translation>
+    </message>
+    <message>
+        <source>A fee higher than %1 is considered an absurdly high fee.</source>
+        <translation>Một fee lớn hơn %1 được coi là ngớ ngẩn cao fee.</translation>
+    </message>
+    <message>
+        <source>Payment request expired.</source>
+        <translation>Payment request hết hạn.</translation>
+    </message>
+    <message numerus="yes">
+        <source>Estimated to begin confirmation within %n block(s).</source>
+        <translation><numerusform>Dự kiến bắt đầu xác nhận trong vòng %n blocks.</numerusform></translation>
+    </message>
+    <message>
+        <source>Warning: Invalid Bitcoin address</source>
+        <translation>Warning: Invalid Bitcoin address</translation>
+    </message>
+    <message>
+        <source>Warning: Unknown change address</source>
+        <translation>Warning: Không biết change address</translation>
+    </message>
+    <message>
+        <source>Confirm custom change address</source>
+        <translation>Confirm custom change address</translation>
+    </message>
+    <message>
+        <source>The address you selected for change is not part of this wallet. Any or all funds in your wallet may be sent to this address. Are you sure?</source>
+        <translation>The address bạn đã chọn dành cho change thì không phải part of this wallet. Bất kỳ hay tất cả funds in your wallet có thể được gửi đến address này. Bạn chắc chứ?</translation>
+    </message>
+    <message>
+        <source>(no label)</source>
+        <translation>(không nhãn)</translation>
+    </message>
+</context>
+<context>
+    <name>SendCoinsEntry</name>
+    <message>
+        <source>A&amp;mount:</source>
+        <translation>A&amp;mount:</translation>
+    </message>
+    <message>
+        <source>Pay &amp;To:</source>
+        <translation>Pay &amp;To:</translation>
+    </message>
+    <message>
+        <source>&amp;Label:</source>
+        <translation>&amp;Label:</translation>
+    </message>
+    <message>
+        <source>Choose previously used address</source>
+        <translation>Chọn mớ
