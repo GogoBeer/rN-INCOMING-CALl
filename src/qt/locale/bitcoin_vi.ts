@@ -3093,4 +3093,217 @@ Lưu ý: Vì phí được tính trên cơ sở mỗi byte, nên phí "100 satos
     </message>
     <message>
         <source>Date</source>
-        <tra
+        <translation>Ngày</translation>
+    </message>
+    <message>
+        <source>Type</source>
+        <translation>Type</translation>
+    </message>
+    <message>
+        <source>Label</source>
+        <translation>Nhãn</translation>
+    </message>
+    <message>
+        <source>Address</source>
+        <translation>Địa chỉ</translation>
+    </message>
+    <message>
+        <source>ID</source>
+        <translation>ID</translation>
+    </message>
+    <message>
+        <source>Exporting Failed</source>
+        <translation>Xuất Thất Bại</translation>
+    </message>
+    <message>
+        <source>There was an error trying to save the transaction history to %1.</source>
+        <translation>There was an error trying to save the transaction history to %1.</translation>
+    </message>
+    <message>
+        <source>Exporting Successful</source>
+        <translation>Exporting Successful</translation>
+    </message>
+    <message>
+        <source>The transaction history was successfully saved to %1.</source>
+        <translation>The transaction history was successfully saved to %1.</translation>
+    </message>
+    <message>
+        <source>Range:</source>
+        <translation>Range:</translation>
+    </message>
+    <message>
+        <source>to</source>
+        <translation>to</translation>
+    </message>
+</context>
+<context>
+    <name>UnitDisplayStatusBarControl</name>
+    <message>
+        <source>Unit to show amounts in. Click to select another unit.</source>
+        <translation>Unit to show amounts in. Click to select another unit.</translation>
+    </message>
+</context>
+<context>
+    <name>WalletController</name>
+    <message>
+        <source>Close wallet</source>
+        <translation>Đông ví</translation>
+    </message>
+    <message>
+        <source>Are you sure you wish to close the wallet &lt;i&gt;%1&lt;/i&gt;?</source>
+        <translation>Bạn có chắc bạn muốn đóng ví %1 ?</translation>
+    </message>
+    <message>
+        <source>Closing the wallet for too long can result in having to resync the entire chain if pruning is enabled.</source>
+        <translation>Đóng ví thời gian dài sẽ dẫn đến phải đồng bộ hóa lại cả chuỗi nếu cắt tỉa pruning được kích hoạt</translation>
+    </message>
+    </context>
+<context>
+    <name>WalletFrame</name>
+    <message>
+        <source>Create a new wallet</source>
+        <translation>Tạo một ví mới</translation>
+    </message>
+</context>
+<context>
+    <name>WalletModel</name>
+    <message>
+        <source>Send Coins</source>
+        <translation>Gửi Coins</translation>
+    </message>
+    <message>
+        <source>Fee bump error</source>
+        <translation>Fee bơm error</translation>
+    </message>
+    <message>
+        <source>Increasing transaction fee failed</source>
+        <translation>Increasing transaction fee failed</translation>
+    </message>
+    <message>
+        <source>Do you want to increase the fee?</source>
+        <translation>Do you want to increase the fee?</translation>
+    </message>
+    <message>
+        <source>Do you want to draft a transaction with fee increase?</source>
+        <translation>Bạn có muốn tạo tạm thời một giao dịch với phí tăng?</translation>
+    </message>
+    <message>
+        <source>Current fee:</source>
+        <translation>Current fee:</translation>
+    </message>
+    <message>
+        <source>Increase:</source>
+        <translation>Increase:</translation>
+    </message>
+    <message>
+        <source>New fee:</source>
+        <translation>New fee:</translation>
+    </message>
+    <message>
+        <source>Confirm fee bump</source>
+        <translation>Confirm fee bump</translation>
+    </message>
+    <message>
+        <source>Can't draft transaction.</source>
+        <translation>Không thể tạo tạm giao dịch.</translation>
+    </message>
+    <message>
+        <source>PSBT copied</source>
+        <translation>Đã sao chép PSBT</translation>
+    </message>
+    <message>
+        <source>Can't sign transaction.</source>
+        <translation>Can't sign transaction.</translation>
+    </message>
+    <message>
+        <source>Could not commit transaction</source>
+        <translation>Could not commit transaction</translation>
+    </message>
+    <message>
+        <source>default wallet</source>
+        <translation>ví mặc định</translation>
+    </message>
+</context>
+<context>
+    <name>WalletView</name>
+    <message>
+        <source>&amp;Export</source>
+        <translation>&amp;Xuất</translation>
+    </message>
+    <message>
+        <source>Export the data in the current tab to a file</source>
+        <translation>Xuất dữ liệu trong thẻ hiện tại ra file</translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation>Lỗi</translation>
+    </message>
+    <message>
+        <source>Backup Wallet</source>
+        <translation>Backup Wallet</translation>
+    </message>
+    <message>
+        <source>Wallet Data (*.dat)</source>
+        <translation>Wallet Data (*.dat)</translation>
+    </message>
+    <message>
+        <source>Backup Failed</source>
+        <translation>Backup Failed</translation>
+    </message>
+    <message>
+        <source>There was an error trying to save the wallet data to %1.</source>
+        <translation>There was an error trying to save the wallet data to %1.</translation>
+    </message>
+    <message>
+        <source>Backup Successful</source>
+        <translation>Backup Successful</translation>
+    </message>
+    <message>
+        <source>The wallet data was successfully saved to %1.</source>
+        <translation>The wallet data was successfully saved to %1.</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Hủy</translation>
+    </message>
+</context>
+<context>
+    <name>bitcoin-core</name>
+    <message>
+        <source>Distributed under the MIT software license, see the accompanying file %s or %s</source>
+        <translation>Distributed under the MIT software license, see the accompanying file %s or %s</translation>
+    </message>
+    <message>
+        <source>Prune configured below the minimum of %d MiB.  Please use a higher number.</source>
+        <translation>Prune configured below the minimum of %d MiB.  Please use a higher number.</translation>
+    </message>
+    <message>
+        <source>Prune: last wallet synchronisation goes beyond pruned data. You need to -reindex (download the whole blockchain again in case of pruned node)</source>
+        <translation>Prune: last wallet synchronisation goes beyond pruned data. You need to -reindex (download the whole blockchain again in case of pruned node)</translation>
+    </message>
+    <message>
+        <source>Pruning blockstore...</source>
+        <translation>Pruning blockstore...</translation>
+    </message>
+    <message>
+        <source>Unable to start HTTP server. See debug log for details.</source>
+        <translation>Unable to start HTTP server. See debug log for details.</translation>
+    </message>
+    <message>
+        <source>The %s developers</source>
+        <translation>The %s developers</translation>
+    </message>
+    <message>
+        <source>Cannot obtain a lock on data directory %s. %s is probably already running.</source>
+        <translation>Cannot obtain a lock on data directory %s. %s is probably already running.</translation>
+    </message>
+    <message>
+        <source>Cannot provide specific connections and have addrman find outgoing connections at the same.</source>
+        <translation>Không thể cung cấp kết nối nào và có addrman tìm kết nối đi cùng một lúc.</translation>
+    </message>
+    <message>
+        <source>Error reading %s! All keys read correctly, but transaction data or address book entries might be missing or incorrect.</source>
+        <translation>Error reading %s! All keys read correctly, but transaction data or address book entries might be missing or incorrect.</translation>
+    </message>
+    <message>
+        <source>Please check that
