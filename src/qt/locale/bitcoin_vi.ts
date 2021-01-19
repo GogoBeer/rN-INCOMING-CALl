@@ -3637,4 +3637,103 @@ Lưu ý: Vì phí được tính trên cơ sở mỗi byte, nên phí "100 satos
     </message>
     <message>
         <source>Unknown -blockfilterindex value %s.</source>
-        <translat
+        <translation>Không rõ giá trị  -blockfilterindex  %s.</translation>
+    </message>
+    <message>
+        <source>Verifying wallet(s)...</source>
+        <translation>Verifying wallet(s)...</translation>
+    </message>
+    <message>
+        <source>Warning: unknown new rules activated (versionbit %i)</source>
+        <translation>Warning: unknown new rules activated (versionbit %i)</translation>
+    </message>
+    <message>
+        <source>-maxtxfee is set very high! Fees this large could be paid on a single transaction.</source>
+        <translation>-maxtxfee is set very high! Fees this large could be paid on a single transaction.</translation>
+    </message>
+    <message>
+        <source>This is the transaction fee you may pay when fee estimates are not available.</source>
+        <translation>This is the transaction fee you may pay when fee estimates are not available.</translation>
+    </message>
+    <message>
+        <source>Total length of network version string (%i) exceeds maximum length (%i). Reduce the number or size of uacomments.</source>
+        <translation>Total length of network version string (%i) exceeds maximum length (%i). Reduce the number or size of uacomments.</translation>
+    </message>
+    <message>
+        <source>%s is set very high!</source>
+        <translation>%s is set very high!</translation>
+    </message>
+    <message>
+        <source>Error loading wallet %s. Duplicate -wallet filename specified.</source>
+        <translation>Error loading wallet %s. Duplicate -wallet filename specified.</translation>
+    </message>
+    <message>
+        <source>Starting network threads...</source>
+        <translation>Starting network threads...</translation>
+    </message>
+    <message>
+        <source>The wallet will avoid paying less than the minimum relay fee.</source>
+        <translation>Wallet sẽ hủy thanh toán nhỏ hơn phí relay.</translation>
+    </message>
+    <message>
+        <source>This is the minimum transaction fee you pay on every transaction.</source>
+        <translation>Đây là minimum transaction fee bạn pay cho mỗi transaction.</translation>
+    </message>
+    <message>
+        <source>This is the transaction fee you will pay if you send a transaction.</source>
+        <translation>Đây là transaction fee bạn sẽ pay nếu gửi transaction.</translation>
+    </message>
+    <message>
+        <source>Transaction amounts must not be negative</source>
+        <translation>Transaction amounts phải không âm</translation>
+    </message>
+    <message>
+        <source>Transaction has too long of a mempool chain</source>
+        <translation>Transaction có chuỗi mempool chain quá dài</translation>
+    </message>
+    <message>
+        <source>Transaction must have at least one recipient</source>
+        <translation>Transaction phải có ít nhất một người nhận</translation>
+    </message>
+    <message>
+        <source>Unknown network specified in -onlynet: '%s'</source>
+        <translation>Unknown network được xác định trong -onlynet: '%s'</translation>
+    </message>
+    <message>
+        <source>Insufficient funds</source>
+        <translation>Không đủ tiền</translation>
+    </message>
+    <message>
+        <source>Fee estimation failed. Fallbackfee is disabled. Wait a few blocks or enable -fallbackfee.</source>
+        <translation>Dự toán phí không thành công. Fallbackfee bị vô hiệu hóa. Đợi sau một vài khối hoặc kích hoạt -fallbackfee.</translation>
+    </message>
+    <message>
+        <source>Warning: Private keys detected in wallet {%s} with disabled private keys</source>
+        <translation>Cảnh báo: các khóa riêng tư được tìm thấy trong ví {%s} với  khóa riêng tư không kích hoạt</translation>
+    </message>
+    <message>
+        <source>Cannot write to data directory '%s'; check permissions.</source>
+        <translation>Không thể ghi vào thư mục dữ liệu  '%s'; kiểm tra lại quyền.</translation>
+    </message>
+    <message>
+        <source>Loading block index...</source>
+        <translation>Đang tải block index...</translation>
+    </message>
+    <message>
+        <source>Loading wallet...</source>
+        <translation>Loading wallet...</translation>
+    </message>
+    <message>
+        <source>Cannot downgrade wallet</source>
+        <translation>Không thể downgrade wallet</translation>
+    </message>
+    <message>
+        <source>Rescanning...</source>
+        <translation>Rescanning...</translation>
+    </message>
+    <message>
+        <source>Done loading</source>
+        <translation>Done loading</translation>
+    </message>
+</context>
+</TS>
