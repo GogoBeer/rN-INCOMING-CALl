@@ -250,4 +250,246 @@ Signing is only possible with addresses of the type 'legacy'.</source>
     </message>
     <message>
         <source>Banned Until</source>
-        <tra
+        <translation>在此之前保持封禁:</translation>
+    </message>
+</context>
+<context>
+    <name>BitcoinGUI</name>
+    <message>
+        <source>Sign &amp;message...</source>
+        <translation>消息签名(&amp;M)...</translation>
+    </message>
+    <message>
+        <source>Synchronizing with network...</source>
+        <translation>正在与网络同步...</translation>
+    </message>
+    <message>
+        <source>&amp;Overview</source>
+        <translation>概况(&amp;O)</translation>
+    </message>
+    <message>
+        <source>Show general overview of wallet</source>
+        <translation>显示钱包概况</translation>
+    </message>
+    <message>
+        <source>&amp;Transactions</source>
+        <translation>交易记录(&amp;T)</translation>
+    </message>
+    <message>
+        <source>Browse transaction history</source>
+        <translation>浏览交易历史</translation>
+    </message>
+    <message>
+        <source>E&amp;xit</source>
+        <translation>退出(&amp;X)</translation>
+    </message>
+    <message>
+        <source>Quit application</source>
+        <translation>退出程序</translation>
+    </message>
+    <message>
+        <source>&amp;About %1</source>
+        <translation>关于 %1 (&amp;A)</translation>
+    </message>
+    <message>
+        <source>Show information about %1</source>
+        <translation>显示 %1 的相关信息</translation>
+    </message>
+    <message>
+        <source>About &amp;Qt</source>
+        <translation>关于 &amp;Qt</translation>
+    </message>
+    <message>
+        <source>Show information about Qt</source>
+        <translation>显示 Qt 相关信息</translation>
+    </message>
+    <message>
+        <source>&amp;Options...</source>
+        <translation>选项(&amp;O)...</translation>
+    </message>
+    <message>
+        <source>Modify configuration options for %1</source>
+        <translation>修改%1的配置选项</translation>
+    </message>
+    <message>
+        <source>&amp;Encrypt Wallet...</source>
+        <translation>加密钱包(&amp;E)...</translation>
+    </message>
+    <message>
+        <source>&amp;Backup Wallet...</source>
+        <translation>备份钱包(&amp;B)...</translation>
+    </message>
+    <message>
+        <source>&amp;Change Passphrase...</source>
+        <translation>更改密码(&amp;C)...</translation>
+    </message>
+    <message>
+        <source>Open &amp;URI...</source>
+        <translation>打开 &amp;URI...</translation>
+    </message>
+    <message>
+        <source>Create Wallet...</source>
+        <translation>创建钱包...</translation>
+    </message>
+    <message>
+        <source>Create a new wallet</source>
+        <translation>创建一个新的钱包</translation>
+    </message>
+    <message>
+        <source>Wallet:</source>
+        <translation>钱包:</translation>
+    </message>
+    <message>
+        <source>Click to disable network activity.</source>
+        <translation>点击禁用网络活动。</translation>
+    </message>
+    <message>
+        <source>Network activity disabled.</source>
+        <translation>网络活动已禁用。</translation>
+    </message>
+    <message>
+        <source>Click to enable network activity again.</source>
+        <translation>点击重新开启网络活动。</translation>
+    </message>
+    <message>
+        <source>Syncing Headers (%1%)...</source>
+        <translation>同步区块头 (%1%)...</translation>
+    </message>
+    <message>
+        <source>Reindexing blocks on disk...</source>
+        <translation>正在为磁盘上的区块数据重建索引...</translation>
+    </message>
+    <message>
+        <source>Proxy is &lt;b&gt;enabled&lt;/b&gt;: %1</source>
+        <translation>代理服务器已&lt;b&gt;启用&lt;/b&gt;: %1</translation>
+    </message>
+    <message>
+        <source>Send coins to a Bitcoin address</source>
+        <translation>向一个比特币地址发币</translation>
+    </message>
+    <message>
+        <source>Backup wallet to another location</source>
+        <translation>备份钱包到其他位置</translation>
+    </message>
+    <message>
+        <source>Change the passphrase used for wallet encryption</source>
+        <translation>修改钱包加密密码</translation>
+    </message>
+    <message>
+        <source>&amp;Verify message...</source>
+        <translation>验证消息(&amp;V)...</translation>
+    </message>
+    <message>
+        <source>&amp;Send</source>
+        <translation>发送(&amp;S)</translation>
+    </message>
+    <message>
+        <source>&amp;Receive</source>
+        <translation>接收(&amp;R)</translation>
+    </message>
+    <message>
+        <source>&amp;Show / Hide</source>
+        <translation>显示 / 隐藏(&amp;S)</translation>
+    </message>
+    <message>
+        <source>Show or hide the main Window</source>
+        <translation>显示或隐藏主窗口</translation>
+    </message>
+    <message>
+        <source>Encrypt the private keys that belong to your wallet</source>
+        <translation>把你钱包中的私钥加密</translation>
+    </message>
+    <message>
+        <source>Sign messages with your Bitcoin addresses to prove you own them</source>
+        <translation>用比特币地址关联的私钥为消息签名，以证明您拥有这个比特币地址</translation>
+    </message>
+    <message>
+        <source>Verify messages to ensure they were signed with specified Bitcoin addresses</source>
+        <translation>校验消息，确保该消息是由指定的比特币地址所有者签名的</translation>
+    </message>
+    <message>
+        <source>&amp;File</source>
+        <translation>文件(&amp;F)</translation>
+    </message>
+    <message>
+        <source>&amp;Settings</source>
+        <translation>设置(&amp;S)</translation>
+    </message>
+    <message>
+        <source>&amp;Help</source>
+        <translation>帮助(&amp;H)</translation>
+    </message>
+    <message>
+        <source>Tabs toolbar</source>
+        <translation>标签页工具栏</translation>
+    </message>
+    <message>
+        <source>Request payments (generates QR codes and bitcoin: URIs)</source>
+        <translation>请求支付 (生成二维码和 bitcoin: URI)</translation>
+    </message>
+    <message>
+        <source>Show the list of used sending addresses and labels</source>
+        <translation>显示用过的付款地址和标签的列表</translation>
+    </message>
+    <message>
+        <source>Show the list of used receiving addresses and labels</source>
+        <translation>显示用过的收款地址和标签的列表</translation>
+    </message>
+    <message>
+        <source>&amp;Command-line options</source>
+        <translation>命令行选项(&amp;C)</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n active connection(s) to Bitcoin network</source>
+        <translation><numerusform>%n 条到比特币网络的活动连接</numerusform></translation>
+    </message>
+    <message>
+        <source>Indexing blocks on disk...</source>
+        <translation>正在为区块数据建立索引...</translation>
+    </message>
+    <message>
+        <source>Processing blocks on disk...</source>
+        <translation>正在处理区块数据...</translation>
+    </message>
+    <message numerus="yes">
+        <source>Processed %n block(s) of transaction history.</source>
+        <translation><numerusform>已处理 %n 个区块的交易历史</numerusform></translation>
+    </message>
+    <message>
+        <source>%1 behind</source>
+        <translation>落后 %1</translation>
+    </message>
+    <message>
+        <source>Last received block was generated %1 ago.</source>
+        <translation>最新收到的区块产生于 %1 之前。</translation>
+    </message>
+    <message>
+        <source>Transactions after this will not yet be visible.</source>
+        <translation>在此之后的交易尚不可见</translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation>错误</translation>
+    </message>
+    <message>
+        <source>Warning</source>
+        <translation>警告</translation>
+    </message>
+    <message>
+        <source>Information</source>
+        <translation>信息</translation>
+    </message>
+    <message>
+        <source>Up to date</source>
+        <translation>已是最新</translation>
+    </message>
+    <message>
+        <source>&amp;Load PSBT from file...</source>
+        <translation>从文件加载PSBT...(&amp;L)</translation>
+    </message>
+    <message>
+        <source>Load Partially Signed Bitcoin Transaction</source>
+        <translation>加载部分签名比特币交易（PSBT）</translation>
+    </message>
+    <message>
+        <source>Load PSBT from clipboard...
