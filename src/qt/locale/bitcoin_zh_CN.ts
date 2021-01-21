@@ -771,4 +771,230 @@ Signing is only possible with addresses of the type 'legacy'.</source>
         <translation>复制数目</translation>
     </message>
     <message>
-     
+        <source>Copy fee</source>
+        <translation>复制手续费</translation>
+    </message>
+    <message>
+        <source>Copy after fee</source>
+        <translation>复制含交易费的金额</translation>
+    </message>
+    <message>
+        <source>Copy bytes</source>
+        <translation>复制字节数</translation>
+    </message>
+    <message>
+        <source>Copy dust</source>
+        <translation>复制粉尘金额</translation>
+    </message>
+    <message>
+        <source>Copy change</source>
+        <translation>复制找零金额</translation>
+    </message>
+    <message>
+        <source>(%1 locked)</source>
+        <translation>(锁定 %1 枚)</translation>
+    </message>
+    <message>
+        <source>yes</source>
+        <translation>是</translation>
+    </message>
+    <message>
+        <source>no</source>
+        <translation>否</translation>
+    </message>
+    <message>
+        <source>This label turns red if any recipient receives an amount smaller than the current dust threshold.</source>
+        <translation>当任何一个收款金额小于目前的粉尘金额阈值时，文字会变红色。</translation>
+    </message>
+    <message>
+        <source>Can vary +/- %1 satoshi(s) per input.</source>
+        <translation>每个输入可能有 +/- %1 聪 (satoshi) 的误差。</translation>
+    </message>
+    <message>
+        <source>(no label)</source>
+        <translation>(无标签)</translation>
+    </message>
+    <message>
+        <source>change from %1 (%2)</source>
+        <translation>来自 %1 的找零 (%2)</translation>
+    </message>
+    <message>
+        <source>(change)</source>
+        <translation>(找零)</translation>
+    </message>
+</context>
+<context>
+    <name>CreateWalletActivity</name>
+    <message>
+        <source>Creating Wallet &lt;b&gt;%1&lt;/b&gt;...</source>
+        <translation>正在创建钱包&lt;b&gt;%1&lt;/b&gt;...</translation>
+    </message>
+    <message>
+        <source>Create wallet failed</source>
+        <translation>创建钱包失败</translation>
+    </message>
+    <message>
+        <source>Create wallet warning</source>
+        <translation>创建钱包警告</translation>
+    </message>
+</context>
+<context>
+    <name>CreateWalletDialog</name>
+    <message>
+        <source>Create Wallet</source>
+        <translation>创建钱包</translation>
+    </message>
+    <message>
+        <source>Wallet Name</source>
+        <translation>钱包名称</translation>
+    </message>
+    <message>
+        <source>Encrypt the wallet. The wallet will be encrypted with a passphrase of your choice.</source>
+        <translation>加密钱包。将会使用您指定的密码将钱包钱包。</translation>
+    </message>
+    <message>
+        <source>Encrypt Wallet</source>
+        <translation>加密钱包</translation>
+    </message>
+    <message>
+        <source>Disable private keys for this wallet. Wallets with private keys disabled will have no private keys and cannot have an HD seed or imported private keys. This is ideal for watch-only wallets.</source>
+        <translation>禁用此钱包的私钥。被禁用私钥的钱包将不会含有任何私钥，而且也不能含有HD种子或导入的私钥。作为仅观察钱包，这是比较理想的。</translation>
+    </message>
+    <message>
+        <source>Disable Private Keys</source>
+        <translation>禁用私钥</translation>
+    </message>
+    <message>
+        <source>Make a blank wallet. Blank wallets do not initially have private keys or scripts. Private keys and addresses can be imported, or an HD seed can be set, at a later time.</source>
+        <translation>创建一个空白的钱包。空白钱包最初不含有任何私钥或脚本。可以以后再导入私钥和地址，或设置HD种子。</translation>
+    </message>
+    <message>
+        <source>Make Blank Wallet</source>
+        <translation>创建空白钱包</translation>
+    </message>
+    <message>
+        <source>Use descriptors for scriptPubKey management</source>
+        <translation>使用输出描述符进行scriptPubKey管理</translation>
+    </message>
+    <message>
+        <source>Descriptor Wallet</source>
+        <translation>输出描述符钱包</translation>
+    </message>
+    <message>
+        <source>Create</source>
+        <translation>创建</translation>
+    </message>
+</context>
+<context>
+    <name>EditAddressDialog</name>
+    <message>
+        <source>Edit Address</source>
+        <translation>编辑地址</translation>
+    </message>
+    <message>
+        <source>&amp;Label</source>
+        <translation>标签(&amp;L)</translation>
+    </message>
+    <message>
+        <source>The label associated with this address list entry</source>
+        <translation>与此地址关联的标签</translation>
+    </message>
+    <message>
+        <source>The address associated with this address list entry. This can only be modified for sending addresses.</source>
+        <translation>与这个列表项关联的地址。只有付款地址才能被修改（收款地址不能被修改）。</translation>
+    </message>
+    <message>
+        <source>&amp;Address</source>
+        <translation>地址(&amp;A)</translation>
+    </message>
+    <message>
+        <source>New sending address</source>
+        <translation>新建付款地址</translation>
+    </message>
+    <message>
+        <source>Edit receiving address</source>
+        <translation>编辑收款地址</translation>
+    </message>
+    <message>
+        <source>Edit sending address</source>
+        <translation>编辑付款地址</translation>
+    </message>
+    <message>
+        <source>The entered address "%1" is not a valid Bitcoin address.</source>
+        <translation>输入的地址 %1 并不是有效的比特币地址。</translation>
+    </message>
+    <message>
+        <source>Address "%1" already exists as a receiving address with label "%2" and so cannot be added as a sending address.</source>
+        <translation>地址“%1”已经存在，它是一个收款地址，标签为“%2”，所以它不能作为一个付款地址被添加进来。</translation>
+    </message>
+    <message>
+        <source>The entered address "%1" is already in the address book with label "%2".</source>
+        <translation>输入的地址“%1”已经存在于地址簿中，标签为“%2”。</translation>
+    </message>
+    <message>
+        <source>Could not unlock wallet.</source>
+        <translation>无法解锁钱包。</translation>
+    </message>
+    <message>
+        <source>New key generation failed.</source>
+        <translation>生成新密钥失败。</translation>
+    </message>
+</context>
+<context>
+    <name>FreespaceChecker</name>
+    <message>
+        <source>A new data directory will be created.</source>
+        <translation>一个新的数据目录将被创建。</translation>
+    </message>
+    <message>
+        <source>name</source>
+        <translation>名称</translation>
+    </message>
+    <message>
+        <source>Directory already exists. Add %1 if you intend to create a new directory here.</source>
+        <translation>目录已存在。如果您打算在这里创建一个新目录，请添加 %1。</translation>
+    </message>
+    <message>
+        <source>Path already exists, and is not a directory.</source>
+        <translation>路径已存在，并且不是一个目录。</translation>
+    </message>
+    <message>
+        <source>Cannot create data directory here.</source>
+        <translation>无法在此创建数据目录。</translation>
+    </message>
+</context>
+<context>
+    <name>HelpMessageDialog</name>
+    <message>
+        <source>version</source>
+        <translation>版本</translation>
+    </message>
+    <message>
+        <source>About %1</source>
+        <translation>关于 %1</translation>
+    </message>
+    <message>
+        <source>Command-line options</source>
+        <translation>命令行选项</translation>
+    </message>
+</context>
+<context>
+    <name>Intro</name>
+    <message>
+        <source>Welcome</source>
+        <translation>欢迎</translation>
+    </message>
+    <message>
+        <source>Welcome to %1.</source>
+        <translation>欢迎使用 %1</translation>
+    </message>
+    <message>
+        <source>As this is the first time the program is launched, you can choose where %1 will store its data.</source>
+        <translation>由于这是第一次启动此程序，您可以选择%1存储数据的位置</translation>
+    </message>
+    <message>
+        <source>When you click OK, %1 will begin to download and process the full %4 block chain (%2GB) starting with the earliest transactions in %3 when %4 initially launched.</source>
+        <translation>当你单击确认后，%1 将会在 %4 启动时从  %3 中最早的交易开始，下载并处理完整的 %4 区块链 (%2GB)。</translation>
+    </message>
+    <message>
+        <source>Reverting this setting requires re-downloading the entire blockchain. It is faster to download the full chain first and prune it la
