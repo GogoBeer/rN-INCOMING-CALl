@@ -1202,4 +1202,215 @@ Signing is only possible with addresses of the type 'legacy'.</source>
     </message>
     <message>
         <source>Open the %1 configuration file from the working directory.</source>
-        <translation>从工作目录下打开配置文件 %1。</
+        <translation>从工作目录下打开配置文件 %1。</translation>
+    </message>
+    <message>
+        <source>Open Configuration File</source>
+        <translation>打开配置文件</translation>
+    </message>
+    <message>
+        <source>Reset all client options to default.</source>
+        <translation>恢复客户端的缺省设置</translation>
+    </message>
+    <message>
+        <source>&amp;Reset Options</source>
+        <translation>恢复缺省设置(&amp;R)</translation>
+    </message>
+    <message>
+        <source>&amp;Network</source>
+        <translation>网络(&amp;N)</translation>
+    </message>
+    <message>
+        <source>Disables some advanced features but all blocks will still be fully validated. Reverting this setting requires re-downloading the entire blockchain. Actual disk usage may be somewhat higher.</source>
+        <translation>禁用一些高级特性，但是仍然会对所有区块数据进行完整验证。必须重新下载整个区块链才能撤销此设置。实际的磁盘空间占用可能会比预想的略高。</translation>
+    </message>
+    <message>
+        <source>Prune &amp;block storage to</source>
+        <translation>将区块存储修剪至(&amp;B)</translation>
+    </message>
+    <message>
+        <source>GB</source>
+        <translation>GB</translation>
+    </message>
+    <message>
+        <source>Reverting this setting requires re-downloading the entire blockchain.</source>
+        <translation>警告:还原此设置需要重新下载整个区块链。</translation>
+    </message>
+    <message>
+        <source>MiB</source>
+        <translation>MiB</translation>
+    </message>
+    <message>
+        <source>(0 = auto, &lt;0 = leave that many cores free)</source>
+        <translation>(0 = 自动, &lt;0 = 保持指定数量的CPU核心空闲)</translation>
+    </message>
+    <message>
+        <source>W&amp;allet</source>
+        <translation>钱包(&amp;A)</translation>
+    </message>
+    <message>
+        <source>Expert</source>
+        <translation>专家</translation>
+    </message>
+    <message>
+        <source>Enable coin &amp;control features</source>
+        <translation>启用手动选币功能(&amp;C)</translation>
+    </message>
+    <message>
+        <source>If you disable the spending of unconfirmed change, the change from a transaction cannot be used until that transaction has at least one confirmation. This also affects how your balance is computed.</source>
+        <translation>如果您禁止动用尚未确认的找零资金，则一笔交易的找零资金至少需要有1个确认后才能动用。这同时也会影响账户余额的计算。</translation>
+    </message>
+    <message>
+        <source>&amp;Spend unconfirmed change</source>
+        <translation>动用尚未确认的找零资金(&amp;S)</translation>
+    </message>
+    <message>
+        <source>Automatically open the Bitcoin client port on the router. This only works when your router supports UPnP and it is enabled.</source>
+        <translation>自动在路由器中为比特币客户端打开端口。只有当您的路由器开启了 UPnP 选项时此功能才会有用。</translation>
+    </message>
+    <message>
+        <source>Map port using &amp;UPnP</source>
+        <translation>使用 &amp;UPnP 映射端口</translation>
+    </message>
+    <message>
+        <source>Accept connections from outside.</source>
+        <translation>接受外部连接。</translation>
+    </message>
+    <message>
+        <source>Allow incomin&amp;g connections</source>
+        <translation>允许传入连接(&amp;G)</translation>
+    </message>
+    <message>
+        <source>Connect to the Bitcoin network through a SOCKS5 proxy.</source>
+        <translation>通过 SOCKS5 代理连接比特币网络。</translation>
+    </message>
+    <message>
+        <source>&amp;Connect through SOCKS5 proxy (default proxy):</source>
+        <translation>通过 SO&amp;CKS5 代理连接(默认代理):</translation>
+    </message>
+    <message>
+        <source>Proxy &amp;IP:</source>
+        <translation>代理服务器 &amp;IP:</translation>
+    </message>
+    <message>
+        <source>&amp;Port:</source>
+        <translation>端口(&amp;P):</translation>
+    </message>
+    <message>
+        <source>Port of the proxy (e.g. 9050)</source>
+        <translation>代理服务器端口（例如 9050）</translation>
+    </message>
+    <message>
+        <source>Used for reaching peers via:</source>
+        <translation>在走这些途径连接到节点的时候启用:</translation>
+    </message>
+    <message>
+        <source>IPv4</source>
+        <translation>IPv4</translation>
+    </message>
+    <message>
+        <source>IPv6</source>
+        <translation>IPv6</translation>
+    </message>
+    <message>
+        <source>Tor</source>
+        <translation>Tor</translation>
+    </message>
+    <message>
+        <source>&amp;Window</source>
+        <translation>窗口(&amp;W)</translation>
+    </message>
+    <message>
+        <source>Show only a tray icon after minimizing the window.</source>
+        <translation>最小化窗口后仅显示托盘图标</translation>
+    </message>
+    <message>
+        <source>&amp;Minimize to the tray instead of the taskbar</source>
+        <translation>最小化到托盘(&amp;M)</translation>
+    </message>
+    <message>
+        <source>M&amp;inimize on close</source>
+        <translation>单击关闭按钮时最小化(&amp;I)</translation>
+    </message>
+    <message>
+        <source>&amp;Display</source>
+        <translation>显示(&amp;D)</translation>
+    </message>
+    <message>
+        <source>User Interface &amp;language:</source>
+        <translation>用户界面语言(&amp;L):</translation>
+    </message>
+    <message>
+        <source>The user interface language can be set here. This setting will take effect after restarting %1.</source>
+        <translation>可以在这里设定用户界面的语言。这个设定在重启 %1 后才会生效。</translation>
+    </message>
+    <message>
+        <source>&amp;Unit to show amounts in:</source>
+        <translation>比特币金额单位(&amp;U):</translation>
+    </message>
+    <message>
+        <source>Choose the default subdivision unit to show in the interface and when sending coins.</source>
+        <translation>选择显示及发送比特币时使用的最小单位。</translation>
+    </message>
+    <message>
+        <source>Whether to show coin control features or not.</source>
+        <translation>是否显示手动选币功能。</translation>
+    </message>
+    <message>
+        <source>Connect to the Bitcoin network through a separate SOCKS5 proxy for Tor onion services.</source>
+        <translation>连接比特币网络时专门为Tor onion服务使用另一个 SOCKS5 代理。</translation>
+    </message>
+    <message>
+        <source>Use separate SOCKS&amp;5 proxy to reach peers via Tor onion services:</source>
+        <translation>连接Tor onion服务节点时使用另一个SOCKS&amp;5代理：</translation>
+    </message>
+    <message>
+        <source>&amp;Third party transaction URLs</source>
+        <translation>第三方交易网址(&amp;T)</translation>
+    </message>
+    <message>
+        <source>Options set in this dialog are overridden by the command line or in the configuration file:</source>
+        <translation>这个对话框中的设置已被如下命令行选项或配置文件项覆盖:</translation>
+    </message>
+    <message>
+        <source>&amp;OK</source>
+        <translation>确定(&amp;O)</translation>
+    </message>
+    <message>
+        <source>&amp;Cancel</source>
+        <translation>取消(&amp;C)</translation>
+    </message>
+    <message>
+        <source>default</source>
+        <translation>默认</translation>
+    </message>
+    <message>
+        <source>none</source>
+        <translation>无</translation>
+    </message>
+    <message>
+        <source>Confirm options reset</source>
+        <translation>确认恢复默认设置</translation>
+    </message>
+    <message>
+        <source>Client restart required to activate changes.</source>
+        <translation>需要重启客户端才能使更改生效。</translation>
+    </message>
+    <message>
+        <source>Client will be shut down. Do you want to proceed?</source>
+        <translation>客户端即将关闭，您想继续吗？</translation>
+    </message>
+    <message>
+        <source>Configuration options</source>
+        <translation>配置选项</translation>
+    </message>
+    <message>
+        <source>The configuration file is used to specify advanced user options which override GUI settings. Additionally, any command-line options will override this configuration file.</source>
+        <translation>配置文件可以用来设置高级选项。配置文件会覆盖设置界面窗口中的选项。此外，命令行会覆盖配置文件指定的选项。</translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation>错误</translation>
+    </message>
+    <message>
+        <so
