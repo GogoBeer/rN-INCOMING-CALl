@@ -997,4 +997,209 @@ Signing is only possible with addresses of the type 'legacy'.</source>
         <translation>当你单击确认后，%1 将会在 %4 启动时从  %3 中最早的交易开始，下载并处理完整的 %4 区块链 (%2GB)。</translation>
     </message>
     <message>
-        <source>Reverting this setting requires re-downloading the entire blockchain. It is faster to download the full chain first and prune it la
+        <source>Reverting this setting requires re-downloading the entire blockchain. It is faster to download the full chain first and prune it later. Disables some advanced features.</source>
+        <translation>取消此设置需要重新下载整个区块链。先完整下载整条链再进行修剪会更快。这会禁用一些高级功能。</translation>
+    </message>
+    <message>
+        <source>This initial synchronisation is very demanding, and may expose hardware problems with your computer that had previously gone unnoticed. Each time you run %1, it will continue downloading where it left off.</source>
+        <translation>初始化同步过程是非常吃力的，同时可能会暴露您之前没有注意到的电脑硬件问题。你每次启动%1时，它都会从之前中断的地方继续下载。</translation>
+    </message>
+    <message>
+        <source>If you have chosen to limit block chain storage (pruning), the historical data must still be downloaded and processed, but will be deleted afterward to keep your disk usage low.</source>
+        <translation>如果你选择限制区块链存储大小（区块链裁剪模式），程序依然会下载并处理全部历史数据，只是不必须的部分会在使用后被删除，以占用最少的存储空间。</translation>
+    </message>
+    <message>
+        <source>Use the default data directory</source>
+        <translation>使用默认的数据目录</translation>
+    </message>
+    <message>
+        <source>Use a custom data directory:</source>
+        <translation>使用自定义的数据目录:</translation>
+    </message>
+    <message>
+        <source>Bitcoin</source>
+        <translation>比特币</translation>
+    </message>
+    <message>
+        <source>Discard blocks after verification, except most recent %1 GB (prune)</source>
+        <translation>在完成验证后丢弃区块，只保留最近的 %1 GB(修剪)</translation>
+    </message>
+    <message>
+        <source>At least %1 GB of data will be stored in this directory, and it will grow over time.</source>
+        <translation>此目录中至少会保存 %1 GB 的数据，并且大小还会随着时间增长。</translation>
+    </message>
+    <message>
+        <source>Approximately %1 GB of data will be stored in this directory.</source>
+        <translation>会在此目录中存储约 %1 GB 的数据。</translation>
+    </message>
+    <message>
+        <source>%1 will download and store a copy of the Bitcoin block chain.</source>
+        <translation>%1 将会下载并存储比特币区块链。</translation>
+    </message>
+    <message>
+        <source>The wallet will also be stored in this directory.</source>
+        <translation>钱包也会被保存在这个目录中。</translation>
+    </message>
+    <message>
+        <source>Error: Specified data directory "%1" cannot be created.</source>
+        <translation>错误:无法创建指定的数据目录 "%1"</translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation>错误</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n GB of free space available</source>
+        <translation><numerusform>有 %n GB 空闲空间可用</numerusform></translation>
+    </message>
+    <message numerus="yes">
+        <source>(of %n GB needed)</source>
+        <translation><numerusform>(需要 %n GB的空间)</numerusform></translation>
+    </message>
+    <message numerus="yes">
+        <source>(%n GB needed for full chain)</source>
+        <translation><numerusform>(保存完整的链需要 %n GB)</numerusform></translation>
+    </message>
+</context>
+<context>
+    <name>ModalOverlay</name>
+    <message>
+        <source>Form</source>
+        <translation>窗体</translation>
+    </message>
+    <message>
+        <source>Recent transactions may not yet be visible, and therefore your wallet's balance might be incorrect. This information will be correct once your wallet has finished synchronizing with the bitcoin network, as detailed below.</source>
+        <translation>近期交易可能尚未显示，因此当前余额可能不准确。以上信息将在与比特币网络完全同步后更正。详情如下</translation>
+    </message>
+    <message>
+        <source>Attempting to spend bitcoins that are affected by not-yet-displayed transactions will not be accepted by the network.</source>
+        <translation>尝试使用受未可见交易影响的余额将不被网络接受。</translation>
+    </message>
+    <message>
+        <source>Number of blocks left</source>
+        <translation>剩余区块数量</translation>
+    </message>
+    <message>
+        <source>Unknown...</source>
+        <translation>未知...</translation>
+    </message>
+    <message>
+        <source>Last block time</source>
+        <translation>上一区块时间</translation>
+    </message>
+    <message>
+        <source>Progress</source>
+        <translation>进度</translation>
+    </message>
+    <message>
+        <source>Progress increase per hour</source>
+        <translation>每小时进度增加</translation>
+    </message>
+    <message>
+        <source>calculating...</source>
+        <translation>正在计算...</translation>
+    </message>
+    <message>
+        <source>Estimated time left until synced</source>
+        <translation>预计剩余同步时间</translation>
+    </message>
+    <message>
+        <source>Hide</source>
+        <translation>隐藏</translation>
+    </message>
+    <message>
+        <source>Esc</source>
+        <translation>Esc</translation>
+    </message>
+    <message>
+        <source>%1 is currently syncing.  It will download headers and blocks from peers and validate them until reaching the tip of the block chain.</source>
+        <translation>%1目前正在同步中。它会从其他节点下载区块头和区块数据并进行验证，直到抵达区块链尖端。</translation>
+    </message>
+    <message>
+        <source>Unknown. Syncing Headers (%1, %2%)...</source>
+        <translation>未知。正在同步区块头 (%1, %2%)...</translation>
+    </message>
+</context>
+<context>
+    <name>OpenURIDialog</name>
+    <message>
+        <source>Open bitcoin URI</source>
+        <translation>打开比特币URI</translation>
+    </message>
+    <message>
+        <source>URI:</source>
+        <translation>URI:</translation>
+    </message>
+</context>
+<context>
+    <name>OpenWalletActivity</name>
+    <message>
+        <source>Open wallet failed</source>
+        <translation>打开钱包失败</translation>
+    </message>
+    <message>
+        <source>Open wallet warning</source>
+        <translation>打开钱包警告</translation>
+    </message>
+    <message>
+        <source>default wallet</source>
+        <translation>默认钱包</translation>
+    </message>
+    <message>
+        <source>Opening Wallet &lt;b&gt;%1&lt;/b&gt;...</source>
+        <translation>正在打开钱包&lt;b&gt;%1&lt;/b&gt;...</translation>
+    </message>
+</context>
+<context>
+    <name>OptionsDialog</name>
+    <message>
+        <source>Options</source>
+        <translation>选项</translation>
+    </message>
+    <message>
+        <source>&amp;Main</source>
+        <translation>主要(&amp;M)</translation>
+    </message>
+    <message>
+        <source>Automatically start %1 after logging in to the system.</source>
+        <translation>在登入系统后自动启动 %1</translation>
+    </message>
+    <message>
+        <source>&amp;Start %1 on system login</source>
+        <translation>系统登入时启动 %1 (&amp;S)</translation>
+    </message>
+    <message>
+        <source>Size of &amp;database cache</source>
+        <translation>数据库缓存大小(&amp;D)</translation>
+    </message>
+    <message>
+        <source>Number of script &amp;verification threads</source>
+        <translation>脚本验证线程数(&amp;V)</translation>
+    </message>
+    <message>
+        <source>IP address of the proxy (e.g. IPv4: 127.0.0.1 / IPv6: ::1)</source>
+        <translation>代理服务器 IP 地址 (例如 IPv4: 127.0.0.1 / IPv6: ::1)</translation>
+    </message>
+    <message>
+        <source>Shows if the supplied default SOCKS5 proxy is used to reach peers via this network type.</source>
+        <translation>显示默认的SOCKS5代理是否被用于在该类型的网络下连接同伴。</translation>
+    </message>
+    <message>
+        <source>Hide the icon from the system tray.</source>
+        <translation>不在系统通知区域显示图标。</translation>
+    </message>
+    <message>
+        <source>&amp;Hide tray icon</source>
+        <translation>隐藏通知区域图标(&amp;H)</translation>
+    </message>
+    <message>
+        <source>Minimize instead of exit the application when the window is closed. When this option is enabled, the application will be closed only after selecting Exit in the menu.</source>
+        <translation>窗口被关闭时最小化程序而不是退出。当此选项启用时，只有在菜单中选择“退出”时才会让程序退出。</translation>
+    </message>
+    <message>
+        <source>Third party URLs (e.g. a block explorer) that appear in the transactions tab as context menu items. %s in the URL is replaced by transaction hash. Multiple URLs are separated by vertical bar |.</source>
+        <translation>这个第三方网址（比如区块浏览器）会出现在交易选项卡的右键菜单中。 网址中的%s代表交易哈希。多个网址需要用竖线 | 相互分隔。</translation>
+    </message>
+    <message>
+        <source>Open the %1 configuration file from the working directory.</source>
+        <translation>从工作目录下打开配置文件 %1。</
