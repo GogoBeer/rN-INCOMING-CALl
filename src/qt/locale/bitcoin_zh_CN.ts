@@ -1898,4 +1898,265 @@ Signing is only possible with addresses of the type 'legacy'.</source>
         <translation>内存池</translation>
     </message>
     <message>
-      
+        <source>Current number of transactions</source>
+        <translation>当前交易数量</translation>
+    </message>
+    <message>
+        <source>Memory usage</source>
+        <translation>内存使用</translation>
+    </message>
+    <message>
+        <source>Wallet: </source>
+        <translation>钱包:</translation>
+    </message>
+    <message>
+        <source>(none)</source>
+        <translation>(无)</translation>
+    </message>
+    <message>
+        <source>&amp;Reset</source>
+        <translation>重置(&amp;R)</translation>
+    </message>
+    <message>
+        <source>Received</source>
+        <translation>已接收</translation>
+    </message>
+    <message>
+        <source>Sent</source>
+        <translation>已发送</translation>
+    </message>
+    <message>
+        <source>&amp;Peers</source>
+        <translation>节点(&amp;P)</translation>
+    </message>
+    <message>
+        <source>Banned peers</source>
+        <translation>已封禁节点</translation>
+    </message>
+    <message>
+        <source>Select a peer to view detailed information.</source>
+        <translation>选择节点查看详细信息。</translation>
+    </message>
+    <message>
+        <source>Direction</source>
+        <translation>方向</translation>
+    </message>
+    <message>
+        <source>Version</source>
+        <translation>版本</translation>
+    </message>
+    <message>
+        <source>Starting Block</source>
+        <translation>起步区块</translation>
+    </message>
+    <message>
+        <source>Synced Headers</source>
+        <translation>已同步区块头</translation>
+    </message>
+    <message>
+        <source>Synced Blocks</source>
+        <translation>已同步区块</translation>
+    </message>
+    <message>
+        <source>The mapped Autonomous System used for diversifying peer selection.</source>
+        <translation>映射到的自治系统，被用来多样化选择节点</translation>
+    </message>
+    <message>
+        <source>Mapped AS</source>
+        <translation>映射到的AS</translation>
+    </message>
+    <message>
+        <source>User Agent</source>
+        <translation>用户代理</translation>
+    </message>
+    <message>
+        <source>Node window</source>
+        <translation>节点窗口</translation>
+    </message>
+    <message>
+        <source>Current block height</source>
+        <translation>当前区块高度</translation>
+    </message>
+    <message>
+        <source>Open the %1 debug log file from the current data directory. This can take a few seconds for large log files.</source>
+        <translation>打开当前数据目录中的 %1 调试日志文件。日志文件大的话可能要等上几秒钟。</translation>
+    </message>
+    <message>
+        <source>Decrease font size</source>
+        <translation>缩小字体大小</translation>
+    </message>
+    <message>
+        <source>Increase font size</source>
+        <translation>放大字体大小</translation>
+    </message>
+    <message>
+        <source>Permissions</source>
+        <translation>权限</translation>
+    </message>
+    <message>
+        <source>Services</source>
+        <translation>服务</translation>
+    </message>
+    <message>
+        <source>Connection Time</source>
+        <translation>连接时间</translation>
+    </message>
+    <message>
+        <source>Last Send</source>
+        <translation>上次发送</translation>
+    </message>
+    <message>
+        <source>Last Receive</source>
+        <translation>上次接收</translation>
+    </message>
+    <message>
+        <source>Ping Time</source>
+        <translation>Ping 延时</translation>
+    </message>
+    <message>
+        <source>The duration of a currently outstanding ping.</source>
+        <translation>目前这一次 ping 已经过去的时间。</translation>
+    </message>
+    <message>
+        <source>Ping Wait</source>
+        <translation>Ping 等待</translation>
+    </message>
+    <message>
+        <source>Min Ping</source>
+        <translation>最小 Ping 值</translation>
+    </message>
+    <message>
+        <source>Time Offset</source>
+        <translation>时间偏移</translation>
+    </message>
+    <message>
+        <source>Last block time</source>
+        <translation>上一区块时间</translation>
+    </message>
+    <message>
+        <source>&amp;Open</source>
+        <translation>打开(&amp;O)</translation>
+    </message>
+    <message>
+        <source>&amp;Console</source>
+        <translation>控制台(&amp;C)</translation>
+    </message>
+    <message>
+        <source>&amp;Network Traffic</source>
+        <translation>网络流量(&amp;N)</translation>
+    </message>
+    <message>
+        <source>Totals</source>
+        <translation>总数</translation>
+    </message>
+    <message>
+        <source>In:</source>
+        <translation>传入:</translation>
+    </message>
+    <message>
+        <source>Out:</source>
+        <translation>传出:</translation>
+    </message>
+    <message>
+        <source>Debug log file</source>
+        <translation>调试日志文件</translation>
+    </message>
+    <message>
+        <source>Clear console</source>
+        <translation>清空控制台</translation>
+    </message>
+    <message>
+        <source>1 &amp;hour</source>
+        <translation>1 小时(&amp;H)</translation>
+    </message>
+    <message>
+        <source>1 &amp;day</source>
+        <translation>1 天(&amp;D)</translation>
+    </message>
+    <message>
+        <source>1 &amp;week</source>
+        <translation>1 周(&amp;W)</translation>
+    </message>
+    <message>
+        <source>1 &amp;year</source>
+        <translation>1 年(&amp;Y)</translation>
+    </message>
+    <message>
+        <source>&amp;Disconnect</source>
+        <translation>断开(&amp;D)</translation>
+    </message>
+    <message>
+        <source>Ban for</source>
+        <translation>封禁时长</translation>
+    </message>
+    <message>
+        <source>&amp;Unban</source>
+        <translation>解封(&amp;U)</translation>
+    </message>
+    <message>
+        <source>Welcome to the %1 RPC console.</source>
+        <translation>欢迎使用 %1 的 RPC 控制台。</translation>
+    </message>
+    <message>
+        <source>Use up and down arrows to navigate history, and %1 to clear screen.</source>
+        <translation>使用上下方向键浏览历史,  使用 %1 清除屏幕。</translation>
+    </message>
+    <message>
+        <source>Type %1 for an overview of available commands.</source>
+        <translation>输入 %1 显示可用命令信息。</translation>
+    </message>
+    <message>
+        <source>For more information on using this console type %1.</source>
+        <translation>输入 %1 以取得使用这个控制台的更多信息。</translation>
+    </message>
+    <message>
+        <source>WARNING: Scammers have been active, telling users to type commands here, stealing their wallet contents. Do not use this console without fully understanding the ramifications of a command.</source>
+        <translation>警告:已有骗子通过要求用户在此输入指令以盗取钱包。不要在没有完全理解命令规范时使用控制台。</translation>
+    </message>
+    <message>
+        <source>Network activity disabled</source>
+        <translation>网络活动已禁用</translation>
+    </message>
+    <message>
+        <source>Executing command without any wallet</source>
+        <translation>不使用任何钱包执行命令</translation>
+    </message>
+    <message>
+        <source>Executing command using "%1" wallet</source>
+        <translation>使用“%1”钱包执行命令</translation>
+    </message>
+    <message>
+        <source>(node id: %1)</source>
+        <translation>(节点ID: %1)</translation>
+    </message>
+    <message>
+        <source>via %1</source>
+        <translation>通过 %1</translation>
+    </message>
+    <message>
+        <source>never</source>
+        <translation>从未</translation>
+    </message>
+    <message>
+        <source>Inbound</source>
+        <translation>传入</translation>
+    </message>
+    <message>
+        <source>Outbound</source>
+        <translation>传出</translation>
+    </message>
+    <message>
+        <source>Unknown</source>
+        <translation>未知</translation>
+    </message>
+</context>
+<context>
+    <name>ReceiveCoinsDialog</name>
+    <message>
+        <source>&amp;Amount:</source>
+        <translation>金额(&amp;A):</translation>
+    </message>
+    <message>
+        <source>&amp;Label:</source>
+        <translation>标签(&amp;L):</translation>
+    <
