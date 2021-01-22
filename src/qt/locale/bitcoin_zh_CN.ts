@@ -1413,4 +1413,234 @@ Signing is only possible with addresses of the type 'legacy'.</source>
         <translation>错误</translation>
     </message>
     <message>
-        <so
+        <source>The configuration file could not be opened.</source>
+        <translation>无法打开配置文件。</translation>
+    </message>
+    <message>
+        <source>This change would require a client restart.</source>
+        <translation>此更改需要重启客户端。</translation>
+    </message>
+    <message>
+        <source>The supplied proxy address is invalid.</source>
+        <translation>提供的代理服务器地址无效。</translation>
+    </message>
+</context>
+<context>
+    <name>OverviewPage</name>
+    <message>
+        <source>Form</source>
+        <translation>窗体</translation>
+    </message>
+    <message>
+        <source>The displayed information may be out of date. Your wallet automatically synchronizes with the Bitcoin network after a connection is established, but this process has not completed yet.</source>
+        <translation>现在显示的消息可能是过期的。在连接上比特币网络节点后，您的钱包将自动与网络同步，但是这个过程还没有完成。</translation>
+    </message>
+    <message>
+        <source>Watch-only:</source>
+        <translation>仅观察:</translation>
+    </message>
+    <message>
+        <source>Available:</source>
+        <translation>可使用的余额:</translation>
+    </message>
+    <message>
+        <source>Your current spendable balance</source>
+        <translation>您当前可使用的余额</translation>
+    </message>
+    <message>
+        <source>Pending:</source>
+        <translation>等待中的余额:</translation>
+    </message>
+    <message>
+        <source>Total of transactions that have yet to be confirmed, and do not yet count toward the spendable balance</source>
+        <translation>尚未确认的交易总额，未计入当前余额</translation>
+    </message>
+    <message>
+        <source>Immature:</source>
+        <translation>未成熟的:</translation>
+    </message>
+    <message>
+        <source>Mined balance that has not yet matured</source>
+        <translation>尚未成熟的挖矿收入余额</translation>
+    </message>
+    <message>
+        <source>Balances</source>
+        <translation>余额</translation>
+    </message>
+    <message>
+        <source>Total:</source>
+        <translation>总额:</translation>
+    </message>
+    <message>
+        <source>Your current total balance</source>
+        <translation>您当前的总余额</translation>
+    </message>
+    <message>
+        <source>Your current balance in watch-only addresses</source>
+        <translation>您当前在仅观察观察地址中的余额</translation>
+    </message>
+    <message>
+        <source>Spendable:</source>
+        <translation>可动用:</translation>
+    </message>
+    <message>
+        <source>Recent transactions</source>
+        <translation>最近交易</translation>
+    </message>
+    <message>
+        <source>Unconfirmed transactions to watch-only addresses</source>
+        <translation>仅观察地址的未确认交易</translation>
+    </message>
+    <message>
+        <source>Mined balance in watch-only addresses that has not yet matured</source>
+        <translation>仅观察地址中尚未成熟的挖矿收入余额:</translation>
+    </message>
+    <message>
+        <source>Current total balance in watch-only addresses</source>
+        <translation>仅观察地址中的当前总余额</translation>
+    </message>
+    <message>
+        <source>Privacy mode activated for the Overview tab. To unmask the values, uncheck Settings-&gt;Mask values.</source>
+        <translation>“概况”标签页已启用隐私模式。要明文显示数值，请在设置中取消勾选“不明文显示数值”。</translation>
+    </message>
+</context>
+<context>
+    <name>PSBTOperationsDialog</name>
+    <message>
+        <source>Dialog</source>
+        <translation>会话</translation>
+    </message>
+    <message>
+        <source>Sign Tx</source>
+        <translation>签名交易</translation>
+    </message>
+    <message>
+        <source>Broadcast Tx</source>
+        <translation>广播交易</translation>
+    </message>
+    <message>
+        <source>Copy to Clipboard</source>
+        <translation>复制到剪贴板</translation>
+    </message>
+    <message>
+        <source>Save...</source>
+        <translation>保存...</translation>
+    </message>
+    <message>
+        <source>Close</source>
+        <translation>关闭</translation>
+    </message>
+    <message>
+        <source>Failed to load transaction: %1</source>
+        <translation>加载交易失败: %1</translation>
+    </message>
+    <message>
+        <source>Failed to sign transaction: %1</source>
+        <translation>签名交易失败: %1</translation>
+    </message>
+    <message>
+        <source>Could not sign any more inputs.</source>
+        <translation>没有交易输入项可供签名了。</translation>
+    </message>
+    <message>
+        <source>Signed %1 inputs, but more signatures are still required.</source>
+        <translation>已签名 %1 个交易输入项，但是仍然还有余下的项目需要签名。</translation>
+    </message>
+    <message>
+        <source>Signed transaction successfully. Transaction is ready to broadcast.</source>
+        <translation>成功签名交易。交易已经可以广播。</translation>
+    </message>
+    <message>
+        <source>Unknown error processing transaction.</source>
+        <translation>处理交易时遇到未知错误。</translation>
+    </message>
+    <message>
+        <source>Transaction broadcast successfully! Transaction ID: %1</source>
+        <translation>已成功广播交易！交易ID: %1</translation>
+    </message>
+    <message>
+        <source>Transaction broadcast failed: %1</source>
+        <translation>交易广播失败: %1</translation>
+    </message>
+    <message>
+        <source>PSBT copied to clipboard.</source>
+        <translation>已复制PSBT到剪贴板</translation>
+    </message>
+    <message>
+        <source>Save Transaction Data</source>
+        <translation>保存交易数据</translation>
+    </message>
+    <message>
+        <source>Partially Signed Transaction (Binary) (*.psbt)</source>
+        <translation>部分签名交易(二进制) (*.psbt)</translation>
+    </message>
+    <message>
+        <source>PSBT saved to disk.</source>
+        <translation>PSBT已保存到硬盘</translation>
+    </message>
+    <message>
+        <source> * Sends %1 to %2</source>
+        <translation> * 发送 %1 至 %2</translation>
+    </message>
+    <message>
+        <source>Unable to calculate transaction fee or total transaction amount.</source>
+        <translation>无法计算交易费用或总交易金额。</translation>
+    </message>
+    <message>
+        <source>Pays transaction fee: </source>
+        <translation>支付交易费用:</translation>
+    </message>
+    <message>
+        <source>Total Amount</source>
+        <translation>总额</translation>
+    </message>
+    <message>
+        <source>or</source>
+        <translation>或</translation>
+    </message>
+    <message>
+        <source>Transaction has %1 unsigned inputs.</source>
+        <translation>交易中含有%1个未签名输入项。</translation>
+    </message>
+    <message>
+        <source>Transaction is missing some information about inputs.</source>
+        <translation>交易中有输入项缺失某些信息。</translation>
+    </message>
+    <message>
+        <source>Transaction still needs signature(s).</source>
+        <translation>交易仍然需要签名。</translation>
+    </message>
+    <message>
+        <source>(But this wallet cannot sign transactions.)</source>
+        <translation>(但这个钱包不能签名交易)</translation>
+    </message>
+    <message>
+        <source>(But this wallet does not have the right keys.)</source>
+        <translation>(但这个钱包没有正确的密钥)</translation>
+    </message>
+    <message>
+        <source>Transaction is fully signed and ready for broadcast.</source>
+        <translation>交易已经完全签名，可以广播。</translation>
+    </message>
+    <message>
+        <source>Transaction status is unknown.</source>
+        <translation>交易状态未知。</translation>
+    </message>
+</context>
+<context>
+    <name>PaymentServer</name>
+    <message>
+        <source>Payment request error</source>
+        <translation>支付请求出错</translation>
+    </message>
+    <message>
+        <source>Cannot start bitcoin: click-to-pay handler</source>
+        <translation>无法启动 bitcoin: 协议的“一键支付”处理程序</translation>
+    </message>
+    <message>
+        <source>URI handling</source>
+        <translation>URI 处理</translation>
+    </message>
+    <message>
+        <source>'bitcoin://' is not a valid URI. Use 'bitcoin:' instead.</source>
+        <translation>‘bitcoin://’不是合
