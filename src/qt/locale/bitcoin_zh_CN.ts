@@ -2159,4 +2159,239 @@ Signing is only possible with addresses of the type 'legacy'.</source>
     <message>
         <source>&amp;Label:</source>
         <translation>标签(&amp;L):</translation>
-    <
+    </message>
+    <message>
+        <source>&amp;Message:</source>
+        <translation>消息(&amp;M):</translation>
+    </message>
+    <message>
+        <source>An optional message to attach to the payment request, which will be displayed when the request is opened. Note: The message will not be sent with the payment over the Bitcoin network.</source>
+        <translation>可在支付请求上备注一条信息，在打开支付请求时可以看到。注意:该消息不是通过比特币网络传送。</translation>
+    </message>
+    <message>
+        <source>An optional label to associate with the new receiving address.</source>
+        <translation>可为新建的收款地址添加一个标签。</translation>
+    </message>
+    <message>
+        <source>Use this form to request payments. All fields are &lt;b&gt;optional&lt;/b&gt;.</source>
+        <translation>使用此表单请求付款。所有字段都是&lt;b&gt;可选&lt;/b&gt;的。</translation>
+    </message>
+    <message>
+        <source>An optional amount to request. Leave this empty or zero to not request a specific amount.</source>
+        <translation>可选的请求金额。留空或填零为不要求具体金额。</translation>
+    </message>
+    <message>
+        <source>An optional label to associate with the new receiving address (used by you to identify an invoice).  It is also attached to the payment request.</source>
+        <translation>一个关联到新收款地址（被您用来识别发票）的可选标签。它也会被附加到付款请求中。</translation>
+    </message>
+    <message>
+        <source>An optional message that is attached to the payment request and may be displayed to the sender.</source>
+        <translation>一条附加到付款请求中的可选消息，可以显示给付款方。</translation>
+    </message>
+    <message>
+        <source>&amp;Create new receiving address</source>
+        <translation>新建收款地址(&amp;C)</translation>
+    </message>
+    <message>
+        <source>Clear all fields of the form.</source>
+        <translation>清除此表单的所有字段。</translation>
+    </message>
+    <message>
+        <source>Clear</source>
+        <translation>清除</translation>
+    </message>
+    <message>
+        <source>Native segwit addresses (aka Bech32 or BIP-173) reduce your transaction fees later on and offer better protection against typos, but old wallets don't support them. When unchecked, an address compatible with older wallets will be created instead.</source>
+        <translation>原生隔离见证地址（又称为Bech32或者BIP-173）可减少您日后的交易费用，并且可以更好地防范打字错误，但旧版本的钱包不能识别这种地址。如果取消勾选，则会生成一个与旧版本钱包兼容的地址。</translation>
+    </message>
+    <message>
+        <source>Generate native segwit (Bech32) address</source>
+        <translation>生成原生隔离见证 (Bech32) 地址</translation>
+    </message>
+    <message>
+        <source>Requested payments history</source>
+        <translation>付款请求历史</translation>
+    </message>
+    <message>
+        <source>Show the selected request (does the same as double clicking an entry)</source>
+        <translation>显示选中的请求 (直接双击项目也可以显示)</translation>
+    </message>
+    <message>
+        <source>Show</source>
+        <translation>显示</translation>
+    </message>
+    <message>
+        <source>Remove the selected entries from the list</source>
+        <translation>从列表中移除选中的条目</translation>
+    </message>
+    <message>
+        <source>Remove</source>
+        <translation>移除</translation>
+    </message>
+    <message>
+        <source>Copy URI</source>
+        <translation>复制URI</translation>
+    </message>
+    <message>
+        <source>Copy label</source>
+        <translation>复制标签</translation>
+    </message>
+    <message>
+        <source>Copy message</source>
+        <translation>复制消息</translation>
+    </message>
+    <message>
+        <source>Copy amount</source>
+        <translation>复制金额</translation>
+    </message>
+    <message>
+        <source>Could not unlock wallet.</source>
+        <translation>无法解锁钱包。</translation>
+    </message>
+    <message>
+        <source>Could not generate new %1 address</source>
+        <translation>无法生成新的%1地址</translation>
+    </message>
+</context>
+<context>
+    <name>ReceiveRequestDialog</name>
+    <message>
+        <source>Request payment to ...</source>
+        <translation>请求付款到 ...</translation>
+    </message>
+    <message>
+        <source>Address:</source>
+        <translation>地址:</translation>
+    </message>
+    <message>
+        <source>Amount:</source>
+        <translation>金额:</translation>
+    </message>
+    <message>
+        <source>Label:</source>
+        <translation>标签：</translation>
+    </message>
+    <message>
+        <source>Message:</source>
+        <translation>消息:</translation>
+    </message>
+    <message>
+        <source>Wallet:</source>
+        <translation>钱包:</translation>
+    </message>
+    <message>
+        <source>Copy &amp;URI</source>
+        <translation>复制 &amp;URI</translation>
+    </message>
+    <message>
+        <source>Copy &amp;Address</source>
+        <translation>复制地址(&amp;A)</translation>
+    </message>
+    <message>
+        <source>&amp;Save Image...</source>
+        <translation>保存图像(&amp;S)...</translation>
+    </message>
+    <message>
+        <source>Request payment to %1</source>
+        <translation>请求付款到 %1</translation>
+    </message>
+    <message>
+        <source>Payment information</source>
+        <translation>付款信息</translation>
+    </message>
+</context>
+<context>
+    <name>RecentRequestsTableModel</name>
+    <message>
+        <source>Date</source>
+        <translation>日期</translation>
+    </message>
+    <message>
+        <source>Label</source>
+        <translation>标签</translation>
+    </message>
+    <message>
+        <source>Message</source>
+        <translation>消息</translation>
+    </message>
+    <message>
+        <source>(no label)</source>
+        <translation>(无标签)</translation>
+    </message>
+    <message>
+        <source>(no message)</source>
+        <translation>(无消息)</translation>
+    </message>
+    <message>
+        <source>(no amount requested)</source>
+        <translation>(未填写请求金额)</translation>
+    </message>
+    <message>
+        <source>Requested</source>
+        <translation>请求金额</translation>
+    </message>
+</context>
+<context>
+    <name>SendCoinsDialog</name>
+    <message>
+        <source>Send Coins</source>
+        <translation>发币</translation>
+    </message>
+    <message>
+        <source>Coin Control Features</source>
+        <translation>手动选币功能</translation>
+    </message>
+    <message>
+        <source>Inputs...</source>
+        <translation>输入...</translation>
+    </message>
+    <message>
+        <source>automatically selected</source>
+        <translation>自动选择</translation>
+    </message>
+    <message>
+        <source>Insufficient funds!</source>
+        <translation>金额不足！</translation>
+    </message>
+    <message>
+        <source>Quantity:</source>
+        <translation>总量:</translation>
+    </message>
+    <message>
+        <source>Bytes:</source>
+        <translation>字节:</translation>
+    </message>
+    <message>
+        <source>Amount:</source>
+        <translation>金额:</translation>
+    </message>
+    <message>
+        <source>Fee:</source>
+        <translation>费用:</translation>
+    </message>
+    <message>
+        <source>After Fee:</source>
+        <translation>加上交易费用后:</translation>
+    </message>
+    <message>
+        <source>Change:</source>
+        <translation>找零:</translation>
+    </message>
+    <message>
+        <source>If this is activated, but the change address is empty or invalid, change will be sent to a newly generated address.</source>
+        <translation>在激活该选项后，如果填写了无效的找零地址，或者干脆没填找零地址，找零资金将会被转入新生成的地址。</translation>
+    </message>
+    <message>
+        <source>Custom change address</source>
+        <translation>自定义找零地址</translation>
+    </message>
+    <message>
+        <source>Transaction Fee:</source>
+        <translation>交易手续费:</translation>
+    </message>
+    <message>
+        <source>Choose...</source>
+        <translation>选择...</translation>
+    </message>
+    <message>
+        <source>Using the fallbackfee can result in sending a transaction that will take several hours or days (or never) to confirm. Consider choosing y
