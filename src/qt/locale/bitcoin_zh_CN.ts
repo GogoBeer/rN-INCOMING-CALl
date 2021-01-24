@@ -2394,4 +2394,220 @@ Signing is only possible with addresses of the type 'legacy'.</source>
         <translation>选择...</translation>
     </message>
     <message>
-        <source>Using the fallbackfee can result in sending a transaction that will take several hours or days (or never) to confirm. Consider choosing y
+        <source>Using the fallbackfee can result in sending a transaction that will take several hours or days (or never) to confirm. Consider choosing your fee manually or wait until you have validated the complete chain.</source>
+        <translation>如果使用备用手续费设置，有可能会导致交易经过几个小时、几天（甚至永远）无法被确认。请考虑手动选择手续费，或等待整个链完成验证。</translation>
+    </message>
+    <message>
+        <source>Warning: Fee estimation is currently not possible.</source>
+        <translation>警告: 目前无法进行手续费估计。</translation>
+    </message>
+    <message>
+        <source>Specify a custom fee per kB (1,000 bytes) of the transaction's virtual size.
+
+Note:  Since the fee is calculated on a per-byte basis, a fee of "100 satoshis per kB" for a transaction size of 500 bytes (half of 1 kB) would ultimately yield a fee of only 50 satoshis.</source>
+        <translation>按照交易的虚拟大小自定义每kB ( 1,000 字节 )要交多少手续费。
+
+注意:手续费是按照字节数计算的，对于一笔大小为500字节（1kB的一半）的交易来说，"每kB付100聪手续费"就意味着手续费一共只付了50聪。</translation>
+    </message>
+    <message>
+        <source>per kilobyte</source>
+        <translation>每KB</translation>
+    </message>
+    <message>
+        <source>Hide</source>
+        <translation>隐藏</translation>
+    </message>
+    <message>
+        <source>Recommended:</source>
+        <translation>推荐:</translation>
+    </message>
+    <message>
+        <source>Custom:</source>
+        <translation>自定义:</translation>
+    </message>
+    <message>
+        <source>(Smart fee not initialized yet. This usually takes a few blocks...)</source>
+        <translation>（智能手续费尚未初始化。 需要再下载一些区块数据...）</translation>
+    </message>
+    <message>
+        <source>Send to multiple recipients at once</source>
+        <translation>一次发送给多个收款人</translation>
+    </message>
+    <message>
+        <source>Add &amp;Recipient</source>
+        <translation>添加收款人(&amp;R)</translation>
+    </message>
+    <message>
+        <source>Clear all fields of the form.</source>
+        <translation>清除此表单的所有字段。</translation>
+    </message>
+    <message>
+        <source>Dust:</source>
+        <translation>粉尘:</translation>
+    </message>
+    <message>
+        <source>Hide transaction fee settings</source>
+        <translation>隐藏交易手续费设置</translation>
+    </message>
+    <message>
+        <source>When there is less transaction volume than space in the blocks, miners as well as relaying nodes may enforce a minimum fee. Paying only this minimum fee is just fine, but be aware that this can result in a never confirming transaction once there is more demand for bitcoin transactions than the network can process.</source>
+        <translation>当交易量小于可用区块空间时，矿工和中继节点可能会执行最低手续费率限制。按照这个最低费率来支付手续费也是可以的，但请注意，一旦交易需求超出比特币网络能处理的限度，你的交易可能永远也无法确认。</translation>
+    </message>
+    <message>
+        <source>A too low fee might result in a never confirming transaction (read the tooltip)</source>
+        <translation>过低的手续费率可能导致交易永远无法确认（请阅读工具提示）</translation>
+    </message>
+    <message>
+        <source>Confirmation time target:</source>
+        <translation>确认时间目标:</translation>
+    </message>
+    <message>
+        <source>Enable Replace-By-Fee</source>
+        <translation>启用手续费追加</translation>
+    </message>
+    <message>
+        <source>With Replace-By-Fee (BIP-125) you can increase a transaction's fee after it is sent. Without this, a higher fee may be recommended to compensate for increased transaction delay risk.</source>
+        <translation>手续费追加（Replace-By-Fee，BIP-125）可以让你在送出交易后继续追加手续费。不用这个功能的话，建议付比较高的手续费来降低交易延迟的风险。</translation>
+    </message>
+    <message>
+        <source>Clear &amp;All</source>
+        <translation>清除所有(&amp;A)</translation>
+    </message>
+    <message>
+        <source>Balance:</source>
+        <translation>余额:</translation>
+    </message>
+    <message>
+        <source>Confirm the send action</source>
+        <translation>确认发送操作</translation>
+    </message>
+    <message>
+        <source>S&amp;end</source>
+        <translation>发送(&amp;E)</translation>
+    </message>
+    <message>
+        <source>Copy quantity</source>
+        <translation>复制数目</translation>
+    </message>
+    <message>
+        <source>Copy amount</source>
+        <translation>复制金额</translation>
+    </message>
+    <message>
+        <source>Copy fee</source>
+        <translation>复制手续费</translation>
+    </message>
+    <message>
+        <source>Copy after fee</source>
+        <translation>复制含交易费的金额</translation>
+    </message>
+    <message>
+        <source>Copy bytes</source>
+        <translation>复制字节数</translation>
+    </message>
+    <message>
+        <source>Copy dust</source>
+        <translation>复制粉尘金额</translation>
+    </message>
+    <message>
+        <source>Copy change</source>
+        <translation>复制找零金额</translation>
+    </message>
+    <message>
+        <source>%1 (%2 blocks)</source>
+        <translation>%1 (%2个块)</translation>
+    </message>
+    <message>
+        <source>Cr&amp;eate Unsigned</source>
+        <translation>创建未签名交易(&amp;E)</translation>
+    </message>
+    <message>
+        <source>Creates a Partially Signed Bitcoin Transaction (PSBT) for use with e.g. an offline %1 wallet, or a PSBT-compatible hardware wallet.</source>
+        <translation>创建一个“部分签名比特币交易”（PSBT），以用于诸如离线%1钱包，或是兼容PSBT的硬件钱包这类用途。</translation>
+    </message>
+    <message>
+        <source> from wallet '%1'</source>
+        <translation>从钱包%1</translation>
+    </message>
+    <message>
+        <source>%1 to '%2'</source>
+        <translation>%1 到 '%2'</translation>
+    </message>
+    <message>
+        <source>%1 to %2</source>
+        <translation>%1 到 %2</translation>
+    </message>
+    <message>
+        <source>Do you want to draft this transaction?</source>
+        <translation>您想要起草这笔交易么？</translation>
+    </message>
+    <message>
+        <source>Are you sure you want to send?</source>
+        <translation>您确定要发出吗？</translation>
+    </message>
+    <message>
+        <source>Create Unsigned</source>
+        <translation>创建未签名交易</translation>
+    </message>
+    <message>
+        <source>Save Transaction Data</source>
+        <translation>保存交易数据</translation>
+    </message>
+    <message>
+        <source>Partially Signed Transaction (Binary) (*.psbt)</source>
+        <translation>部分签名交易(二进制) (*.psbt)</translation>
+    </message>
+    <message>
+        <source>PSBT saved</source>
+        <translation>已保存PSBT</translation>
+    </message>
+    <message>
+        <source>or</source>
+        <translation>或</translation>
+    </message>
+    <message>
+        <source>You can increase the fee later (signals Replace-By-Fee, BIP-125).</source>
+        <translation>你可以后来再追加手续费（打上支持BIP-125手续费追加的标记）</translation>
+    </message>
+    <message>
+        <source>Please, review your transaction proposal. This will produce a Partially Signed Bitcoin Transaction (PSBT) which you can save or copy and then sign with e.g. an offline %1 wallet, or a PSBT-compatible hardware wallet.</source>
+        <translation>请务必仔细检查您的交易请求。这会产生一个部分签名比特币交易(PSBT)，可以把保存下来或复制出去，然后就可以对它进行签名，比如用离线%1钱包，或是用兼容PSBT的硬件钱包。</translation>
+    </message>
+    <message>
+        <source>Please, review your transaction.</source>
+        <translation>请检查您的交易。</translation>
+    </message>
+    <message>
+        <source>Transaction fee</source>
+        <translation>交易手续费</translation>
+    </message>
+    <message>
+        <source>Not signalling Replace-By-Fee, BIP-125.</source>
+        <translation>没有打上BIP-125手续费追加的标记。</translation>
+    </message>
+    <message>
+        <source>Total Amount</source>
+        <translation>总额</translation>
+    </message>
+    <message>
+        <source>To review recipient list click "Show Details..."</source>
+        <translation>要查看收款人列表，请单击"显示详细信息..."</translation>
+    </message>
+    <message>
+        <source>Confirm send coins</source>
+        <translation>确认发币</translation>
+    </message>
+    <message>
+        <source>Confirm transaction proposal</source>
+        <translation>确认交易请求</translation>
+    </message>
+    <message>
+        <source>Send</source>
+        <translation>发送</translation>
+    </message>
+    <message>
+        <source>Watch-only balance:</source>
+        <translation>仅观察余额:</translation>
+    </message>
+    <message>
+        <source>The recipient address 
