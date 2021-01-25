@@ -3333,4 +3333,240 @@ Note:  Since the fee is calculated on a per-byte basis, a fee of "100 satoshis p
         <source>Label</source>
         <translation>标签</translation>
     </message>
-    <mes
+    <message>
+        <source>Address</source>
+        <translation>地址</translation>
+    </message>
+    <message>
+        <source>ID</source>
+        <translation>ID</translation>
+    </message>
+    <message>
+        <source>Exporting Failed</source>
+        <translation>导出失败</translation>
+    </message>
+    <message>
+        <source>There was an error trying to save the transaction history to %1.</source>
+        <translation>尝试把交易历史保存到 %1 时发生了错误。</translation>
+    </message>
+    <message>
+        <source>Exporting Successful</source>
+        <translation>导出成功</translation>
+    </message>
+    <message>
+        <source>The transaction history was successfully saved to %1.</source>
+        <translation>已成功将交易历史保存到 %1。</translation>
+    </message>
+    <message>
+        <source>Range:</source>
+        <translation>范围:</translation>
+    </message>
+    <message>
+        <source>to</source>
+        <translation>到</translation>
+    </message>
+</context>
+<context>
+    <name>UnitDisplayStatusBarControl</name>
+    <message>
+        <source>Unit to show amounts in. Click to select another unit.</source>
+        <translation>金额单位。单击选择别的单位。</translation>
+    </message>
+</context>
+<context>
+    <name>WalletController</name>
+    <message>
+        <source>Close wallet</source>
+        <translation>卸载钱包</translation>
+    </message>
+    <message>
+        <source>Are you sure you wish to close the wallet &lt;i&gt;%1&lt;/i&gt;?</source>
+        <translation>您确定想要关闭钱包&lt;i&gt;%1&lt;/i&gt;吗？</translation>
+    </message>
+    <message>
+        <source>Closing the wallet for too long can result in having to resync the entire chain if pruning is enabled.</source>
+        <translation>启用修剪时，如果一个钱包被卸载太久，就必须重新同步整条区块链才能再次加载它。</translation>
+    </message>
+    <message>
+        <source>Close all wallets</source>
+        <translation>关闭所有钱包</translation>
+    </message>
+    <message>
+        <source>Are you sure you wish to close all wallets?</source>
+        <translation>您确定想要关闭所有钱包吗?</translation>
+    </message>
+</context>
+<context>
+    <name>WalletFrame</name>
+    <message>
+        <source>No wallet has been loaded.
+Go to File &gt; Open Wallet to load a wallet.
+- OR -</source>
+        <translation>未加载钱包。
+请转到“文件”菜单 &gt; “打开钱包”来加载一个钱包。
+- 或者 -</translation>
+    </message>
+    <message>
+        <source>Create a new wallet</source>
+        <translation>创建一个新的钱包</translation>
+    </message>
+</context>
+<context>
+    <name>WalletModel</name>
+    <message>
+        <source>Send Coins</source>
+        <translation>发币</translation>
+    </message>
+    <message>
+        <source>Fee bump error</source>
+        <translation>追加手续费出错</translation>
+    </message>
+    <message>
+        <source>Increasing transaction fee failed</source>
+        <translation>追加交易手续费失败</translation>
+    </message>
+    <message>
+        <source>Do you want to increase the fee?</source>
+        <translation>您想追加手续费吗？</translation>
+    </message>
+    <message>
+        <source>Do you want to draft a transaction with fee increase?</source>
+        <translation>您要起草一笔手续费提高的交易么？</translation>
+    </message>
+    <message>
+        <source>Current fee:</source>
+        <translation>当前手续费:</translation>
+    </message>
+    <message>
+        <source>Increase:</source>
+        <translation>增加量:</translation>
+    </message>
+    <message>
+        <source>New fee:</source>
+        <translation>新交易费:</translation>
+    </message>
+    <message>
+        <source>Confirm fee bump</source>
+        <translation>确认手续费追加</translation>
+    </message>
+    <message>
+        <source>Can't draft transaction.</source>
+        <translation>无法起草交易。</translation>
+    </message>
+    <message>
+        <source>PSBT copied</source>
+        <translation>已复制PSBT</translation>
+    </message>
+    <message>
+        <source>Can't sign transaction.</source>
+        <translation>无法签名交易</translation>
+    </message>
+    <message>
+        <source>Could not commit transaction</source>
+        <translation>无法提交交易</translation>
+    </message>
+    <message>
+        <source>default wallet</source>
+        <translation>默认钱包</translation>
+    </message>
+</context>
+<context>
+    <name>WalletView</name>
+    <message>
+        <source>&amp;Export</source>
+        <translation>导出(&amp;E)</translation>
+    </message>
+    <message>
+        <source>Export the data in the current tab to a file</source>
+        <translation>将当前标签页数据导出到文件</translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation>错误</translation>
+    </message>
+    <message>
+        <source>Unable to decode PSBT from clipboard (invalid base64)</source>
+        <translation>无法从剪贴板解码PSBT(Base64值无效)</translation>
+    </message>
+    <message>
+        <source>Load Transaction Data</source>
+        <translation>加载交易数据</translation>
+    </message>
+    <message>
+        <source>Partially Signed Transaction (*.psbt)</source>
+        <translation>部分签名交易 (*.psbt)</translation>
+    </message>
+    <message>
+        <source>PSBT file must be smaller than 100 MiB</source>
+        <translation>PSBT文件必须小于100MiB</translation>
+    </message>
+    <message>
+        <source>Unable to decode PSBT</source>
+        <translation>无法解码PSBT</translation>
+    </message>
+    <message>
+        <source>Backup Wallet</source>
+        <translation>备份钱包</translation>
+    </message>
+    <message>
+        <source>Wallet Data (*.dat)</source>
+        <translation>钱包文件(*.dat)</translation>
+    </message>
+    <message>
+        <source>Backup Failed</source>
+        <translation>备份失败</translation>
+    </message>
+    <message>
+        <source>There was an error trying to save the wallet data to %1.</source>
+        <translation>尝试保存钱包数据至 %1 时发生了错误。</translation>
+    </message>
+    <message>
+        <source>Backup Successful</source>
+        <translation>备份成功</translation>
+    </message>
+    <message>
+        <source>The wallet data was successfully saved to %1.</source>
+        <translation>已成功保存钱包数据至 %1。</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>取消</translation>
+    </message>
+</context>
+<context>
+    <name>bitcoin-core</name>
+    <message>
+        <source>Distributed under the MIT software license, see the accompanying file %s or %s</source>
+        <translation>在MIT协议下分发，参见附带的 %s 或 %s 文件</translation>
+    </message>
+    <message>
+        <source>Prune configured below the minimum of %d MiB.  Please use a higher number.</source>
+        <translation>修剪被设置得太小，已经低于最小值%d MiB，请使用更大的数值。</translation>
+    </message>
+    <message>
+        <source>Prune: last wallet synchronisation goes beyond pruned data. You need to -reindex (download the whole blockchain again in case of pruned node)</source>
+        <translation>修剪:上次同步钱包的位置已经超出（落后于）现有修剪后数据的范围。你需要进行-reindex（对于已经启用修剪节点，就需要重新下载整个区块链）</translation>
+    </message>
+    <message>
+        <source>Pruning blockstore...</source>
+        <translation>正在修剪区块存储...</translation>
+    </message>
+    <message>
+        <source>Unable to start HTTP server. See debug log for details.</source>
+        <translation>无法启动HTTP服务，查看日志获取更多信息</translation>
+    </message>
+    <message>
+        <source>The %s developers</source>
+        <translation>%s 开发者</translation>
+    </message>
+    <message>
+        <source>Cannot obtain a lock on data directory %s. %s is probably already running.</source>
+        <translation>无法锁定数据目录 %s。%s 可能已经在运行。</translation>
+    </message>
+    <message>
+        <source>Cannot provide specific connections and have addrman find outgoing connections at the same.</source>
+        <translation>在使用地址管理器(addrman)寻找出站连接时，无法同时提供特定的连接。</translation>
+    </message>
+    <message>
+        <source>Error reading %s! All keys read correctly, but transaction data or address book entries might be missing or incorrect.</source>
+        <translation>读取 %s 时发生错误！所有的密
