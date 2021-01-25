@@ -2610,4 +2610,219 @@ Note:  Since the fee is calculated on a per-byte basis, a fee of "100 satoshis p
         <translation>仅观察余额:</translation>
     </message>
     <message>
-        <source>The recipient address 
+        <source>The recipient address is not valid. Please recheck.</source>
+        <translation>接收人地址无效。请重新检查。</translation>
+    </message>
+    <message>
+        <source>The amount to pay must be larger than 0.</source>
+        <translation>支付金额必须大于0。</translation>
+    </message>
+    <message>
+        <source>The amount exceeds your balance.</source>
+        <translation>金额超出您的余额。</translation>
+    </message>
+    <message>
+        <source>The total exceeds your balance when the %1 transaction fee is included.</source>
+        <translation>计入 %1 手续费后，金额超出了您的余额。</translation>
+    </message>
+    <message>
+        <source>Duplicate address found: addresses should only be used once each.</source>
+        <translation>发现重复地址:每个地址应该只使用一次。</translation>
+    </message>
+    <message>
+        <source>Transaction creation failed!</source>
+        <translation>交易创建失败！</translation>
+    </message>
+    <message>
+        <source>A fee higher than %1 is considered an absurdly high fee.</source>
+        <translation>超过 %1 的手续费被视为高得离谱。</translation>
+    </message>
+    <message>
+        <source>Payment request expired.</source>
+        <translation>支付请求已过期。</translation>
+    </message>
+    <message numerus="yes">
+        <source>Estimated to begin confirmation within %n block(s).</source>
+        <translation><numerusform>预计在等待 %n 个区块后会有第一个确认。</numerusform></translation>
+    </message>
+    <message>
+        <source>Warning: Invalid Bitcoin address</source>
+        <translation>警告: 比特币地址无效</translation>
+    </message>
+    <message>
+        <source>Warning: Unknown change address</source>
+        <translation>警告:未知的找零地址</translation>
+    </message>
+    <message>
+        <source>Confirm custom change address</source>
+        <translation>确认自定义找零地址</translation>
+    </message>
+    <message>
+        <source>The address you selected for change is not part of this wallet. Any or all funds in your wallet may be sent to this address. Are you sure?</source>
+        <translation>你选择的找零地址未被包含在本钱包中，你钱包中的部分或全部金额将被发送至该地址。你确定要这样做吗？</translation>
+    </message>
+    <message>
+        <source>(no label)</source>
+        <translation>(无标签)</translation>
+    </message>
+</context>
+<context>
+    <name>SendCoinsEntry</name>
+    <message>
+        <source>A&amp;mount:</source>
+        <translation>金额(&amp;M)</translation>
+    </message>
+    <message>
+        <source>Pay &amp;To:</source>
+        <translation>付给(&amp;T):</translation>
+    </message>
+    <message>
+        <source>&amp;Label:</source>
+        <translation>标签(&amp;L):</translation>
+    </message>
+    <message>
+        <source>Choose previously used address</source>
+        <translation>选择以前用过的地址</translation>
+    </message>
+    <message>
+        <source>The Bitcoin address to send the payment to</source>
+        <translation>付款目的地址</translation>
+    </message>
+    <message>
+        <source>Alt+A</source>
+        <translation>Alt+A</translation>
+    </message>
+    <message>
+        <source>Paste address from clipboard</source>
+        <translation>从剪贴板粘贴地址</translation>
+    </message>
+    <message>
+        <source>Alt+P</source>
+        <translation>Alt+P</translation>
+    </message>
+    <message>
+        <source>Remove this entry</source>
+        <translation>移除此项</translation>
+    </message>
+    <message>
+        <source>The amount to send in the selected unit</source>
+        <translation>用被选单位表示的待发送金额</translation>
+    </message>
+    <message>
+        <source>The fee will be deducted from the amount being sent. The recipient will receive less bitcoins than you enter in the amount field. If multiple recipients are selected, the fee is split equally.</source>
+        <translation>交易费将从发送金额中扣除。接收人收到的比特币将会比您在金额框中输入的更少。如果选中了多个收件人，交易费平分。</translation>
+    </message>
+    <message>
+        <source>S&amp;ubtract fee from amount</source>
+        <translation>从金额中减去交易费(&amp;U)</translation>
+    </message>
+    <message>
+        <source>Use available balance</source>
+        <translation>使用全部可用余额</translation>
+    </message>
+    <message>
+        <source>Message:</source>
+        <translation>消息:</translation>
+    </message>
+    <message>
+        <source>This is an unauthenticated payment request.</source>
+        <translation>这是一个未经验证的支付请求。</translation>
+    </message>
+    <message>
+        <source>This is an authenticated payment request.</source>
+        <translation>这是一个已经验证的支付请求。</translation>
+    </message>
+    <message>
+        <source>Enter a label for this address to add it to the list of used addresses</source>
+        <translation>请为此地址输入一个标签以将它加入已用地址列表</translation>
+    </message>
+    <message>
+        <source>A message that was attached to the bitcoin: URI which will be stored with the transaction for your reference. Note: This message will not be sent over the Bitcoin network.</source>
+        <translation>bitcoin: URI 附带的备注信息，将会和交易一起存储，备查。 注意：该消息不会通过比特币网络传输。</translation>
+    </message>
+    <message>
+        <source>Pay To:</source>
+        <translation>支付给:</translation>
+    </message>
+    <message>
+        <source>Memo:</source>
+        <translation>附言:</translation>
+    </message>
+</context>
+<context>
+    <name>ShutdownWindow</name>
+    <message>
+        <source>%1 is shutting down...</source>
+        <translation>正在关闭 %1 ...</translation>
+    </message>
+    <message>
+        <source>Do not shut down the computer until this window disappears.</source>
+        <translation>在此窗口消失前不要关闭计算机。</translation>
+    </message>
+</context>
+<context>
+    <name>SignVerifyMessageDialog</name>
+    <message>
+        <source>Signatures - Sign / Verify a Message</source>
+        <translation>签名 - 为消息签名/验证签名消息</translation>
+    </message>
+    <message>
+        <source>&amp;Sign Message</source>
+        <translation>消息签名(&amp;S)</translation>
+    </message>
+    <message>
+        <source>You can sign messages/agreements with your addresses to prove you can receive bitcoins sent to them. Be careful not to sign anything vague or random, as phishing attacks may try to trick you into signing your identity over to them. Only sign fully-detailed statements you agree to.</source>
+        <translation>您可以用你的地址对消息/协议进行签名，以证明您可以接收发送到该地址的比特币。注意不要对任何模棱两可或者随机的消息进行签名，以免遭受钓鱼式攻击。请确保消息内容准确的表达了您的真实意愿。</translation>
+    </message>
+    <message>
+        <source>The Bitcoin address to sign the message with</source>
+        <translation>用来对消息签名的地址</translation>
+    </message>
+    <message>
+        <source>Choose previously used address</source>
+        <translation>选择以前用过的地址</translation>
+    </message>
+    <message>
+        <source>Alt+A</source>
+        <translation>Alt+A</translation>
+    </message>
+    <message>
+        <source>Paste address from clipboard</source>
+        <translation>从剪贴板粘贴地址</translation>
+    </message>
+    <message>
+        <source>Alt+P</source>
+        <translation>Alt+P</translation>
+    </message>
+    <message>
+        <source>Enter the message you want to sign here</source>
+        <translation>在这里输入您想要签名的消息</translation>
+    </message>
+    <message>
+        <source>Signature</source>
+        <translation>签名</translation>
+    </message>
+    <message>
+        <source>Copy the current signature to the system clipboard</source>
+        <translation>复制当前签名至剪贴板</translation>
+    </message>
+    <message>
+        <source>Sign the message to prove you own this Bitcoin address</source>
+        <translation>签名消息，以证明这个地址属于您</translation>
+    </message>
+    <message>
+        <source>Sign &amp;Message</source>
+        <translation>签名消息(&amp;M)</translation>
+    </message>
+    <message>
+        <source>Reset all sign message fields</source>
+        <translation>清空所有签名消息栏</translation>
+    </message>
+    <message>
+        <source>Clear &amp;All</source>
+        <translation>清除所有(&amp;A)</translation>
+    </message>
+    <message>
+        <source>&amp;Verify Message</source>
+        <translation>消息验证(&amp;V)</translation>
+  
