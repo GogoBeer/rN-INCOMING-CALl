@@ -3927,3 +3927,163 @@ Go to File &gt; Open Wallet to load a wallet.
         <source>Prune mode is incompatible with -blockfilterindex.</source>
         <translation>修剪模式与 -blockfilterindex 不兼容。</translation>
     </message>
+    <message>
+        <source>Reducing -maxconnections from %d to %d, because of system limitations.</source>
+        <translation>因为系统的限制，将 -maxconnections 参数从 %d 降到了 %d</translation>
+    </message>
+    <message>
+        <source>Section [%s] is not recognized.</source>
+        <translation>无法识别配置章节 [%s]。</translation>
+    </message>
+    <message>
+        <source>Signing transaction failed</source>
+        <translation>签名交易失败</translation>
+    </message>
+    <message>
+        <source>Specified -walletdir "%s" does not exist</source>
+        <translation>参数 -walletdir "%s" 指定了不存在的路径</translation>
+    </message>
+    <message>
+        <source>Specified -walletdir "%s" is a relative path</source>
+        <translation>参数 -walletdir "%s" 指定了相对路径</translation>
+    </message>
+    <message>
+        <source>Specified -walletdir "%s" is not a directory</source>
+        <translation>参数 -walletdir "%s" 指定的路径不是目录</translation>
+    </message>
+    <message>
+        <source>The specified config file %s does not exist
+</source>
+        <translation>指定的配置文件 %s 不存在
+</translation>
+    </message>
+    <message>
+        <source>The transaction amount is too small to pay the fee</source>
+        <translation>交易金额太小，不足以支付交易费</translation>
+    </message>
+    <message>
+        <source>This is experimental software.</source>
+        <translation>这是实验性的软件。</translation>
+    </message>
+    <message>
+        <source>Transaction amount too small</source>
+        <translation>交易金额太小</translation>
+    </message>
+    <message>
+        <source>Transaction too large</source>
+        <translation>交易过大</translation>
+    </message>
+    <message>
+        <source>Unable to bind to %s on this computer (bind returned error %s)</source>
+        <translation>无法在本机绑定%s端口 (bind函数返回了错误 %s)</translation>
+    </message>
+    <message>
+        <source>Unable to create the PID file '%s': %s</source>
+        <translation>无法创建PID文件'%s': %s</translation>
+    </message>
+    <message>
+        <source>Unable to generate initial keys</source>
+        <translation>无法生成初始密钥</translation>
+    </message>
+    <message>
+        <source>Unknown -blockfilterindex value %s.</source>
+        <translation>未知的 -blockfilterindex 数值 %s。</translation>
+    </message>
+    <message>
+        <source>Verifying wallet(s)...</source>
+        <translation>正在检测钱包的完整性...</translation>
+    </message>
+    <message>
+        <source>Warning: unknown new rules activated (versionbit %i)</source>
+        <translation>警告:不明的交易规则已经激活(versionbit %i)</translation>
+    </message>
+    <message>
+        <source>-maxtxfee is set very high! Fees this large could be paid on a single transaction.</source>
+        <translation>参数 -maxtxfee 被设置得非常高！即使是单笔交易也可能付出如此之大的手续费。</translation>
+    </message>
+    <message>
+        <source>This is the transaction fee you may pay when fee estimates are not available.</source>
+        <translation>不能估计手续费时，你会付出这个手续费金额。</translation>
+    </message>
+    <message>
+        <source>Total length of network version string (%i) exceeds maximum length (%i). Reduce the number or size of uacomments.</source>
+        <translation>网络版本字符串的总长度 (%i) 超过最大长度 (%i) 了。请减少 uacomment 参数的数目或长度。</translation>
+    </message>
+    <message>
+        <source>%s is set very high!</source>
+        <translation>%s非常高！</translation>
+    </message>
+    <message>
+        <source>Error loading wallet %s. Duplicate -wallet filename specified.</source>
+        <translation>加载钱包 %s 出错。 重复指定了 -wallet 文件名。</translation>
+    </message>
+    <message>
+        <source>Starting network threads...</source>
+        <translation>正在启动网络线程...</translation>
+    </message>
+    <message>
+        <source>The wallet will avoid paying less than the minimum relay fee.</source>
+        <translation>钱包会避免让手续费低于最小转发费率(minrelay fee)。</translation>
+    </message>
+    <message>
+        <source>This is the minimum transaction fee you pay on every transaction.</source>
+        <translation>这是你每次交易付款时最少要付的手续费。</translation>
+    </message>
+    <message>
+        <source>This is the transaction fee you will pay if you send a transaction.</source>
+        <translation>如果发送交易，这将是你要支付的手续费。</translation>
+    </message>
+    <message>
+        <source>Transaction amounts must not be negative</source>
+        <translation>交易金额不不可为负数</translation>
+    </message>
+    <message>
+        <source>Transaction has too long of a mempool chain</source>
+        <translation>此交易在内存池中的存在过长的链条</translation>
+    </message>
+    <message>
+        <source>Transaction must have at least one recipient</source>
+        <translation>交易必须包含至少一个收款人</translation>
+    </message>
+    <message>
+        <source>Unknown network specified in -onlynet: '%s'</source>
+        <translation>-onlynet 指定的是未知网络: %s</translation>
+    </message>
+    <message>
+        <source>Insufficient funds</source>
+        <translation>金额不足</translation>
+    </message>
+    <message>
+        <source>Fee estimation failed. Fallbackfee is disabled. Wait a few blocks or enable -fallbackfee.</source>
+        <translation>手续费估计失败。而且备用手续费估计（fallbackfee）已被禁用。请再等一些区块，或者通过-fallbackfee参数启用备用手续费估计。</translation>
+    </message>
+    <message>
+        <source>Warning: Private keys detected in wallet {%s} with disabled private keys</source>
+        <translation>警告：在已经禁用私钥的钱包 {%s} 中仍然检测到私钥</translation>
+    </message>
+    <message>
+        <source>Cannot write to data directory '%s'; check permissions.</source>
+        <translation>不能写入到数据目录'%s'；请检查文件权限。</translation>
+    </message>
+    <message>
+        <source>Loading block index...</source>
+        <translation>正在加载区块索引...</translation>
+    </message>
+    <message>
+        <source>Loading wallet...</source>
+        <translation>正在加载钱包...</translation>
+    </message>
+    <message>
+        <source>Cannot downgrade wallet</source>
+        <translation>无法降级钱包</translation>
+    </message>
+    <message>
+        <source>Rescanning...</source>
+        <translation>正在重新扫描...</translation>
+    </message>
+    <message>
+        <source>Done loading</source>
+        <translation>加载完成</translation>
+    </message>
+</context>
+</TS>
