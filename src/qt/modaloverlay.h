@@ -25,4 +25,33 @@ public:
     explicit ModalOverlay(bool enable_wallet, QWidget *parent);
     ~ModalOverlay();
 
-    void tipUpdate(int count, const QDateTime& blockDate, double nVerification
+    void tipUpdate(int count, const QDateTime& blockDate, double nVerificationProgress);
+    void setKnownBestHeight(int count, const QDateTime& blockDate);
+
+    // will show or hide the modal layer
+    void showHide(bool hide = false, bool userRequested = false);
+    bool isLayerVisible() const { return layerIsVisible; }
+
+public Q_SLOTS:
+    void toggleVisibility();
+    void closeClicked();
+
+Q_SIGNALS:
+    void triggered(bool hidden);
+
+protected:
+    bool eventFilter(QObject * obj, QEvent * ev) override;
+    bool event(QEvent* ev) override;
+
+private:
+    Ui::ModalOverlay *ui;
+    int bestHeaderHeight; //best known height (based on the headers)
+    QDateTime bestHeaderDate;
+    QVector<QPair<qint64, double> > blockProcessTime;
+    bool layerIsVisible;
+    bool userClosed;
+    QPropertyAnimation m_animation;
+    void UpdateHeaderSyncLabel();
+};
+
+#endif // BITCOIN_QT_MODALOVERLAY_H
