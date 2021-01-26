@@ -210,4 +210,43 @@ void Notificator::notifySystray(Class cls, const QString &title, const QString &
     switch(cls) // Set icon based on class
     {
     case Information: sicon = QSystemTrayIcon::Information; break;
-    case Warning: sicon = QSystemTrayIcon::Warning; break
+    case Warning: sicon = QSystemTrayIcon::Warning; break;
+    case Critical: sicon = QSystemTrayIcon::Critical; break;
+    }
+    trayIcon->showMessage(title, text, sicon, millisTimeout);
+}
+
+#ifdef Q_OS_MAC
+void Notificator::notifyMacUserNotificationCenter(const QString &title, const QString &text)
+{
+    // icon is not supported by the user notification center yet. OSX will use the app icon.
+    MacNotificationHandler::instance()->showNotification(title, text);
+}
+#endif
+
+void Notificator::notify(Class cls, const QString &title, const QString &text, const QIcon &icon, int millisTimeout)
+{
+    switch(mode)
+    {
+#ifdef USE_DBUS
+    case Freedesktop:
+        notifyDBus(cls, title, text, icon, millisTimeout);
+        break;
+#endif
+    case QSystemTray:
+        notifySystray(cls, title, text, millisTimeout);
+        break;
+#ifdef Q_OS_MAC
+    case UserNotificationCenter:
+        notifyMacUserNotificationCenter(title, text);
+        break;
+#endif
+    default:
+        if(cls == Critical)
+        {
+            // Fall back to old fashioned pop-up dialog if critical and no other notification available
+            QMessageBox::critical(parent, title, text, QMessageBox::Ok, QMessageBox::Ok);
+        }
+        break;
+    }
+}
