@@ -228,4 +228,120 @@ void OverviewPage::setBalance(const interfaces::WalletBalances& balances)
 
     // for symmetry reasons also show immature label when the watch-only one is shown
     ui->labelImmature->setVisible(showImmature || showWatchOnlyImmature);
-    ui->labelImmatureText->setVisible(showIm
+    ui->labelImmatureText->setVisible(showImmature || showWatchOnlyImmature);
+    ui->labelWatchImmature->setVisible(!walletModel->wallet().privateKeysDisabled() && showWatchOnlyImmature); // show watch-only immature balance
+}
+
+// show/hide watch-only labels
+void OverviewPage::updateWatchOnlyLabels(bool showWatchOnly)
+{
+    ui->labelSpendable->setVisible(showWatchOnly);      // show spendable label (only when watch-only is active)
+    ui->labelWatchonly->setVisible(showWatchOnly);      // show watch-only label
+    ui->lineWatchBalance->setVisible(showWatchOnly);    // show watch-only balance separator line
+    ui->labelWatchAvailable->setVisible(showWatchOnly); // show watch-only available balance
+    ui->labelWatchPending->setVisible(showWatchOnly);   // show watch-only pending balance
+    ui->labelWatchTotal->setVisible(showWatchOnly);     // show watch-only total balance
+
+    if (!showWatchOnly)
+        ui->labelWatchImmature->hide();
+}
+
+void OverviewPage::setClientModel(ClientModel *model)
+{
+    this->clientModel = model;
+    if (model) {
+        // Show warning, for example if this is a prerelease version
+        connect(model, &ClientModel::alertsChanged, this, &OverviewPage::updateAlerts);
+        updateAlerts(model->getStatusBarWarnings());
+
+        connect(model->getOptionsModel(), &OptionsModel::useEmbeddedMonospacedFontChanged, this, &OverviewPage::setMonospacedFont);
+        setMonospacedFont(model->getOptionsModel()->getUseEmbeddedMonospacedFont());
+    }
+}
+
+void OverviewPage::setWalletModel(WalletModel *model)
+{
+    this->walletModel = model;
+    if(model && model->getOptionsModel())
+    {
+        // Set up transaction list
+        filter.reset(new TransactionFilterProxy());
+        filter->setSourceModel(model->getTransactionTableModel());
+        filter->setLimit(NUM_ITEMS);
+        filter->setDynamicSortFilter(true);
+        filter->setSortRole(Qt::EditRole);
+        filter->setShowInactive(false);
+        filter->sort(TransactionTableModel::Date, Qt::DescendingOrder);
+
+        ui->listTransactions->setModel(filter.get());
+        ui->listTransactions->setModelColumn(TransactionTableModel::ToAddress);
+
+        // Keep up to date with wallet
+        interfaces::Wallet& wallet = model->wallet();
+        interfaces::WalletBalances balances = wallet.getBalances();
+        setBalance(balances);
+        connect(model, &WalletModel::balanceChanged, this, &OverviewPage::setBalance);
+
+        connect(model->getOptionsModel(), &OptionsModel::displayUnitChanged, this, &OverviewPage::updateDisplayUnit);
+
+        updateWatchOnlyLabels(wallet.haveWatchOnly() && !model->wallet().privateKeysDisabled());
+        connect(model, &WalletModel::notifyWatchonlyChanged, [this](bool showWatchOnly) {
+            updateWatchOnlyLabels(showWatchOnly && !walletModel->wallet().privateKeysDisabled());
+        });
+    }
+
+    // update the display unit, to not use the default ("BTC")
+    updateDisplayUnit();
+}
+
+void OverviewPage::changeEvent(QEvent* e)
+{
+    if (e->type() == QEvent::PaletteChange) {
+        QIcon icon = m_platform_style->SingleColorIcon(QStringLiteral(":/icons/warning"));
+        ui->labelTransactionsStatus->setIcon(icon);
+        ui->labelWalletStatus->setIcon(icon);
+    }
+
+    QWidget::changeEvent(e);
+}
+
+void OverviewPage::updateDisplayUnit()
+{
+    if(walletModel && walletModel->getOptionsModel())
+    {
+        if (m_balances.balance != -1) {
+            setBalance(m_balances);
+        }
+
+        // Update txdelegate->unit with the current unit
+        txdelegate->unit = walletModel->getOptionsModel()->getDisplayUnit();
+
+        ui->listTransactions->update();
+    }
+}
+
+void OverviewPage::updateAlerts(const QString &warnings)
+{
+    this->ui->labelAlerts->setVisible(!warnings.isEmpty());
+    this->ui->labelAlerts->setText(warnings);
+}
+
+void OverviewPage::showOutOfSyncWarning(bool fShow)
+{
+    ui->labelWalletStatus->setVisible(fShow);
+    ui->labelTransactionsStatus->setVisible(fShow);
+}
+
+void OverviewPage::setMonospacedFont(bool use_embedded_font)
+{
+    QFont f = GUIUtil::fixedPitchFont(use_embedded_font);
+    f.setWeight(QFont::Bold);
+    ui->labelBalance->setFont(f);
+    ui->labelUnconfirmed->setFont(f);
+    ui->labelImmature->setFont(f);
+    ui->labelTotal->setFont(f);
+    ui->labelWatchAvailable->setFont(f);
+    ui->labelWatchPending->setFont(f);
+    ui->labelWatchImmature->setFont(f);
+    ui->labelWatchTotal->setFont(f);
+}
