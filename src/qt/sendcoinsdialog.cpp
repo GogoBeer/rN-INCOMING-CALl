@@ -130,4 +130,185 @@ SendCoinsDialog::SendCoinsDialog(const PlatformStyle *_platformStyle, QWidget *p
     ui->customFee->setValue(settings.value("nTransactionFee").toLongLong());
     minimizeFeeSection(settings.value("fFeeSectionMinimized").toBool());
 
-    GUIUtil::ExceptionSafeConnect(ui->sendBut
+    GUIUtil::ExceptionSafeConnect(ui->sendButton, &QPushButton::clicked, this, &SendCoinsDialog::sendButtonClicked);
+}
+
+void SendCoinsDialog::setClientModel(ClientModel *_clientModel)
+{
+    this->clientModel = _clientModel;
+
+    if (_clientModel) {
+        connect(_clientModel, &ClientModel::numBlocksChanged, this, &SendCoinsDialog::updateNumberOfBlocks);
+    }
+}
+
+void SendCoinsDialog::setModel(WalletModel *_model)
+{
+    this->model = _model;
+
+    if(_model && _model->getOptionsModel())
+    {
+        for(int i = 0; i < ui->entries->count(); ++i)
+        {
+            SendCoinsEntry *entry = qobject_cast<SendCoinsEntry*>(ui->entries->itemAt(i)->widget());
+            if(entry)
+            {
+                entry->setModel(_model);
+            }
+        }
+
+        interfaces::WalletBalances balances = _model->wallet().getBalances();
+        setBalance(balances);
+        connect(_model, &WalletModel::balanceChanged, this, &SendCoinsDialog::setBalance);
+        connect(_model->getOptionsModel(), &OptionsModel::displayUnitChanged, this, &SendCoinsDialog::updateDisplayUnit);
+        updateDisplayUnit();
+
+        // Coin Control
+        connect(_model->getOptionsModel(), &OptionsModel::displayUnitChanged, this, &SendCoinsDialog::coinControlUpdateLabels);
+        connect(_model->getOptionsModel(), &OptionsModel::coinControlFeaturesChanged, this, &SendCoinsDialog::coinControlFeatureChanged);
+        ui->frameCoinControl->setVisible(_model->getOptionsModel()->getCoinControlFeatures());
+        coinControlUpdateLabels();
+
+        // fee section
+        for (const int n : confTargets) {
+            ui->confTargetSelector->addItem(tr("%1 (%2 blocks)").arg(GUIUtil::formatNiceTimeOffset(n*Params().GetConsensus().nPowTargetSpacing)).arg(n));
+        }
+        connect(ui->confTargetSelector, qOverload<int>(&QComboBox::currentIndexChanged), this, &SendCoinsDialog::updateSmartFeeLabel);
+        connect(ui->confTargetSelector, qOverload<int>(&QComboBox::currentIndexChanged), this, &SendCoinsDialog::coinControlUpdateLabels);
+
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 15, 0))
+        connect(ui->groupFee, &QButtonGroup::idClicked, this, &SendCoinsDialog::updateFeeSectionControls);
+        connect(ui->groupFee, &QButtonGroup::idClicked, this, &SendCoinsDialog::coinControlUpdateLabels);
+#else
+        connect(ui->groupFee, qOverload<int>(&QButtonGroup::buttonClicked), this, &SendCoinsDialog::updateFeeSectionControls);
+        connect(ui->groupFee, qOverload<int>(&QButtonGroup::buttonClicked), this, &SendCoinsDialog::coinControlUpdateLabels);
+#endif
+
+        connect(ui->customFee, &BitcoinAmountField::valueChanged, this, &SendCoinsDialog::coinControlUpdateLabels);
+        connect(ui->optInRBF, &QCheckBox::stateChanged, this, &SendCoinsDialog::updateSmartFeeLabel);
+        connect(ui->optInRBF, &QCheckBox::stateChanged, this, &SendCoinsDialog::coinControlUpdateLabels);
+        CAmount requiredFee = model->wallet().getRequiredFee(1000);
+        ui->customFee->SetMinValue(requiredFee);
+        if (ui->customFee->value() < requiredFee) {
+            ui->customFee->setValue(requiredFee);
+        }
+        ui->customFee->setSingleStep(requiredFee);
+        updateFeeSectionControls();
+        updateSmartFeeLabel();
+
+        // set default rbf checkbox state
+        ui->optInRBF->setCheckState(Qt::Checked);
+
+        if (model->wallet().hasExternalSigner()) {
+            //: "device" usually means a hardware wallet.
+            ui->sendButton->setText(tr("Sign on device"));
+            if (gArgs.GetArg("-signer", "") != "") {
+                ui->sendButton->setEnabled(true);
+                ui->sendButton->setToolTip(tr("Connect your hardware wallet first."));
+            } else {
+                ui->sendButton->setEnabled(false);
+                //: "External signer" means using devices such as hardware wallets.
+                ui->sendButton->setToolTip(tr("Set external signer script path in Options -> Wallet"));
+            }
+        } else if (model->wallet().privateKeysDisabled()) {
+            ui->sendButton->setText(tr("Cr&eate Unsigned"));
+            ui->sendButton->setToolTip(tr("Creates a Partially Signed Bitcoin Transaction (PSBT) for use with e.g. an offline %1 wallet, or a PSBT-compatible hardware wallet.").arg(PACKAGE_NAME));
+        }
+
+        // set the smartfee-sliders default value (wallets default conf.target or last stored value)
+        QSettings settings;
+        if (settings.value("nSmartFeeSliderPosition").toInt() != 0) {
+            // migrate nSmartFeeSliderPosition to nConfTarget
+            // nConfTarget is available since 0.15 (replaced nSmartFeeSliderPosition)
+            int nConfirmTarget = 25 - settings.value("nSmartFeeSliderPosition").toInt(); // 25 == old slider range
+            settings.setValue("nConfTarget", nConfirmTarget);
+            settings.remove("nSmartFeeSliderPosition");
+        }
+        if (settings.value("nConfTarget").toInt() == 0)
+            ui->confTargetSelector->setCurrentIndex(getIndexForConfTarget(model->wallet().getConfirmTarget()));
+        else
+            ui->confTargetSelector->setCurrentIndex(getIndexForConfTarget(settings.value("nConfTarget").toInt()));
+    }
+}
+
+SendCoinsDialog::~SendCoinsDialog()
+{
+    QSettings settings;
+    settings.setValue("fFeeSectionMinimized", fFeeMinimized);
+    settings.setValue("nFeeRadio", ui->groupFee->checkedId());
+    settings.setValue("nConfTarget", getConfTargetForIndex(ui->confTargetSelector->currentIndex()));
+    settings.setValue("nTransactionFee", (qint64)ui->customFee->value());
+
+    delete ui;
+}
+
+bool SendCoinsDialog::PrepareSendText(QString& question_string, QString& informative_text, QString& detailed_text)
+{
+    QList<SendCoinsRecipient> recipients;
+    bool valid = true;
+
+    for(int i = 0; i < ui->entries->count(); ++i)
+    {
+        SendCoinsEntry *entry = qobject_cast<SendCoinsEntry*>(ui->entries->itemAt(i)->widget());
+        if(entry)
+        {
+            if(entry->validate(model->node()))
+            {
+                recipients.append(entry->getValue());
+            }
+            else if (valid)
+            {
+                ui->scrollArea->ensureWidgetVisible(entry);
+                valid = false;
+            }
+        }
+    }
+
+    if(!valid || recipients.isEmpty())
+    {
+        return false;
+    }
+
+    fNewRecipientAllowed = false;
+    WalletModel::UnlockContext ctx(model->requestUnlock());
+    if(!ctx.isValid())
+    {
+        // Unlock wallet was cancelled
+        fNewRecipientAllowed = true;
+        return false;
+    }
+
+    // prepare transaction for getting txFee earlier
+    m_current_transaction = std::make_unique<WalletModelTransaction>(recipients);
+    WalletModel::SendCoinsReturn prepareStatus;
+
+    updateCoinControlState();
+
+    prepareStatus = model->prepareTransaction(*m_current_transaction, *m_coin_control);
+
+    // process prepareStatus and on error generate message shown to user
+    processSendCoinsReturn(prepareStatus,
+        BitcoinUnits::formatWithUnit(model->getOptionsModel()->getDisplayUnit(), m_current_transaction->getTransactionFee()));
+
+    if(prepareStatus.status != WalletModel::OK) {
+        fNewRecipientAllowed = true;
+        return false;
+    }
+
+    CAmount txFee = m_current_transaction->getTransactionFee();
+    QStringList formatted;
+    for (const SendCoinsRecipient &rcp : m_current_transaction->getRecipients())
+    {
+        // generate amount string with wallet name in case of multiwallet
+        QString amount = BitcoinUnits::formatWithUnit(model->getOptionsModel()->getDisplayUnit(), rcp.amount);
+        if (model->isMultiwallet()) {
+            amount.append(tr(" from wallet '%1'").arg(GUIUtil::HtmlEscape(model->getWalletName())));
+        }
+
+        // generate address string
+        QString address = rcp.address;
+
+        QString recipientElement;
+
+        {
+            
