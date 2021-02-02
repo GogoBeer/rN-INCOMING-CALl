@@ -311,4 +311,153 @@ bool SendCoinsDialog::PrepareSendText(QString& question_string, QString& informa
         QString recipientElement;
 
         {
-            
+            if(rcp.label.length() > 0) // label with address
+            {
+                recipientElement.append(tr("%1 to '%2'").arg(amount, GUIUtil::HtmlEscape(rcp.label)));
+                recipientElement.append(QString(" (%1)").arg(address));
+            }
+            else // just address
+            {
+                recipientElement.append(tr("%1 to %2").arg(amount, address));
+            }
+        }
+        formatted.append(recipientElement);
+    }
+
+    /*: Message displayed when attempting to create a transaction. Cautionary text to prompt the user to verify
+        that the displayed transaction details represent the transaction the user intends to create. */
+    question_string.append(tr("Do you want to create this transaction?"));
+    question_string.append("<br /><span style='font-size:10pt;'>");
+    if (model->wallet().privateKeysDisabled() && !model->wallet().hasExternalSigner()) {
+        /*: Text to inform a user attempting to create a transaction of their current options. At this stage,
+            a user can only create a PSBT. This string is displayed when private keys are disabled and an external
+            signer is not available. */
+        question_string.append(tr("Please, review your transaction proposal. This will produce a Partially Signed Bitcoin Transaction (PSBT) which you can save or copy and then sign with e.g. an offline %1 wallet, or a PSBT-compatible hardware wallet.").arg(PACKAGE_NAME));
+    } else if (model->getOptionsModel()->getEnablePSBTControls()) {
+        /*: Text to inform a user attempting to create a transaction of their current options. At this stage,
+            a user can send their transaction or create a PSBT. This string is displayed when both private keys
+            and PSBT controls are enabled. */
+        question_string.append(tr("Please, review your transaction. You can create and send this transaction or create a Partially Signed Bitcoin Transaction (PSBT), which you can save or copy and then sign with, e.g., an offline %1 wallet, or a PSBT-compatible hardware wallet.").arg(PACKAGE_NAME));
+    } else {
+        /*: Text to prompt a user to review the details of the transaction they are attempting to send. */
+        question_string.append(tr("Please, review your transaction."));
+    }
+    question_string.append("</span>%1");
+
+    if(txFee > 0)
+    {
+        // append fee string if a fee is required
+        question_string.append("<hr /><b>");
+        question_string.append(tr("Transaction fee"));
+        question_string.append("</b>");
+
+        // append transaction size
+        question_string.append(" (" + QString::number((double)m_current_transaction->getTransactionSize() / 1000) + " kB): ");
+
+        // append transaction fee value
+        question_string.append("<span style='color:#aa0000; font-weight:bold;'>");
+        question_string.append(BitcoinUnits::formatHtmlWithUnit(model->getOptionsModel()->getDisplayUnit(), txFee));
+        question_string.append("</span><br />");
+
+        // append RBF message according to transaction's signalling
+        question_string.append("<span style='font-size:10pt; font-weight:normal;'>");
+        if (ui->optInRBF->isChecked()) {
+            question_string.append(tr("You can increase the fee later (signals Replace-By-Fee, BIP-125)."));
+        } else {
+            question_string.append(tr("Not signalling Replace-By-Fee, BIP-125."));
+        }
+        question_string.append("</span>");
+    }
+
+    // add total amount in all subdivision units
+    question_string.append("<hr />");
+    CAmount totalAmount = m_current_transaction->getTotalTransactionAmount() + txFee;
+    QStringList alternativeUnits;
+    for (const BitcoinUnits::Unit u : BitcoinUnits::availableUnits())
+    {
+        if(u != model->getOptionsModel()->getDisplayUnit())
+            alternativeUnits.append(BitcoinUnits::formatHtmlWithUnit(u, totalAmount));
+    }
+    question_string.append(QString("<b>%1</b>: <b>%2</b>").arg(tr("Total Amount"))
+        .arg(BitcoinUnits::formatHtmlWithUnit(model->getOptionsModel()->getDisplayUnit(), totalAmount)));
+    question_string.append(QString("<br /><span style='font-size:10pt; font-weight:normal;'>(=%1)</span>")
+        .arg(alternativeUnits.join(" " + tr("or") + " ")));
+
+    if (formatted.size() > 1) {
+        question_string = question_string.arg("");
+        informative_text = tr("To review recipient list click \"Show Details…\"");
+        detailed_text = formatted.join("\n\n");
+    } else {
+        question_string = question_string.arg("<br /><br />" + formatted.at(0));
+    }
+
+    return true;
+}
+
+void SendCoinsDialog::sendButtonClicked([[maybe_unused]] bool checked)
+{
+    if(!model || !model->getOptionsModel())
+        return;
+
+    QString question_string, informative_text, detailed_text;
+    if (!PrepareSendText(question_string, informative_text, detailed_text)) return;
+    assert(m_current_transaction);
+
+    const QString confirmation = tr("Confirm send coins");
+    auto confirmationDialog = new SendConfirmationDialog(confirmation, question_string, informative_text, detailed_text, SEND_CONFIRM_DELAY, !model->wallet().privateKeysDisabled(), model->getOptionsModel()->getEnablePSBTControls(), this);
+    confirmationDialog->setAttribute(Qt::WA_DeleteOnClose);
+    // TODO: Replace QDialog::exec() with safer QDialog::show().
+    const auto retval = static_cast<QMessageBox::StandardButton>(confirmationDialog->exec());
+
+    if(retval != QMessageBox::Yes && retval != QMessageBox::Save)
+    {
+        fNewRecipientAllowed = true;
+        return;
+    }
+
+    bool send_failure = false;
+    if (retval == QMessageBox::Save) {
+        CMutableTransaction mtx = CMutableTransaction{*(m_current_transaction->getWtx())};
+        PartiallySignedTransaction psbtx(mtx);
+        bool complete = false;
+        // Always fill without signing first. This prevents an external signer
+        // from being called prematurely and is not expensive.
+        TransactionError err = model->wallet().fillPSBT(SIGHASH_ALL, false /* sign */, true /* bip32derivs */, nullptr, psbtx, complete);
+        assert(!complete);
+        assert(err == TransactionError::OK);
+        if (model->wallet().hasExternalSigner()) {
+            try {
+                err = model->wallet().fillPSBT(SIGHASH_ALL, true /* sign */, true /* bip32derivs */, nullptr, psbtx, complete);
+            } catch (const std::runtime_error& e) {
+                QMessageBox::critical(nullptr, tr("Sign failed"), e.what());
+                send_failure = true;
+                return;
+            }
+            if (err == TransactionError::EXTERNAL_SIGNER_NOT_FOUND) {
+                //: "External signer" means using devices such as hardware wallets.
+                QMessageBox::critical(nullptr, tr("External signer not found"), "External signer not found");
+                send_failure = true;
+                return;
+            }
+            if (err == TransactionError::EXTERNAL_SIGNER_FAILED) {
+                //: "External signer" means using devices such as hardware wallets.
+                QMessageBox::critical(nullptr, tr("External signer failure"), "External signer failure");
+                send_failure = true;
+                return;
+            }
+            if (err != TransactionError::OK) {
+                tfm::format(std::cerr, "Failed to sign PSBT");
+                processSendCoinsReturn(WalletModel::TransactionCreationFailed);
+                send_failure = true;
+                return;
+            }
+            // fillPSBT does not always properly finalize
+            complete = FinalizeAndExtractPSBT(psbtx, mtx);
+        }
+
+        // Broadcast transaction if complete (even with an external signer this
+        // is not always the case, e.g. in a multisig wallet).
+        if (complete) {
+            const CTransactionRef tx = MakeTransactionRef(mtx);
+            m_current_transaction->setWtx(tx);
+            WalletModel::SendCoinsReturn sendStatus = model->sendCo
