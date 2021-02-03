@@ -460,4 +460,246 @@ void SendCoinsDialog::sendButtonClicked([[maybe_unused]] bool checked)
         if (complete) {
             const CTransactionRef tx = MakeTransactionRef(mtx);
             m_current_transaction->setWtx(tx);
-            WalletModel::SendCoinsReturn sendStatus = model->sendCo
+            WalletModel::SendCoinsReturn sendStatus = model->sendCoins(*m_current_transaction);
+            // process sendStatus and on error generate message shown to user
+            processSendCoinsReturn(sendStatus);
+
+            if (sendStatus.status == WalletModel::OK) {
+                Q_EMIT coinsSent(m_current_transaction->getWtx()->GetHash());
+            } else {
+                send_failure = true;
+            }
+            return;
+        }
+
+        // Copy PSBT to clipboard and offer to save
+        assert(!complete);
+        // Serialize the PSBT
+        CDataStream ssTx(SER_NETWORK, PROTOCOL_VERSION);
+        ssTx << psbtx;
+        GUIUtil::setClipboard(EncodeBase64(ssTx.str()).c_str());
+        QMessageBox msgBox;
+        msgBox.setText("Unsigned Transaction");
+        msgBox.setInformativeText("The PSBT has been copied to the clipboard. You can also save it.");
+        msgBox.setStandardButtons(QMessageBox::Save | QMessageBox::Discard);
+        msgBox.setDefaultButton(QMessageBox::Discard);
+        switch (msgBox.exec()) {
+        case QMessageBox::Save: {
+            QString selectedFilter;
+            QString fileNameSuggestion = "";
+            bool first = true;
+            for (const SendCoinsRecipient &rcp : m_current_transaction->getRecipients()) {
+                if (!first) {
+                    fileNameSuggestion.append(" - ");
+                }
+                QString labelOrAddress = rcp.label.isEmpty() ? rcp.address : rcp.label;
+                QString amount = BitcoinUnits::formatWithUnit(model->getOptionsModel()->getDisplayUnit(), rcp.amount);
+                fileNameSuggestion.append(labelOrAddress + "-" + amount);
+                first = false;
+            }
+            fileNameSuggestion.append(".psbt");
+            QString filename = GUIUtil::getSaveFileName(this,
+                tr("Save Transaction Data"), fileNameSuggestion,
+                //: Expanded name of the binary PSBT file format. See: BIP 174.
+                tr("Partially Signed Transaction (Binary)") + QLatin1String(" (*.psbt)"), &selectedFilter);
+            if (filename.isEmpty()) {
+                return;
+            }
+            std::ofstream out(filename.toLocal8Bit().data(), std::ofstream::out | std::ofstream::binary);
+            out << ssTx.str();
+            out.close();
+            Q_EMIT message(tr("PSBT saved"), "PSBT saved to disk", CClientUIInterface::MSG_INFORMATION);
+            break;
+        }
+        case QMessageBox::Discard:
+            break;
+        default:
+            assert(false);
+        } // msgBox.exec()
+    } else {
+        assert(!model->wallet().privateKeysDisabled());
+        // now send the prepared transaction
+        WalletModel::SendCoinsReturn sendStatus = model->sendCoins(*m_current_transaction);
+        // process sendStatus and on error generate message shown to user
+        processSendCoinsReturn(sendStatus);
+
+        if (sendStatus.status == WalletModel::OK) {
+            Q_EMIT coinsSent(m_current_transaction->getWtx()->GetHash());
+        } else {
+            send_failure = true;
+        }
+    }
+    if (!send_failure) {
+        accept();
+        m_coin_control->UnSelectAll();
+        coinControlUpdateLabels();
+    }
+    fNewRecipientAllowed = true;
+    m_current_transaction.reset();
+}
+
+void SendCoinsDialog::clear()
+{
+    m_current_transaction.reset();
+
+    // Clear coin control settings
+    m_coin_control->UnSelectAll();
+    ui->checkBoxCoinControlChange->setChecked(false);
+    ui->lineEditCoinControlChange->clear();
+    coinControlUpdateLabels();
+
+    // Remove entries until only one left
+    while(ui->entries->count())
+    {
+        ui->entries->takeAt(0)->widget()->deleteLater();
+    }
+    addEntry();
+
+    updateTabsAndLabels();
+}
+
+void SendCoinsDialog::reject()
+{
+    clear();
+}
+
+void SendCoinsDialog::accept()
+{
+    clear();
+}
+
+SendCoinsEntry *SendCoinsDialog::addEntry()
+{
+    SendCoinsEntry *entry = new SendCoinsEntry(platformStyle, this);
+    entry->setModel(model);
+    ui->entries->addWidget(entry);
+    connect(entry, &SendCoinsEntry::removeEntry, this, &SendCoinsDialog::removeEntry);
+    connect(entry, &SendCoinsEntry::useAvailableBalance, this, &SendCoinsDialog::useAvailableBalance);
+    connect(entry, &SendCoinsEntry::payAmountChanged, this, &SendCoinsDialog::coinControlUpdateLabels);
+    connect(entry, &SendCoinsEntry::subtractFeeFromAmountChanged, this, &SendCoinsDialog::coinControlUpdateLabels);
+
+    // Focus the field, so that entry can start immediately
+    entry->clear();
+    entry->setFocus();
+    ui->scrollAreaWidgetContents->resize(ui->scrollAreaWidgetContents->sizeHint());
+    qApp->processEvents();
+    QScrollBar* bar = ui->scrollArea->verticalScrollBar();
+    if(bar)
+        bar->setSliderPosition(bar->maximum());
+
+    updateTabsAndLabels();
+    return entry;
+}
+
+void SendCoinsDialog::updateTabsAndLabels()
+{
+    setupTabChain(nullptr);
+    coinControlUpdateLabels();
+}
+
+void SendCoinsDialog::removeEntry(SendCoinsEntry* entry)
+{
+    entry->hide();
+
+    // If the last entry is about to be removed add an empty one
+    if (ui->entries->count() == 1)
+        addEntry();
+
+    entry->deleteLater();
+
+    updateTabsAndLabels();
+}
+
+QWidget *SendCoinsDialog::setupTabChain(QWidget *prev)
+{
+    for(int i = 0; i < ui->entries->count(); ++i)
+    {
+        SendCoinsEntry *entry = qobject_cast<SendCoinsEntry*>(ui->entries->itemAt(i)->widget());
+        if(entry)
+        {
+            prev = entry->setupTabChain(prev);
+        }
+    }
+    QWidget::setTabOrder(prev, ui->sendButton);
+    QWidget::setTabOrder(ui->sendButton, ui->clearButton);
+    QWidget::setTabOrder(ui->clearButton, ui->addButton);
+    return ui->addButton;
+}
+
+void SendCoinsDialog::setAddress(const QString &address)
+{
+    SendCoinsEntry *entry = nullptr;
+    // Replace the first entry if it is still unused
+    if(ui->entries->count() == 1)
+    {
+        SendCoinsEntry *first = qobject_cast<SendCoinsEntry*>(ui->entries->itemAt(0)->widget());
+        if(first->isClear())
+        {
+            entry = first;
+        }
+    }
+    if(!entry)
+    {
+        entry = addEntry();
+    }
+
+    entry->setAddress(address);
+}
+
+void SendCoinsDialog::pasteEntry(const SendCoinsRecipient &rv)
+{
+    if(!fNewRecipientAllowed)
+        return;
+
+    SendCoinsEntry *entry = nullptr;
+    // Replace the first entry if it is still unused
+    if(ui->entries->count() == 1)
+    {
+        SendCoinsEntry *first = qobject_cast<SendCoinsEntry*>(ui->entries->itemAt(0)->widget());
+        if(first->isClear())
+        {
+            entry = first;
+        }
+    }
+    if(!entry)
+    {
+        entry = addEntry();
+    }
+
+    entry->setValue(rv);
+    updateTabsAndLabels();
+}
+
+bool SendCoinsDialog::handlePaymentRequest(const SendCoinsRecipient &rv)
+{
+    // Just paste the entry, all pre-checks
+    // are done in paymentserver.cpp.
+    pasteEntry(rv);
+    return true;
+}
+
+void SendCoinsDialog::setBalance(const interfaces::WalletBalances& balances)
+{
+    if(model && model->getOptionsModel())
+    {
+        CAmount balance = balances.balance;
+        if (model->wallet().hasExternalSigner()) {
+            ui->labelBalanceName->setText(tr("External balance:"));
+        } else if (model->wallet().privateKeysDisabled()) {
+            balance = balances.watch_only_balance;
+            ui->labelBalanceName->setText(tr("Watch-only balance:"));
+        }
+        ui->labelBalance->setText(BitcoinUnits::formatWithUnit(model->getOptionsModel()->getDisplayUnit(), balance));
+    }
+}
+
+void SendCoinsDialog::updateDisplayUnit()
+{
+    setBalance(model->wallet().getBalances());
+    ui->customFee->setDisplayUnit(model->getOptionsModel()->getDisplayUnit());
+    updateSmartFeeLabel();
+}
+
+void SendCoinsDialog::processSendCoinsReturn(const WalletModel::SendCoinsReturn &sendCoinsReturn, const QString &msgArg)
+{
+    QPair<QString, CClientUIInterface::MessageBoxFlags> ms
