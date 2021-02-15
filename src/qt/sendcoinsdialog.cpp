@@ -895,4 +895,204 @@ void SendCoinsDialog::coinControlClipboardBytes()
 }
 
 // Coin Control: copy label "Dust" to clipboard
-void SendCoinsDialog::coinControlClipboardL
+void SendCoinsDialog::coinControlClipboardLowOutput()
+{
+    GUIUtil::setClipboard(ui->labelCoinControlLowOutput->text());
+}
+
+// Coin Control: copy label "Change" to clipboard
+void SendCoinsDialog::coinControlClipboardChange()
+{
+    GUIUtil::setClipboard(ui->labelCoinControlChange->text().left(ui->labelCoinControlChange->text().indexOf(" ")).replace(ASYMP_UTF8, ""));
+}
+
+// Coin Control: settings menu - coin control enabled/disabled by user
+void SendCoinsDialog::coinControlFeatureChanged(bool checked)
+{
+    ui->frameCoinControl->setVisible(checked);
+
+    if (!checked && model) { // coin control features disabled
+        m_coin_control = std::make_unique<CCoinControl>();
+    }
+
+    coinControlUpdateLabels();
+}
+
+// Coin Control: button inputs -> show actual coin control dialog
+void SendCoinsDialog::coinControlButtonClicked()
+{
+    auto dlg = new CoinControlDialog(*m_coin_control, model, platformStyle);
+    connect(dlg, &QDialog::finished, this, &SendCoinsDialog::coinControlUpdateLabels);
+    GUIUtil::ShowModalDialogAndDeleteOnClose(dlg);
+}
+
+// Coin Control: checkbox custom change address
+void SendCoinsDialog::coinControlChangeChecked(int state)
+{
+    if (state == Qt::Unchecked)
+    {
+        m_coin_control->destChange = CNoDestination();
+        ui->labelCoinControlChangeLabel->clear();
+    }
+    else
+        // use this to re-validate an already entered address
+        coinControlChangeEdited(ui->lineEditCoinControlChange->text());
+
+    ui->lineEditCoinControlChange->setEnabled((state == Qt::Checked));
+}
+
+// Coin Control: custom change address changed
+void SendCoinsDialog::coinControlChangeEdited(const QString& text)
+{
+    if (model && model->getAddressTableModel())
+    {
+        // Default to no change address until verified
+        m_coin_control->destChange = CNoDestination();
+        ui->labelCoinControlChangeLabel->setStyleSheet("QLabel{color:red;}");
+
+        const CTxDestination dest = DecodeDestination(text.toStdString());
+
+        if (text.isEmpty()) // Nothing entered
+        {
+            ui->labelCoinControlChangeLabel->setText("");
+        }
+        else if (!IsValidDestination(dest)) // Invalid address
+        {
+            ui->labelCoinControlChangeLabel->setText(tr("Warning: Invalid Bitcoin address"));
+        }
+        else // Valid address
+        {
+            if (!model->wallet().isSpendable(dest)) {
+                ui->labelCoinControlChangeLabel->setText(tr("Warning: Unknown change address"));
+
+                // confirmation dialog
+                QMessageBox::StandardButton btnRetVal = QMessageBox::question(this, tr("Confirm custom change address"), tr("The address you selected for change is not part of this wallet. Any or all funds in your wallet may be sent to this address. Are you sure?"),
+                    QMessageBox::Yes | QMessageBox::Cancel, QMessageBox::Cancel);
+
+                if(btnRetVal == QMessageBox::Yes)
+                    m_coin_control->destChange = dest;
+                else
+                {
+                    ui->lineEditCoinControlChange->setText("");
+                    ui->labelCoinControlChangeLabel->setStyleSheet("QLabel{color:black;}");
+                    ui->labelCoinControlChangeLabel->setText("");
+                }
+            }
+            else // Known change address
+            {
+                ui->labelCoinControlChangeLabel->setStyleSheet("QLabel{color:black;}");
+
+                // Query label
+                QString associatedLabel = model->getAddressTableModel()->labelForAddress(text);
+                if (!associatedLabel.isEmpty())
+                    ui->labelCoinControlChangeLabel->setText(associatedLabel);
+                else
+                    ui->labelCoinControlChangeLabel->setText(tr("(no label)"));
+
+                m_coin_control->destChange = dest;
+            }
+        }
+    }
+}
+
+// Coin Control: update labels
+void SendCoinsDialog::coinControlUpdateLabels()
+{
+    if (!model || !model->getOptionsModel())
+        return;
+
+    updateCoinControlState();
+
+    // set pay amounts
+    CoinControlDialog::payAmounts.clear();
+    CoinControlDialog::fSubtractFeeFromAmount = false;
+
+    for(int i = 0; i < ui->entries->count(); ++i)
+    {
+        SendCoinsEntry *entry = qobject_cast<SendCoinsEntry*>(ui->entries->itemAt(i)->widget());
+        if(entry && !entry->isHidden())
+        {
+            SendCoinsRecipient rcp = entry->getValue();
+            CoinControlDialog::payAmounts.append(rcp.amount);
+            if (rcp.fSubtractFeeFromAmount)
+                CoinControlDialog::fSubtractFeeFromAmount = true;
+        }
+    }
+
+    if (m_coin_control->HasSelected())
+    {
+        // actual coin control calculation
+        CoinControlDialog::updateLabels(*m_coin_control, model, this);
+
+        // show coin control stats
+        ui->labelCoinControlAutomaticallySelected->hide();
+        ui->widgetCoinControl->show();
+    }
+    else
+    {
+        // hide coin control stats
+        ui->labelCoinControlAutomaticallySelected->show();
+        ui->widgetCoinControl->hide();
+        ui->labelCoinControlInsuffFunds->hide();
+    }
+}
+
+SendConfirmationDialog::SendConfirmationDialog(const QString& title, const QString& text, const QString& informative_text, const QString& detailed_text, int _secDelay, bool enable_send, bool always_show_unsigned, QWidget* parent)
+    : QMessageBox(parent), secDelay(_secDelay), m_enable_send(enable_send)
+{
+    setIcon(QMessageBox::Question);
+    setWindowTitle(title); // On macOS, the window title is ignored (as required by the macOS Guidelines).
+    setText(text);
+    setInformativeText(informative_text);
+    setDetailedText(detailed_text);
+    setStandardButtons(QMessageBox::Yes | QMessageBox::Cancel);
+    if (always_show_unsigned || !enable_send) addButton(QMessageBox::Save);
+    setDefaultButton(QMessageBox::Cancel);
+    yesButton = button(QMessageBox::Yes);
+    if (confirmButtonText.isEmpty()) {
+        confirmButtonText = yesButton->text();
+    }
+    m_psbt_button = button(QMessageBox::Save);
+    updateButtons();
+    connect(&countDownTimer, &QTimer::timeout, this, &SendConfirmationDialog::countDown);
+}
+
+int SendConfirmationDialog::exec()
+{
+    updateButtons();
+    countDownTimer.start(1000);
+    return QMessageBox::exec();
+}
+
+void SendConfirmationDialog::countDown()
+{
+    secDelay--;
+    updateButtons();
+
+    if(secDelay <= 0)
+    {
+        countDownTimer.stop();
+    }
+}
+
+void SendConfirmationDialog::updateButtons()
+{
+    if(secDelay > 0)
+    {
+        yesButton->setEnabled(false);
+        yesButton->setText(confirmButtonText + (m_enable_send ? (" (" + QString::number(secDelay) + ")") : QString("")));
+        if (m_psbt_button) {
+            m_psbt_button->setEnabled(false);
+            m_psbt_button->setText(m_psbt_button_text + " (" + QString::number(secDelay) + ")");
+        }
+    }
+    else
+    {
+        yesButton->setEnabled(m_enable_send);
+        yesButton->setText(confirmButtonText);
+        if (m_psbt_button) {
+            m_psbt_button->setEnabled(true);
+            m_psbt_button->setText(m_psbt_button_text);
+        }
+    }
+}
