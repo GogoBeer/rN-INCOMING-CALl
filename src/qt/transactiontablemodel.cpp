@@ -631,4 +631,141 @@ QVariant TransactionTableModel::data(const QModelIndex &index, int role) const
         {
             QString details;
             QDateTime date = QDateTime::fromSecsSinceEpoch(rec->time);
-            QString txLabel = walletModel->getAddressTableModel()->labelForAddress(QString::fromStdString(rec->
+            QString txLabel = walletModel->getAddressTableModel()->labelForAddress(QString::fromStdString(rec->address));
+
+            details.append(date.toString("M/d/yy HH:mm"));
+            details.append(" ");
+            details.append(formatTxStatus(rec));
+            details.append(". ");
+            if(!formatTxType(rec).isEmpty()) {
+                details.append(formatTxType(rec));
+                details.append(" ");
+            }
+            if(!rec->address.empty()) {
+                if(txLabel.isEmpty())
+                    details.append(tr("(no label)") + " ");
+                else {
+                    details.append("(");
+                    details.append(txLabel);
+                    details.append(") ");
+                }
+                details.append(QString::fromStdString(rec->address));
+                details.append(" ");
+            }
+            details.append(formatTxAmount(rec, false, BitcoinUnits::SeparatorStyle::NEVER));
+            return details;
+        }
+    case ConfirmedRole:
+        return rec->status.status == TransactionStatus::Status::Confirming || rec->status.status == TransactionStatus::Status::Confirmed;
+    case FormattedAmountRole:
+        // Used for copy/export, so don't include separators
+        return formatTxAmount(rec, false, BitcoinUnits::SeparatorStyle::NEVER);
+    case StatusRole:
+        return rec->status.status;
+    }
+    return QVariant();
+}
+
+QVariant TransactionTableModel::headerData(int section, Qt::Orientation orientation, int role) const
+{
+    if(orientation == Qt::Horizontal)
+    {
+        if(role == Qt::DisplayRole)
+        {
+            return columns[section];
+        }
+        else if (role == Qt::TextAlignmentRole)
+        {
+            return column_alignments[section];
+        } else if (role == Qt::ToolTipRole)
+        {
+            switch(section)
+            {
+            case Status:
+                return tr("Transaction status. Hover over this field to show number of confirmations.");
+            case Date:
+                return tr("Date and time that the transaction was received.");
+            case Type:
+                return tr("Type of transaction.");
+            case Watchonly:
+                return tr("Whether or not a watch-only address is involved in this transaction.");
+            case ToAddress:
+                return tr("User-defined intent/purpose of the transaction.");
+            case Amount:
+                return tr("Amount removed from or added to balance.");
+            }
+        }
+    }
+    return QVariant();
+}
+
+QModelIndex TransactionTableModel::index(int row, int column, const QModelIndex &parent) const
+{
+    Q_UNUSED(parent);
+    TransactionRecord* data = priv->index(walletModel->wallet(), walletModel->getLastBlockProcessed(), row);
+    if(data)
+    {
+        return createIndex(row, column, data);
+    }
+    return QModelIndex();
+}
+
+void TransactionTableModel::updateDisplayUnit()
+{
+    // emit dataChanged to update Amount column with the current unit
+    updateAmountColumnTitle();
+    Q_EMIT dataChanged(index(0, Amount), index(priv->size()-1, Amount));
+}
+
+void TransactionTablePriv::NotifyTransactionChanged(const uint256 &hash, ChangeType status)
+{
+    // Find transaction in wallet
+    // Determine whether to show transaction or not (determine this here so that no relocking is needed in GUI thread)
+    bool showTransaction = TransactionRecord::showTransaction();
+
+    TransactionNotification notification(hash, status, showTransaction);
+
+    if (!m_loaded || m_loading)
+    {
+        vQueueNotifications.push_back(notification);
+        return;
+    }
+    notification.invoke(parent);
+}
+
+void TransactionTablePriv::DispatchNotifications()
+{
+    if (!m_loaded || m_loading) return;
+
+    if (vQueueNotifications.size() > 10) { // prevent balloon spam, show maximum 10 balloons
+        bool invoked = QMetaObject::invokeMethod(parent, "setProcessingQueuedTransactions", Qt::QueuedConnection, Q_ARG(bool, true));
+        assert(invoked);
+    }
+    for (unsigned int i = 0; i < vQueueNotifications.size(); ++i)
+    {
+        if (vQueueNotifications.size() - i <= 10) {
+            bool invoked = QMetaObject::invokeMethod(parent, "setProcessingQueuedTransactions", Qt::QueuedConnection, Q_ARG(bool, false));
+            assert(invoked);
+        }
+
+        vQueueNotifications[i].invoke(parent);
+    }
+    vQueueNotifications.clear();
+}
+
+void TransactionTableModel::subscribeToCoreSignals()
+{
+    // Connect signals to wallet
+    m_handler_transaction_changed = walletModel->wallet().handleTransactionChanged(std::bind(&TransactionTablePriv::NotifyTransactionChanged, priv, std::placeholders::_1, std::placeholders::_2));
+    m_handler_show_progress = walletModel->wallet().handleShowProgress([this](const std::string&, int progress) {
+        priv->m_loading = progress < 100;
+        priv->DispatchNotifications();
+    });
+}
+
+void TransactionTableModel::unsubscribeFromCoreSignals()
+{
+    // Disconnect signals from wallet
+    m_handler_transaction_changed->disconnect();
+    m_handler_show_progress->disconnect();
+}
