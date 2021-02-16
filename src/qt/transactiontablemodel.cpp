@@ -416,4 +416,219 @@ QString TransactionTableModel::formatTxToAddress(const TransactionRecord *wtx, b
 {
     QString watchAddress;
     if (tooltip && wtx->involvesWatchAddress) {
-        // Mark transactions involving watch-only addresses by adding " (watch-on
+        // Mark transactions involving watch-only addresses by adding " (watch-only)"
+        watchAddress = QLatin1String(" (") + tr("watch-only") + QLatin1Char(')');
+    }
+
+    switch(wtx->type)
+    {
+    case TransactionRecord::RecvFromOther:
+        return QString::fromStdString(wtx->address) + watchAddress;
+    case TransactionRecord::RecvWithAddress:
+    case TransactionRecord::SendToAddress:
+    case TransactionRecord::Generated:
+        return lookupAddress(wtx->address, tooltip) + watchAddress;
+    case TransactionRecord::SendToOther:
+        return QString::fromStdString(wtx->address) + watchAddress;
+    case TransactionRecord::SendToSelf:
+        return lookupAddress(wtx->address, tooltip) + watchAddress;
+    default:
+        return tr("(n/a)") + watchAddress;
+    }
+}
+
+QVariant TransactionTableModel::addressColor(const TransactionRecord *wtx) const
+{
+    // Show addresses without label in a less visible color
+    switch(wtx->type)
+    {
+    case TransactionRecord::RecvWithAddress:
+    case TransactionRecord::SendToAddress:
+    case TransactionRecord::Generated:
+        {
+        QString label = walletModel->getAddressTableModel()->labelForAddress(QString::fromStdString(wtx->address));
+        if(label.isEmpty())
+            return COLOR_BAREADDRESS;
+        } break;
+    case TransactionRecord::SendToSelf:
+        return COLOR_BAREADDRESS;
+    default:
+        break;
+    }
+    return QVariant();
+}
+
+QString TransactionTableModel::formatTxAmount(const TransactionRecord *wtx, bool showUnconfirmed, BitcoinUnits::SeparatorStyle separators) const
+{
+    QString str = BitcoinUnits::format(walletModel->getOptionsModel()->getDisplayUnit(), wtx->credit + wtx->debit, false, separators);
+    if(showUnconfirmed)
+    {
+        if(!wtx->status.countsForBalance)
+        {
+            str = QString("[") + str + QString("]");
+        }
+    }
+    return QString(str);
+}
+
+QVariant TransactionTableModel::txStatusDecoration(const TransactionRecord *wtx) const
+{
+    switch(wtx->status.status)
+    {
+    case TransactionStatus::OpenUntilBlock:
+    case TransactionStatus::OpenUntilDate:
+        return COLOR_TX_STATUS_OPENUNTILDATE;
+    case TransactionStatus::Unconfirmed:
+        return QIcon(":/icons/transaction_0");
+    case TransactionStatus::Abandoned:
+        return QIcon(":/icons/transaction_abandoned");
+    case TransactionStatus::Confirming:
+        switch(wtx->status.depth)
+        {
+        case 1: return QIcon(":/icons/transaction_1");
+        case 2: return QIcon(":/icons/transaction_2");
+        case 3: return QIcon(":/icons/transaction_3");
+        case 4: return QIcon(":/icons/transaction_4");
+        default: return QIcon(":/icons/transaction_5");
+        };
+    case TransactionStatus::Confirmed:
+        return QIcon(":/icons/transaction_confirmed");
+    case TransactionStatus::Conflicted:
+        return QIcon(":/icons/transaction_conflicted");
+    case TransactionStatus::Immature: {
+        int total = wtx->status.depth + wtx->status.matures_in;
+        int part = (wtx->status.depth * 4 / total) + 1;
+        return QIcon(QString(":/icons/transaction_%1").arg(part));
+        }
+    case TransactionStatus::NotAccepted:
+        return QIcon(":/icons/transaction_0");
+    default:
+        return COLOR_BLACK;
+    }
+}
+
+QVariant TransactionTableModel::txWatchonlyDecoration(const TransactionRecord *wtx) const
+{
+    if (wtx->involvesWatchAddress)
+        return QIcon(":/icons/eye");
+    else
+        return QVariant();
+}
+
+QString TransactionTableModel::formatTooltip(const TransactionRecord *rec) const
+{
+    QString tooltip = formatTxStatus(rec) + QString("\n") + formatTxType(rec);
+    if(rec->type==TransactionRecord::RecvFromOther || rec->type==TransactionRecord::SendToOther ||
+       rec->type==TransactionRecord::SendToAddress || rec->type==TransactionRecord::RecvWithAddress)
+    {
+        tooltip += QString(" ") + formatTxToAddress(rec, true);
+    }
+    return tooltip;
+}
+
+QVariant TransactionTableModel::data(const QModelIndex &index, int role) const
+{
+    if(!index.isValid())
+        return QVariant();
+    TransactionRecord *rec = static_cast<TransactionRecord*>(index.internalPointer());
+
+    const auto column = static_cast<ColumnIndex>(index.column());
+    switch (role) {
+    case RawDecorationRole:
+        switch (column) {
+        case Status:
+            return txStatusDecoration(rec);
+        case Watchonly:
+            return txWatchonlyDecoration(rec);
+        case Date: return {};
+        case Type: return {};
+        case ToAddress:
+            return txAddressDecoration(rec);
+        case Amount: return {};
+        } // no default case, so the compiler can warn about missing cases
+        assert(false);
+    case Qt::DecorationRole:
+    {
+        QIcon icon = qvariant_cast<QIcon>(index.data(RawDecorationRole));
+        return platformStyle->TextColorIcon(icon);
+    }
+    case Qt::DisplayRole:
+        switch (column) {
+        case Status: return {};
+        case Watchonly: return {};
+        case Date:
+            return formatTxDate(rec);
+        case Type:
+            return formatTxType(rec);
+        case ToAddress:
+            return formatTxToAddress(rec, false);
+        case Amount:
+            return formatTxAmount(rec, true, BitcoinUnits::SeparatorStyle::ALWAYS);
+        } // no default case, so the compiler can warn about missing cases
+        assert(false);
+    case Qt::EditRole:
+        // Edit role is used for sorting, so return the unformatted values
+        switch (column) {
+        case Status:
+            return QString::fromStdString(rec->status.sortKey);
+        case Date:
+            return rec->time;
+        case Type:
+            return formatTxType(rec);
+        case Watchonly:
+            return (rec->involvesWatchAddress ? 1 : 0);
+        case ToAddress:
+            return formatTxToAddress(rec, true);
+        case Amount:
+            return qint64(rec->credit + rec->debit);
+        } // no default case, so the compiler can warn about missing cases
+        assert(false);
+    case Qt::ToolTipRole:
+        return formatTooltip(rec);
+    case Qt::TextAlignmentRole:
+        return column_alignments[index.column()];
+    case Qt::ForegroundRole:
+        // Use the "danger" color for abandoned transactions
+        if(rec->status.status == TransactionStatus::Abandoned)
+        {
+            return COLOR_TX_STATUS_DANGER;
+        }
+        // Non-confirmed (but not immature) as transactions are grey
+        if(!rec->status.countsForBalance && rec->status.status != TransactionStatus::Immature)
+        {
+            return COLOR_UNCONFIRMED;
+        }
+        if(index.column() == Amount && (rec->credit+rec->debit) < 0)
+        {
+            return COLOR_NEGATIVE;
+        }
+        if(index.column() == ToAddress)
+        {
+            return addressColor(rec);
+        }
+        break;
+    case TypeRole:
+        return rec->type;
+    case DateRole:
+        return QDateTime::fromSecsSinceEpoch(rec->time);
+    case WatchonlyRole:
+        return rec->involvesWatchAddress;
+    case WatchonlyDecorationRole:
+        return txWatchonlyDecoration(rec);
+    case LongDescriptionRole:
+        return priv->describe(walletModel->node(), walletModel->wallet(), rec, walletModel->getOptionsModel()->getDisplayUnit());
+    case AddressRole:
+        return QString::fromStdString(rec->address);
+    case LabelRole:
+        return walletModel->getAddressTableModel()->labelForAddress(QString::fromStdString(rec->address));
+    case AmountRole:
+        return qint64(rec->credit + rec->debit);
+    case TxHashRole:
+        return rec->getTxHash();
+    case TxHexRole:
+        return priv->getTxHex(walletModel->wallet(), rec);
+    case TxPlainTextRole:
+        {
+            QString details;
+            QDateTime date = QDateTime::fromSecsSinceEpoch(rec->time);
+            QString txLabel = walletModel->getAddressTableModel()->labelForAddress(QString::fromStdString(rec->
