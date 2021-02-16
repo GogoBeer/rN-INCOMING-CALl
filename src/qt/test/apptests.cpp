@@ -75,4 +75,50 @@ void AppTests::appTests()
         return gArgs.GetDataDirNet() / "blocks";
     }());
 
-    qRegisterMetaType<interfaces::BlockAndHeaderTipInfo>("inter
+    qRegisterMetaType<interfaces::BlockAndHeaderTipInfo>("interfaces::BlockAndHeaderTipInfo");
+    m_app.parameterSetup();
+    m_app.createOptionsModel(true /* reset settings */);
+    QScopedPointer<const NetworkStyle> style(NetworkStyle::instantiate(Params().NetworkIDString()));
+    m_app.setupPlatformStyle();
+    m_app.createWindow(style.data());
+    connect(&m_app, &BitcoinApplication::windowShown, this, &AppTests::guiTests);
+    expectCallback("guiTests");
+    m_app.baseInitialize();
+    m_app.requestInitialize();
+    m_app.exec();
+    m_app.requestShutdown();
+    m_app.exec();
+
+    // Reset global state to avoid interfering with later tests.
+    LogInstance().DisconnectTestLogger();
+    AbortShutdown();
+}
+
+//! Entry point for BitcoinGUI tests.
+void AppTests::guiTests(BitcoinGUI* window)
+{
+    HandleCallback callback{"guiTests", *this};
+    connect(window, &BitcoinGUI::consoleShown, this, &AppTests::consoleTests);
+    expectCallback("consoleTests");
+    QAction* action = window->findChild<QAction*>("openRPCConsoleAction");
+    action->activate(QAction::Trigger);
+}
+
+//! Entry point for RPCConsole tests.
+void AppTests::consoleTests(RPCConsole* console)
+{
+    HandleCallback callback{"consoleTests", *this};
+    TestRpcCommand(console);
+}
+
+//! Destructor to shut down after the last expected callback completes.
+AppTests::HandleCallback::~HandleCallback()
+{
+    auto& callbacks = m_app_tests.m_callbacks;
+    auto it = callbacks.find(m_callback);
+    assert(it != callbacks.end());
+    callbacks.erase(it);
+    if (callbacks.empty()) {
+        m_app_tests.m_app.quit();
+    }
+}
