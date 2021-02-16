@@ -92,4 +92,32 @@ private:
     bool fProcessingQueuedTransactions;
     const PlatformStyle *platformStyle;
 
-    void subscribeToCoreS
+    void subscribeToCoreSignals();
+    void unsubscribeFromCoreSignals();
+
+    QString lookupAddress(const std::string &address, bool tooltip) const;
+    QVariant addressColor(const TransactionRecord *wtx) const;
+    QString formatTxStatus(const TransactionRecord *wtx) const;
+    QString formatTxDate(const TransactionRecord *wtx) const;
+    QString formatTxType(const TransactionRecord *wtx) const;
+    QString formatTxToAddress(const TransactionRecord *wtx, bool tooltip) const;
+    QString formatTxAmount(const TransactionRecord *wtx, bool showUnconfirmed=true, BitcoinUnits::SeparatorStyle separators=BitcoinUnits::SeparatorStyle::STANDARD) const;
+    QString formatTooltip(const TransactionRecord *rec) const;
+    QVariant txStatusDecoration(const TransactionRecord *wtx) const;
+    QVariant txWatchonlyDecoration(const TransactionRecord *wtx) const;
+    QVariant txAddressDecoration(const TransactionRecord *wtx) const;
+
+public Q_SLOTS:
+    /* New transaction, or transaction changed status */
+    void updateTransaction(const QString &hash, int status, bool showTransaction);
+    void updateConfirmations();
+    void updateDisplayUnit();
+    /** Updates the column title to "Amount (DisplayUnit)" and emits headerDataChanged() signal for table headers to react. */
+    void updateAmountColumnTitle();
+    /* Needed to update fProcessingQueuedTransactions through a QueuedConnection */
+    void setProcessingQueuedTransactions(bool value) { fProcessingQueuedTransactions = value; }
+
+    friend class TransactionTablePriv;
+};
+
+#endif // BITCOIN_QT_TRANSACTIONTABLEMODEL_H
