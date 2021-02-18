@@ -156,4 +156,186 @@ TransactionView::TransactionView(const PlatformStyle *platformStyle, QWidget *pa
     if (!transactionView->horizontalHeader()->restoreState(settings.value("TransactionViewHeaderState").toByteArray())) {
         transactionView->setColumnWidth(TransactionTableModel::Status, STATUS_COLUMN_WIDTH);
         transactionView->setColumnWidth(TransactionTableModel::Watchonly, WATCHONLY_COLUMN_WIDTH);
-        transactionView->setColumnWidth(TransactionTableModel::Date, 
+        transactionView->setColumnWidth(TransactionTableModel::Date, DATE_COLUMN_WIDTH);
+        transactionView->setColumnWidth(TransactionTableModel::Type, TYPE_COLUMN_WIDTH);
+        transactionView->setColumnWidth(TransactionTableModel::Amount, AMOUNT_MINIMUM_COLUMN_WIDTH);
+        transactionView->horizontalHeader()->setMinimumSectionSize(MINIMUM_COLUMN_WIDTH);
+        transactionView->horizontalHeader()->setStretchLastSection(true);
+    }
+
+    contextMenu = new QMenu(this);
+    contextMenu->setObjectName("contextMenu");
+    copyAddressAction = contextMenu->addAction(tr("&Copy address"), this, &TransactionView::copyAddress);
+    copyLabelAction = contextMenu->addAction(tr("Copy &label"), this, &TransactionView::copyLabel);
+    contextMenu->addAction(tr("Copy &amount"), this, &TransactionView::copyAmount);
+    contextMenu->addAction(tr("Copy transaction &ID"), this, &TransactionView::copyTxID);
+    contextMenu->addAction(tr("Copy &raw transaction"), this, &TransactionView::copyTxHex);
+    contextMenu->addAction(tr("Copy full transaction &details"), this, &TransactionView::copyTxPlainText);
+    contextMenu->addAction(tr("&Show transaction details"), this, &TransactionView::showDetails);
+    contextMenu->addSeparator();
+    bumpFeeAction = contextMenu->addAction(tr("Increase transaction &fee"));
+    GUIUtil::ExceptionSafeConnect(bumpFeeAction, &QAction::triggered, this, &TransactionView::bumpFee);
+    bumpFeeAction->setObjectName("bumpFeeAction");
+    abandonAction = contextMenu->addAction(tr("A&bandon transaction"), this, &TransactionView::abandonTx);
+    contextMenu->addAction(tr("&Edit address label"), this, &TransactionView::editLabel);
+
+    connect(dateWidget, qOverload<int>(&QComboBox::activated), this, &TransactionView::chooseDate);
+    connect(typeWidget, qOverload<int>(&QComboBox::activated), this, &TransactionView::chooseType);
+    connect(watchOnlyWidget, qOverload<int>(&QComboBox::activated), this, &TransactionView::chooseWatchonly);
+    connect(amountWidget, &QLineEdit::textChanged, amount_typing_delay, qOverload<>(&QTimer::start));
+    connect(amount_typing_delay, &QTimer::timeout, this, &TransactionView::changedAmount);
+    connect(search_widget, &QLineEdit::textChanged, prefix_typing_delay, qOverload<>(&QTimer::start));
+    connect(prefix_typing_delay, &QTimer::timeout, this, &TransactionView::changedSearch);
+
+    connect(transactionView, &QTableView::doubleClicked, this, &TransactionView::doubleClicked);
+    connect(transactionView, &QTableView::customContextMenuRequested, this, &TransactionView::contextualMenu);
+
+    // Double-clicking on a transaction on the transaction history page shows details
+    connect(this, &TransactionView::doubleClicked, this, &TransactionView::showDetails);
+    // Highlight transaction after fee bump
+    connect(this, &TransactionView::bumpedFee, [this](const uint256& txid) {
+      focusTransaction(txid);
+    });
+}
+
+TransactionView::~TransactionView()
+{
+    QSettings settings;
+    settings.setValue("TransactionViewHeaderState", transactionView->horizontalHeader()->saveState());
+}
+
+void TransactionView::setModel(WalletModel *_model)
+{
+    this->model = _model;
+    if(_model)
+    {
+        transactionProxyModel = new TransactionFilterProxy(this);
+        transactionProxyModel->setSourceModel(_model->getTransactionTableModel());
+        transactionProxyModel->setDynamicSortFilter(true);
+        transactionProxyModel->setSortCaseSensitivity(Qt::CaseInsensitive);
+        transactionProxyModel->setFilterCaseSensitivity(Qt::CaseInsensitive);
+        transactionProxyModel->setSortRole(Qt::EditRole);
+        transactionView->setModel(transactionProxyModel);
+        transactionView->sortByColumn(TransactionTableModel::Date, Qt::DescendingOrder);
+
+        if (_model->getOptionsModel())
+        {
+            // Add third party transaction URLs to context menu
+            QStringList listUrls = GUIUtil::SplitSkipEmptyParts(_model->getOptionsModel()->getThirdPartyTxUrls(), "|");
+            bool actions_created = false;
+            for (int i = 0; i < listUrls.size(); ++i)
+            {
+                QString url = listUrls[i].trimmed();
+                QString host = QUrl(url, QUrl::StrictMode).host();
+                if (!host.isEmpty())
+                {
+                    if (!actions_created) {
+                        contextMenu->addSeparator();
+                        actions_created = true;
+                    }
+                    /*: Transactions table context menu action to show the
+                        selected transaction in a third-party block explorer.
+                        %1 is a stand-in argument for the URL of the explorer. */
+                    contextMenu->addAction(tr("Show in %1").arg(host), [this, url] { openThirdPartyTxUrl(url); });
+                }
+            }
+        }
+
+        // show/hide column Watch-only
+        updateWatchOnlyColumn(_model->wallet().haveWatchOnly());
+
+        // Watch-only signal
+        connect(_model, &WalletModel::notifyWatchonlyChanged, this, &TransactionView::updateWatchOnlyColumn);
+    }
+}
+
+void TransactionView::changeEvent(QEvent* e)
+{
+    if (e->type() == QEvent::PaletteChange) {
+        watchOnlyWidget->setItemIcon(
+            TransactionFilterProxy::WatchOnlyFilter_Yes,
+            m_platform_style->SingleColorIcon(QStringLiteral(":/icons/eye_plus")));
+        watchOnlyWidget->setItemIcon(
+            TransactionFilterProxy::WatchOnlyFilter_No,
+            m_platform_style->SingleColorIcon(QStringLiteral(":/icons/eye_minus")));
+    }
+
+    QWidget::changeEvent(e);
+}
+
+void TransactionView::chooseDate(int idx)
+{
+    if (!transactionProxyModel) return;
+    QDate current = QDate::currentDate();
+    dateRangeWidget->setVisible(false);
+    switch(dateWidget->itemData(idx).toInt())
+    {
+    case All:
+        transactionProxyModel->setDateRange(
+                std::nullopt,
+                std::nullopt);
+        break;
+    case Today:
+        transactionProxyModel->setDateRange(
+                GUIUtil::StartOfDay(current),
+                std::nullopt);
+        break;
+    case ThisWeek: {
+        // Find last Monday
+        QDate startOfWeek = current.addDays(-(current.dayOfWeek()-1));
+        transactionProxyModel->setDateRange(
+                GUIUtil::StartOfDay(startOfWeek),
+                std::nullopt);
+
+        } break;
+    case ThisMonth:
+        transactionProxyModel->setDateRange(
+                GUIUtil::StartOfDay(QDate(current.year(), current.month(), 1)),
+                std::nullopt);
+        break;
+    case LastMonth:
+        transactionProxyModel->setDateRange(
+                GUIUtil::StartOfDay(QDate(current.year(), current.month(), 1).addMonths(-1)),
+                GUIUtil::StartOfDay(QDate(current.year(), current.month(), 1)));
+        break;
+    case ThisYear:
+        transactionProxyModel->setDateRange(
+                GUIUtil::StartOfDay(QDate(current.year(), 1, 1)),
+                std::nullopt);
+        break;
+    case Range:
+        dateRangeWidget->setVisible(true);
+        dateRangeChanged();
+        break;
+    }
+}
+
+void TransactionView::chooseType(int idx)
+{
+    if(!transactionProxyModel)
+        return;
+    transactionProxyModel->setTypeFilter(
+        typeWidget->itemData(idx).toInt());
+}
+
+void TransactionView::chooseWatchonly(int idx)
+{
+    if(!transactionProxyModel)
+        return;
+    transactionProxyModel->setWatchOnlyFilter(
+        static_cast<TransactionFilterProxy::WatchOnlyFilter>(watchOnlyWidget->itemData(idx).toInt()));
+}
+
+void TransactionView::changedSearch()
+{
+    if(!transactionProxyModel)
+        return;
+    transactionProxyModel->setSearchString(search_widget->text());
+}
+
+void TransactionView::changedAmount()
+{
+    if(!transactionProxyModel)
+        return;
+    CAmount amount_parsed = 0;
+    if (BitcoinUnits::p
