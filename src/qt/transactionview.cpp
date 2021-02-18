@@ -338,4 +338,216 @@ void TransactionView::changedAmount()
     if(!transactionProxyModel)
         return;
     CAmount amount_parsed = 0;
-    if (BitcoinUnits::p
+    if (BitcoinUnits::parse(model->getOptionsModel()->getDisplayUnit(), amountWidget->text(), &amount_parsed)) {
+        transactionProxyModel->setMinAmount(amount_parsed);
+    }
+    else
+    {
+        transactionProxyModel->setMinAmount(0);
+    }
+}
+
+void TransactionView::exportClicked()
+{
+    if (!model || !model->getOptionsModel()) {
+        return;
+    }
+
+    // CSV is currently the only supported format
+    QString filename = GUIUtil::getSaveFileName(this,
+        tr("Export Transaction History"), QString(),
+        /*: Expanded name of the CSV file format.
+            See: https://en.wikipedia.org/wiki/Comma-separated_values. */
+        tr("Comma separated file") + QLatin1String(" (*.csv)"), nullptr);
+
+    if (filename.isNull())
+        return;
+
+    CSVModelWriter writer(filename);
+
+    // name, column, role
+    writer.setModel(transactionProxyModel);
+    writer.addColumn(tr("Confirmed"), 0, TransactionTableModel::ConfirmedRole);
+    if (model->wallet().haveWatchOnly())
+        writer.addColumn(tr("Watch-only"), TransactionTableModel::Watchonly);
+    writer.addColumn(tr("Date"), 0, TransactionTableModel::DateRole);
+    writer.addColumn(tr("Type"), TransactionTableModel::Type, Qt::EditRole);
+    writer.addColumn(tr("Label"), 0, TransactionTableModel::LabelRole);
+    writer.addColumn(tr("Address"), 0, TransactionTableModel::AddressRole);
+    writer.addColumn(BitcoinUnits::getAmountColumnTitle(model->getOptionsModel()->getDisplayUnit()), 0, TransactionTableModel::FormattedAmountRole);
+    writer.addColumn(tr("ID"), 0, TransactionTableModel::TxHashRole);
+
+    if(!writer.write()) {
+        Q_EMIT message(tr("Exporting Failed"), tr("There was an error trying to save the transaction history to %1.").arg(filename),
+            CClientUIInterface::MSG_ERROR);
+    }
+    else {
+        Q_EMIT message(tr("Exporting Successful"), tr("The transaction history was successfully saved to %1.").arg(filename),
+            CClientUIInterface::MSG_INFORMATION);
+    }
+}
+
+void TransactionView::contextualMenu(const QPoint &point)
+{
+    QModelIndex index = transactionView->indexAt(point);
+    QModelIndexList selection = transactionView->selectionModel()->selectedRows(0);
+    if (selection.empty())
+        return;
+
+    // check if transaction can be abandoned, disable context menu action in case it doesn't
+    uint256 hash;
+    hash.SetHex(selection.at(0).data(TransactionTableModel::TxHashRole).toString().toStdString());
+    abandonAction->setEnabled(model->wallet().transactionCanBeAbandoned(hash));
+    bumpFeeAction->setEnabled(model->wallet().transactionCanBeBumped(hash));
+    copyAddressAction->setEnabled(GUIUtil::hasEntryData(transactionView, 0, TransactionTableModel::AddressRole));
+    copyLabelAction->setEnabled(GUIUtil::hasEntryData(transactionView, 0, TransactionTableModel::LabelRole));
+
+    if (index.isValid()) {
+        GUIUtil::PopupMenu(contextMenu, transactionView->viewport()->mapToGlobal(point));
+    }
+}
+
+void TransactionView::abandonTx()
+{
+    if(!transactionView || !transactionView->selectionModel())
+        return;
+    QModelIndexList selection = transactionView->selectionModel()->selectedRows(0);
+
+    // get the hash from the TxHashRole (QVariant / QString)
+    uint256 hash;
+    QString hashQStr = selection.at(0).data(TransactionTableModel::TxHashRole).toString();
+    hash.SetHex(hashQStr.toStdString());
+
+    // Abandon the wallet transaction over the walletModel
+    model->wallet().abandonTransaction(hash);
+
+    // Update the table
+    model->getTransactionTableModel()->updateTransaction(hashQStr, CT_UPDATED, false);
+}
+
+void TransactionView::bumpFee([[maybe_unused]] bool checked)
+{
+    if(!transactionView || !transactionView->selectionModel())
+        return;
+    QModelIndexList selection = transactionView->selectionModel()->selectedRows(0);
+
+    // get the hash from the TxHashRole (QVariant / QString)
+    uint256 hash;
+    QString hashQStr = selection.at(0).data(TransactionTableModel::TxHashRole).toString();
+    hash.SetHex(hashQStr.toStdString());
+
+    // Bump tx fee over the walletModel
+    uint256 newHash;
+    if (model->bumpFee(hash, newHash)) {
+        // Update the table
+        transactionView->selectionModel()->clearSelection();
+        model->getTransactionTableModel()->updateTransaction(hashQStr, CT_UPDATED, true);
+
+        qApp->processEvents();
+        Q_EMIT bumpedFee(newHash);
+    }
+}
+
+void TransactionView::copyAddress()
+{
+    GUIUtil::copyEntryData(transactionView, 0, TransactionTableModel::AddressRole);
+}
+
+void TransactionView::copyLabel()
+{
+    GUIUtil::copyEntryData(transactionView, 0, TransactionTableModel::LabelRole);
+}
+
+void TransactionView::copyAmount()
+{
+    GUIUtil::copyEntryData(transactionView, 0, TransactionTableModel::FormattedAmountRole);
+}
+
+void TransactionView::copyTxID()
+{
+    GUIUtil::copyEntryData(transactionView, 0, TransactionTableModel::TxHashRole);
+}
+
+void TransactionView::copyTxHex()
+{
+    GUIUtil::copyEntryData(transactionView, 0, TransactionTableModel::TxHexRole);
+}
+
+void TransactionView::copyTxPlainText()
+{
+    GUIUtil::copyEntryData(transactionView, 0, TransactionTableModel::TxPlainTextRole);
+}
+
+void TransactionView::editLabel()
+{
+    if(!transactionView->selectionModel() ||!model)
+        return;
+    QModelIndexList selection = transactionView->selectionModel()->selectedRows();
+    if(!selection.isEmpty())
+    {
+        AddressTableModel *addressBook = model->getAddressTableModel();
+        if(!addressBook)
+            return;
+        QString address = selection.at(0).data(TransactionTableModel::AddressRole).toString();
+        if(address.isEmpty())
+        {
+            // If this transaction has no associated address, exit
+            return;
+        }
+        // Is address in address book? Address book can miss address when a transaction is
+        // sent from outside the UI.
+        int idx = addressBook->lookupAddress(address);
+        if(idx != -1)
+        {
+            // Edit sending / receiving address
+            QModelIndex modelIdx = addressBook->index(idx, 0, QModelIndex());
+            // Determine type of address, launch appropriate editor dialog type
+            QString type = modelIdx.data(AddressTableModel::TypeRole).toString();
+
+            auto dlg = new EditAddressDialog(
+                type == AddressTableModel::Receive
+                ? EditAddressDialog::EditReceivingAddress
+                : EditAddressDialog::EditSendingAddress, this);
+            dlg->setModel(addressBook);
+            dlg->loadRow(idx);
+            GUIUtil::ShowModalDialogAndDeleteOnClose(dlg);
+        }
+        else
+        {
+            // Add sending address
+            auto dlg = new EditAddressDialog(EditAddressDialog::NewSendingAddress,
+                this);
+            dlg->setModel(addressBook);
+            dlg->setAddress(address);
+            GUIUtil::ShowModalDialogAndDeleteOnClose(dlg);
+        }
+    }
+}
+
+void TransactionView::showDetails()
+{
+    if(!transactionView->selectionModel())
+        return;
+    QModelIndexList selection = transactionView->selectionModel()->selectedRows();
+    if(!selection.isEmpty())
+    {
+        TransactionDescDialog *dlg = new TransactionDescDialog(selection.at(0));
+        dlg->setAttribute(Qt::WA_DeleteOnClose);
+        dlg->show();
+    }
+}
+
+void TransactionView::openThirdPartyTxUrl(QString url)
+{
+    if(!transactionView || !transactionView->selectionModel())
+        return;
+    QModelIndexList selection = transactionView->selectionModel()->selectedRows(0);
+    if(!selection.isEmpty())
+         QDesktopServices::openUrl(QUrl::fromUserInput(url.replace("%s", selection.at(0).data(TransactionTableModel::TxHashRole).toString())));
+}
+
+QWidget *TransactionView::createDateRangeWidget()
+{
+    dateRangeWidget = new QFrame();
+    dateRangeWidget->setFrameStyle(QFrame::Panel | QFrame::Raised);
+    dateRangeWidget->setContentsMargi
