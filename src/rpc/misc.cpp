@@ -283,4 +283,200 @@ static RPCHelpMan deriveaddresses()
     UniValue addresses(UniValue::VARR);
 
     for (int i = range_begin; i <= range_end; ++i) {
-      
+        FlatSigningProvider provider;
+        std::vector<CScript> scripts;
+        if (!desc->Expand(i, key_provider, scripts, provider)) {
+            throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Cannot derive script without private keys");
+        }
+
+        for (const CScript &script : scripts) {
+            CTxDestination dest;
+            if (!ExtractDestination(script, dest)) {
+                throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Descriptor does not have a corresponding address");
+            }
+
+            addresses.push_back(EncodeDestination(dest));
+        }
+    }
+
+    // This should not be possible, but an assert seems overkill:
+    if (addresses.empty()) {
+        throw JSONRPCError(RPC_MISC_ERROR, "Unexpected empty result");
+    }
+
+    return addresses;
+},
+    };
+}
+
+static RPCHelpMan verifymessage()
+{
+    return RPCHelpMan{"verifymessage",
+                "Verify a signed message.",
+                {
+                    {"address", RPCArg::Type::STR, RPCArg::Optional::NO, "The bitcoin address to use for the signature."},
+                    {"signature", RPCArg::Type::STR, RPCArg::Optional::NO, "The signature provided by the signer in base 64 encoding (see signmessage)."},
+                    {"message", RPCArg::Type::STR, RPCArg::Optional::NO, "The message that was signed."},
+                },
+                RPCResult{
+                    RPCResult::Type::BOOL, "", "If the signature is verified or not."
+                },
+                RPCExamples{
+            "\nUnlock the wallet for 30 seconds\n"
+            + HelpExampleCli("walletpassphrase", "\"mypassphrase\" 30") +
+            "\nCreate the signature\n"
+            + HelpExampleCli("signmessage", "\"1D1ZrZNe3JUo7ZycKEYQQiQAWd9y54F4XX\" \"my message\"") +
+            "\nVerify the signature\n"
+            + HelpExampleCli("verifymessage", "\"1D1ZrZNe3JUo7ZycKEYQQiQAWd9y54F4XX\" \"signature\" \"my message\"") +
+            "\nAs a JSON-RPC call\n"
+            + HelpExampleRpc("verifymessage", "\"1D1ZrZNe3JUo7ZycKEYQQiQAWd9y54F4XX\", \"signature\", \"my message\"")
+                },
+        [&](const RPCHelpMan& self, const JSONRPCRequest& request) -> UniValue
+{
+    LOCK(cs_main);
+
+    std::string strAddress  = request.params[0].get_str();
+    std::string strSign     = request.params[1].get_str();
+    std::string strMessage  = request.params[2].get_str();
+
+    switch (MessageVerify(strAddress, strSign, strMessage)) {
+    case MessageVerificationResult::ERR_INVALID_ADDRESS:
+        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid address");
+    case MessageVerificationResult::ERR_ADDRESS_NO_KEY:
+        throw JSONRPCError(RPC_TYPE_ERROR, "Address does not refer to key");
+    case MessageVerificationResult::ERR_MALFORMED_SIGNATURE:
+        throw JSONRPCError(RPC_TYPE_ERROR, "Malformed base64 encoding");
+    case MessageVerificationResult::ERR_PUBKEY_NOT_RECOVERED:
+    case MessageVerificationResult::ERR_NOT_SIGNED:
+        return false;
+    case MessageVerificationResult::OK:
+        return true;
+    }
+
+    return false;
+},
+    };
+}
+
+static RPCHelpMan signmessagewithprivkey()
+{
+    return RPCHelpMan{"signmessagewithprivkey",
+                "\nSign a message with the private key of an address\n",
+                {
+                    {"privkey", RPCArg::Type::STR, RPCArg::Optional::NO, "The private key to sign the message with."},
+                    {"message", RPCArg::Type::STR, RPCArg::Optional::NO, "The message to create a signature of."},
+                },
+                RPCResult{
+                    RPCResult::Type::STR, "signature", "The signature of the message encoded in base 64"
+                },
+                RPCExamples{
+            "\nCreate the signature\n"
+            + HelpExampleCli("signmessagewithprivkey", "\"privkey\" \"my message\"") +
+            "\nVerify the signature\n"
+            + HelpExampleCli("verifymessage", "\"1D1ZrZNe3JUo7ZycKEYQQiQAWd9y54F4XX\" \"signature\" \"my message\"") +
+            "\nAs a JSON-RPC call\n"
+            + HelpExampleRpc("signmessagewithprivkey", "\"privkey\", \"my message\"")
+                },
+        [&](const RPCHelpMan& self, const JSONRPCRequest& request) -> UniValue
+{
+    std::string strPrivkey = request.params[0].get_str();
+    std::string strMessage = request.params[1].get_str();
+
+    CKey key = DecodeSecret(strPrivkey);
+    if (!key.IsValid()) {
+        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid private key");
+    }
+
+    std::string signature;
+
+    if (!MessageSign(key, strMessage, signature)) {
+        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Sign failed");
+    }
+
+    return signature;
+},
+    };
+}
+
+static RPCHelpMan setmocktime()
+{
+    return RPCHelpMan{"setmocktime",
+        "\nSet the local time to given timestamp (-regtest only)\n",
+        {
+            {"timestamp", RPCArg::Type::NUM, RPCArg::Optional::NO, UNIX_EPOCH_TIME + "\n"
+             "Pass 0 to go back to using the system time."},
+        },
+        RPCResult{RPCResult::Type::NONE, "", ""},
+        RPCExamples{""},
+        [&](const RPCHelpMan& self, const JSONRPCRequest& request) -> UniValue
+{
+    if (!Params().IsMockableChain()) {
+        throw std::runtime_error("setmocktime is for regression testing (-regtest mode) only");
+    }
+
+    // For now, don't change mocktime if we're in the middle of validation, as
+    // this could have an effect on mempool time-based eviction, as well as
+    // IsCurrentForFeeEstimation() and IsInitialBlockDownload().
+    // TODO: figure out the right way to synchronize around mocktime, and
+    // ensure all call sites of GetTime() are accessing this safely.
+    LOCK(cs_main);
+
+    RPCTypeCheck(request.params, {UniValue::VNUM});
+    const int64_t time{request.params[0].get_int64()};
+    if (time < 0) {
+        throw JSONRPCError(RPC_INVALID_PARAMETER, strprintf("Mocktime can not be negative: %s.", time));
+    }
+    SetMockTime(time);
+    auto node_context = util::AnyPtr<NodeContext>(request.context);
+    if (node_context) {
+        for (const auto& chain_client : node_context->chain_clients) {
+            chain_client->setMockTime(time);
+        }
+    }
+
+    return NullUniValue;
+},
+    };
+}
+
+#if defined(USE_SYSCALL_SANDBOX)
+static RPCHelpMan invokedisallowedsyscall()
+{
+    return RPCHelpMan{
+        "invokedisallowedsyscall",
+        "\nInvoke a disallowed syscall to trigger a syscall sandbox violation. Used for testing purposes.\n",
+        {},
+        RPCResult{RPCResult::Type::NONE, "", ""},
+        RPCExamples{
+            HelpExampleCli("invokedisallowedsyscall", "") + HelpExampleRpc("invokedisallowedsyscall", "")},
+        [&](const RPCHelpMan& self, const JSONRPCRequest& request) -> UniValue {
+            if (!Params().IsTestChain()) {
+                throw std::runtime_error("invokedisallowedsyscall is used for testing only.");
+            }
+            TestDisallowedSandboxCall();
+            return NullUniValue;
+        },
+    };
+}
+#endif // USE_SYSCALL_SANDBOX
+
+static RPCHelpMan mockscheduler()
+{
+    return RPCHelpMan{"mockscheduler",
+        "\nBump the scheduler into the future (-regtest only)\n",
+        {
+            {"delta_time", RPCArg::Type::NUM, RPCArg::Optional::NO, "Number of seconds to forward the scheduler into the future." },
+        },
+        RPCResult{RPCResult::Type::NONE, "", ""},
+        RPCExamples{""},
+        [&](const RPCHelpMan& self, const JSONRPCRequest& request) -> UniValue
+{
+    if (!Params().IsMockableChain()) {
+        throw std::runtime_error("mockscheduler is for regression testing (-regtest mode) only");
+    }
+
+    // check params are valid values
+    RPCTypeCheck(request.params, {UniValue::VNUM});
+    int64_t delta_seconds = request.params[0].get_int64();
+    if (delta_seconds <= 0 || delta_seconds > 3600) {
+        throw std::runtime_error("delta_time must be between 
