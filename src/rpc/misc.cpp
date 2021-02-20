@@ -479,4 +479,182 @@ static RPCHelpMan mockscheduler()
     RPCTypeCheck(request.params, {UniValue::VNUM});
     int64_t delta_seconds = request.params[0].get_int64();
     if (delta_seconds <= 0 || delta_seconds > 3600) {
-        throw std::runtime_error("delta_time must be between 
+        throw std::runtime_error("delta_time must be between 1 and 3600 seconds (1 hr)");
+    }
+
+    auto node_context = util::AnyPtr<NodeContext>(request.context);
+    // protect against null pointer dereference
+    CHECK_NONFATAL(node_context);
+    CHECK_NONFATAL(node_context->scheduler);
+    node_context->scheduler->MockForward(std::chrono::seconds(delta_seconds));
+
+    return NullUniValue;
+},
+    };
+}
+
+static UniValue RPCLockedMemoryInfo()
+{
+    LockedPool::Stats stats = LockedPoolManager::Instance().stats();
+    UniValue obj(UniValue::VOBJ);
+    obj.pushKV("used", uint64_t(stats.used));
+    obj.pushKV("free", uint64_t(stats.free));
+    obj.pushKV("total", uint64_t(stats.total));
+    obj.pushKV("locked", uint64_t(stats.locked));
+    obj.pushKV("chunks_used", uint64_t(stats.chunks_used));
+    obj.pushKV("chunks_free", uint64_t(stats.chunks_free));
+    return obj;
+}
+
+#ifdef HAVE_MALLOC_INFO
+static std::string RPCMallocInfo()
+{
+    char *ptr = nullptr;
+    size_t size = 0;
+    FILE *f = open_memstream(&ptr, &size);
+    if (f) {
+        malloc_info(0, f);
+        fclose(f);
+        if (ptr) {
+            std::string rv(ptr, size);
+            free(ptr);
+            return rv;
+        }
+    }
+    return "";
+}
+#endif
+
+static RPCHelpMan getmemoryinfo()
+{
+    /* Please, avoid using the word "pool" here in the RPC interface or help,
+     * as users will undoubtedly confuse it with the other "memory pool"
+     */
+    return RPCHelpMan{"getmemoryinfo",
+                "Returns an object containing information about memory usage.\n",
+                {
+                    {"mode", RPCArg::Type::STR, RPCArg::Default{"stats"}, "determines what kind of information is returned.\n"
+            "  - \"stats\" returns general statistics about memory usage in the daemon.\n"
+            "  - \"mallocinfo\" returns an XML string describing low-level heap state (only available if compiled with glibc 2.10+)."},
+                },
+                {
+                    RPCResult{"mode \"stats\"",
+                        RPCResult::Type::OBJ, "", "",
+                        {
+                            {RPCResult::Type::OBJ, "locked", "Information about locked memory manager",
+                            {
+                                {RPCResult::Type::NUM, "used", "Number of bytes used"},
+                                {RPCResult::Type::NUM, "free", "Number of bytes available in current arenas"},
+                                {RPCResult::Type::NUM, "total", "Total number of bytes managed"},
+                                {RPCResult::Type::NUM, "locked", "Amount of bytes that succeeded locking. If this number is smaller than total, locking pages failed at some point and key data could be swapped to disk."},
+                                {RPCResult::Type::NUM, "chunks_used", "Number allocated chunks"},
+                                {RPCResult::Type::NUM, "chunks_free", "Number unused chunks"},
+                            }},
+                        }
+                    },
+                    RPCResult{"mode \"mallocinfo\"",
+                        RPCResult::Type::STR, "", "\"<malloc version=\"1\">...\""
+                    },
+                },
+                RPCExamples{
+                    HelpExampleCli("getmemoryinfo", "")
+            + HelpExampleRpc("getmemoryinfo", "")
+                },
+        [&](const RPCHelpMan& self, const JSONRPCRequest& request) -> UniValue
+{
+    std::string mode = request.params[0].isNull() ? "stats" : request.params[0].get_str();
+    if (mode == "stats") {
+        UniValue obj(UniValue::VOBJ);
+        obj.pushKV("locked", RPCLockedMemoryInfo());
+        return obj;
+    } else if (mode == "mallocinfo") {
+#ifdef HAVE_MALLOC_INFO
+        return RPCMallocInfo();
+#else
+        throw JSONRPCError(RPC_INVALID_PARAMETER, "mallocinfo mode not available");
+#endif
+    } else {
+        throw JSONRPCError(RPC_INVALID_PARAMETER, "unknown mode " + mode);
+    }
+},
+    };
+}
+
+static void EnableOrDisableLogCategories(UniValue cats, bool enable) {
+    cats = cats.get_array();
+    for (unsigned int i = 0; i < cats.size(); ++i) {
+        std::string cat = cats[i].get_str();
+
+        bool success;
+        if (enable) {
+            success = LogInstance().EnableCategory(cat);
+        } else {
+            success = LogInstance().DisableCategory(cat);
+        }
+
+        if (!success) {
+            throw JSONRPCError(RPC_INVALID_PARAMETER, "unknown logging category " + cat);
+        }
+    }
+}
+
+static RPCHelpMan logging()
+{
+    return RPCHelpMan{"logging",
+            "Gets and sets the logging configuration.\n"
+            "When called without an argument, returns the list of categories with status that are currently being debug logged or not.\n"
+            "When called with arguments, adds or removes categories from debug logging and return the lists above.\n"
+            "The arguments are evaluated in order \"include\", \"exclude\".\n"
+            "If an item is both included and excluded, it will thus end up being excluded.\n"
+            "The valid logging categories are: " + LogInstance().LogCategoriesString() + "\n"
+            "In addition, the following are available as category names with special meanings:\n"
+            "  - \"all\",  \"1\" : represent all logging categories.\n"
+            "  - \"none\", \"0\" : even if other logging categories are specified, ignore all of them.\n"
+            ,
+                {
+                    {"include", RPCArg::Type::ARR, RPCArg::Optional::OMITTED_NAMED_ARG, "The categories to add to debug logging",
+                        {
+                            {"include_category", RPCArg::Type::STR, RPCArg::Optional::OMITTED, "the valid logging category"},
+                        }},
+                    {"exclude", RPCArg::Type::ARR, RPCArg::Optional::OMITTED_NAMED_ARG, "The categories to remove from debug logging",
+                        {
+                            {"exclude_category", RPCArg::Type::STR, RPCArg::Optional::OMITTED, "the valid logging category"},
+                        }},
+                },
+                RPCResult{
+                    RPCResult::Type::OBJ_DYN, "", "keys are the logging categories, and values indicates its status",
+                    {
+                        {RPCResult::Type::BOOL, "category", "if being debug logged or not. false:inactive, true:active"},
+                    }
+                },
+                RPCExamples{
+                    HelpExampleCli("logging", "\"[\\\"all\\\"]\" \"[\\\"http\\\"]\"")
+            + HelpExampleRpc("logging", "[\"all\"], [\"libevent\"]")
+                },
+        [&](const RPCHelpMan& self, const JSONRPCRequest& request) -> UniValue
+{
+    uint32_t original_log_categories = LogInstance().GetCategoryMask();
+    if (request.params[0].isArray()) {
+        EnableOrDisableLogCategories(request.params[0], true);
+    }
+    if (request.params[1].isArray()) {
+        EnableOrDisableLogCategories(request.params[1], false);
+    }
+    uint32_t updated_log_categories = LogInstance().GetCategoryMask();
+    uint32_t changed_log_categories = original_log_categories ^ updated_log_categories;
+
+    // Update libevent logging if BCLog::LIBEVENT has changed.
+    // If the library version doesn't allow it, UpdateHTTPServerLogging() returns false,
+    // in which case we should clear the BCLog::LIBEVENT flag.
+    // Throw an error if the user has explicitly asked to change only the libevent
+    // flag and it failed.
+    if (changed_log_categories & BCLog::LIBEVENT) {
+        if (!UpdateHTTPServerLogging(LogInstance().WillLogCategory(BCLog::LIBEVENT))) {
+            LogInstance().DisableCategory(BCLog::LIBEVENT);
+            if (changed_log_categories == BCLog::LIBEVENT) {
+            throw JSONRPCError(RPC_INVALID_PARAMETER, "libevent logging cannot be updated when using libevent before v2.1.1.");
+            }
+        }
+    }
+
+ 
