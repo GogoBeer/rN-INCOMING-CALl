@@ -44,4 +44,10 @@ class ShutdownWindow : public QWidget
 
 public:
     explicit ShutdownWindow(QWidget *parent=nullptr, Qt::WindowFlags f=Qt::Widget);
-    static QWidget* showShutdown
+    static QWidget* showShutdownWindow(QMainWindow* window);
+
+protected:
+    void closeEvent(QCloseEvent *event) override;
+};
+
+#endif // BITCOIN_QT_UTILITYDIALOG_H
