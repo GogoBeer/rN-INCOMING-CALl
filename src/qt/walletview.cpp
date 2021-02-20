@@ -185,4 +185,98 @@ void WalletView::gotoVerifyMessageTab(QString addr)
 {
     // calls show() in showTab_VM()
     SignVerifyMessageDialog *signVerifyMessageDialog = new SignVerifyMessageDialog(platformStyle, this);
-    signVerifyMessageDialog->setAttrib
+    signVerifyMessageDialog->setAttribute(Qt::WA_DeleteOnClose);
+    signVerifyMessageDialog->setModel(walletModel);
+    signVerifyMessageDialog->showTab_VM(true);
+
+    if (!addr.isEmpty())
+        signVerifyMessageDialog->setAddress_VM(addr);
+}
+
+bool WalletView::handlePaymentRequest(const SendCoinsRecipient& recipient)
+{
+    return sendCoinsPage->handlePaymentRequest(recipient);
+}
+
+void WalletView::showOutOfSyncWarning(bool fShow)
+{
+    overviewPage->showOutOfSyncWarning(fShow);
+}
+
+void WalletView::encryptWallet()
+{
+    auto dlg = new AskPassphraseDialog(AskPassphraseDialog::Encrypt, this);
+    dlg->setModel(walletModel);
+    connect(dlg, &QDialog::finished, this, &WalletView::encryptionStatusChanged);
+    GUIUtil::ShowModalDialogAndDeleteOnClose(dlg);
+}
+
+void WalletView::backupWallet()
+{
+    QString filename = GUIUtil::getSaveFileName(this,
+        tr("Backup Wallet"), QString(),
+        //: Name of the wallet data file format.
+        tr("Wallet Data") + QLatin1String(" (*.dat)"), nullptr);
+
+    if (filename.isEmpty())
+        return;
+
+    if (!walletModel->wallet().backupWallet(filename.toLocal8Bit().data())) {
+        Q_EMIT message(tr("Backup Failed"), tr("There was an error trying to save the wallet data to %1.").arg(filename),
+            CClientUIInterface::MSG_ERROR);
+        }
+    else {
+        Q_EMIT message(tr("Backup Successful"), tr("The wallet data was successfully saved to %1.").arg(filename),
+            CClientUIInterface::MSG_INFORMATION);
+    }
+}
+
+void WalletView::changePassphrase()
+{
+    auto dlg = new AskPassphraseDialog(AskPassphraseDialog::ChangePass, this);
+    dlg->setModel(walletModel);
+    GUIUtil::ShowModalDialogAndDeleteOnClose(dlg);
+}
+
+void WalletView::unlockWallet()
+{
+    // Unlock wallet when requested by wallet model
+    if (walletModel->getEncryptionStatus() == WalletModel::Locked) {
+        auto dlg = new AskPassphraseDialog(AskPassphraseDialog::Unlock, this);
+        dlg->setModel(walletModel);
+        GUIUtil::ShowModalDialogAndDeleteOnClose(dlg);
+    }
+}
+
+void WalletView::usedSendingAddresses()
+{
+    GUIUtil::bringToFront(usedSendingAddressesPage);
+}
+
+void WalletView::usedReceivingAddresses()
+{
+    GUIUtil::bringToFront(usedReceivingAddressesPage);
+}
+
+void WalletView::showProgress(const QString &title, int nProgress)
+{
+    if (nProgress == 0) {
+        progressDialog = new QProgressDialog(title, tr("Cancel"), 0, 100);
+        GUIUtil::PolishProgressDialog(progressDialog);
+        progressDialog->setWindowModality(Qt::ApplicationModal);
+        progressDialog->setAutoClose(false);
+        progressDialog->setValue(0);
+    } else if (nProgress == 100) {
+        if (progressDialog) {
+            progressDialog->close();
+            progressDialog->deleteLater();
+            progressDialog = nullptr;
+        }
+    } else if (progressDialog) {
+        if (progressDialog->wasCanceled()) {
+            getWalletModel()->wallet().abortRescan();
+        } else {
+            progressDialog->setValue(nProgress);
+        }
+    }
+}
