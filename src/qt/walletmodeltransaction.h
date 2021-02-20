@@ -12,4 +12,36 @@
 
 #include <QObject>
 
-class SendCoinsRecip
+class SendCoinsRecipient;
+
+namespace interfaces {
+class Node;
+}
+
+/** Data model for a walletmodel transaction. */
+class WalletModelTransaction
+{
+public:
+    explicit WalletModelTransaction(const QList<SendCoinsRecipient> &recipients);
+
+    QList<SendCoinsRecipient> getRecipients() const;
+
+    CTransactionRef& getWtx();
+    void setWtx(const CTransactionRef&);
+
+    unsigned int getTransactionSize();
+
+    void setTransactionFee(const CAmount& newFee);
+    CAmount getTransactionFee() const;
+
+    CAmount getTotalTransactionAmount() const;
+
+    void reassignAmounts(int nChangePosRet); // needed for the subtract-fee-from-amount feature
+
+private:
+    QList<SendCoinsRecipient> recipients;
+    CTransactionRef wtx;
+    CAmount fee;
+};
+
+#endif // BITCOIN_QT_WALLETMODELTRANSACTION_H

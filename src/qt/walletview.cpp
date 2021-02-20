@@ -1,0 +1,188 @@
+// Copyright (c) 2011-2021 The Bitcoin Core developers
+// Distributed under the MIT software license, see the accompanying
+// file COPYING or http://www.opensource.org/licenses/mit-license.php.
+
+#include <qt/walletview.h>
+
+#include <qt/addressbookpage.h>
+#include <qt/askpassphrasedialog.h>
+#include <qt/clientmodel.h>
+#include <qt/guiutil.h>
+#include <qt/optionsmodel.h>
+#include <qt/overviewpage.h>
+#include <qt/platformstyle.h>
+#include <qt/receivecoinsdialog.h>
+#include <qt/sendcoinsdialog.h>
+#include <qt/signverifymessagedialog.h>
+#include <qt/transactiontablemodel.h>
+#include <qt/transactionview.h>
+#include <qt/walletmodel.h>
+
+#include <interfaces/node.h>
+#include <node/ui_interface.h>
+#include <util/strencodings.h>
+
+#include <QAction>
+#include <QActionGroup>
+#include <QFileDialog>
+#include <QHBoxLayout>
+#include <QProgressDialog>
+#include <QPushButton>
+#include <QVBoxLayout>
+
+WalletView::WalletView(WalletModel* wallet_model, const PlatformStyle* _platformStyle, QWidget* parent)
+    : QStackedWidget(parent),
+      clientModel(nullptr),
+      walletModel(wallet_model),
+      platformStyle(_platformStyle)
+{
+    assert(walletModel);
+
+    // Create tabs
+    overviewPage = new OverviewPage(platformStyle);
+    overviewPage->setWalletModel(walletModel);
+
+    transactionsPage = new QWidget(this);
+    QVBoxLayout *vbox = new QVBoxLayout();
+    QHBoxLayout *hbox_buttons = new QHBoxLayout();
+    transactionView = new TransactionView(platformStyle, this);
+    transactionView->setModel(walletModel);
+
+    vbox->addWidget(transactionView);
+    QPushButton *exportButton = new QPushButton(tr("&Export"), this);
+    exportButton->setToolTip(tr("Export the data in the current tab to a file"));
+    if (platformStyle->getImagesOnButtons()) {
+        exportButton->setIcon(platformStyle->SingleColorIcon(":/icons/export"));
+    }
+    hbox_buttons->addStretch();
+    hbox_buttons->addWidget(exportButton);
+    vbox->addLayout(hbox_buttons);
+    transactionsPage->setLayout(vbox);
+
+    receiveCoinsPage = new ReceiveCoinsDialog(platformStyle);
+    receiveCoinsPage->setModel(walletModel);
+
+    sendCoinsPage = new SendCoinsDialog(platformStyle);
+    sendCoinsPage->setModel(walletModel);
+
+    usedSendingAddressesPage = new AddressBookPage(platformStyle, AddressBookPage::ForEditing, AddressBookPage::SendingTab, this);
+    usedSendingAddressesPage->setModel(walletModel->getAddressTableModel());
+
+    usedReceivingAddressesPage = new AddressBookPage(platformStyle, AddressBookPage::ForEditing, AddressBookPage::ReceivingTab, this);
+    usedReceivingAddressesPage->setModel(walletModel->getAddressTableModel());
+
+    addWidget(overviewPage);
+    addWidget(transactionsPage);
+    addWidget(receiveCoinsPage);
+    addWidget(sendCoinsPage);
+
+    connect(overviewPage, &OverviewPage::transactionClicked, this, &WalletView::transactionClicked);
+    // Clicking on a transaction on the overview pre-selects the transaction on the transaction history page
+    connect(overviewPage, &OverviewPage::transactionClicked, transactionView, qOverload<const QModelIndex&>(&TransactionView::focusTransaction));
+
+    connect(overviewPage, &OverviewPage::outOfSyncWarningClicked, this, &WalletView::outOfSyncWarningClicked);
+
+    connect(sendCoinsPage, &SendCoinsDialog::coinsSent, this, &WalletView::coinsSent);
+    // Highlight transaction after send
+    connect(sendCoinsPage, &SendCoinsDialog::coinsSent, transactionView, qOverload<const uint256&>(&TransactionView::focusTransaction));
+
+    // Clicking on "Export" allows to export the transaction list
+    connect(exportButton, &QPushButton::clicked, transactionView, &TransactionView::exportClicked);
+
+    // Pass through messages from sendCoinsPage
+    connect(sendCoinsPage, &SendCoinsDialog::message, this, &WalletView::message);
+    // Pass through messages from transactionView
+    connect(transactionView, &TransactionView::message, this, &WalletView::message);
+
+    connect(this, &WalletView::setPrivacy, overviewPage, &OverviewPage::setPrivacy);
+
+    // Receive and pass through messages from wallet model
+    connect(walletModel, &WalletModel::message, this, &WalletView::message);
+
+    // Handle changes in encryption status
+    connect(walletModel, &WalletModel::encryptionStatusChanged, this, &WalletView::encryptionStatusChanged);
+
+    // Balloon pop-up for new transaction
+    connect(walletModel->getTransactionTableModel(), &TransactionTableModel::rowsInserted, this, &WalletView::processNewTransaction);
+
+    // Ask for passphrase if needed
+    connect(walletModel, &WalletModel::requireUnlock, this, &WalletView::unlockWallet);
+
+    // Show progress dialog
+    connect(walletModel, &WalletModel::showProgress, this, &WalletView::showProgress);
+}
+
+WalletView::~WalletView()
+{
+}
+
+void WalletView::setClientModel(ClientModel *_clientModel)
+{
+    this->clientModel = _clientModel;
+
+    overviewPage->setClientModel(_clientModel);
+    sendCoinsPage->setClientModel(_clientModel);
+    walletModel->setClientModel(_clientModel);
+}
+
+void WalletView::processNewTransaction(const QModelIndex& parent, int start, int /*end*/)
+{
+    // Prevent balloon-spam when initial block download is in progress
+    if (!clientModel || clientModel->node().isInitialBlockDownload()) {
+        return;
+    }
+
+    TransactionTableModel *ttm = walletModel->getTransactionTableModel();
+    if (!ttm || ttm->processingQueuedTransactions())
+        return;
+
+    QString date = ttm->index(start, TransactionTableModel::Date, parent).data().toString();
+    qint64 amount = ttm->index(start, TransactionTableModel::Amount, parent).data(Qt::EditRole).toULongLong();
+    QString type = ttm->index(start, TransactionTableModel::Type, parent).data().toString();
+    QModelIndex index = ttm->index(start, 0, parent);
+    QString address = ttm->data(index, TransactionTableModel::AddressRole).toString();
+    QString label = GUIUtil::HtmlEscape(ttm->data(index, TransactionTableModel::LabelRole).toString());
+
+    Q_EMIT incomingTransaction(date, walletModel->getOptionsModel()->getDisplayUnit(), amount, type, address, label, GUIUtil::HtmlEscape(walletModel->getWalletName()));
+}
+
+void WalletView::gotoOverviewPage()
+{
+    setCurrentWidget(overviewPage);
+}
+
+void WalletView::gotoHistoryPage()
+{
+    setCurrentWidget(transactionsPage);
+}
+
+void WalletView::gotoReceiveCoinsPage()
+{
+    setCurrentWidget(receiveCoinsPage);
+}
+
+void WalletView::gotoSendCoinsPage(QString addr)
+{
+    setCurrentWidget(sendCoinsPage);
+
+    if (!addr.isEmpty())
+        sendCoinsPage->setAddress(addr);
+}
+
+void WalletView::gotoSignMessageTab(QString addr)
+{
+    // calls show() in showTab_SM()
+    SignVerifyMessageDialog *signVerifyMessageDialog = new SignVerifyMessageDialog(platformStyle, this);
+    signVerifyMessageDialog->setAttribute(Qt::WA_DeleteOnClose);
+    signVerifyMessageDialog->setModel(walletModel);
+    signVerifyMessageDialog->showTab_SM(true);
+
+    if (!addr.isEmpty())
+        signVerifyMessageDialog->setAddress_SM(addr);
+}
+
+void WalletView::gotoVerifyMessageTab(QString addr)
+{
+    // calls show() in showTab_VM()
+    SignVerifyMessageDialog *signVerifyMessageDialog = new SignVerifyMessageDialog(platformStyle, this);
+    signVerifyMessageDialog->setAttrib
