@@ -41,4 +41,39 @@ static RPCHelpMan enumeratesigners()
         {
             const std::string command = gArgs.GetArg("-signer", "");
             if (command == "") throw JSONRPCError(RPC_MISC_ERROR, "Error: restart bitcoind with -signer=<cmd>");
-            const st
+            const std::string chain = gArgs.GetChainName();
+            UniValue signers_res = UniValue::VARR;
+            try {
+                std::vector<ExternalSigner> signers;
+                ExternalSigner::Enumerate(command, signers, chain);
+                for (const ExternalSigner& signer : signers) {
+                    UniValue signer_res = UniValue::VOBJ;
+                    signer_res.pushKV("fingerprint", signer.m_fingerprint);
+                    signer_res.pushKV("name", signer.m_name);
+                    signers_res.push_back(signer_res);
+                }
+            } catch (const std::exception& e) {
+                throw JSONRPCError(RPC_MISC_ERROR, e.what());
+            }
+            UniValue result(UniValue::VOBJ);
+            result.pushKV("signers", signers_res);
+            return result;
+        }
+    };
+}
+
+void RegisterSignerRPCCommands(CRPCTable &t)
+{
+// clang-format off
+static const CRPCCommand commands[] =
+{ // category              actor (function)
+  // --------------------- ------------------------
+  { "signer",              &enumeratesigners,      },
+};
+// clang-format on
+    for (const auto& c : commands) {
+        t.appendCommand(c.name, &c);
+    }
+}
+
+#endif // ENABLE_EXTERNAL_SIGNER
