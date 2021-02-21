@@ -465,4 +465,168 @@ static RPCHelpMan decoderawtransaction()
                         {RPCResult::Type::STR_HEX, "txid", "The transaction id"},
                         {RPCResult::Type::STR_HEX, "hash", "The transaction hash (differs from txid for witness transactions)"},
                         {RPCResult::Type::NUM, "size", "The transaction size"},
-                        {RPCResult::Type::NUM, "vsize", "The virtual t
+                        {RPCResult::Type::NUM, "vsize", "The virtual transaction size (differs from size for witness transactions)"},
+                        {RPCResult::Type::NUM, "weight", "The transaction's weight (between vsize*4 - 3 and vsize*4)"},
+                        {RPCResult::Type::NUM, "version", "The version"},
+                        {RPCResult::Type::NUM_TIME, "locktime", "The lock time"},
+                        {RPCResult::Type::ARR, "vin", "",
+                        {
+                            {RPCResult::Type::OBJ, "", "",
+                            {
+                                {RPCResult::Type::STR_HEX, "coinbase", /*optional=*/true, ""},
+                                {RPCResult::Type::STR_HEX, "txid", /*optional=*/true, "The transaction id"},
+                                {RPCResult::Type::NUM, "vout", /*optional=*/true, "The output number"},
+                                {RPCResult::Type::OBJ, "scriptSig", /*optional=*/true, "The script",
+                                {
+                                    {RPCResult::Type::STR, "asm", "asm"},
+                                    {RPCResult::Type::STR_HEX, "hex", "hex"},
+                                }},
+                                {RPCResult::Type::ARR, "txinwitness", /*optional=*/true, "",
+                                {
+                                    {RPCResult::Type::STR_HEX, "hex", "hex-encoded witness data (if any)"},
+                                }},
+                                {RPCResult::Type::NUM, "sequence", "The script sequence number"},
+                            }},
+                        }},
+                        {RPCResult::Type::ARR, "vout", "",
+                        {
+                            {RPCResult::Type::OBJ, "", "",
+                            {
+                                {RPCResult::Type::NUM, "value", "The value in " + CURRENCY_UNIT},
+                                {RPCResult::Type::NUM, "n", "index"},
+                                {RPCResult::Type::OBJ, "scriptPubKey", "",
+                                {
+                                    {RPCResult::Type::STR, "asm", "the asm"},
+                                    {RPCResult::Type::STR_HEX, "hex", "the hex"},
+                                    {RPCResult::Type::STR, "type", "The type, eg 'pubkeyhash'"},
+                                    {RPCResult::Type::STR, "address", /*optional=*/true, "The Bitcoin address (only if a well-defined address exists)"},
+                                }},
+                            }},
+                        }},
+                    }
+                },
+                RPCExamples{
+                    HelpExampleCli("decoderawtransaction", "\"hexstring\"")
+            + HelpExampleRpc("decoderawtransaction", "\"hexstring\"")
+                },
+        [&](const RPCHelpMan& self, const JSONRPCRequest& request) -> UniValue
+{
+    RPCTypeCheck(request.params, {UniValue::VSTR, UniValue::VBOOL});
+
+    CMutableTransaction mtx;
+
+    bool try_witness = request.params[1].isNull() ? true : request.params[1].get_bool();
+    bool try_no_witness = request.params[1].isNull() ? true : !request.params[1].get_bool();
+
+    if (!DecodeHexTx(mtx, request.params[0].get_str(), try_no_witness, try_witness)) {
+        throw JSONRPCError(RPC_DESERIALIZATION_ERROR, "TX decode failed");
+    }
+
+    UniValue result(UniValue::VOBJ);
+    TxToUniv(CTransaction(std::move(mtx)), uint256(), result, false);
+
+    return result;
+},
+    };
+}
+
+static std::string GetAllOutputTypes()
+{
+    std::vector<std::string> ret;
+    using U = std::underlying_type<TxoutType>::type;
+    for (U i = (U)TxoutType::NONSTANDARD; i <= (U)TxoutType::WITNESS_UNKNOWN; ++i) {
+        ret.emplace_back(GetTxnOutputType(static_cast<TxoutType>(i)));
+    }
+    return Join(ret, ", ");
+}
+
+static RPCHelpMan decodescript()
+{
+    return RPCHelpMan{
+        "decodescript",
+        "\nDecode a hex-encoded script.\n",
+        {
+            {"hexstring", RPCArg::Type::STR_HEX, RPCArg::Optional::NO, "the hex-encoded script"},
+        },
+        RPCResult{
+            RPCResult::Type::OBJ, "", "",
+            {
+                {RPCResult::Type::STR, "asm", "Script public key"},
+                {RPCResult::Type::STR, "type", "The output type (e.g. " + GetAllOutputTypes() + ")"},
+                {RPCResult::Type::STR, "address", /*optional=*/true, "The Bitcoin address (only if a well-defined address exists)"},
+                {RPCResult::Type::STR, "p2sh", /*optional=*/true,
+                 "address of P2SH script wrapping this redeem script (not returned for types that should not be wrapped)"},
+                {RPCResult::Type::OBJ, "segwit", /*optional=*/true,
+                 "Result of a witness script public key wrapping this redeem script (not returned for types that should not be wrapped)",
+                 {
+                     {RPCResult::Type::STR, "asm", "String representation of the script public key"},
+                     {RPCResult::Type::STR_HEX, "hex", "Hex string of the script public key"},
+                     {RPCResult::Type::STR, "type", "The type of the script public key (e.g. witness_v0_keyhash or witness_v0_scripthash)"},
+                     {RPCResult::Type::STR, "address", /*optional=*/true, "The Bitcoin address (only if a well-defined address exists)"},
+                     {RPCResult::Type::STR, "p2sh-segwit", "address of the P2SH script wrapping this witness redeem script"},
+                 }},
+            },
+        },
+        RPCExamples{
+            HelpExampleCli("decodescript", "\"hexstring\"")
+          + HelpExampleRpc("decodescript", "\"hexstring\"")
+        },
+        [&](const RPCHelpMan& self, const JSONRPCRequest& request) -> UniValue
+{
+    RPCTypeCheck(request.params, {UniValue::VSTR});
+
+    UniValue r(UniValue::VOBJ);
+    CScript script;
+    if (request.params[0].get_str().size() > 0){
+        std::vector<unsigned char> scriptData(ParseHexV(request.params[0], "argument"));
+        script = CScript(scriptData.begin(), scriptData.end());
+    } else {
+        // Empty scripts are valid
+    }
+    ScriptPubKeyToUniv(script, r, /* include_hex */ false);
+
+    std::vector<std::vector<unsigned char>> solutions_data;
+    const TxoutType which_type{Solver(script, solutions_data)};
+
+    const bool can_wrap{[&] {
+        switch (which_type) {
+        case TxoutType::MULTISIG:
+        case TxoutType::NONSTANDARD:
+        case TxoutType::PUBKEY:
+        case TxoutType::PUBKEYHASH:
+        case TxoutType::WITNESS_V0_KEYHASH:
+        case TxoutType::WITNESS_V0_SCRIPTHASH:
+            // Can be wrapped if the checks below pass
+            break;
+        case TxoutType::NULL_DATA:
+        case TxoutType::SCRIPTHASH:
+        case TxoutType::WITNESS_UNKNOWN:
+        case TxoutType::WITNESS_V1_TAPROOT:
+            // Should not be wrapped
+            return false;
+        } // no default case, so the compiler can warn about missing cases
+        if (!script.HasValidOps() || script.IsUnspendable()) {
+            return false;
+        }
+        for (CScript::const_iterator it{script.begin()}; it != script.end();) {
+            opcodetype op;
+            CHECK_NONFATAL(script.GetOp(it, op));
+            if (op == OP_CHECKSIGADD || IsOpSuccess(op)) {
+                return false;
+            }
+        }
+        return true;
+    }()};
+
+    if (can_wrap) {
+        r.pushKV("p2sh", EncodeDestination(ScriptHash(script)));
+        // P2SH and witness programs cannot be wrapped in P2WSH, if this script
+        // is a witness program, don't return addresses for a segwit programs.
+        const bool can_wrap_P2WSH{[&] {
+            switch (which_type) {
+            case TxoutType::MULTISIG:
+            case TxoutType::PUBKEY:
+            // Uncompressed pubkeys cannot be used with segwit checksigs.
+            // If the script contains an uncompressed pubkey, skip encoding of a segwit program.
+                for (const auto& solution : solutions_data) {
+                    if
