@@ -138,4 +138,148 @@ static RPCHelpMan getrawtransaction()
                              {RPCResult::Type::STR_HEX, "hex", "The serialized, hex-encoded data for 'txid'"},
                              {RPCResult::Type::STR_HEX, "txid", "The transaction id (same as provided)"},
                              {RPCResult::Type::STR_HEX, "hash", "The transaction hash (differs from txid for witness transactions)"},
-       
+                             {RPCResult::Type::NUM, "size", "The serialized transaction size"},
+                             {RPCResult::Type::NUM, "vsize", "The virtual transaction size (differs from size for witness transactions)"},
+                             {RPCResult::Type::NUM, "weight", "The transaction's weight (between vsize*4-3 and vsize*4)"},
+                             {RPCResult::Type::NUM, "version", "The version"},
+                             {RPCResult::Type::NUM_TIME, "locktime", "The lock time"},
+                             {RPCResult::Type::ARR, "vin", "",
+                             {
+                                 {RPCResult::Type::OBJ, "", "",
+                                 {
+                                     {RPCResult::Type::STR_HEX, "txid", "The transaction id"},
+                                     {RPCResult::Type::NUM, "vout", "The output number"},
+                                     {RPCResult::Type::OBJ, "scriptSig", "The script",
+                                     {
+                                         {RPCResult::Type::STR, "asm", "asm"},
+                                         {RPCResult::Type::STR_HEX, "hex", "hex"},
+                                     }},
+                                     {RPCResult::Type::NUM, "sequence", "The script sequence number"},
+                                     {RPCResult::Type::ARR, "txinwitness", /*optional=*/true, "",
+                                     {
+                                         {RPCResult::Type::STR_HEX, "hex", "hex-encoded witness data (if any)"},
+                                     }},
+                                 }},
+                             }},
+                             {RPCResult::Type::ARR, "vout", "",
+                             {
+                                 {RPCResult::Type::OBJ, "", "",
+                                 {
+                                     {RPCResult::Type::NUM, "value", "The value in " + CURRENCY_UNIT},
+                                     {RPCResult::Type::NUM, "n", "index"},
+                                     {RPCResult::Type::OBJ, "scriptPubKey", "",
+                                     {
+                                         {RPCResult::Type::STR, "asm", "the asm"},
+                                         {RPCResult::Type::STR, "hex", "the hex"},
+                                         {RPCResult::Type::STR, "type", "The type, eg 'pubkeyhash'"},
+                                         {RPCResult::Type::STR, "address", /*optional=*/true, "The Bitcoin address (only if a well-defined address exists)"},
+                                     }},
+                                 }},
+                             }},
+                             {RPCResult::Type::STR_HEX, "blockhash", /*optional=*/true, "the block hash"},
+                             {RPCResult::Type::NUM, "confirmations", /*optional=*/true, "The confirmations"},
+                             {RPCResult::Type::NUM_TIME, "blocktime", /*optional=*/true, "The block time expressed in " + UNIX_EPOCH_TIME},
+                             {RPCResult::Type::NUM, "time", /*optional=*/true, "Same as \"blocktime\""},
+                        }
+                    },
+                },
+                RPCExamples{
+                    HelpExampleCli("getrawtransaction", "\"mytxid\"")
+            + HelpExampleCli("getrawtransaction", "\"mytxid\" true")
+            + HelpExampleRpc("getrawtransaction", "\"mytxid\", true")
+            + HelpExampleCli("getrawtransaction", "\"mytxid\" false \"myblockhash\"")
+            + HelpExampleCli("getrawtransaction", "\"mytxid\" true \"myblockhash\"")
+                },
+        [&](const RPCHelpMan& self, const JSONRPCRequest& request) -> UniValue
+{
+    const NodeContext& node = EnsureAnyNodeContext(request.context);
+    ChainstateManager& chainman = EnsureChainman(node);
+
+    bool in_active_chain = true;
+    uint256 hash = ParseHashV(request.params[0], "parameter 1");
+    CBlockIndex* blockindex = nullptr;
+
+    if (hash == Params().GenesisBlock().hashMerkleRoot) {
+        // Special exception for the genesis block coinbase transaction
+        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "The genesis block coinbase is not considered an ordinary transaction and cannot be retrieved");
+    }
+
+    // Accept either a bool (true) or a num (>=1) to indicate verbose output.
+    bool fVerbose = false;
+    if (!request.params[1].isNull()) {
+        fVerbose = request.params[1].isNum() ? (request.params[1].get_int() != 0) : request.params[1].get_bool();
+    }
+
+    if (!request.params[2].isNull()) {
+        LOCK(cs_main);
+
+        uint256 blockhash = ParseHashV(request.params[2], "parameter 3");
+        blockindex = chainman.m_blockman.LookupBlockIndex(blockhash);
+        if (!blockindex) {
+            throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Block hash not found");
+        }
+        in_active_chain = chainman.ActiveChain().Contains(blockindex);
+    }
+
+    bool f_txindex_ready = false;
+    if (g_txindex && !blockindex) {
+        f_txindex_ready = g_txindex->BlockUntilSyncedToCurrentChain();
+    }
+
+    uint256 hash_block;
+    const CTransactionRef tx = GetTransaction(blockindex, node.mempool.get(), hash, Params().GetConsensus(), hash_block);
+    if (!tx) {
+        std::string errmsg;
+        if (blockindex) {
+            if (!(blockindex->nStatus & BLOCK_HAVE_DATA)) {
+                throw JSONRPCError(RPC_MISC_ERROR, "Block not available");
+            }
+            errmsg = "No such transaction found in the provided block";
+        } else if (!g_txindex) {
+            errmsg = "No such mempool transaction. Use -txindex or provide a block hash to enable blockchain transaction queries";
+        } else if (!f_txindex_ready) {
+            errmsg = "No such mempool transaction. Blockchain transactions are still in the process of being indexed";
+        } else {
+            errmsg = "No such mempool or blockchain transaction";
+        }
+        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, errmsg + ". Use gettransaction for wallet transactions.");
+    }
+
+    if (!fVerbose) {
+        return EncodeHexTx(*tx, RPCSerializationFlags());
+    }
+
+    UniValue result(UniValue::VOBJ);
+    if (blockindex) result.pushKV("in_active_chain", in_active_chain);
+    TxToJSON(*tx, hash_block, result, chainman.ActiveChainstate());
+    return result;
+},
+    };
+}
+
+static RPCHelpMan gettxoutproof()
+{
+    return RPCHelpMan{"gettxoutproof",
+                "\nReturns a hex-encoded proof that \"txid\" was included in a block.\n"
+                "\nNOTE: By default this function only works sometimes. This is when there is an\n"
+                "unspent output in the utxo for this transaction. To make it always work,\n"
+                "you need to maintain a transaction index, using the -txindex command line option or\n"
+                "specify the block in which the transaction is included manually (by blockhash).\n",
+                {
+                    {"txids", RPCArg::Type::ARR, RPCArg::Optional::NO, "The txids to filter",
+                        {
+                            {"txid", RPCArg::Type::STR_HEX, RPCArg::Optional::OMITTED, "A transaction hash"},
+                        },
+                        },
+                    {"blockhash", RPCArg::Type::STR_HEX, RPCArg::Optional::OMITTED_NAMED_ARG, "If specified, looks for txid in the block with this hash"},
+                },
+                RPCResult{
+                    RPCResult::Type::STR, "data", "A string that is a serialized, hex-encoded data for the proof."
+                },
+                RPCExamples{""},
+        [&](const RPCHelpMan& self, const JSONRPCRequest& request) -> UniValue
+{
+    std::set<uint256> setTxids;
+    UniValue txids = request.params[0].get_array();
+    if (txids.empty()) {
+        throw JSONRPCError(RPC_INVALID_PARAMETER, "Param
