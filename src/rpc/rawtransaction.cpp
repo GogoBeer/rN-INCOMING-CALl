@@ -629,4 +629,172 @@ static RPCHelpMan decodescript()
             // Uncompressed pubkeys cannot be used with segwit checksigs.
             // If the script contains an uncompressed pubkey, skip encoding of a segwit program.
                 for (const auto& solution : solutions_data) {
-                    if
+                    if ((solution.size() != 1) && !CPubKey(solution).IsCompressed()) {
+                        return false;
+                    }
+                }
+                return true;
+            case TxoutType::NONSTANDARD:
+            case TxoutType::PUBKEYHASH:
+                // Can be P2WSH wrapped
+                return true;
+            case TxoutType::NULL_DATA:
+            case TxoutType::SCRIPTHASH:
+            case TxoutType::WITNESS_UNKNOWN:
+            case TxoutType::WITNESS_V0_KEYHASH:
+            case TxoutType::WITNESS_V0_SCRIPTHASH:
+            case TxoutType::WITNESS_V1_TAPROOT:
+                // Should not be wrapped
+                return false;
+            } // no default case, so the compiler can warn about missing cases
+            CHECK_NONFATAL(false);
+        }()};
+        if (can_wrap_P2WSH) {
+            UniValue sr(UniValue::VOBJ);
+            CScript segwitScr;
+            if (which_type == TxoutType::PUBKEY) {
+                segwitScr = GetScriptForDestination(WitnessV0KeyHash(Hash160(solutions_data[0])));
+            } else if (which_type == TxoutType::PUBKEYHASH) {
+                segwitScr = GetScriptForDestination(WitnessV0KeyHash(uint160{solutions_data[0]}));
+            } else {
+                // Scripts that are not fit for P2WPKH are encoded as P2WSH.
+                segwitScr = GetScriptForDestination(WitnessV0ScriptHash(script));
+            }
+            ScriptPubKeyToUniv(segwitScr, sr, /* include_hex */ true);
+            sr.pushKV("p2sh-segwit", EncodeDestination(ScriptHash(segwitScr)));
+            r.pushKV("segwit", sr);
+        }
+    }
+
+    return r;
+},
+    };
+}
+
+static RPCHelpMan combinerawtransaction()
+{
+    return RPCHelpMan{"combinerawtransaction",
+                "\nCombine multiple partially signed transactions into one transaction.\n"
+                "The combined transaction may be another partially signed transaction or a \n"
+                "fully signed transaction.",
+                {
+                    {"txs", RPCArg::Type::ARR, RPCArg::Optional::NO, "The hex strings of partially signed transactions",
+                        {
+                            {"hexstring", RPCArg::Type::STR_HEX, RPCArg::Optional::OMITTED, "A hex-encoded raw transaction"},
+                        },
+                        },
+                },
+                RPCResult{
+                    RPCResult::Type::STR, "", "The hex-encoded raw transaction with signature(s)"
+                },
+                RPCExamples{
+                    HelpExampleCli("combinerawtransaction", R"('["myhex1", "myhex2", "myhex3"]')")
+                },
+        [&](const RPCHelpMan& self, const JSONRPCRequest& request) -> UniValue
+{
+
+    UniValue txs = request.params[0].get_array();
+    std::vector<CMutableTransaction> txVariants(txs.size());
+
+    for (unsigned int idx = 0; idx < txs.size(); idx++) {
+        if (!DecodeHexTx(txVariants[idx], txs[idx].get_str())) {
+            throw JSONRPCError(RPC_DESERIALIZATION_ERROR, strprintf("TX decode failed for tx %d. Make sure the tx has at least one input.", idx));
+        }
+    }
+
+    if (txVariants.empty()) {
+        throw JSONRPCError(RPC_DESERIALIZATION_ERROR, "Missing transactions");
+    }
+
+    // mergedTx will end up with all the signatures; it
+    // starts as a clone of the rawtx:
+    CMutableTransaction mergedTx(txVariants[0]);
+
+    // Fetch previous transactions (inputs):
+    CCoinsView viewDummy;
+    CCoinsViewCache view(&viewDummy);
+    {
+        NodeContext& node = EnsureAnyNodeContext(request.context);
+        const CTxMemPool& mempool = EnsureMemPool(node);
+        ChainstateManager& chainman = EnsureChainman(node);
+        LOCK2(cs_main, mempool.cs);
+        CCoinsViewCache &viewChain = chainman.ActiveChainstate().CoinsTip();
+        CCoinsViewMemPool viewMempool(&viewChain, mempool);
+        view.SetBackend(viewMempool); // temporarily switch cache backend to db+mempool view
+
+        for (const CTxIn& txin : mergedTx.vin) {
+            view.AccessCoin(txin.prevout); // Load entries from viewChain into view; can fail.
+        }
+
+        view.SetBackend(viewDummy); // switch back to avoid locking mempool for too long
+    }
+
+    // Use CTransaction for the constant parts of the
+    // transaction to avoid rehashing.
+    const CTransaction txConst(mergedTx);
+    // Sign what we can:
+    for (unsigned int i = 0; i < mergedTx.vin.size(); i++) {
+        CTxIn& txin = mergedTx.vin[i];
+        const Coin& coin = view.AccessCoin(txin.prevout);
+        if (coin.IsSpent()) {
+            throw JSONRPCError(RPC_VERIFY_ERROR, "Input not found or already spent");
+        }
+        SignatureData sigdata;
+
+        // ... and merge in other signatures:
+        for (const CMutableTransaction& txv : txVariants) {
+            if (txv.vin.size() > i) {
+                sigdata.MergeSignatureData(DataFromTransaction(txv, i, coin.out));
+            }
+        }
+        ProduceSignature(DUMMY_SIGNING_PROVIDER, MutableTransactionSignatureCreator(&mergedTx, i, coin.out.nValue, 1), coin.out.scriptPubKey, sigdata);
+
+        UpdateInput(txin, sigdata);
+    }
+
+    return EncodeHexTx(CTransaction(mergedTx));
+},
+    };
+}
+
+static RPCHelpMan signrawtransactionwithkey()
+{
+    return RPCHelpMan{"signrawtransactionwithkey",
+                "\nSign inputs for raw transaction (serialized, hex-encoded).\n"
+                "The second argument is an array of base58-encoded private\n"
+                "keys that will be the only keys used to sign the transaction.\n"
+                "The third optional argument (may be null) is an array of previous transaction outputs that\n"
+                "this transaction depends on but may not yet be in the block chain.\n",
+                {
+                    {"hexstring", RPCArg::Type::STR, RPCArg::Optional::NO, "The transaction hex string"},
+                    {"privkeys", RPCArg::Type::ARR, RPCArg::Optional::NO, "The base58-encoded private keys for signing",
+                        {
+                            {"privatekey", RPCArg::Type::STR_HEX, RPCArg::Optional::OMITTED, "private key in base58-encoding"},
+                        },
+                        },
+                    {"prevtxs", RPCArg::Type::ARR, RPCArg::Optional::OMITTED_NAMED_ARG, "The previous dependent transaction outputs",
+                        {
+                            {"", RPCArg::Type::OBJ, RPCArg::Optional::OMITTED, "",
+                                {
+                                    {"txid", RPCArg::Type::STR_HEX, RPCArg::Optional::NO, "The transaction id"},
+                                    {"vout", RPCArg::Type::NUM, RPCArg::Optional::NO, "The output number"},
+                                    {"scriptPubKey", RPCArg::Type::STR_HEX, RPCArg::Optional::NO, "script key"},
+                                    {"redeemScript", RPCArg::Type::STR_HEX, RPCArg::Optional::OMITTED, "(required for P2SH) redeem script"},
+                                    {"witnessScript", RPCArg::Type::STR_HEX, RPCArg::Optional::OMITTED, "(required for P2WSH or P2SH-P2WSH) witness script"},
+                                    {"amount", RPCArg::Type::AMOUNT, RPCArg::Optional::OMITTED, "(required for Segwit inputs) the amount spent"},
+                                },
+                                },
+                        },
+                        },
+                    {"sighashtype", RPCArg::Type::STR, RPCArg::Default{"DEFAULT for Taproot, ALL otherwise"}, "The signature hash type. Must be one of:\n"
+            "       \"DEFAULT\"\n"
+            "       \"ALL\"\n"
+            "       \"NONE\"\n"
+            "       \"SINGLE\"\n"
+            "       \"ALL|ANYONECANPAY\"\n"
+            "       \"NONE|ANYONECANPAY\"\n"
+            "       \"SINGLE|ANYONECANPAY\"\n"
+                    },
+                },
+                RPCResult{
+                    RPCResult::Type::OBJ, "", "",
