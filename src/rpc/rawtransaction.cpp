@@ -944,4 +944,143 @@ static RPCHelpMan testmempoolaccept()
                         "Returns results for each transaction in the same order they were passed in.\n"
                         "Transactions that cannot be fully validated due to failures in other transactions will not contain an 'allowed' result.\n",
                     {
-             
+                        {RPCResult::Type::OBJ, "", "",
+                        {
+                            {RPCResult::Type::STR_HEX, "txid", "The transaction hash in hex"},
+                            {RPCResult::Type::STR_HEX, "wtxid", "The transaction witness hash in hex"},
+                            {RPCResult::Type::STR, "package-error", /*optional=*/true, "Package validation error, if any (only possible if rawtxs had more than 1 transaction)."},
+                            {RPCResult::Type::BOOL, "allowed", /*optional=*/true, "Whether this tx would be accepted to the mempool and pass client-specified maxfeerate. "
+                                                               "If not present, the tx was not fully validated due to a failure in another tx in the list."},
+                            {RPCResult::Type::NUM, "vsize", /*optional=*/true, "Virtual transaction size as defined in BIP 141. This is different from actual serialized size for witness transactions as witness data is discounted (only present when 'allowed' is true)"},
+                            {RPCResult::Type::OBJ, "fees", /*optional=*/true, "Transaction fees (only present if 'allowed' is true)",
+                            {
+                                {RPCResult::Type::STR_AMOUNT, "base", "transaction fee in " + CURRENCY_UNIT},
+                            }},
+                            {RPCResult::Type::STR, "reject-reason", /*optional=*/true, "Rejection string (only present when 'allowed' is false)"},
+                        }},
+                    }
+                },
+                RPCExamples{
+            "\nCreate a transaction\n"
+            + HelpExampleCli("createrawtransaction", "\"[{\\\"txid\\\" : \\\"mytxid\\\",\\\"vout\\\":0}]\" \"{\\\"myaddress\\\":0.01}\"") +
+            "Sign the transaction, and get back the hex\n"
+            + HelpExampleCli("signrawtransactionwithwallet", "\"myhex\"") +
+            "\nTest acceptance of the transaction (signed hex)\n"
+            + HelpExampleCli("testmempoolaccept", R"('["signedhex"]')") +
+            "\nAs a JSON-RPC call\n"
+            + HelpExampleRpc("testmempoolaccept", "[\"signedhex\"]")
+                },
+        [&](const RPCHelpMan& self, const JSONRPCRequest& request) -> UniValue
+{
+    RPCTypeCheck(request.params, {
+        UniValue::VARR,
+        UniValueType(), // VNUM or VSTR, checked inside AmountFromValue()
+    });
+    const UniValue raw_transactions = request.params[0].get_array();
+    if (raw_transactions.size() < 1 || raw_transactions.size() > MAX_PACKAGE_COUNT) {
+        throw JSONRPCError(RPC_INVALID_PARAMETER,
+                           "Array must contain between 1 and " + ToString(MAX_PACKAGE_COUNT) + " transactions.");
+    }
+
+    const CFeeRate max_raw_tx_fee_rate = request.params[1].isNull() ?
+                                             DEFAULT_MAX_RAW_TX_FEE_RATE :
+                                             CFeeRate(AmountFromValue(request.params[1]));
+
+    std::vector<CTransactionRef> txns;
+    txns.reserve(raw_transactions.size());
+    for (const auto& rawtx : raw_transactions.getValues()) {
+        CMutableTransaction mtx;
+        if (!DecodeHexTx(mtx, rawtx.get_str())) {
+            throw JSONRPCError(RPC_DESERIALIZATION_ERROR,
+                               "TX decode failed: " + rawtx.get_str() + " Make sure the tx has at least one input.");
+        }
+        txns.emplace_back(MakeTransactionRef(std::move(mtx)));
+    }
+
+    NodeContext& node = EnsureAnyNodeContext(request.context);
+    CTxMemPool& mempool = EnsureMemPool(node);
+    ChainstateManager& chainman = EnsureChainman(node);
+    CChainState& chainstate = chainman.ActiveChainstate();
+    const PackageMempoolAcceptResult package_result = [&] {
+        LOCK(::cs_main);
+        if (txns.size() > 1) return ProcessNewPackage(chainstate, mempool, txns, /* test_accept */ true);
+        return PackageMempoolAcceptResult(txns[0]->GetWitnessHash(),
+               chainman.ProcessTransaction(txns[0], /*test_accept=*/ true));
+    }();
+
+    UniValue rpc_result(UniValue::VARR);
+    // We will check transaction fees while we iterate through txns in order. If any transaction fee
+    // exceeds maxfeerate, we will leave the rest of the validation results blank, because it
+    // doesn't make sense to return a validation result for a transaction if its ancestor(s) would
+    // not be submitted.
+    bool exit_early{false};
+    for (const auto& tx : txns) {
+        UniValue result_inner(UniValue::VOBJ);
+        result_inner.pushKV("txid", tx->GetHash().GetHex());
+        result_inner.pushKV("wtxid", tx->GetWitnessHash().GetHex());
+        if (package_result.m_state.GetResult() == PackageValidationResult::PCKG_POLICY) {
+            result_inner.pushKV("package-error", package_result.m_state.GetRejectReason());
+        }
+        auto it = package_result.m_tx_results.find(tx->GetWitnessHash());
+        if (exit_early || it == package_result.m_tx_results.end()) {
+            // Validation unfinished. Just return the txid and wtxid.
+            rpc_result.push_back(result_inner);
+            continue;
+        }
+        const auto& tx_result = it->second;
+        // Package testmempoolaccept doesn't allow transactions to already be in the mempool.
+        CHECK_NONFATAL(tx_result.m_result_type != MempoolAcceptResult::ResultType::MEMPOOL_ENTRY);
+        if (tx_result.m_result_type == MempoolAcceptResult::ResultType::VALID) {
+            const CAmount fee = tx_result.m_base_fees.value();
+            // Check that fee does not exceed maximum fee
+            const int64_t virtual_size = tx_result.m_vsize.value();
+            const CAmount max_raw_tx_fee = max_raw_tx_fee_rate.GetFee(virtual_size);
+            if (max_raw_tx_fee && fee > max_raw_tx_fee) {
+                result_inner.pushKV("allowed", false);
+                result_inner.pushKV("reject-reason", "max-fee-exceeded");
+                exit_early = true;
+            } else {
+                // Only return the fee and vsize if the transaction would pass ATMP.
+                // These can be used to calculate the feerate.
+                result_inner.pushKV("allowed", true);
+                result_inner.pushKV("vsize", virtual_size);
+                UniValue fees(UniValue::VOBJ);
+                fees.pushKV("base", ValueFromAmount(fee));
+                result_inner.pushKV("fees", fees);
+            }
+        } else {
+            result_inner.pushKV("allowed", false);
+            const TxValidationState state = tx_result.m_state;
+            if (state.GetResult() == TxValidationResult::TX_MISSING_INPUTS) {
+                result_inner.pushKV("reject-reason", "missing-inputs");
+            } else {
+                result_inner.pushKV("reject-reason", state.GetRejectReason());
+            }
+        }
+        rpc_result.push_back(result_inner);
+    }
+    return rpc_result;
+},
+    };
+}
+
+static RPCHelpMan decodepsbt()
+{
+    return RPCHelpMan{
+        "decodepsbt",
+        "Return a JSON object representing the serialized, base64-encoded partially signed Bitcoin transaction.",
+                {
+                    {"psbt", RPCArg::Type::STR, RPCArg::Optional::NO, "The PSBT base64 string"},
+                },
+                RPCResult{
+                    RPCResult::Type::OBJ, "", "",
+                    {
+                        {RPCResult::Type::OBJ, "tx", "The decoded network-serialized unsigned transaction.",
+                        {
+                            {RPCResult::Type::ELISION, "", "The layout is the same as the output of decoderawtransaction."},
+                        }},
+                        {RPCResult::Type::ARR, "global_xpubs", "",
+                        {
+                            {RPCResult::Type::OBJ, "", "",
+                            {
+                                {RPCResult::Type::STR, "
