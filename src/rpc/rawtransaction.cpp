@@ -1193,4 +1193,182 @@ static RPCHelpMan decodepsbt()
                         {
                             {RPCResult::Type::OBJ, "", "",
                             {
-                                {RPCResult::Type:
+                                {RPCResult::Type::OBJ, "redeem_script", /*optional=*/true, "",
+                                {
+                                    {RPCResult::Type::STR, "asm", "The asm"},
+                                    {RPCResult::Type::STR_HEX, "hex", "The hex"},
+                                    {RPCResult::Type::STR, "type", "The type, eg 'pubkeyhash'"},
+                                }},
+                                {RPCResult::Type::OBJ, "witness_script", /*optional=*/true, "",
+                                {
+                                    {RPCResult::Type::STR, "asm", "The asm"},
+                                    {RPCResult::Type::STR_HEX, "hex", "The hex"},
+                                    {RPCResult::Type::STR, "type", "The type, eg 'pubkeyhash'"},
+                                }},
+                                {RPCResult::Type::ARR, "bip32_derivs", /*optional=*/true, "",
+                                {
+                                    {RPCResult::Type::OBJ, "", "",
+                                    {
+                                        {RPCResult::Type::STR, "pubkey", "The public key this path corresponds to"},
+                                        {RPCResult::Type::STR, "master_fingerprint", "The fingerprint of the master key"},
+                                        {RPCResult::Type::STR, "path", "The path"},
+                                    }},
+                                }},
+                                {RPCResult::Type::OBJ_DYN, "unknown", /*optional=*/true, "The unknown global fields",
+                                {
+                                    {RPCResult::Type::STR_HEX, "key", "(key-value pair) An unknown key-value pair"},
+                                }},
+                                {RPCResult::Type::ARR, "proprietary", /*optional=*/true, "The output proprietary map",
+                                {
+                                    {RPCResult::Type::OBJ, "", "",
+                                    {
+                                        {RPCResult::Type::STR_HEX, "identifier", "The hex string for the proprietary identifier"},
+                                        {RPCResult::Type::NUM, "subtype", "The number for the subtype"},
+                                        {RPCResult::Type::STR_HEX, "key", "The hex for the key"},
+                                        {RPCResult::Type::STR_HEX, "value", "The hex for the value"},
+                                    }},
+                                }},
+                            }},
+                        }},
+                        {RPCResult::Type::STR_AMOUNT, "fee", /*optional=*/true, "The transaction fee paid if all UTXOs slots in the PSBT have been filled."},
+                    }
+                },
+                RPCExamples{
+                    HelpExampleCli("decodepsbt", "\"psbt\"")
+                },
+        [&](const RPCHelpMan& self, const JSONRPCRequest& request) -> UniValue
+{
+    RPCTypeCheck(request.params, {UniValue::VSTR});
+
+    // Unserialize the transactions
+    PartiallySignedTransaction psbtx;
+    std::string error;
+    if (!DecodeBase64PSBT(psbtx, request.params[0].get_str(), error)) {
+        throw JSONRPCError(RPC_DESERIALIZATION_ERROR, strprintf("TX decode failed %s", error));
+    }
+
+    UniValue result(UniValue::VOBJ);
+
+    // Add the decoded tx
+    UniValue tx_univ(UniValue::VOBJ);
+    TxToUniv(CTransaction(*psbtx.tx), uint256(), tx_univ, false);
+    result.pushKV("tx", tx_univ);
+
+    // Add the global xpubs
+    UniValue global_xpubs(UniValue::VARR);
+    for (std::pair<KeyOriginInfo, std::set<CExtPubKey>> xpub_pair : psbtx.m_xpubs) {
+        for (auto& xpub : xpub_pair.second) {
+            std::vector<unsigned char> ser_xpub;
+            ser_xpub.assign(BIP32_EXTKEY_WITH_VERSION_SIZE, 0);
+            xpub.EncodeWithVersion(ser_xpub.data());
+
+            UniValue keypath(UniValue::VOBJ);
+            keypath.pushKV("xpub", EncodeBase58Check(ser_xpub));
+            keypath.pushKV("master_fingerprint", HexStr(Span<unsigned char>(xpub_pair.first.fingerprint, xpub_pair.first.fingerprint + 4)));
+            keypath.pushKV("path", WriteHDKeypath(xpub_pair.first.path));
+            global_xpubs.push_back(keypath);
+        }
+    }
+    result.pushKV("global_xpubs", global_xpubs);
+
+    // PSBT version
+    result.pushKV("psbt_version", static_cast<uint64_t>(psbtx.GetVersion()));
+
+    // Proprietary
+    UniValue proprietary(UniValue::VARR);
+    for (const auto& entry : psbtx.m_proprietary) {
+        UniValue this_prop(UniValue::VOBJ);
+        this_prop.pushKV("identifier", HexStr(entry.identifier));
+        this_prop.pushKV("subtype", entry.subtype);
+        this_prop.pushKV("key", HexStr(entry.key));
+        this_prop.pushKV("value", HexStr(entry.value));
+        proprietary.push_back(this_prop);
+    }
+    result.pushKV("proprietary", proprietary);
+
+    // Unknown data
+    UniValue unknowns(UniValue::VOBJ);
+    for (auto entry : psbtx.unknown) {
+        unknowns.pushKV(HexStr(entry.first), HexStr(entry.second));
+    }
+    result.pushKV("unknown", unknowns);
+
+    // inputs
+    CAmount total_in = 0;
+    bool have_all_utxos = true;
+    UniValue inputs(UniValue::VARR);
+    for (unsigned int i = 0; i < psbtx.inputs.size(); ++i) {
+        const PSBTInput& input = psbtx.inputs[i];
+        UniValue in(UniValue::VOBJ);
+        // UTXOs
+        bool have_a_utxo = false;
+        CTxOut txout;
+        if (!input.witness_utxo.IsNull()) {
+            txout = input.witness_utxo;
+
+            UniValue o(UniValue::VOBJ);
+            ScriptPubKeyToUniv(txout.scriptPubKey, o, /* include_hex */ true);
+
+            UniValue out(UniValue::VOBJ);
+            out.pushKV("amount", ValueFromAmount(txout.nValue));
+            out.pushKV("scriptPubKey", o);
+
+            in.pushKV("witness_utxo", out);
+
+            have_a_utxo = true;
+        }
+        if (input.non_witness_utxo) {
+            txout = input.non_witness_utxo->vout[psbtx.tx->vin[i].prevout.n];
+
+            UniValue non_wit(UniValue::VOBJ);
+            TxToUniv(*input.non_witness_utxo, uint256(), non_wit, false);
+            in.pushKV("non_witness_utxo", non_wit);
+
+            have_a_utxo = true;
+        }
+        if (have_a_utxo) {
+            if (MoneyRange(txout.nValue) && MoneyRange(total_in + txout.nValue)) {
+                total_in += txout.nValue;
+            } else {
+                // Hack to just not show fee later
+                have_all_utxos = false;
+            }
+        } else {
+            have_all_utxos = false;
+        }
+
+        // Partial sigs
+        if (!input.partial_sigs.empty()) {
+            UniValue partial_sigs(UniValue::VOBJ);
+            for (const auto& sig : input.partial_sigs) {
+                partial_sigs.pushKV(HexStr(sig.second.first), HexStr(sig.second.second));
+            }
+            in.pushKV("partial_signatures", partial_sigs);
+        }
+
+        // Sighash
+        if (input.sighash_type != std::nullopt) {
+            in.pushKV("sighash", SighashToStr((unsigned char)*input.sighash_type));
+        }
+
+        // Redeem script and witness script
+        if (!input.redeem_script.empty()) {
+            UniValue r(UniValue::VOBJ);
+            ScriptToUniv(input.redeem_script, r);
+            in.pushKV("redeem_script", r);
+        }
+        if (!input.witness_script.empty()) {
+            UniValue r(UniValue::VOBJ);
+            ScriptToUniv(input.witness_script, r);
+            in.pushKV("witness_script", r);
+        }
+
+        // keypaths
+        if (!input.hd_keypaths.empty()) {
+            UniValue keypaths(UniValue::VARR);
+            for (auto entry : input.hd_keypaths) {
+                UniValue keypath(UniValue::VOBJ);
+                keypath.pushKV("pubkey", HexStr(entry.first));
+
+                keypath.pushKV("master_fingerprint", strprintf("%08x", ReadBE32(entry.second.fingerprint)));
+      
