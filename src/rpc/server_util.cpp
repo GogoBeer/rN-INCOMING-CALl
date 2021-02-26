@@ -89,4 +89,5 @@ PeerManager& EnsurePeerman(const NodeContext& node)
     if (!node.peerman) {
         throw JSONRPCError(RPC_CLIENT_P2P_DISABLED, "Error: Peer-to-peer functionality missing or disabled");
     }
-    return *n
+    return *node.peerman;
+}
