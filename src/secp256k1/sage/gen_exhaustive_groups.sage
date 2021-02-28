@@ -96,4 +96,29 @@ for f in sorted(results.keys()):
     print("#  %s EXHAUSTIVE_TEST_ORDER == %i" % ("if" if first else "elif", f))
     first = False
     print("static const secp256k1_ge secp256k1_ge_const_g = SECP256K1_GE_CONST(")
-    print("    0x%08x, 0x%08x, 0x
+    print("    0x%08x, 0x%08x, 0x%08x, 0x%08x," % tuple((int(G[0]) >> (32 * (7 - i))) & 0xffffffff for i in range(4)))
+    print("    0x%08x, 0x%08x, 0x%08x, 0x%08x," % tuple((int(G[0]) >> (32 * (7 - i))) & 0xffffffff for i in range(4, 8)))
+    print("    0x%08x, 0x%08x, 0x%08x, 0x%08x," % tuple((int(G[1]) >> (32 * (7 - i))) & 0xffffffff for i in range(4)))
+    print("    0x%08x, 0x%08x, 0x%08x, 0x%08x" % tuple((int(G[1]) >> (32 * (7 - i))) & 0xffffffff for i in range(4, 8)))
+    print(");")
+    print("static const secp256k1_fe secp256k1_fe_const_b = SECP256K1_FE_CONST(")
+    print("    0x%08x, 0x%08x, 0x%08x, 0x%08x," % tuple((int(b) >> (32 * (7 - i))) & 0xffffffff for i in range(4)))
+    print("    0x%08x, 0x%08x, 0x%08x, 0x%08x" % tuple((int(b) >> (32 * (7 - i))) & 0xffffffff for i in range(4, 8)))
+    print(");")
+print("#  else")
+print("#    error No known generator for the specified exhaustive test group order.")
+print("#  endif")
+
+print("")
+print("")
+print("/* To be put in src/scalar_impl.h: */")
+first = True
+for f in sorted(results.keys()):
+    lam = results[f]["lambda"]
+    print("#  %s EXHAUSTIVE_TEST_ORDER == %i" % ("if" if first else "elif", f))
+    first = False
+    print("#    define EXHAUSTIVE_TEST_LAMBDA %i" % lam)
+print("#  else")
+print("#    error No known lambda for the specified exhaustive test group order.")
+print("#  endif")
+print("")
