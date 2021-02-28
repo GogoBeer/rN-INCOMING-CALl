@@ -229,4 +229,78 @@ def formula_secp256k1_gej_add_ge(branch, a, b):
     return (constraints(zero={b.Z - 1 : 'b.z=1', b.Infinity : 'b_finite'}), constraints(zero=zeroes, nonzero=nonzeroes), point_at_infinity())
   return (constraints(zero={b.Z - 1 : 'b.z=1', b.Infinity : 'b_finite'}), constraints(zero=zeroes, nonzero=nonzeroes), jacobianpoint(rx, ry, rz))
 
-def formula_secp256k1_gej_add_
+def formula_secp256k1_gej_add_ge_old(branch, a, b):
+  """libsecp256k1's old secp256k1_gej_add_ge, which fails when ay+by=0 but ax!=bx"""
+  a_infinity = (branch & 1) != 0
+  zero = {}
+  nonzero = {}
+  if a_infinity:
+    nonzero.update({a.Infinity : 'a_infinite'})
+  else:
+    zero.update({a.Infinity : 'a_finite'})
+  zz = a.Z^2
+  u1 = a.X
+  u2 = b.X * zz
+  s1 = a.Y
+  s2 = b.Y * zz
+  s2 = s2 * a.Z
+  z = a.Z
+  t = u1
+  t = t + u2
+  m = s1
+  m = m + s2
+  n = m^2
+  q = n * t
+  n = n^2
+  rr = t^2
+  t = u1 * u2
+  t = -t
+  rr = rr + t
+  t = rr^2
+  rz = m * z
+  infinity = False
+  if (branch & 2) != 0:
+    if not a_infinity:
+      infinity = True
+    else:
+      return (constraints(zero={b.Z - 1 : 'b.z=1', b.Infinity : 'b_finite'}), constraints(nonzero={z : 'conflict_a'}, zero={z : 'conflict_b'}), point_at_infinity())
+    zero.update({rz : 'r.z=0'})
+  else:
+    nonzero.update({rz : 'r.z!=0'})
+  rz = rz * (0 if a_infinity else 2)
+  rx = t
+  q = -q
+  rx = rx + q
+  q = q * 3
+  t = t * 2
+  t = t + q
+  t = t * rr
+  t = t + n
+  ry = -t
+  rx = rx * (0 if a_infinity else 4)
+  ry = ry * (0 if a_infinity else 4)
+  t = b.X
+  t = t * (1 if a_infinity else 0)
+  rx = rx + t
+  t = b.Y
+  t = t * (1 if a_infinity else 0)
+  ry = ry + t
+  t = (1 if a_infinity else 0)
+  rz = rz + t
+  if infinity:
+    return (constraints(zero={b.Z - 1 : 'b.z=1', b.Infinity : 'b_finite'}), constraints(zero=zero, nonzero=nonzero), point_at_infinity())
+  return (constraints(zero={b.Z - 1 : 'b.z=1', b.Infinity : 'b_finite'}), constraints(zero=zero, nonzero=nonzero), jacobianpoint(rx, ry, rz))
+
+if __name__ == "__main__":
+  check_symbolic_jacobian_weierstrass("secp256k1_gej_add_var", 0, 7, 5, formula_secp256k1_gej_add_var)
+  check_symbolic_jacobian_weierstrass("secp256k1_gej_add_ge_var", 0, 7, 5, formula_secp256k1_gej_add_ge_var)
+  check_symbolic_jacobian_weierstrass("secp256k1_gej_add_zinv_var", 0, 7, 5, formula_secp256k1_gej_add_zinv_var)
+  check_symbolic_jacobian_weierstrass("secp256k1_gej_add_ge", 0, 7, 16, formula_secp256k1_gej_add_ge)
+  check_symbolic_jacobian_weierstrass("secp256k1_gej_add_ge_old [should fail]", 0, 7, 4, formula_secp256k1_gej_add_ge_old)
+
+  if len(sys.argv) >= 2 and sys.argv[1] == "--exhaustive":
+    check_exhaustive_jacobian_weierstrass("secp256k1_gej_add_var", 0, 7, 5, formula_secp256k1_gej_add_var, 43)
+    check_exhaustive_jacobian_weierstrass("secp256k1_gej_add_ge_var", 0, 7, 5, formula_secp256k1_gej_add_ge_var, 43)
+    check_exhaustive_jacobian_weierstrass("secp256k1_gej_add_zinv_var", 0, 7, 5, formula_secp256k1_gej_add_zinv_var, 43)
+    check_exhaustive_jacobian_weierstrass("secp256k1_gej_add_ge", 0, 7, 16, formula_secp256k1_gej_add_ge, 43)
+    check_exhaustive_jacobian_weierstrass("secp256k1_gej_add_ge_old [should fail]", 0, 7, 4, formula_secp256k1_gej_add_ge_old, 43)
