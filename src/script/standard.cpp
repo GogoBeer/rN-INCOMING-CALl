@@ -559,4 +559,65 @@ std::optional<std::vector<std::tuple<int, CScript, int>>> InferTaprootTree(const
                     // We're in an unexplored node. Create subtrees and descend.
                     node->explored = true;
                     node->inner = true;
-     
+                    node->sub[0] = std::make_unique<TreeNode>();
+                    node->sub[1] = std::make_unique<TreeNode>();
+                    node->sub[1]->hash = hash;
+                    node = &*node->sub[0];
+                }
+            }
+            // Cannot turn a known inner node into a leaf.
+            if (node->sub[0]) return std::nullopt;
+            node->explored = true;
+            node->inner = false;
+            node->leaf = &key;
+            node->hash = leaf_hash;
+        }
+    }
+
+    // Recursive processing to turn the tree into flattened output. Use an explicit stack here to avoid
+    // overflowing the call stack (the tree may be 128 levels deep).
+    std::vector<TreeNode*> stack{&root};
+    while (!stack.empty()) {
+        TreeNode& node = *stack.back();
+        if (!node.explored) {
+            // Unexplored node, which means the tree is incomplete.
+            return std::nullopt;
+        } else if (!node.inner) {
+            // Leaf node; produce output.
+            ret.emplace_back(stack.size() - 1, node.leaf->first, node.leaf->second);
+            node.done = true;
+            stack.pop_back();
+        } else if (node.sub[0]->done && !node.sub[1]->done && !node.sub[1]->explored && !node.sub[1]->hash.IsNull() &&
+                   (CHashWriter{HASHER_TAPBRANCH} << node.sub[1]->hash << node.sub[1]->hash).GetSHA256() == node.hash) {
+            // Whenever there are nodes with two identical subtrees under it, we run into a problem:
+            // the control blocks for the leaves underneath those will be identical as well, and thus
+            // they will all be matched to the same path in the tree. The result is that at the location
+            // where the duplicate occurred, the left child will contain a normal tree that can be explored
+            // and processed, but the right one will remain unexplored.
+            //
+            // This situation can be detected, by encountering an inner node with unexplored right subtree
+            // with known hash, and H_TapBranch(hash, hash) is equal to the parent node (this node)'s hash.
+            //
+            // To deal with this, simply process the left tree a second time (set its done flag to false;
+            // noting that the done flag of its children have already been set to false after processing
+            // those). To avoid ending up in an infinite loop, set the done flag of the right (unexplored)
+            // subtree to true.
+            node.sub[0]->done = false;
+            node.sub[1]->done = true;
+        } else if (node.sub[0]->done && node.sub[1]->done) {
+            // An internal node which we're finished with.
+            node.sub[0]->done = false;
+            node.sub[1]->done = false;
+            node.done = true;
+            stack.pop_back();
+        } else if (!node.sub[0]->done) {
+            // An internal node whose left branch hasn't been processed yet. Do so first.
+            stack.push_back(&*node.sub[0]);
+        } else if (!node.sub[1]->done) {
+            // An internal node whose right branch hasn't been processed yet. Do so first.
+            stack.push_back(&*node.sub[1]);
+        }
+    }
+
+    return ret;
+}
