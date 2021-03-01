@@ -1,0 +1,62 @@
+/***********************************************************************
+ * Copyright (c) 2014-2015 Pieter Wuille                               *
+ * Distributed under the MIT software license, see the accompanying    *
+ * file COPYING or https://www.opensource.org/licenses/mit-license.php.*
+ ***********************************************************************/
+#include <stdio.h>
+
+#include "secp256k1.c"
+#include "../include/secp256k1.h"
+
+#include "assumptions.h"
+#include "util.h"
+#include "hash_impl.h"
+#include "field_impl.h"
+#include "group_impl.h"
+#include "scalar_impl.h"
+#include "ecmult_const_impl.h"
+#include "ecmult_impl.h"
+#include "bench.h"
+
+typedef struct {
+    secp256k1_scalar scalar[2];
+    secp256k1_fe fe[4];
+    secp256k1_ge ge[2];
+    secp256k1_gej gej[2];
+    unsigned char data[64];
+    int wnaf[256];
+} bench_inv;
+
+void bench_setup(void* arg) {
+    bench_inv *data = (bench_inv*)arg;
+
+    static const unsigned char init[4][32] = {
+        /* Initializer for scalar[0], fe[0], first half of data, the X coordinate of ge[0],
+           and the (implied affine) X coordinate of gej[0]. */
+        {
+            0x02, 0x03, 0x05, 0x07, 0x0b, 0x0d, 0x11, 0x13,
+            0x17, 0x1d, 0x1f, 0x25, 0x29, 0x2b, 0x2f, 0x35,
+            0x3b, 0x3d, 0x43, 0x47, 0x49, 0x4f, 0x53, 0x59,
+            0x61, 0x65, 0x67, 0x6b, 0x6d, 0x71, 0x7f, 0x83
+        },
+        /* Initializer for scalar[1], fe[1], first half of data, the X coordinate of ge[1],
+           and the (implied affine) X coordinate of gej[1]. */
+        {
+            0x82, 0x83, 0x85, 0x87, 0x8b, 0x8d, 0x81, 0x83,
+            0x97, 0xad, 0xaf, 0xb5, 0xb9, 0xbb, 0xbf, 0xc5,
+            0xdb, 0xdd, 0xe3, 0xe7, 0xe9, 0xef, 0xf3, 0xf9,
+            0x11, 0x15, 0x17, 0x1b, 0x1d, 0xb1, 0xbf, 0xd3
+        },
+        /* Initializer for fe[2] and the Z coordinate of gej[0]. */
+        {
+            0x3d, 0x2d, 0xef, 0xf4, 0x25, 0x98, 0x4f, 0x5d,
+            0xe2, 0xca, 0x5f, 0x41, 0x3f, 0x3f, 0xce, 0x44,
+            0xaa, 0x2c, 0x53, 0x8a, 0xc6, 0x59, 0x1f, 0x38,
+            0x38, 0x23, 0xe4, 0x11, 0x27, 0xc6, 0xa0, 0xe7
+        },
+        /* Initializer for fe[3] and the Z coordinate of gej[1]. */
+        {
+            0xbd, 0x21, 0xa5, 0xe1, 0x13, 0x50, 0x73, 0x2e,
+            0x52, 0x98, 0xc8, 0x9e, 0xab, 0x00, 0xa2, 0x68,
+            0x43, 0xf5, 0xd7, 0x49, 0x80, 0x72, 0xa7, 0xf3,
+            0xd7, 0x60, 0x
