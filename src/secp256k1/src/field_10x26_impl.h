@@ -1251,3 +1251,8 @@ static void secp256k1_fe_inv_var(secp256k1_fe *r, const secp256k1_fe *x) {
     secp256k1_fe_to_signed30(&s, &tmp);
     secp256k1_modinv32_var(&s, &secp256k1_const_modinfo_fe);
     secp256k1_fe_from_signed30(r, &s);
+
+    VERIFY_CHECK(secp256k1_fe_normalizes_to_zero(r) == secp256k1_fe_normalizes_to_zero(&tmp));
+}
+
+#endif /* SECP256K1_FIELD_REPR_IMPL_H */
