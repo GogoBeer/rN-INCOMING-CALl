@@ -219,4 +219,217 @@ static void secp256k1_pubkey_save(secp256k1_pubkey* pubkey, secp256k1_ge* ge) {
     } else {
         VERIFY_CHECK(!secp256k1_ge_is_infinity(ge));
         secp256k1_fe_normalize_var(&ge->x);
-        secp256k1_fe_normalize
+        secp256k1_fe_normalize_var(&ge->y);
+        secp256k1_fe_get_b32(pubkey->data, &ge->x);
+        secp256k1_fe_get_b32(pubkey->data + 32, &ge->y);
+    }
+}
+
+int secp256k1_ec_pubkey_parse(const secp256k1_context* ctx, secp256k1_pubkey* pubkey, const unsigned char *input, size_t inputlen) {
+    secp256k1_ge Q;
+
+    VERIFY_CHECK(ctx != NULL);
+    ARG_CHECK(pubkey != NULL);
+    memset(pubkey, 0, sizeof(*pubkey));
+    ARG_CHECK(input != NULL);
+    if (!secp256k1_eckey_pubkey_parse(&Q, input, inputlen)) {
+        return 0;
+    }
+    if (!secp256k1_ge_is_in_correct_subgroup(&Q)) {
+        return 0;
+    }
+    secp256k1_pubkey_save(pubkey, &Q);
+    secp256k1_ge_clear(&Q);
+    return 1;
+}
+
+int secp256k1_ec_pubkey_serialize(const secp256k1_context* ctx, unsigned char *output, size_t *outputlen, const secp256k1_pubkey* pubkey, unsigned int flags) {
+    secp256k1_ge Q;
+    size_t len;
+    int ret = 0;
+
+    VERIFY_CHECK(ctx != NULL);
+    ARG_CHECK(outputlen != NULL);
+    ARG_CHECK(*outputlen >= ((flags & SECP256K1_FLAGS_BIT_COMPRESSION) ? 33u : 65u));
+    len = *outputlen;
+    *outputlen = 0;
+    ARG_CHECK(output != NULL);
+    memset(output, 0, len);
+    ARG_CHECK(pubkey != NULL);
+    ARG_CHECK((flags & SECP256K1_FLAGS_TYPE_MASK) == SECP256K1_FLAGS_TYPE_COMPRESSION);
+    if (secp256k1_pubkey_load(ctx, &Q, pubkey)) {
+        ret = secp256k1_eckey_pubkey_serialize(&Q, output, &len, flags & SECP256K1_FLAGS_BIT_COMPRESSION);
+        if (ret) {
+            *outputlen = len;
+        }
+    }
+    return ret;
+}
+
+int secp256k1_ec_pubkey_cmp(const secp256k1_context* ctx, const secp256k1_pubkey* pubkey0, const secp256k1_pubkey* pubkey1) {
+    unsigned char out[2][33];
+    const secp256k1_pubkey* pk[2];
+    int i;
+
+    VERIFY_CHECK(ctx != NULL);
+    pk[0] = pubkey0; pk[1] = pubkey1;
+    for (i = 0; i < 2; i++) {
+        size_t out_size = sizeof(out[i]);
+        /* If the public key is NULL or invalid, ec_pubkey_serialize will call
+         * the illegal_callback and return 0. In that case we will serialize the
+         * key as all zeros which is less than any valid public key. This
+         * results in consistent comparisons even if NULL or invalid pubkeys are
+         * involved and prevents edge cases such as sorting algorithms that use
+         * this function and do not terminate as a result. */
+        if (!secp256k1_ec_pubkey_serialize(ctx, out[i], &out_size, pk[i], SECP256K1_EC_COMPRESSED)) {
+            /* Note that ec_pubkey_serialize should already set the output to
+             * zero in that case, but it's not guaranteed by the API, we can't
+             * test it and writing a VERIFY_CHECK is more complex than
+             * explicitly memsetting (again). */
+            memset(out[i], 0, sizeof(out[i]));
+        }
+    }
+    return secp256k1_memcmp_var(out[0], out[1], sizeof(out[0]));
+}
+
+static void secp256k1_ecdsa_signature_load(const secp256k1_context* ctx, secp256k1_scalar* r, secp256k1_scalar* s, const secp256k1_ecdsa_signature* sig) {
+    (void)ctx;
+    if (sizeof(secp256k1_scalar) == 32) {
+        /* When the secp256k1_scalar type is exactly 32 byte, use its
+         * representation inside secp256k1_ecdsa_signature, as conversion is very fast.
+         * Note that secp256k1_ecdsa_signature_save must use the same representation. */
+        memcpy(r, &sig->data[0], 32);
+        memcpy(s, &sig->data[32], 32);
+    } else {
+        secp256k1_scalar_set_b32(r, &sig->data[0], NULL);
+        secp256k1_scalar_set_b32(s, &sig->data[32], NULL);
+    }
+}
+
+static void secp256k1_ecdsa_signature_save(secp256k1_ecdsa_signature* sig, const secp256k1_scalar* r, const secp256k1_scalar* s) {
+    if (sizeof(secp256k1_scalar) == 32) {
+        memcpy(&sig->data[0], r, 32);
+        memcpy(&sig->data[32], s, 32);
+    } else {
+        secp256k1_scalar_get_b32(&sig->data[0], r);
+        secp256k1_scalar_get_b32(&sig->data[32], s);
+    }
+}
+
+int secp256k1_ecdsa_signature_parse_der(const secp256k1_context* ctx, secp256k1_ecdsa_signature* sig, const unsigned char *input, size_t inputlen) {
+    secp256k1_scalar r, s;
+
+    VERIFY_CHECK(ctx != NULL);
+    ARG_CHECK(sig != NULL);
+    ARG_CHECK(input != NULL);
+
+    if (secp256k1_ecdsa_sig_parse(&r, &s, input, inputlen)) {
+        secp256k1_ecdsa_signature_save(sig, &r, &s);
+        return 1;
+    } else {
+        memset(sig, 0, sizeof(*sig));
+        return 0;
+    }
+}
+
+int secp256k1_ecdsa_signature_parse_compact(const secp256k1_context* ctx, secp256k1_ecdsa_signature* sig, const unsigned char *input64) {
+    secp256k1_scalar r, s;
+    int ret = 1;
+    int overflow = 0;
+
+    VERIFY_CHECK(ctx != NULL);
+    ARG_CHECK(sig != NULL);
+    ARG_CHECK(input64 != NULL);
+
+    secp256k1_scalar_set_b32(&r, &input64[0], &overflow);
+    ret &= !overflow;
+    secp256k1_scalar_set_b32(&s, &input64[32], &overflow);
+    ret &= !overflow;
+    if (ret) {
+        secp256k1_ecdsa_signature_save(sig, &r, &s);
+    } else {
+        memset(sig, 0, sizeof(*sig));
+    }
+    return ret;
+}
+
+int secp256k1_ecdsa_signature_serialize_der(const secp256k1_context* ctx, unsigned char *output, size_t *outputlen, const secp256k1_ecdsa_signature* sig) {
+    secp256k1_scalar r, s;
+
+    VERIFY_CHECK(ctx != NULL);
+    ARG_CHECK(output != NULL);
+    ARG_CHECK(outputlen != NULL);
+    ARG_CHECK(sig != NULL);
+
+    secp256k1_ecdsa_signature_load(ctx, &r, &s, sig);
+    return secp256k1_ecdsa_sig_serialize(output, outputlen, &r, &s);
+}
+
+int secp256k1_ecdsa_signature_serialize_compact(const secp256k1_context* ctx, unsigned char *output64, const secp256k1_ecdsa_signature* sig) {
+    secp256k1_scalar r, s;
+
+    VERIFY_CHECK(ctx != NULL);
+    ARG_CHECK(output64 != NULL);
+    ARG_CHECK(sig != NULL);
+
+    secp256k1_ecdsa_signature_load(ctx, &r, &s, sig);
+    secp256k1_scalar_get_b32(&output64[0], &r);
+    secp256k1_scalar_get_b32(&output64[32], &s);
+    return 1;
+}
+
+int secp256k1_ecdsa_signature_normalize(const secp256k1_context* ctx, secp256k1_ecdsa_signature *sigout, const secp256k1_ecdsa_signature *sigin) {
+    secp256k1_scalar r, s;
+    int ret = 0;
+
+    VERIFY_CHECK(ctx != NULL);
+    ARG_CHECK(sigin != NULL);
+
+    secp256k1_ecdsa_signature_load(ctx, &r, &s, sigin);
+    ret = secp256k1_scalar_is_high(&s);
+    if (sigout != NULL) {
+        if (ret) {
+            secp256k1_scalar_negate(&s, &s);
+        }
+        secp256k1_ecdsa_signature_save(sigout, &r, &s);
+    }
+
+    return ret;
+}
+
+int secp256k1_ecdsa_verify(const secp256k1_context* ctx, const secp256k1_ecdsa_signature *sig, const unsigned char *msghash32, const secp256k1_pubkey *pubkey) {
+    secp256k1_ge q;
+    secp256k1_scalar r, s;
+    secp256k1_scalar m;
+    VERIFY_CHECK(ctx != NULL);
+    ARG_CHECK(msghash32 != NULL);
+    ARG_CHECK(sig != NULL);
+    ARG_CHECK(pubkey != NULL);
+
+    secp256k1_scalar_set_b32(&m, msghash32, NULL);
+    secp256k1_ecdsa_signature_load(ctx, &r, &s, sig);
+    return (!secp256k1_scalar_is_high(&s) &&
+            secp256k1_pubkey_load(ctx, &q, pubkey) &&
+            secp256k1_ecdsa_sig_verify(&r, &s, &q, &m));
+}
+
+static SECP256K1_INLINE void buffer_append(unsigned char *buf, unsigned int *offset, const void *data, unsigned int len) {
+    memcpy(buf + *offset, data, len);
+    *offset += len;
+}
+
+static int nonce_function_rfc6979(unsigned char *nonce32, const unsigned char *msg32, const unsigned char *key32, const unsigned char *algo16, void *data, unsigned int counter) {
+   unsigned char keydata[112];
+   unsigned int offset = 0;
+   secp256k1_rfc6979_hmac_sha256 rng;
+   unsigned int i;
+   /* We feed a byte array to the PRNG as input, consisting of:
+    * - the private key (32 bytes) and message (32 bytes), see RFC 6979 3.2d.
+    * - optionally 32 extra bytes of data, see RFC 6979 3.6 Additional Data.
+    * - optionally 16 extra bytes with the algorithm name.
+    * Because the arguments have distinct fixed lengths it is not possible for
+    *  different argument mixtures to emulate each other and result in the same
+    *  nonces.
+    */
+   buffer_append(keydata, &offset, key32, 32);
+   buffer_append(keydata, &offset
