@@ -82,4 +82,18 @@ static void *secp256k1_scratch_alloc(const secp256k1_callback* error_callback, s
     size = rounded_size;
 
     if (secp256k1_memcmp_var(scratch->magic, "scratch", 8) != 0) {
-        secp256k1_callback_call(error_callback, "invali
+        secp256k1_callback_call(error_callback, "invalid scratch space");
+        return NULL;
+    }
+
+    if (size > scratch->max_size - scratch->alloc_size) {
+        return NULL;
+    }
+    ret = (void *) ((char *) scratch->data + scratch->alloc_size);
+    memset(ret, 0, size);
+    scratch->alloc_size += size;
+
+    return ret;
+}
+
+#endif
