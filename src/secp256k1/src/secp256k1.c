@@ -432,4 +432,224 @@ static int nonce_function_rfc6979(unsigned char *nonce32, const unsigned char *m
     *  nonces.
     */
    buffer_append(keydata, &offset, key32, 32);
-   buffer_append(keydata, &offset
+   buffer_append(keydata, &offset, msg32, 32);
+   if (data != NULL) {
+       buffer_append(keydata, &offset, data, 32);
+   }
+   if (algo16 != NULL) {
+       buffer_append(keydata, &offset, algo16, 16);
+   }
+   secp256k1_rfc6979_hmac_sha256_initialize(&rng, keydata, offset);
+   memset(keydata, 0, sizeof(keydata));
+   for (i = 0; i <= counter; i++) {
+       secp256k1_rfc6979_hmac_sha256_generate(&rng, nonce32, 32);
+   }
+   secp256k1_rfc6979_hmac_sha256_finalize(&rng);
+   return 1;
+}
+
+const secp256k1_nonce_function secp256k1_nonce_function_rfc6979 = nonce_function_rfc6979;
+const secp256k1_nonce_function secp256k1_nonce_function_default = nonce_function_rfc6979;
+
+static int secp256k1_ecdsa_sign_inner(const secp256k1_context* ctx, secp256k1_scalar* r, secp256k1_scalar* s, int* recid, const unsigned char *msg32, const unsigned char *seckey, secp256k1_nonce_function noncefp, const void* noncedata) {
+    secp256k1_scalar sec, non, msg;
+    int ret = 0;
+    int is_sec_valid;
+    unsigned char nonce32[32];
+    unsigned int count = 0;
+    /* Default initialization here is important so we won't pass uninit values to the cmov in the end */
+    *r = secp256k1_scalar_zero;
+    *s = secp256k1_scalar_zero;
+    if (recid) {
+        *recid = 0;
+    }
+    if (noncefp == NULL) {
+        noncefp = secp256k1_nonce_function_default;
+    }
+
+    /* Fail if the secret key is invalid. */
+    is_sec_valid = secp256k1_scalar_set_b32_seckey(&sec, seckey);
+    secp256k1_scalar_cmov(&sec, &secp256k1_scalar_one, !is_sec_valid);
+    secp256k1_scalar_set_b32(&msg, msg32, NULL);
+    while (1) {
+        int is_nonce_valid;
+        ret = !!noncefp(nonce32, msg32, seckey, NULL, (void*)noncedata, count);
+        if (!ret) {
+            break;
+        }
+        is_nonce_valid = secp256k1_scalar_set_b32_seckey(&non, nonce32);
+        /* The nonce is still secret here, but it being invalid is is less likely than 1:2^255. */
+        secp256k1_declassify(ctx, &is_nonce_valid, sizeof(is_nonce_valid));
+        if (is_nonce_valid) {
+            ret = secp256k1_ecdsa_sig_sign(&ctx->ecmult_gen_ctx, r, s, &sec, &msg, &non, recid);
+            /* The final signature is no longer a secret, nor is the fact that we were successful or not. */
+            secp256k1_declassify(ctx, &ret, sizeof(ret));
+            if (ret) {
+                break;
+            }
+        }
+        count++;
+    }
+    /* We don't want to declassify is_sec_valid and therefore the range of
+     * seckey. As a result is_sec_valid is included in ret only after ret was
+     * used as a branching variable. */
+    ret &= is_sec_valid;
+    memset(nonce32, 0, 32);
+    secp256k1_scalar_clear(&msg);
+    secp256k1_scalar_clear(&non);
+    secp256k1_scalar_clear(&sec);
+    secp256k1_scalar_cmov(r, &secp256k1_scalar_zero, !ret);
+    secp256k1_scalar_cmov(s, &secp256k1_scalar_zero, !ret);
+    if (recid) {
+        const int zero = 0;
+        secp256k1_int_cmov(recid, &zero, !ret);
+    }
+    return ret;
+}
+
+int secp256k1_ecdsa_sign(const secp256k1_context* ctx, secp256k1_ecdsa_signature *signature, const unsigned char *msghash32, const unsigned char *seckey, secp256k1_nonce_function noncefp, const void* noncedata) {
+    secp256k1_scalar r, s;
+    int ret;
+    VERIFY_CHECK(ctx != NULL);
+    ARG_CHECK(secp256k1_ecmult_gen_context_is_built(&ctx->ecmult_gen_ctx));
+    ARG_CHECK(msghash32 != NULL);
+    ARG_CHECK(signature != NULL);
+    ARG_CHECK(seckey != NULL);
+
+    ret = secp256k1_ecdsa_sign_inner(ctx, &r, &s, NULL, msghash32, seckey, noncefp, noncedata);
+    secp256k1_ecdsa_signature_save(signature, &r, &s);
+    return ret;
+}
+
+int secp256k1_ec_seckey_verify(const secp256k1_context* ctx, const unsigned char *seckey) {
+    secp256k1_scalar sec;
+    int ret;
+    VERIFY_CHECK(ctx != NULL);
+    ARG_CHECK(seckey != NULL);
+
+    ret = secp256k1_scalar_set_b32_seckey(&sec, seckey);
+    secp256k1_scalar_clear(&sec);
+    return ret;
+}
+
+static int secp256k1_ec_pubkey_create_helper(const secp256k1_ecmult_gen_context *ecmult_gen_ctx, secp256k1_scalar *seckey_scalar, secp256k1_ge *p, const unsigned char *seckey) {
+    secp256k1_gej pj;
+    int ret;
+
+    ret = secp256k1_scalar_set_b32_seckey(seckey_scalar, seckey);
+    secp256k1_scalar_cmov(seckey_scalar, &secp256k1_scalar_one, !ret);
+
+    secp256k1_ecmult_gen(ecmult_gen_ctx, &pj, seckey_scalar);
+    secp256k1_ge_set_gej(p, &pj);
+    return ret;
+}
+
+int secp256k1_ec_pubkey_create(const secp256k1_context* ctx, secp256k1_pubkey *pubkey, const unsigned char *seckey) {
+    secp256k1_ge p;
+    secp256k1_scalar seckey_scalar;
+    int ret = 0;
+    VERIFY_CHECK(ctx != NULL);
+    ARG_CHECK(pubkey != NULL);
+    memset(pubkey, 0, sizeof(*pubkey));
+    ARG_CHECK(secp256k1_ecmult_gen_context_is_built(&ctx->ecmult_gen_ctx));
+    ARG_CHECK(seckey != NULL);
+
+    ret = secp256k1_ec_pubkey_create_helper(&ctx->ecmult_gen_ctx, &seckey_scalar, &p, seckey);
+    secp256k1_pubkey_save(pubkey, &p);
+    secp256k1_memczero(pubkey, sizeof(*pubkey), !ret);
+
+    secp256k1_scalar_clear(&seckey_scalar);
+    return ret;
+}
+
+int secp256k1_ec_seckey_negate(const secp256k1_context* ctx, unsigned char *seckey) {
+    secp256k1_scalar sec;
+    int ret = 0;
+    VERIFY_CHECK(ctx != NULL);
+    ARG_CHECK(seckey != NULL);
+
+    ret = secp256k1_scalar_set_b32_seckey(&sec, seckey);
+    secp256k1_scalar_cmov(&sec, &secp256k1_scalar_zero, !ret);
+    secp256k1_scalar_negate(&sec, &sec);
+    secp256k1_scalar_get_b32(seckey, &sec);
+
+    secp256k1_scalar_clear(&sec);
+    return ret;
+}
+
+int secp256k1_ec_privkey_negate(const secp256k1_context* ctx, unsigned char *seckey) {
+    return secp256k1_ec_seckey_negate(ctx, seckey);
+}
+
+int secp256k1_ec_pubkey_negate(const secp256k1_context* ctx, secp256k1_pubkey *pubkey) {
+    int ret = 0;
+    secp256k1_ge p;
+    VERIFY_CHECK(ctx != NULL);
+    ARG_CHECK(pubkey != NULL);
+
+    ret = secp256k1_pubkey_load(ctx, &p, pubkey);
+    memset(pubkey, 0, sizeof(*pubkey));
+    if (ret) {
+        secp256k1_ge_neg(&p, &p);
+        secp256k1_pubkey_save(pubkey, &p);
+    }
+    return ret;
+}
+
+
+static int secp256k1_ec_seckey_tweak_add_helper(secp256k1_scalar *sec, const unsigned char *tweak32) {
+    secp256k1_scalar term;
+    int overflow = 0;
+    int ret = 0;
+
+    secp256k1_scalar_set_b32(&term, tweak32, &overflow);
+    ret = (!overflow) & secp256k1_eckey_privkey_tweak_add(sec, &term);
+    secp256k1_scalar_clear(&term);
+    return ret;
+}
+
+int secp256k1_ec_seckey_tweak_add(const secp256k1_context* ctx, unsigned char *seckey, const unsigned char *tweak32) {
+    secp256k1_scalar sec;
+    int ret = 0;
+    VERIFY_CHECK(ctx != NULL);
+    ARG_CHECK(seckey != NULL);
+    ARG_CHECK(tweak32 != NULL);
+
+    ret = secp256k1_scalar_set_b32_seckey(&sec, seckey);
+    ret &= secp256k1_ec_seckey_tweak_add_helper(&sec, tweak32);
+    secp256k1_scalar_cmov(&sec, &secp256k1_scalar_zero, !ret);
+    secp256k1_scalar_get_b32(seckey, &sec);
+
+    secp256k1_scalar_clear(&sec);
+    return ret;
+}
+
+int secp256k1_ec_privkey_tweak_add(const secp256k1_context* ctx, unsigned char *seckey, const unsigned char *tweak32) {
+    return secp256k1_ec_seckey_tweak_add(ctx, seckey, tweak32);
+}
+
+static int secp256k1_ec_pubkey_tweak_add_helper(secp256k1_ge *p, const unsigned char *tweak32) {
+    secp256k1_scalar term;
+    int overflow = 0;
+    secp256k1_scalar_set_b32(&term, tweak32, &overflow);
+    return !overflow && secp256k1_eckey_pubkey_tweak_add(p, &term);
+}
+
+int secp256k1_ec_pubkey_tweak_add(const secp256k1_context* ctx, secp256k1_pubkey *pubkey, const unsigned char *tweak32) {
+    secp256k1_ge p;
+    int ret = 0;
+    VERIFY_CHECK(ctx != NULL);
+    ARG_CHECK(pubkey != NULL);
+    ARG_CHECK(tweak32 != NULL);
+
+    ret = secp256k1_pubkey_load(ctx, &p, pubkey);
+    memset(pubkey, 0, sizeof(*pubkey));
+    ret = ret && secp256k1_ec_pubkey_tweak_add_helper(&p, tweak32);
+    if (ret) {
+        secp256k1_pubkey_save(pubkey, &p);
+    }
+
+    return ret;
+}
+
+in
