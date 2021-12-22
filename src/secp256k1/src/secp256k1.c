@@ -652,4 +652,112 @@ int secp256k1_ec_pubkey_tweak_add(const secp256k1_context* ctx, secp256k1_pubkey
     return ret;
 }
 
-in
+int secp256k1_ec_seckey_tweak_mul(const secp256k1_context* ctx, unsigned char *seckey, const unsigned char *tweak32) {
+    secp256k1_scalar factor;
+    secp256k1_scalar sec;
+    int ret = 0;
+    int overflow = 0;
+    VERIFY_CHECK(ctx != NULL);
+    ARG_CHECK(seckey != NULL);
+    ARG_CHECK(tweak32 != NULL);
+
+    secp256k1_scalar_set_b32(&factor, tweak32, &overflow);
+    ret = secp256k1_scalar_set_b32_seckey(&sec, seckey);
+    ret &= (!overflow) & secp256k1_eckey_privkey_tweak_mul(&sec, &factor);
+    secp256k1_scalar_cmov(&sec, &secp256k1_scalar_zero, !ret);
+    secp256k1_scalar_get_b32(seckey, &sec);
+
+    secp256k1_scalar_clear(&sec);
+    secp256k1_scalar_clear(&factor);
+    return ret;
+}
+
+int secp256k1_ec_privkey_tweak_mul(const secp256k1_context* ctx, unsigned char *seckey, const unsigned char *tweak32) {
+    return secp256k1_ec_seckey_tweak_mul(ctx, seckey, tweak32);
+}
+
+int secp256k1_ec_pubkey_tweak_mul(const secp256k1_context* ctx, secp256k1_pubkey *pubkey, const unsigned char *tweak32) {
+    secp256k1_ge p;
+    secp256k1_scalar factor;
+    int ret = 0;
+    int overflow = 0;
+    VERIFY_CHECK(ctx != NULL);
+    ARG_CHECK(pubkey != NULL);
+    ARG_CHECK(tweak32 != NULL);
+
+    secp256k1_scalar_set_b32(&factor, tweak32, &overflow);
+    ret = !overflow && secp256k1_pubkey_load(ctx, &p, pubkey);
+    memset(pubkey, 0, sizeof(*pubkey));
+    if (ret) {
+        if (secp256k1_eckey_pubkey_tweak_mul(&p, &factor)) {
+            secp256k1_pubkey_save(pubkey, &p);
+        } else {
+            ret = 0;
+        }
+    }
+
+    return ret;
+}
+
+int secp256k1_context_randomize(secp256k1_context* ctx, const unsigned char *seed32) {
+    VERIFY_CHECK(ctx != NULL);
+    if (secp256k1_ecmult_gen_context_is_built(&ctx->ecmult_gen_ctx)) {
+        secp256k1_ecmult_gen_blind(&ctx->ecmult_gen_ctx, seed32);
+    }
+    return 1;
+}
+
+int secp256k1_ec_pubkey_combine(const secp256k1_context* ctx, secp256k1_pubkey *pubnonce, const secp256k1_pubkey * const *pubnonces, size_t n) {
+    size_t i;
+    secp256k1_gej Qj;
+    secp256k1_ge Q;
+
+    VERIFY_CHECK(ctx != NULL);
+    ARG_CHECK(pubnonce != NULL);
+    memset(pubnonce, 0, sizeof(*pubnonce));
+    ARG_CHECK(n >= 1);
+    ARG_CHECK(pubnonces != NULL);
+
+    secp256k1_gej_set_infinity(&Qj);
+
+    for (i = 0; i < n; i++) {
+        ARG_CHECK(pubnonces[i] != NULL);
+        secp256k1_pubkey_load(ctx, &Q, pubnonces[i]);
+        secp256k1_gej_add_ge(&Qj, &Qj, &Q);
+    }
+    if (secp256k1_gej_is_infinity(&Qj)) {
+        return 0;
+    }
+    secp256k1_ge_set_gej(&Q, &Qj);
+    secp256k1_pubkey_save(pubnonce, &Q);
+    return 1;
+}
+
+int secp256k1_tagged_sha256(const secp256k1_context* ctx, unsigned char *hash32, const unsigned char *tag, size_t taglen, const unsigned char *msg, size_t msglen) {
+    secp256k1_sha256 sha;
+    VERIFY_CHECK(ctx != NULL);
+    ARG_CHECK(hash32 != NULL);
+    ARG_CHECK(tag != NULL);
+    ARG_CHECK(msg != NULL);
+
+    secp256k1_sha256_initialize_tagged(&sha, tag, taglen);
+    secp256k1_sha256_write(&sha, msg, msglen);
+    secp256k1_sha256_finalize(&sha, hash32);
+    return 1;
+}
+
+#ifdef ENABLE_MODULE_ECDH
+# include "modules/ecdh/main_impl.h"
+#endif
+
+#ifdef ENABLE_MODULE_RECOVERY
+# include "modules/recovery/main_impl.h"
+#endif
+
+#ifdef ENABLE_MODULE_EXTRAKEYS
+# include "modules/extrakeys/main_impl.h"
+#endif
+
+#ifdef ENABLE_MODULE_SCHNORRSIG
+# include "modules/schnorrsig/main_impl.h"
+#endif
