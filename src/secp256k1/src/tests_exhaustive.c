@@ -335,4 +335,123 @@ void test_exhaustive_sign(const secp256k1_context *ctx, const secp256k1_ge *grou
      * than the field order, when coercing the x-values to scalar values, some
      * appear more often than others, so we are actually not zero-knowledge.
      * (This effect also appears in the real code, but the difference is on the
- 
+     * order of 1/2^128th the field order, so the deviation is not useful to a
+     * computationally bounded attacker.)
+     */
+}
+
+#ifdef ENABLE_MODULE_RECOVERY
+#include "src/modules/recovery/tests_exhaustive_impl.h"
+#endif
+
+#ifdef ENABLE_MODULE_EXTRAKEYS
+#include "src/modules/extrakeys/tests_exhaustive_impl.h"
+#endif
+
+#ifdef ENABLE_MODULE_SCHNORRSIG
+#include "src/modules/schnorrsig/tests_exhaustive_impl.h"
+#endif
+
+int main(int argc, char** argv) {
+    int i;
+    secp256k1_gej groupj[EXHAUSTIVE_TEST_ORDER];
+    secp256k1_ge group[EXHAUSTIVE_TEST_ORDER];
+    unsigned char rand32[32];
+    secp256k1_context *ctx;
+
+    /* Disable buffering for stdout to improve reliability of getting
+     * diagnostic information. Happens right at the start of main because
+     * setbuf must be used before any other operation on the stream. */
+    setbuf(stdout, NULL);
+    /* Also disable buffering for stderr because it's not guaranteed that it's
+     * unbuffered on all systems. */
+    setbuf(stderr, NULL);
+
+    printf("Exhaustive tests for order %lu\n", (unsigned long)EXHAUSTIVE_TEST_ORDER);
+
+    /* find iteration count */
+    if (argc > 1) {
+        count = strtol(argv[1], NULL, 0);
+    }
+    printf("test count = %i\n", count);
+
+    /* find random seed */
+    secp256k1_testrand_init(argc > 2 ? argv[2] : NULL);
+
+    /* set up split processing */
+    if (argc > 4) {
+        num_cores = strtol(argv[3], NULL, 0);
+        this_core = strtol(argv[4], NULL, 0);
+        if (num_cores < 1 || this_core >= num_cores) {
+            fprintf(stderr, "Usage: %s [count] [seed] [numcores] [thiscore]\n", argv[0]);
+            return 1;
+        }
+        printf("running tests for core %lu (out of [0..%lu])\n", (unsigned long)this_core, (unsigned long)num_cores - 1);
+    }
+
+    /* Recreate the ecmult_gen table using the right generator (as selected via EXHAUSTIVE_TEST_ORDER) */
+    secp256k1_ecmult_gen_create_prec_table(&secp256k1_ecmult_gen_prec_table[0][0], &secp256k1_ge_const_g, ECMULT_GEN_PREC_BITS);
+
+    while (count--) {
+        /* Build context */
+        ctx = secp256k1_context_create(SECP256K1_CONTEXT_SIGN | SECP256K1_CONTEXT_VERIFY);
+        secp256k1_testrand256(rand32);
+        CHECK(secp256k1_context_randomize(ctx, rand32));
+
+        /* Generate the entire group */
+        secp256k1_gej_set_infinity(&groupj[0]);
+        secp256k1_ge_set_gej(&group[0], &groupj[0]);
+        for (i = 1; i < EXHAUSTIVE_TEST_ORDER; i++) {
+            secp256k1_gej_add_ge(&groupj[i], &groupj[i - 1], &secp256k1_ge_const_g);
+            secp256k1_ge_set_gej(&group[i], &groupj[i]);
+            if (count != 0) {
+                /* Set a different random z-value for each Jacobian point, except z=1
+                   is used in the last iteration. */
+                secp256k1_fe z;
+                random_fe(&z);
+                secp256k1_gej_rescale(&groupj[i], &z);
+            }
+
+            /* Verify against ecmult_gen */
+            {
+                secp256k1_scalar scalar_i;
+                secp256k1_gej generatedj;
+                secp256k1_ge generated;
+
+                secp256k1_scalar_set_int(&scalar_i, i);
+                secp256k1_ecmult_gen(&ctx->ecmult_gen_ctx, &generatedj, &scalar_i);
+                secp256k1_ge_set_gej(&generated, &generatedj);
+
+                CHECK(group[i].infinity == 0);
+                CHECK(generated.infinity == 0);
+                CHECK(secp256k1_fe_equal_var(&generated.x, &group[i].x));
+                CHECK(secp256k1_fe_equal_var(&generated.y, &group[i].y));
+            }
+        }
+
+        /* Run the tests */
+        test_exhaustive_endomorphism(group);
+        test_exhaustive_addition(group, groupj);
+        test_exhaustive_ecmult(group, groupj);
+        test_exhaustive_ecmult_multi(ctx, group);
+        test_exhaustive_sign(ctx, group);
+        test_exhaustive_verify(ctx, group);
+
+#ifdef ENABLE_MODULE_RECOVERY
+        test_exhaustive_recovery(ctx, group);
+#endif
+#ifdef ENABLE_MODULE_EXTRAKEYS
+        test_exhaustive_extrakeys(ctx, group);
+#endif
+#ifdef ENABLE_MODULE_SCHNORRSIG
+        test_exhaustive_schnorrsig(ctx);
+#endif
+
+        secp256k1_context_destroy(ctx);
+    }
+
+    secp256k1_testrand_finish();
+
+    printf("no problems found\n");
+    return 0;
+}
