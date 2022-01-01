@@ -226,4 +226,147 @@ BOOST_AUTO_TEST_CASE(SufficientPreforwardRTTest)
         shortIDs.shorttxids.resize(1);
         shortIDs.shorttxids[0] = shortIDs.GetShortID(block.vtx[1]->GetHash());
 
-        CDataStream st
+        CDataStream stream(SER_NETWORK, PROTOCOL_VERSION);
+        stream << shortIDs;
+
+        CBlockHeaderAndShortTxIDs shortIDs2;
+        stream >> shortIDs2;
+
+        PartiallyDownloadedBlock partialBlock(&pool);
+        BOOST_CHECK(partialBlock.InitData(shortIDs2, extra_txn) == READ_STATUS_OK);
+        BOOST_CHECK( partialBlock.IsTxAvailable(0));
+        BOOST_CHECK( partialBlock.IsTxAvailable(1));
+        BOOST_CHECK( partialBlock.IsTxAvailable(2));
+
+        BOOST_CHECK_EQUAL(pool.mapTx.find(block.vtx[1]->GetHash())->GetSharedTx().use_count(), SHARED_TX_OFFSET + 1);
+
+        CBlock block2;
+        PartiallyDownloadedBlock partialBlockCopy = partialBlock;
+        BOOST_CHECK(partialBlock.FillBlock(block2, {}) == READ_STATUS_OK);
+        BOOST_CHECK_EQUAL(block.GetHash().ToString(), block2.GetHash().ToString());
+        bool mutated;
+        BOOST_CHECK_EQUAL(block.hashMerkleRoot.ToString(), BlockMerkleRoot(block2, &mutated).ToString());
+        BOOST_CHECK(!mutated);
+
+        txhash = block.vtx[1]->GetHash();
+        block.vtx.clear();
+        block2.vtx.clear();
+        BOOST_CHECK_EQUAL(pool.mapTx.find(txhash)->GetSharedTx().use_count(), SHARED_TX_OFFSET + 1 - 1); // + 1 because of partialBlock; -1 because of block.
+    }
+    BOOST_CHECK_EQUAL(pool.mapTx.find(txhash)->GetSharedTx().use_count(), SHARED_TX_OFFSET - 1); // -1 because of block
+}
+
+BOOST_AUTO_TEST_CASE(EmptyBlockRoundTripTest)
+{
+    CTxMemPool pool;
+    CMutableTransaction coinbase;
+    coinbase.vin.resize(1);
+    coinbase.vin[0].scriptSig.resize(10);
+    coinbase.vout.resize(1);
+    coinbase.vout[0].nValue = 42;
+
+    CBlock block;
+    block.vtx.resize(1);
+    block.vtx[0] = MakeTransactionRef(std::move(coinbase));
+    block.nVersion = 42;
+    block.hashPrevBlock = InsecureRand256();
+    block.nBits = 0x207fffff;
+
+    bool mutated;
+    block.hashMerkleRoot = BlockMerkleRoot(block, &mutated);
+    assert(!mutated);
+    while (!CheckProofOfWork(block.GetHash(), block.nBits, Params().GetConsensus())) ++block.nNonce;
+
+    // Test simple header round-trip with only coinbase
+    {
+        CBlockHeaderAndShortTxIDs shortIDs(block, false);
+
+        CDataStream stream(SER_NETWORK, PROTOCOL_VERSION);
+        stream << shortIDs;
+
+        CBlockHeaderAndShortTxIDs shortIDs2;
+        stream >> shortIDs2;
+
+        PartiallyDownloadedBlock partialBlock(&pool);
+        BOOST_CHECK(partialBlock.InitData(shortIDs2, extra_txn) == READ_STATUS_OK);
+        BOOST_CHECK(partialBlock.IsTxAvailable(0));
+
+        CBlock block2;
+        std::vector<CTransactionRef> vtx_missing;
+        BOOST_CHECK(partialBlock.FillBlock(block2, vtx_missing) == READ_STATUS_OK);
+        BOOST_CHECK_EQUAL(block.GetHash().ToString(), block2.GetHash().ToString());
+        BOOST_CHECK_EQUAL(block.hashMerkleRoot.ToString(), BlockMerkleRoot(block2, &mutated).ToString());
+        BOOST_CHECK(!mutated);
+    }
+}
+
+BOOST_AUTO_TEST_CASE(TransactionsRequestSerializationTest) {
+    BlockTransactionsRequest req1;
+    req1.blockhash = InsecureRand256();
+    req1.indexes.resize(4);
+    req1.indexes[0] = 0;
+    req1.indexes[1] = 1;
+    req1.indexes[2] = 3;
+    req1.indexes[3] = 4;
+
+    CDataStream stream(SER_NETWORK, PROTOCOL_VERSION);
+    stream << req1;
+
+    BlockTransactionsRequest req2;
+    stream >> req2;
+
+    BOOST_CHECK_EQUAL(req1.blockhash.ToString(), req2.blockhash.ToString());
+    BOOST_CHECK_EQUAL(req1.indexes.size(), req2.indexes.size());
+    BOOST_CHECK_EQUAL(req1.indexes[0], req2.indexes[0]);
+    BOOST_CHECK_EQUAL(req1.indexes[1], req2.indexes[1]);
+    BOOST_CHECK_EQUAL(req1.indexes[2], req2.indexes[2]);
+    BOOST_CHECK_EQUAL(req1.indexes[3], req2.indexes[3]);
+}
+
+BOOST_AUTO_TEST_CASE(TransactionsRequestDeserializationMaxTest) {
+    // Check that the highest legal index is decoded correctly
+    BlockTransactionsRequest req0;
+    req0.blockhash = InsecureRand256();
+    req0.indexes.resize(1);
+    req0.indexes[0] = 0xffff;
+    CDataStream stream(SER_NETWORK, PROTOCOL_VERSION);
+    stream << req0;
+
+    BlockTransactionsRequest req1;
+    stream >> req1;
+    BOOST_CHECK_EQUAL(req0.indexes.size(), req1.indexes.size());
+    BOOST_CHECK_EQUAL(req0.indexes[0], req1.indexes[0]);
+}
+
+BOOST_AUTO_TEST_CASE(TransactionsRequestDeserializationOverflowTest) {
+    // Any set of index deltas that starts with N values that sum to (0x10000 - N)
+    // causes the edge-case overflow that was originally not checked for. Such
+    // a request cannot be created by serializing a real BlockTransactionsRequest
+    // due to the overflow, so here we'll serialize from raw deltas.
+    BlockTransactionsRequest req0;
+    req0.blockhash = InsecureRand256();
+    req0.indexes.resize(3);
+    req0.indexes[0] = 0x7000;
+    req0.indexes[1] = 0x10000 - 0x7000 - 2;
+    req0.indexes[2] = 0;
+    CDataStream stream(SER_NETWORK, PROTOCOL_VERSION);
+    stream << req0.blockhash;
+    WriteCompactSize(stream, req0.indexes.size());
+    WriteCompactSize(stream, req0.indexes[0]);
+    WriteCompactSize(stream, req0.indexes[1]);
+    WriteCompactSize(stream, req0.indexes[2]);
+
+    BlockTransactionsRequest req1;
+    try {
+        stream >> req1;
+        // before patch: deserialize above succeeds and this check fails, demonstrating the overflow
+        BOOST_CHECK(req1.indexes[1] < req1.indexes[2]);
+        // this shouldn't be reachable before or after patch
+        BOOST_CHECK(0);
+    } catch(std::ios_base::failure &) {
+        // deserialize should fail
+        BOOST_CHECK(true); // Needed to suppress "Test case [...] did not check any assertions"
+    }
+}
+
+BOOST_AUTO_TEST_SUITE_END()
