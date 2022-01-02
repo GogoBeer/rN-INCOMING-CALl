@@ -521,4 +521,130 @@ BOOST_AUTO_TEST_CASE(poly1305_testvector)
                  "56d656e747320696e20494554462073657373696f6e732c2061732077656c6c206173207772697474656e20616e6420656c65"
                  "6374726f6e696320636f6d6d756e69636174696f6e73206d61646520617420616e792074696d65206f7220706c6163652c207"
                  "768696368206172652061646472657373656420746f",
-                 "0000000000000000000000000000000036e
+                 "0000000000000000000000000000000036e5f6b5c5e06070f0efca96227a863e",
+                 "36e5f6b5c5e06070f0efca96227a863e");
+
+    TestPoly1305("416e79207375626d697373696f6e20746f20746865204945544620696e74656e6465642062792074686520436f6e747269627"
+                 "5746f7220666f72207075626c69636174696f6e20617320616c6c206f722070617274206f6620616e204945544620496e7465"
+                 "726e65742d4472616674206f722052464320616e6420616e792073746174656d656e74206d6164652077697468696e2074686"
+                 "520636f6e74657874206f6620616e204945544620616374697669747920697320636f6e7369646572656420616e2022494554"
+                 "4620436f6e747269627574696f6e222e20537563682073746174656d656e747320696e636c756465206f72616c20737461746"
+                 "56d656e747320696e20494554462073657373696f6e732c2061732077656c6c206173207772697474656e20616e6420656c65"
+                 "6374726f6e696320636f6d6d756e69636174696f6e73206d61646520617420616e792074696d65206f7220706c6163652c207"
+                 "768696368206172652061646472657373656420746f",
+                 "36e5f6b5c5e06070f0efca96227a863e00000000000000000000000000000000",
+                 "f3477e7cd95417af89a6b8794c310cf0");
+
+    TestPoly1305("2754776173206272696c6c69672c20616e642074686520736c6974687920746f7665730a446964206779726520616e6420676"
+                 "96d626c6520696e2074686520776162653a0a416c6c206d696d737920776572652074686520626f726f676f7665732c0a416e"
+                 "6420746865206d6f6d65207261746873206f757467726162652e",
+                 "1c9240a5eb55d38af333888604f6b5f0473917c1402b80099dca5cbc207075c0",
+                 "4541669a7eaaee61e708dc7cbcc5eb62");
+
+    TestPoly1305("ffffffffffffffffffffffffffffffff",
+                 "0200000000000000000000000000000000000000000000000000000000000000",
+                 "03000000000000000000000000000000");
+
+    TestPoly1305("02000000000000000000000000000000",
+                 "02000000000000000000000000000000ffffffffffffffffffffffffffffffff",
+                 "03000000000000000000000000000000");
+
+    TestPoly1305("fffffffffffffffffffffffffffffffff0ffffffffffffffffffffffffffffff11000000000000000000000000000000",
+                 "0100000000000000000000000000000000000000000000000000000000000000",
+                 "05000000000000000000000000000000");
+
+    TestPoly1305("fffffffffffffffffffffffffffffffffbfefefefefefefefefefefefefefefe01010101010101010101010101010101",
+                 "0100000000000000000000000000000000000000000000000000000000000000",
+                 "00000000000000000000000000000000");
+
+    TestPoly1305("fdffffffffffffffffffffffffffffff",
+                 "0200000000000000000000000000000000000000000000000000000000000000",
+                 "faffffffffffffffffffffffffffffff");
+
+    TestPoly1305("e33594d7505e43b900000000000000003394d7505e4379cd01000000000000000000000000000000000000000000000001000000000000000000000000000000",
+                 "0100000000000000040000000000000000000000000000000000000000000000",
+                 "14000000000000005500000000000000");
+
+    TestPoly1305("e33594d7505e43b900000000000000003394d7505e4379cd010000000000000000000000000000000000000000000000",
+                 "0100000000000000040000000000000000000000000000000000000000000000",
+                 "13000000000000000000000000000000");
+}
+
+BOOST_AUTO_TEST_CASE(hkdf_hmac_sha256_l32_tests)
+{
+    // Use rfc5869 test vectors but truncated to 32 bytes (our implementation only support length 32)
+    TestHKDF_SHA256_32(
+                /*ikm_hex=*/"0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b",
+                /*salt_hex=*/"000102030405060708090a0b0c",
+                /*info_hex=*/"f0f1f2f3f4f5f6f7f8f9",
+                /*okm_check_hex=*/"3cb25f25faacd57a90434f64d0362f2a2d2d0a90cf1a5a4c5db02d56ecc4c5bf");
+    TestHKDF_SHA256_32(
+                "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f202122232425262728292a2b2c2d2e2f303132333435363738393a3b3c3d3e3f404142434445464748494a4b4c4d4e4f",
+                "606162636465666768696a6b6c6d6e6f707172737475767778797a7b7c7d7e7f808182838485868788898a8b8c8d8e8f909192939495969798999a9b9c9d9e9fa0a1a2a3a4a5a6a7a8a9aaabacadaeaf",
+                "b0b1b2b3b4b5b6b7b8b9babbbcbdbebfc0c1c2c3c4c5c6c7c8c9cacbcccdcecfd0d1d2d3d4d5d6d7d8d9dadbdcdddedfe0e1e2e3e4e5e6e7e8e9eaebecedeeeff0f1f2f3f4f5f6f7f8f9fafbfcfdfeff",
+                "b11e398dc80327a1c8e7f78c596a49344f012eda2d4efad8a050cc4c19afa97c");
+    TestHKDF_SHA256_32(
+                "0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b",
+                "",
+                "",
+                "8da4e775a563c18f715f802a063c5a31b8a11f5c5ee1879ec3454e5f3c738d2d");
+}
+
+static void TestChaCha20Poly1305AEAD(bool must_succeed, unsigned int expected_aad_length, const std::string& hex_m, const std::string& hex_k1, const std::string& hex_k2, const std::string& hex_aad_keystream, const std::string& hex_encrypted_message, const std::string& hex_encrypted_message_seq_999)
+{
+    // we need two sequence numbers, one for the payload cipher instance...
+    uint32_t seqnr_payload = 0;
+    // ... and one for the AAD (length) cipher instance
+    uint32_t seqnr_aad = 0;
+    // we need to keep track of the position in the AAD cipher instance
+    // keystream since we use the same 64byte output 21 times
+    // (21 times 3 bytes length < 64)
+    int aad_pos = 0;
+
+    std::vector<unsigned char> aead_K_1 = ParseHex(hex_k1);
+    std::vector<unsigned char> aead_K_2 = ParseHex(hex_k2);
+    std::vector<unsigned char> plaintext_buf = ParseHex(hex_m);
+    std::vector<unsigned char> expected_aad_keystream = ParseHex(hex_aad_keystream);
+    std::vector<unsigned char> expected_ciphertext_and_mac = ParseHex(hex_encrypted_message);
+    std::vector<unsigned char> expected_ciphertext_and_mac_sequence999 = ParseHex(hex_encrypted_message_seq_999);
+
+    std::vector<unsigned char> ciphertext_buf(plaintext_buf.size() + POLY1305_TAGLEN, 0);
+    std::vector<unsigned char> plaintext_buf_new(plaintext_buf.size(), 0);
+    std::vector<unsigned char> cmp_ctx_buffer(64);
+    uint32_t out_len = 0;
+
+    // create the AEAD instance
+    ChaCha20Poly1305AEAD aead(aead_K_1.data(), aead_K_1.size(), aead_K_2.data(), aead_K_2.size());
+
+    // create a chacha20 instance to compare against
+    ChaCha20 cmp_ctx(aead_K_1.data(), 32);
+
+    // encipher
+    bool res = aead.Crypt(seqnr_payload, seqnr_aad, aad_pos, ciphertext_buf.data(), ciphertext_buf.size(), plaintext_buf.data(), plaintext_buf.size(), true);
+    // make sure the operation succeeded if expected to succeed
+    BOOST_CHECK_EQUAL(res, must_succeed);
+    if (!res) return;
+
+    // verify ciphertext & mac against the test vector
+    BOOST_CHECK_EQUAL(expected_ciphertext_and_mac.size(), ciphertext_buf.size());
+    BOOST_CHECK(memcmp(ciphertext_buf.data(), expected_ciphertext_and_mac.data(), ciphertext_buf.size()) == 0);
+
+    // manually construct the AAD keystream
+    cmp_ctx.SetIV(seqnr_aad);
+    cmp_ctx.Seek(0);
+    cmp_ctx.Keystream(cmp_ctx_buffer.data(), 64);
+    BOOST_CHECK(memcmp(expected_aad_keystream.data(), cmp_ctx_buffer.data(), expected_aad_keystream.size()) == 0);
+    // crypt the 3 length bytes and compare the length
+    uint32_t len_cmp = 0;
+    len_cmp = (ciphertext_buf[0] ^ cmp_ctx_buffer[aad_pos + 0]) |
+              (ciphertext_buf[1] ^ cmp_ctx_buffer[aad_pos + 1]) << 8 |
+              (ciphertext_buf[2] ^ cmp_ctx_buffer[aad_pos + 2]) << 16;
+    BOOST_CHECK_EQUAL(len_cmp, expected_aad_length);
+
+    // encrypt / decrypt 1000 packets
+    for (size_t i = 0; i < 1000; ++i) {
+        res = aead.Crypt(seqnr_payload, seqnr_aad, aad_pos, ciphertext_buf.data(), ciphertext_buf.size(), plaintext_buf.data(), plaintext_buf.size(), true);
+        BOOST_CHECK(res);
+        BOOST_CHECK(aead.GetLength(&out_len, seqnr_aad, aad_pos, ciphertext_buf.data()));
+        BOOST_CHECK_EQUAL(out_len, expected_aad_length);
+        res = aead.Crypt(seqnr_payload, seqnr_aad, aad_pos, plaintext_buf_new.data(), plaintext_buf_new.size(), ciphertext_buf.dat
