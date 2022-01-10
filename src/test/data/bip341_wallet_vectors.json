@@ -153,4 +153,130 @@
                             "id": 2,
                             "script": "207337c0dd4253cb86f2c43a2351aadd82cccb12a172cd120452b9bb8324f2186aac",
                             "leafVersion": 192
-                    
+                        }
+                    ]
+                ]
+            },
+            "intermediary": {
+                "leafHashes": [
+                    "2645a02e0aac1fe69d69755733a9b7621b694bb5b5cde2bbfc94066ed62b9817",
+                    "ba982a91d4fc552163cb1c0da03676102d5b7a014304c01f0c77b2b8e888de1c",
+                    "9e31407bffa15fefbf5090b149d53959ecdf3f62b1246780238c24501d5ceaf6"
+                ],
+                "merkleRoot": "ccbd66c6f7e8fdab47b3a486f59d28262be857f30d4773f2d5ea47f7761ce0e2",
+                "tweak": "b57bfa183d28eeb6ad688ddaabb265b4a41fbf68e5fed2c72c74de70d5a786f4",
+                "tweakedPubkey": "91b64d5324723a985170e4dc5a0f84c041804f2cd12660fa5dec09fc21783605"
+            },
+            "expected": {
+                "scriptPubKey": "512091b64d5324723a985170e4dc5a0f84c041804f2cd12660fa5dec09fc21783605",
+                "bip350Address": "bc1pjxmy65eywgafs5tsunw95ruycpqcqnev6ynxp7jaasylcgtcxczs6n332e",
+                "scriptPathControlBlocks": [
+                    "c0e0dfe2300b0dd746a3f8674dfd4525623639042569d829c7f0eed9602d263e6fffe578e9ea769027e4f5a3de40732f75a88a6353a09d767ddeb66accef85e553",
+                    "c0e0dfe2300b0dd746a3f8674dfd4525623639042569d829c7f0eed9602d263e6f9e31407bffa15fefbf5090b149d53959ecdf3f62b1246780238c24501d5ceaf62645a02e0aac1fe69d69755733a9b7621b694bb5b5cde2bbfc94066ed62b9817",
+                    "c0e0dfe2300b0dd746a3f8674dfd4525623639042569d829c7f0eed9602d263e6fba982a91d4fc552163cb1c0da03676102d5b7a014304c01f0c77b2b8e888de1c2645a02e0aac1fe69d69755733a9b7621b694bb5b5cde2bbfc94066ed62b9817"
+                ]
+            }
+        },
+        {
+            "given": {
+                "internalPubkey": "55adf4e8967fbd2e29f20ac896e60c3b0f1d5b0efa9d34941b5958c7b0a0312d",
+                "scriptTree": [
+                    {
+                        "id": 0,
+                        "script": "2071981521ad9fc9036687364118fb6ccd2035b96a423c59c5430e98310a11abe2ac",
+                        "leafVersion": 192
+                    },
+                    [
+                        {
+                            "id": 1,
+                            "script": "20d5094d2dbe9b76e2c245a2b89b6006888952e2faa6a149ae318d69e520617748ac",
+                            "leafVersion": 192
+                        },
+                        {
+                            "id": 2,
+                            "script": "20c440b462ad48c7a77f94cd4532d8f2119dcebbd7c9764557e62726419b08ad4cac",
+                            "leafVersion": 192
+                        }
+                    ]
+                ]
+            },
+            "intermediary": {
+                "leafHashes": [
+                    "f154e8e8e17c31d3462d7132589ed29353c6fafdb884c5a6e04ea938834f0d9d",
+                    "737ed1fe30bc42b8022d717b44f0d93516617af64a64753b7a06bf16b26cd711",
+                    "d7485025fceb78b9ed667db36ed8b8dc7b1f0b307ac167fa516fe4352b9f4ef7"
+                ],
+                "merkleRoot": "2f6b2c5397b6d68ca18e09a3f05161668ffe93a988582d55c6f07bd5b3329def",
+                "tweak": "6579138e7976dc13b6a92f7bfd5a2fc7684f5ea42419d43368301470f3b74ed9",
+                "tweakedPubkey": "75169f4001aa68f15bbed28b218df1d0a62cbbcf1188c6665110c293c907b831"
+            },
+            "expected": {
+                "scriptPubKey": "512075169f4001aa68f15bbed28b218df1d0a62cbbcf1188c6665110c293c907b831",
+                "bip350Address": "bc1pw5tf7sqp4f50zka7629jrr036znzew70zxyvvej3zrpf8jg8hqcssyuewe",
+                "scriptPathControlBlocks": [
+                    "c155adf4e8967fbd2e29f20ac896e60c3b0f1d5b0efa9d34941b5958c7b0a0312d3cd369a528b326bc9d2133cbd2ac21451acb31681a410434672c8e34fe757e91",
+                    "c155adf4e8967fbd2e29f20ac896e60c3b0f1d5b0efa9d34941b5958c7b0a0312dd7485025fceb78b9ed667db36ed8b8dc7b1f0b307ac167fa516fe4352b9f4ef7f154e8e8e17c31d3462d7132589ed29353c6fafdb884c5a6e04ea938834f0d9d",
+                    "c155adf4e8967fbd2e29f20ac896e60c3b0f1d5b0efa9d34941b5958c7b0a0312d737ed1fe30bc42b8022d717b44f0d93516617af64a64753b7a06bf16b26cd711f154e8e8e17c31d3462d7132589ed29353c6fafdb884c5a6e04ea938834f0d9d"
+                ]
+            }
+        }
+    ],
+    "keyPathSpending": [
+        {
+            "given": {
+                "rawUnsignedTx": "02000000097de20cbff686da83a54981d2b9bab3586f4ca7e48f57f5b55963115f3b334e9c010000000000000000d7b7cab57b1393ace2d064f4d4a2cb8af6def61273e127517d44759b6dafdd990000000000fffffffff8e1f583384333689228c5d28eac13366be082dc57441760d957275419a418420000000000fffffffff0689180aa63b30cb162a73c6d2a38b7eeda2a83ece74310fda0843ad604853b0100000000feffffffaa5202bdf6d8ccd2ee0f0202afbbb7461d9264a25e5bfd3c5a52ee1239e0ba6c0000000000feffffff956149bdc66faa968eb2be2d2faa29718acbfe3941215893a2a3446d32acd050000000000000000000e664b9773b88c09c32cb70a2a3e4da0ced63b7ba3b22f848531bbb1d5d5f4c94010000000000000000e9aa6b8e6c9de67619e6a3924ae25696bb7b694bb677a632a74ef7eadfd4eabf0000000000ffffffffa778eb6a263dc090464cd125c466b5a99667720b1c110468831d058aa1b82af10100000000ffffffff0200ca9a3b000000001976a91406afd46bcdfd22ef94ac122aa11f241244a37ecc88ac807840cb0000000020ac9a87f5594be208f8532db38cff670c450ed2fea8fcdefcc9a663f78bab962b0065cd1d",
+                "utxosSpent": [
+                    {
+                        "scriptPubKey": "512053a1f6e454df1aa2776a2814a721372d6258050de330b3c6d10ee8f4e0dda343",
+                        "amountSats": 420000000
+                    },
+                    {
+                        "scriptPubKey": "5120147c9c57132f6e7ecddba9800bb0c4449251c92a1e60371ee77557b6620f3ea3",
+                        "amountSats": 462000000
+                    },
+                    {
+                        "scriptPubKey": "76a914751e76e8199196d454941c45d1b3a323f1433bd688ac",
+                        "amountSats": 294000000
+                    },
+                    {
+                        "scriptPubKey": "5120e4d810fd50586274face62b8a807eb9719cef49c04177cc6b76a9a4251d5450e",
+                        "amountSats": 504000000
+                    },
+                    {
+                        "scriptPubKey": "512091b64d5324723a985170e4dc5a0f84c041804f2cd12660fa5dec09fc21783605",
+                        "amountSats": 630000000
+                    },
+                    {
+                        "scriptPubKey": "00147dd65592d0ab2fe0d0257d571abf032cd9db93dc",
+                        "amountSats": 378000000
+                    },
+                    {
+                        "scriptPubKey": "512075169f4001aa68f15bbed28b218df1d0a62cbbcf1188c6665110c293c907b831",
+                        "amountSats": 672000000
+                    },
+                    {
+                        "scriptPubKey": "5120712447206d7a5238acc7ff53fbe94a3b64539ad291c7cdbc490b7577e4b17df5",
+                        "amountSats": 546000000
+                    },
+                    {
+                        "scriptPubKey": "512077e30a5522dd9f894c3f8b8bd4c4b2cf82ca7da8a3ea6a239655c39c050ab220",
+                        "amountSats": 588000000
+                    }
+                ]
+            },
+            "intermediary": {
+                "hashAmounts": "58a6964a4f5f8f0b642ded0a8a553be7622a719da71d1f5befcefcdee8e0fde6",
+                "hashOutputs": "a2e6dab7c1f0dcd297c8d61647fd17d821541ea69c3cc37dcbad7f90d4eb4bc5",
+                "hashPrevouts": "e3b33bb4ef3a52ad1fffb555c0d82828eb22737036eaeb02a235d82b909c4c3f",
+                "hashScriptPubkeys": "23ad0f61ad2bca5ba6a7693f50fce988e17c3780bf2b1e720cfbb38fbdd52e21",
+                "hashSequences": "18959c7221ab5ce9e26c3cd67b22c24f8baa54bac281d8e6b05e400e6c3a957e"
+            },
+            "inputSpending": [
+                {
+                    "given": {
+                        "txinIndex": 0,
+                        "internalPrivkey": "6b973d88838f27366ed61c9ad6367663045cb456e28335c109e30717ae0c6baa",
+                        "merkleRoot": null,
+                        "hashType": 3
+                    },
+                    "intermediary": {
