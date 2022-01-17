@@ -31,4 +31,19 @@ FUZZ_TARGET(block_header)
     {
         CBlockHeader mut_block_header = *block_header;
         mut_block_header.SetNull();
-       
+        assert(mut_block_header.IsNull());
+        CBlock block{*block_header};
+        assert(block.GetBlockHeader().GetHash() == block_header->GetHash());
+        (void)block.ToString();
+        block.SetNull();
+        assert(block.GetBlockHeader().GetHash() == mut_block_header.GetHash());
+    }
+    {
+        std::optional<CBlockLocator> block_locator = ConsumeDeserializable<CBlockLocator>(fuzzed_data_provider);
+        if (block_locator) {
+            (void)block_locator->IsNull();
+            block_locator->SetNull();
+            assert(block_locator->IsNull());
+        }
+    }
+}
