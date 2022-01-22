@@ -36,4 +36,12 @@ inline void FuzzFrameworkEmptyInitFun() {}
 
 #define FUZZ_TARGET_INIT_HIDDEN(name, init_fun, hidden)                               \
     void name##_fuzz_target(FuzzBufferType);                                          \
-   
+    struct name##_Before_Main {                                                       \
+        name##_Before_Main()                                                          \
+        {                                                                             \
+            FuzzFrameworkRegisterTarget(#name, name##_fuzz_target, init_fun, hidden); \
+        }                                                                             \
+    } const static g_##name##_before_main;                                            \
+    void name##_fuzz_target(FuzzBufferType buffer)
+
+#endif // BITCOIN_TEST_FUZZ_FUZZ_H
