@@ -45,4 +45,5 @@ FUZZ_TARGET(merkleblock)
     (void)partial_merkle_tree.GetNumTransactions();
     std::vector<uint256> matches;
     std::vector<unsigned int> indices;
-    (void)partial_merkle_tree.ExtractMatche
+    (void)partial_merkle_tree.ExtractMatches(matches, indices);
+}
