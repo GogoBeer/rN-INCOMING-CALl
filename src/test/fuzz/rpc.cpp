@@ -259,4 +259,112 @@ std::string ConsumeScalarRPCArgument(FuzzedDataProvider& fuzzed_data_provider)
             if (!opt_tx) {
                 return;
             }
-            CDataStream
+            CDataStream data_stream{SER_NETWORK, fuzzed_data_provider.ConsumeBool() ? PROTOCOL_VERSION : (PROTOCOL_VERSION | SERIALIZE_TRANSACTION_NO_WITNESS)};
+            data_stream << *opt_tx;
+            r = HexStr(data_stream);
+        },
+        [&] {
+            // base64 encoded psbt
+            std::optional<PartiallySignedTransaction> opt_psbt = ConsumeDeserializable<PartiallySignedTransaction>(fuzzed_data_provider);
+            if (!opt_psbt) {
+                return;
+            }
+            CDataStream data_stream{SER_NETWORK, PROTOCOL_VERSION};
+            data_stream << *opt_psbt;
+            r = EncodeBase64({data_stream.begin(), data_stream.end()});
+        },
+        [&] {
+            // base58 encoded key
+            const std::vector<uint8_t> random_bytes = fuzzed_data_provider.ConsumeBytes<uint8_t>(32);
+            CKey key;
+            key.Set(random_bytes.begin(), random_bytes.end(), fuzzed_data_provider.ConsumeBool());
+            if (!key.IsValid()) {
+                return;
+            }
+            r = EncodeSecret(key);
+        },
+        [&] {
+            // hex encoded pubkey
+            const std::vector<uint8_t> random_bytes = fuzzed_data_provider.ConsumeBytes<uint8_t>(32);
+            CKey key;
+            key.Set(random_bytes.begin(), random_bytes.end(), fuzzed_data_provider.ConsumeBool());
+            if (!key.IsValid()) {
+                return;
+            }
+            r = HexStr(key.GetPubKey());
+        });
+    return r;
+}
+
+std::string ConsumeArrayRPCArgument(FuzzedDataProvider& fuzzed_data_provider)
+{
+    std::vector<std::string> scalar_arguments;
+    LIMITED_WHILE(fuzzed_data_provider.ConsumeBool(), 100) {
+        scalar_arguments.push_back(ConsumeScalarRPCArgument(fuzzed_data_provider));
+    }
+    return "[\"" + Join(scalar_arguments, "\",\"") + "\"]";
+}
+
+std::string ConsumeRPCArgument(FuzzedDataProvider& fuzzed_data_provider)
+{
+    return fuzzed_data_provider.ConsumeBool() ? ConsumeScalarRPCArgument(fuzzed_data_provider) : ConsumeArrayRPCArgument(fuzzed_data_provider);
+}
+
+RPCFuzzTestingSetup* InitializeRPCFuzzTestingSetup()
+{
+    static const auto setup = MakeNoLogFileContext<RPCFuzzTestingSetup>();
+    SetRPCWarmupFinished();
+    return setup.get();
+}
+}; // namespace
+
+void initialize_rpc()
+{
+    rpc_testing_setup = InitializeRPCFuzzTestingSetup();
+    const std::vector<std::string> supported_rpc_commands = rpc_testing_setup->GetRPCCommands();
+    for (const std::string& rpc_command : supported_rpc_commands) {
+        const bool safe_for_fuzzing = std::find(RPC_COMMANDS_SAFE_FOR_FUZZING.begin(), RPC_COMMANDS_SAFE_FOR_FUZZING.end(), rpc_command) != RPC_COMMANDS_SAFE_FOR_FUZZING.end();
+        const bool not_safe_for_fuzzing = std::find(RPC_COMMANDS_NOT_SAFE_FOR_FUZZING.begin(), RPC_COMMANDS_NOT_SAFE_FOR_FUZZING.end(), rpc_command) != RPC_COMMANDS_NOT_SAFE_FOR_FUZZING.end();
+        if (!(safe_for_fuzzing || not_safe_for_fuzzing)) {
+            std::cerr << "Error: RPC command \"" << rpc_command << "\" not found in RPC_COMMANDS_SAFE_FOR_FUZZING or RPC_COMMANDS_NOT_SAFE_FOR_FUZZING. Please update " << __FILE__ << ".\n";
+            std::terminate();
+        }
+        if (safe_for_fuzzing && not_safe_for_fuzzing) {
+            std::cerr << "Error: RPC command \"" << rpc_command << "\" found in *both* RPC_COMMANDS_SAFE_FOR_FUZZING and RPC_COMMANDS_NOT_SAFE_FOR_FUZZING. Please update " << __FILE__ << ".\n";
+            std::terminate();
+        }
+    }
+    const char* limit_to_rpc_command_env = std::getenv("LIMIT_TO_RPC_COMMAND");
+    if (limit_to_rpc_command_env != nullptr) {
+        g_limit_to_rpc_command = std::string{limit_to_rpc_command_env};
+    }
+}
+
+FUZZ_TARGET_INIT(rpc, initialize_rpc)
+{
+    FuzzedDataProvider fuzzed_data_provider{buffer.data(), buffer.size()};
+    SetMockTime(ConsumeTime(fuzzed_data_provider));
+    const std::string rpc_command = fuzzed_data_provider.ConsumeRandomLengthString(64);
+    if (!g_limit_to_rpc_command.empty() && rpc_command != g_limit_to_rpc_command) {
+        return;
+    }
+    const bool safe_for_fuzzing = std::find(RPC_COMMANDS_SAFE_FOR_FUZZING.begin(), RPC_COMMANDS_SAFE_FOR_FUZZING.end(), rpc_command) != RPC_COMMANDS_SAFE_FOR_FUZZING.end();
+    if (!safe_for_fuzzing) {
+        return;
+    }
+    std::vector<std::string> arguments;
+    LIMITED_WHILE(fuzzed_data_provider.ConsumeBool(), 100) {
+        arguments.push_back(ConsumeRPCArgument(fuzzed_data_provider));
+    }
+    try {
+        rpc_testing_setup->CallRPC(rpc_command, arguments);
+    } catch (const UniValue& json_rpc_error) {
+        const std::string error_msg{find_value(json_rpc_error, "message").get_str()};
+        // Once c++20 is allowed, starts_with can be used.
+        // if (error_msg.starts_with("Internal bug detected")) {
+        if (0 == error_msg.rfind("Internal bug detected", 0)) {
+            // Only allow the intentional internal bug
+            assert(error_msg.find("trigger_internal_bug") != std::string::npos);
+        }
+    }
+}
