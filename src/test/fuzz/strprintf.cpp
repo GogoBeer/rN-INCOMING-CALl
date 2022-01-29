@@ -79,4 +79,56 @@ FUZZ_TARGET(str_printf)
     }
 
     if (format_string.find('%') != std::string::npos && format_string.find('c') != std::string::npos) {
-        
+        // Avoid triggering the following:
+        // * strprintf("%c", 1.31783e+38);
+        // tinyformat.h:244:36: runtime error: 1.31783e+38 is outside the range of representable values of type 'char'
+        return;
+    }
+
+    if (format_string.find('%') != std::string::npos && format_string.find('*') != std::string::npos) {
+        // Avoid triggering the following:
+        // * strprintf("%*", -2.33527e+38);
+        // tinyformat.h:283:65: runtime error: -2.33527e+38 is outside the range of representable values of type 'int'
+        // * strprintf("%*", -2147483648);
+        // tinyformat.h:763:25: runtime error: negation of -2147483648 cannot be represented in type 'int'; cast to an unsigned type to negate this value to itself
+        return;
+    }
+
+    try {
+        CallOneOf(
+            fuzzed_data_provider,
+            [&] {
+                (void)strprintf(format_string, fuzzed_data_provider.ConsumeFloatingPoint<float>());
+                (void)tinyformat::format(bilingual_string, fuzzed_data_provider.ConsumeFloatingPoint<float>());
+            },
+            [&] {
+                (void)strprintf(format_string, fuzzed_data_provider.ConsumeFloatingPoint<double>());
+                (void)tinyformat::format(bilingual_string, fuzzed_data_provider.ConsumeFloatingPoint<double>());
+            },
+            [&] {
+                (void)strprintf(format_string, fuzzed_data_provider.ConsumeIntegral<int16_t>());
+                (void)tinyformat::format(bilingual_string, fuzzed_data_provider.ConsumeIntegral<int16_t>());
+            },
+            [&] {
+                (void)strprintf(format_string, fuzzed_data_provider.ConsumeIntegral<uint16_t>());
+                (void)tinyformat::format(bilingual_string, fuzzed_data_provider.ConsumeIntegral<uint16_t>());
+            },
+            [&] {
+                (void)strprintf(format_string, fuzzed_data_provider.ConsumeIntegral<int32_t>());
+                (void)tinyformat::format(bilingual_string, fuzzed_data_provider.ConsumeIntegral<int32_t>());
+            },
+            [&] {
+                (void)strprintf(format_string, fuzzed_data_provider.ConsumeIntegral<uint32_t>());
+                (void)tinyformat::format(bilingual_string, fuzzed_data_provider.ConsumeIntegral<uint32_t>());
+            },
+            [&] {
+                (void)strprintf(format_string, fuzzed_data_provider.ConsumeIntegral<int64_t>());
+                (void)tinyformat::format(bilingual_string, fuzzed_data_provider.ConsumeIntegral<int64_t>());
+            },
+            [&] {
+                (void)strprintf(format_string, fuzzed_data_provider.ConsumeIntegral<uint64_t>());
+                (void)tinyformat::format(bilingual_string, fuzzed_data_provider.ConsumeIntegral<uint64_t>());
+            });
+    } catch (const tinyformat::format_error&) {
+    }
+}
