@@ -57,4 +57,13 @@ FUZZ_TARGET_INIT(signature_checker, initialize_signature_checker)
 {
     FuzzedDataProvider fuzzed_data_provider(buffer.data(), buffer.size());
     const unsigned int flags = fuzzed_data_provider.ConsumeIntegral<unsigned int>();
-    const SigVersion sig_version = fuzzed_data_prov
+    const SigVersion sig_version = fuzzed_data_provider.PickValueInArray({SigVersion::BASE, SigVersion::WITNESS_V0});
+    const auto script_1{ConsumeScript(fuzzed_data_provider)};
+    const auto script_2{ConsumeScript(fuzzed_data_provider)};
+    std::vector<std::vector<unsigned char>> stack;
+    (void)EvalScript(stack, script_1, flags, FuzzedSignatureChecker(fuzzed_data_provider), sig_version, nullptr);
+    if (!IsValidFlagCombination(flags)) {
+        return;
+    }
+    (void)VerifyScript(script_1, script_2, nullptr, flags, FuzzedSignatureChecker(fuzzed_data_provider), nullptr);
+}
