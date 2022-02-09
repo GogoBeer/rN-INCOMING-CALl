@@ -205,4 +205,148 @@ FUZZ_TARGET_INIT(tx_pool_standard, initialize_tx_pool)
                 Assert(outpoints_rbf.insert(in.prevout).second);
             }
             return tx;
-        }()
+        }();
+
+        if (fuzzed_data_provider.ConsumeBool()) {
+            MockTime(fuzzed_data_provider, chainstate);
+        }
+        if (fuzzed_data_provider.ConsumeBool()) {
+            SetMempoolConstraints(*node.args, fuzzed_data_provider);
+        }
+        if (fuzzed_data_provider.ConsumeBool()) {
+            tx_pool.RollingFeeUpdate();
+        }
+        if (fuzzed_data_provider.ConsumeBool()) {
+            const auto& txid = fuzzed_data_provider.ConsumeBool() ?
+                                   tx->GetHash() :
+                                   PickValue(fuzzed_data_provider, outpoints_rbf).hash;
+            const auto delta = fuzzed_data_provider.ConsumeIntegralInRange<CAmount>(-50 * COIN, +50 * COIN);
+            tx_pool.PrioritiseTransaction(txid, delta);
+        }
+
+        // Remember all removed and added transactions
+        std::set<CTransactionRef> removed;
+        std::set<CTransactionRef> added;
+        auto txr = std::make_shared<TransactionsDelta>(removed, added);
+        RegisterSharedValidationInterface(txr);
+        const bool bypass_limits = fuzzed_data_provider.ConsumeBool();
+        ::fRequireStandard = fuzzed_data_provider.ConsumeBool();
+
+        // Make sure ProcessNewPackage on one transaction works and always fully validates the transaction.
+        // The result is not guaranteed to be the same as what is returned by ATMP.
+        const auto result_package = WITH_LOCK(::cs_main,
+                                    return ProcessNewPackage(chainstate, tx_pool, {tx}, true));
+        auto it = result_package.m_tx_results.find(tx->GetWitnessHash());
+        Assert(it != result_package.m_tx_results.end());
+        Assert(it->second.m_result_type == MempoolAcceptResult::ResultType::VALID ||
+               it->second.m_result_type == MempoolAcceptResult::ResultType::INVALID);
+
+        const auto res = WITH_LOCK(::cs_main, return AcceptToMemoryPool(chainstate, tx, GetTime(), bypass_limits, /*test_accept=*/false));
+        const bool accepted = res.m_result_type == MempoolAcceptResult::ResultType::VALID;
+        SyncWithValidationInterfaceQueue();
+        UnregisterSharedValidationInterface(txr);
+
+        Assert(accepted != added.empty());
+        Assert(accepted == res.m_state.IsValid());
+        Assert(accepted != res.m_state.IsInvalid());
+        if (accepted) {
+            Assert(added.size() == 1); // For now, no package acceptance
+            Assert(tx == *added.begin());
+        } else {
+            // Do not consider rejected transaction removed
+            removed.erase(tx);
+        }
+
+        // Helper to insert spent and created outpoints of a tx into collections
+        using Sets = std::vector<std::reference_wrapper<std::set<COutPoint>>>;
+        const auto insert_tx = [](Sets created_by_tx, Sets consumed_by_tx, const auto& tx) {
+            for (size_t i{0}; i < tx.vout.size(); ++i) {
+                for (auto& set : created_by_tx) {
+                    Assert(set.get().emplace(tx.GetHash(), i).second);
+                }
+            }
+            for (const auto& in : tx.vin) {
+                for (auto& set : consumed_by_tx) {
+                    Assert(set.get().insert(in.prevout).second);
+                }
+            }
+        };
+        // Add created outpoints, remove spent outpoints
+        {
+            // Outpoints that no longer exist at all
+            std::set<COutPoint> consumed_erased;
+            // Outpoints that no longer count toward the total supply
+            std::set<COutPoint> consumed_supply;
+            for (const auto& removed_tx : removed) {
+                insert_tx(/*created_by_tx=*/{consumed_erased}, /*consumed_by_tx=*/{outpoints_supply}, /*tx=*/*removed_tx);
+            }
+            for (const auto& added_tx : added) {
+                insert_tx(/*created_by_tx=*/{outpoints_supply, outpoints_rbf}, /*consumed_by_tx=*/{consumed_supply}, /*tx=*/*added_tx);
+            }
+            for (const auto& p : consumed_erased) {
+                Assert(outpoints_supply.erase(p) == 1);
+                Assert(outpoints_rbf.erase(p) == 1);
+            }
+            for (const auto& p : consumed_supply) {
+                Assert(outpoints_supply.erase(p) == 1);
+            }
+        }
+    }
+    Finish(fuzzed_data_provider, tx_pool, chainstate);
+}
+
+FUZZ_TARGET_INIT(tx_pool, initialize_tx_pool)
+{
+    FuzzedDataProvider fuzzed_data_provider(buffer.data(), buffer.size());
+    const auto& node = g_setup->m_node;
+    auto& chainstate = node.chainman->ActiveChainstate();
+
+    MockTime(fuzzed_data_provider, chainstate);
+    SetMempoolConstraints(*node.args, fuzzed_data_provider);
+
+    std::vector<uint256> txids;
+    for (const auto& outpoint : g_outpoints_coinbase_init_mature) {
+        txids.push_back(outpoint.hash);
+    }
+    for (int i{0}; i <= 3; ++i) {
+        // Add some immature and non-existent outpoints
+        txids.push_back(g_outpoints_coinbase_init_immature.at(i).hash);
+        txids.push_back(ConsumeUInt256(fuzzed_data_provider));
+    }
+
+    CTxMemPool tx_pool_{/*estimator=*/nullptr, /*check_ratio=*/1};
+    MockedTxPool& tx_pool = *static_cast<MockedTxPool*>(&tx_pool_);
+
+    LIMITED_WHILE(fuzzed_data_provider.ConsumeBool(), 300)
+    {
+        const auto mut_tx = ConsumeTransaction(fuzzed_data_provider, txids);
+
+        if (fuzzed_data_provider.ConsumeBool()) {
+            MockTime(fuzzed_data_provider, chainstate);
+        }
+        if (fuzzed_data_provider.ConsumeBool()) {
+            SetMempoolConstraints(*node.args, fuzzed_data_provider);
+        }
+        if (fuzzed_data_provider.ConsumeBool()) {
+            tx_pool.RollingFeeUpdate();
+        }
+        if (fuzzed_data_provider.ConsumeBool()) {
+            const auto& txid = fuzzed_data_provider.ConsumeBool() ?
+                                   mut_tx.GetHash() :
+                                   PickValue(fuzzed_data_provider, txids);
+            const auto delta = fuzzed_data_provider.ConsumeIntegralInRange<CAmount>(-50 * COIN, +50 * COIN);
+            tx_pool.PrioritiseTransaction(txid, delta);
+        }
+
+        const auto tx = MakeTransactionRef(mut_tx);
+        const bool bypass_limits = fuzzed_data_provider.ConsumeBool();
+        ::fRequireStandard = fuzzed_data_provider.ConsumeBool();
+        const auto res = WITH_LOCK(::cs_main, return AcceptToMemoryPool(chainstate, tx, GetTime(), bypass_limits, /*test_accept=*/false));
+        const bool accepted = res.m_result_type == MempoolAcceptResult::ResultType::VALID;
+        if (accepted) {
+            txids.push_back(tx->GetHash());
+        }
+    }
+    Finish(fuzzed_data_provider, tx_pool, chainstate);
+}
+} // namespace
