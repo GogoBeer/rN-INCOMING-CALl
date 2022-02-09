@@ -106,4 +106,17 @@ FUZZ_TARGET_INIT(system, initialize_system)
     (void)args_manager.GetArg(s1, s2);
     (void)args_manager.GetArgFlags(s1);
     (void)args_manager.GetArgs(s1);
-    (void)args_manager.G
+    (void)args_manager.GetBoolArg(s1, b);
+    try {
+        (void)args_manager.GetChainName();
+    } catch (const std::runtime_error&) {
+    }
+    (void)args_manager.GetHelpMessage();
+    (void)args_manager.GetUnrecognizedSections();
+    (void)args_manager.GetUnsuitableSectionOnlyArgs();
+    (void)args_manager.IsArgNegated(s1);
+    (void)args_manager.IsArgSet(s1);
+
+    (void)HelpRequested(args_manager);
+}
+} // namespace
