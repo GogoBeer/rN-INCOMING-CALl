@@ -263,4 +263,89 @@ FUZZ_TARGET_INIT(versionbits, initialize)
     bool signal = (signalling_mask >> (period % 32)) & 1;
     if (signal) ++blocks_sig;
     CBlockIndex* current_block = blocks.mine_block(signal);
-    ass
+    assert(checker.Condition(current_block) == signal);
+
+    // GetStateStatistics is safe on a period boundary
+    // and has progressed to a new period
+    const BIP9Stats stats = checker.GetStateStatisticsFor(current_block);
+    assert(stats.period == period);
+    assert(stats.threshold == threshold);
+    assert(stats.elapsed == 0);
+    assert(stats.count == 0);
+    assert(stats.possible == true);
+
+    // More interesting is whether the state changed.
+    const ThresholdState state = checker.GetStateFor(current_block);
+    const int since = checker.GetStateSinceHeightFor(current_block);
+
+    // since is straightforward:
+    assert(since % period == 0);
+    assert(0 <= since && since <= current_block->nHeight + 1);
+    if (state == exp_state) {
+        assert(since == exp_since);
+    } else {
+        assert(since == current_block->nHeight + 1);
+    }
+
+    // state is where everything interesting is
+    switch (state) {
+    case ThresholdState::DEFINED:
+        assert(since == 0);
+        assert(exp_state == ThresholdState::DEFINED);
+        assert(current_block->GetMedianTimePast() < checker.m_begin);
+        break;
+    case ThresholdState::STARTED:
+        assert(current_block->GetMedianTimePast() >= checker.m_begin);
+        if (exp_state == ThresholdState::STARTED) {
+            assert(blocks_sig < threshold);
+            assert(current_block->GetMedianTimePast() < checker.m_end);
+        } else {
+            assert(exp_state == ThresholdState::DEFINED);
+        }
+        break;
+    case ThresholdState::LOCKED_IN:
+        if (exp_state == ThresholdState::LOCKED_IN) {
+            assert(current_block->nHeight + 1 < min_activation);
+        } else {
+            assert(exp_state == ThresholdState::STARTED);
+            assert(blocks_sig >= threshold);
+        }
+        break;
+    case ThresholdState::ACTIVE:
+        assert(always_active_test || min_activation <= current_block->nHeight + 1);
+        assert(exp_state == ThresholdState::ACTIVE || exp_state == ThresholdState::LOCKED_IN);
+        break;
+    case ThresholdState::FAILED:
+        assert(never_active_test || current_block->GetMedianTimePast() >= checker.m_end);
+        if (exp_state == ThresholdState::STARTED) {
+            assert(blocks_sig < threshold);
+        } else {
+            assert(exp_state == ThresholdState::FAILED);
+        }
+        break;
+    default:
+        assert(false);
+    }
+
+    if (blocks.size() >= period * max_periods) {
+        // we chose the timeout (and block times) so that by the time we have this many blocks it's all over
+        assert(state == ThresholdState::ACTIVE || state == ThresholdState::FAILED);
+    }
+
+    if (always_active_test) {
+        // "always active" has additional restrictions
+        assert(state == ThresholdState::ACTIVE);
+        assert(exp_state == ThresholdState::ACTIVE);
+        assert(since == 0);
+    } else if (never_active_test) {
+        // "never active" does too
+        assert(state == ThresholdState::FAILED);
+        assert(exp_state == ThresholdState::FAILED);
+        assert(since == 0);
+    } else {
+        // for signalled deployments, the initial state is always DEFINED
+        assert(since > 0 || state == ThresholdState::DEFINED);
+        assert(exp_since > 0 || exp_state == ThresholdState::DEFINED);
+    }
+}
+} // namespace
