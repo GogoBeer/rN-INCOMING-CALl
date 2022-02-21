@@ -193,4 +193,186 @@ BOOST_AUTO_TEST_CASE(peer_protection_test)
         8, [](NodeEvictionCandidate& c) {
             c.m_connected = std::chrono::seconds{c.id};
             c.m_is_local = (c.id == 6);
-     
+            c.m_network = (c.id == 5) ? NET_ONION : NET_IPV4;
+        },
+        /*protected_peer_ids=*/{0, 1, 5, 6},
+        /*unprotected_peer_ids=*/{2, 3, 4, 7},
+        random_context));
+
+    // Combined test: expect having 3 localhost and 3 onion peers out of 12 to
+    // protect 2 localhost and 1 onion, plus 3 other peers, sorted by longest
+    // uptime; stable sort breaks ties with the array order of localhost first.
+    BOOST_CHECK(IsProtected(
+        num_peers, [](NodeEvictionCandidate& c) {
+            c.m_connected = std::chrono::seconds{c.id};
+            c.m_is_local = (c.id == 6 || c.id == 9 || c.id == 11);
+            c.m_network = (c.id == 7 || c.id == 8 || c.id == 10) ? NET_ONION : NET_IPV6;
+        },
+        /*protected_peer_ids=*/{0, 1, 2, 6, 7, 9},
+        /*unprotected_peer_ids=*/{3, 4, 5, 8, 10, 11},
+        random_context));
+
+    // Combined test: expect having 4 localhost and 1 onion peer out of 12 to
+    // protect 2 localhost and 1 onion, plus 3 other peers, sorted by longest uptime.
+    BOOST_CHECK(IsProtected(
+        num_peers, [](NodeEvictionCandidate& c) {
+            c.m_connected = std::chrono::seconds{c.id};
+            c.m_is_local = (c.id > 4 && c.id < 9);
+            c.m_network = (c.id == 10) ? NET_ONION : NET_IPV4;
+        },
+        /*protected_peer_ids=*/{0, 1, 2, 5, 6, 10},
+        /*unprotected_peer_ids=*/{3, 4, 7, 8, 9, 11},
+        random_context));
+
+    // Combined test: expect having 4 localhost and 2 onion peers out of 16 to
+    // protect 2 localhost and 2 onions, plus 4 other peers, sorted by longest uptime.
+    BOOST_CHECK(IsProtected(
+        16, [](NodeEvictionCandidate& c) {
+            c.m_connected = std::chrono::seconds{c.id};
+            c.m_is_local = (c.id == 6 || c.id == 9 || c.id == 11 || c.id == 12);
+            c.m_network = (c.id == 8 || c.id == 10) ? NET_ONION : NET_IPV6;
+        },
+        /*protected_peer_ids=*/{0, 1, 2, 3, 6, 8, 9, 10},
+        /*unprotected_peer_ids=*/{4, 5, 7, 11, 12, 13, 14, 15},
+        random_context));
+
+    // Combined test: expect having 5 localhost and 1 onion peer out of 16 to
+    // protect 3 localhost (recovering the unused onion slot), 1 onion, and 4
+    // others, sorted by longest uptime.
+    BOOST_CHECK(IsProtected(
+        16, [](NodeEvictionCandidate& c) {
+            c.m_connected = std::chrono::seconds{c.id};
+            c.m_is_local = (c.id > 10);
+            c.m_network = (c.id == 10) ? NET_ONION : NET_IPV4;
+        },
+        /*protected_peer_ids=*/{0, 1, 2, 3, 10, 11, 12, 13},
+        /*unprotected_peer_ids=*/{4, 5, 6, 7, 8, 9, 14, 15},
+        random_context));
+
+    // Combined test: expect having 1 localhost and 4 onion peers out of 16 to
+    // protect 1 localhost and 3 onions (recovering the unused localhost slot),
+    // plus 4 others, sorted by longest uptime.
+    BOOST_CHECK(IsProtected(
+        16, [](NodeEvictionCandidate& c) {
+            c.m_connected = std::chrono::seconds{c.id};
+            c.m_is_local = (c.id == 15);
+            c.m_network = (c.id > 6 && c.id < 11) ? NET_ONION : NET_IPV6;
+        },
+        /*protected_peer_ids=*/{0, 1, 2, 3, 7, 8, 9, 15},
+        /*unprotected_peer_ids=*/{5, 6, 10, 11, 12, 13, 14},
+        random_context));
+
+    // Combined test: expect having 2 onion and 4 I2P out of 12 peers to protect
+    // 2 onion (prioritized for having fewer candidates) and 1 I2P, plus 3
+    // others, sorted by longest uptime.
+    BOOST_CHECK(IsProtected(
+        num_peers, [](NodeEvictionCandidate& c) {
+            c.m_connected = std::chrono::seconds{c.id};
+            c.m_is_local = false;
+            if (c.id == 8 || c.id == 10) {
+                c.m_network = NET_ONION;
+            } else if (c.id == 6 || c.id == 9 || c.id == 11 || c.id == 12) {
+                c.m_network = NET_I2P;
+            } else {
+                c.m_network = NET_IPV4;
+            }
+        },
+        /*protected_peer_ids=*/{0, 1, 2, 6, 8, 10},
+        /*unprotected_peer_ids=*/{3, 4, 5, 7, 9, 11},
+        random_context));
+
+    // Tests with 3 networks...
+
+    // Combined test: expect having 1 localhost, 1 I2P and 1 onion peer out of 4
+    // to protect 1 I2P, 0 localhost, 0 onion and 1 other peer (2 total), sorted
+    // by longest uptime; stable sort breaks tie with array order of I2P first.
+    BOOST_CHECK(IsProtected(
+        4, [](NodeEvictionCandidate& c) {
+            c.m_connected = std::chrono::seconds{c.id};
+            c.m_is_local = (c.id == 3);
+            if (c.id == 4) {
+                c.m_network = NET_I2P;
+            } else if (c.id == 2) {
+                c.m_network = NET_ONION;
+            } else {
+                c.m_network = NET_IPV6;
+            }
+        },
+        /*protected_peer_ids=*/{0, 4},
+        /*unprotected_peer_ids=*/{1, 2},
+        random_context));
+
+    // Combined test: expect having 1 localhost, 1 I2P and 1 onion peer out of 7
+    // to protect 1 I2P, 0 localhost, 0 onion and 2 other peers (3 total) sorted
+    // by longest uptime; stable sort breaks tie with array order of I2P first.
+    BOOST_CHECK(IsProtected(
+        7, [](NodeEvictionCandidate& c) {
+            c.m_connected = std::chrono::seconds{c.id};
+            c.m_is_local = (c.id == 4);
+            if (c.id == 6) {
+                c.m_network = NET_I2P;
+            } else if (c.id == 5) {
+                c.m_network = NET_ONION;
+            } else {
+                c.m_network = NET_IPV6;
+            }
+        },
+        /*protected_peer_ids=*/{0, 1, 6},
+        /*unprotected_peer_ids=*/{2, 3, 4, 5},
+        random_context));
+
+    // Combined test: expect having 1 localhost, 1 I2P and 1 onion peer out of 8
+    // to protect 1 I2P, 1 localhost, 0 onion and 2 other peers (4 total) sorted
+    // by uptime; stable sort breaks tie with array order of I2P then localhost.
+    BOOST_CHECK(IsProtected(
+        8, [](NodeEvictionCandidate& c) {
+            c.m_connected = std::chrono::seconds{c.id};
+            c.m_is_local = (c.id == 6);
+            if (c.id == 5) {
+                c.m_network = NET_I2P;
+            } else if (c.id == 4) {
+                c.m_network = NET_ONION;
+            } else {
+                c.m_network = NET_IPV6;
+            }
+        },
+        /*protected_peer_ids=*/{0, 1, 5, 6},
+        /*unprotected_peer_ids=*/{2, 3, 4, 7},
+        random_context));
+
+    // Combined test: expect having 4 localhost, 2 I2P, and 2 onion peers out of
+    // 16 to protect 1 localhost, 2 I2P, and 1 onion (4/16 total), plus 4 others
+    // for 8 total, sorted by longest uptime.
+    BOOST_CHECK(IsProtected(
+        16, [](NodeEvictionCandidate& c) {
+            c.m_connected = std::chrono::seconds{c.id};
+            c.m_is_local = (c.id == 6 || c.id > 11);
+            if (c.id == 7 || c.id == 11) {
+                c.m_network = NET_I2P;
+            } else if (c.id == 9 || c.id == 10) {
+                c.m_network = NET_ONION;
+            } else {
+                c.m_network = NET_IPV4;
+            }
+        },
+        /*protected_peer_ids=*/{0, 1, 2, 3, 6, 7, 9, 11},
+        /*unprotected_peer_ids=*/{4, 5, 8, 10, 12, 13, 14, 15},
+        random_context));
+
+    // Combined test: expect having 1 localhost, 8 I2P and 1 onion peer out of
+    // 24 to protect 1, 4, and 1 (6 total), plus 6 others for 12/24 total,
+    // sorted by longest uptime.
+    BOOST_CHECK(IsProtected(
+        24, [](NodeEvictionCandidate& c) {
+            c.m_connected = std::chrono::seconds{c.id};
+            c.m_is_local = (c.id == 12);
+            if (c.id > 14 && c.id < 23) { // 4 protected instead of usual 2
+                c.m_network = NET_I2P;
+            } else if (c.id == 23) {
+                c.m_network = NET_ONION;
+            } else {
+                c.m_network = NET_IPV6;
+            }
+        },
+        /*protected_peer_ids=*/{0, 1, 2, 3, 4, 5, 12, 15, 16, 17, 18, 23},
+        /*
