@@ -375,4 +375,159 @@ BOOST_AUTO_TEST_CASE(peer_protection_test)
             }
         },
         /*protected_peer_ids=*/{0, 1, 2, 3, 4, 5, 12, 15, 16, 17, 18, 23},
-        /*
+        /*unprotected_peer_ids=*/{6, 7, 8, 9, 10, 11, 13, 14, 19, 20, 21, 22},
+        random_context));
+
+    // Combined test: expect having 1 localhost, 3 I2P and 6 onion peers out of
+    // 24 to protect 1, 3, and 2 (6 total, I2P has fewer candidates and so gets the
+    // unused localhost slot), plus 6 others for 12/24 total, sorted by longest uptime.
+    BOOST_CHECK(IsProtected(
+        24, [](NodeEvictionCandidate& c) {
+            c.m_connected = std::chrono::seconds{c.id};
+            c.m_is_local = (c.id == 15);
+            if (c.id == 12 || c.id == 14 || c.id == 17) {
+                c.m_network = NET_I2P;
+            } else if (c.id > 17) { // 4 protected instead of usual 2
+                c.m_network = NET_ONION;
+            } else {
+                c.m_network = NET_IPV4;
+            }
+        },
+        /*protected_peer_ids=*/{0, 1, 2, 3, 4, 5, 12, 14, 15, 17, 18, 19},
+        /*unprotected_peer_ids=*/{6, 7, 8, 9, 10, 11, 13, 16, 20, 21, 22, 23},
+        random_context));
+
+    // Combined test: expect having 1 localhost, 7 I2P and 4 onion peers out of
+    // 24 to protect 1 localhost, 2 I2P, and 3 onions (6 total), plus 6 others
+    // for 12/24 total, sorted by longest uptime.
+    BOOST_CHECK(IsProtected(
+        24, [](NodeEvictionCandidate& c) {
+            c.m_connected = std::chrono::seconds{c.id};
+            c.m_is_local = (c.id == 13);
+            if (c.id > 16) {
+                c.m_network = NET_I2P;
+            } else if (c.id == 12 || c.id == 14 || c.id == 15 || c.id == 16) {
+                c.m_network = NET_ONION;
+            } else {
+                c.m_network = NET_IPV6;
+            }
+        },
+        /*protected_peer_ids=*/{0, 1, 2, 3, 4, 5, 12, 13, 14, 15, 17, 18},
+        /*unprotected_peer_ids=*/{6, 7, 8, 9, 10, 11, 16, 19, 20, 21, 22, 23},
+        random_context));
+
+    // Combined test: expect having 8 localhost, 4 I2P, and 3 onion peers out of
+    // 24 to protect 2 of each (6 total), plus 6 others for 12/24 total, sorted
+    // by longest uptime.
+    BOOST_CHECK(IsProtected(
+        24, [](NodeEvictionCandidate& c) {
+            c.m_connected = std::chrono::seconds{c.id};
+            c.m_is_local = (c.id > 15);
+            if (c.id > 10 && c.id < 15) {
+                c.m_network = NET_I2P;
+            } else if (c.id > 6 && c.id < 10) {
+                c.m_network = NET_ONION;
+            } else {
+                c.m_network = NET_IPV4;
+            }
+        },
+        /*protected_peer_ids=*/{0, 1, 2, 3, 4, 5, 7, 8, 11, 12, 16, 17},
+        /*unprotected_peer_ids=*/{6, 9, 10, 13, 14, 15, 18, 19, 20, 21, 22, 23},
+        random_context));
+}
+
+// Returns true if any of the node ids in node_ids are selected for eviction.
+bool IsEvicted(std::vector<NodeEvictionCandidate> candidates, const std::unordered_set<NodeId>& node_ids, FastRandomContext& random_context)
+{
+    Shuffle(candidates.begin(), candidates.end(), random_context);
+    const std::optional<NodeId> evicted_node_id = SelectNodeToEvict(std::move(candidates));
+    if (!evicted_node_id) {
+        return false;
+    }
+    return node_ids.count(*evicted_node_id);
+}
+
+// Create number_of_nodes random nodes, apply setup function candidate_setup_fn,
+// apply eviction logic and then return true if any of the node ids in node_ids
+// are selected for eviction.
+bool IsEvicted(const int number_of_nodes, std::function<void(NodeEvictionCandidate&)> candidate_setup_fn, const std::unordered_set<NodeId>& node_ids, FastRandomContext& random_context)
+{
+    std::vector<NodeEvictionCandidate> candidates = GetRandomNodeEvictionCandidates(number_of_nodes, random_context);
+    for (NodeEvictionCandidate& candidate : candidates) {
+        candidate_setup_fn(candidate);
+    }
+    return IsEvicted(candidates, node_ids, random_context);
+}
+
+BOOST_AUTO_TEST_CASE(peer_eviction_test)
+{
+    FastRandomContext random_context{true};
+
+    for (int number_of_nodes = 0; number_of_nodes < 200; ++number_of_nodes) {
+        // Four nodes with the highest keyed netgroup values should be
+        // protected from eviction.
+        BOOST_CHECK(!IsEvicted(
+                        number_of_nodes, [number_of_nodes](NodeEvictionCandidate& candidate) {
+                            candidate.nKeyedNetGroup = number_of_nodes - candidate.id;
+                        },
+                        {0, 1, 2, 3}, random_context));
+
+        // Eight nodes with the lowest minimum ping time should be protected
+        // from eviction.
+        BOOST_CHECK(!IsEvicted(
+                        number_of_nodes, [](NodeEvictionCandidate& candidate) {
+                            candidate.m_min_ping_time = std::chrono::microseconds{candidate.id};
+                        },
+                        {0, 1, 2, 3, 4, 5, 6, 7}, random_context));
+
+        // Four nodes that most recently sent us novel transactions accepted
+        // into our mempool should be protected from eviction.
+        BOOST_CHECK(!IsEvicted(
+                        number_of_nodes, [number_of_nodes](NodeEvictionCandidate& candidate) {
+                            candidate.m_last_tx_time = std::chrono::seconds{number_of_nodes - candidate.id};
+                        },
+                        {0, 1, 2, 3}, random_context));
+
+        // Up to eight non-tx-relay peers that most recently sent us novel
+        // blocks should be protected from eviction.
+        BOOST_CHECK(!IsEvicted(
+                        number_of_nodes, [number_of_nodes](NodeEvictionCandidate& candidate) {
+                            candidate.m_last_block_time = std::chrono::seconds{number_of_nodes - candidate.id};
+                            if (candidate.id <= 7) {
+                                candidate.fRelayTxes = false;
+                                candidate.fRelevantServices = true;
+                            }
+                        },
+                        {0, 1, 2, 3, 4, 5, 6, 7}, random_context));
+
+        // Four peers that most recently sent us novel blocks should be
+        // protected from eviction.
+        BOOST_CHECK(!IsEvicted(
+                        number_of_nodes, [number_of_nodes](NodeEvictionCandidate& candidate) {
+                            candidate.m_last_block_time = std::chrono::seconds{number_of_nodes - candidate.id};
+                        },
+                        {0, 1, 2, 3}, random_context));
+
+        // Combination of the previous two tests.
+        BOOST_CHECK(!IsEvicted(
+                        number_of_nodes, [number_of_nodes](NodeEvictionCandidate& candidate) {
+                            candidate.m_last_block_time = std::chrono::seconds{number_of_nodes - candidate.id};
+                            if (candidate.id <= 7) {
+                                candidate.fRelayTxes = false;
+                                candidate.fRelevantServices = true;
+                            }
+                        },
+                        {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11}, random_context));
+
+        // Combination of all tests above.
+        BOOST_CHECK(!IsEvicted(
+                        number_of_nodes, [number_of_nodes](NodeEvictionCandidate& candidate) {
+                            candidate.nKeyedNetGroup = number_of_nodes - candidate.id;           // 4 protected
+                            candidate.m_min_ping_time = std::chrono::microseconds{candidate.id}; // 8 protected
+                            candidate.m_last_tx_time = std::chrono::seconds{number_of_nodes - candidate.id};    // 4 protected
+                            candidate.m_last_block_time = std::chrono::seconds{number_of_nodes - candidate.id}; // 4 protected
+                        },
+                        {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19}, random_context));
+
+        // An eviction is expected given >= 29 random eviction candidates. The eviction logic protects at most
+        // four peers by net group, eight by lowest ping time, four by last time of novel 
