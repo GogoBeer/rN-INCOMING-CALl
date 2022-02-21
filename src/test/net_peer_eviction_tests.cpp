@@ -530,4 +530,23 @@ BOOST_AUTO_TEST_CASE(peer_eviction_test)
                         {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19}, random_context));
 
         // An eviction is expected given >= 29 random eviction candidates. The eviction logic protects at most
-        // four peers by net group, eight by lowest ping time, four by last time of novel 
+        // four peers by net group, eight by lowest ping time, four by last time of novel tx, up to eight non-tx-relay
+        // peers by last novel block time, and four more peers by last novel block time.
+        if (number_of_nodes >= 29) {
+            BOOST_CHECK(SelectNodeToEvict(GetRandomNodeEvictionCandidates(number_of_nodes, random_context)));
+        }
+
+        // No eviction is expected given <= 20 random eviction candidates. The eviction logic protects at least
+        // four peers by net group, eight by lowest ping time, four by last time of novel tx and four peers by last
+        // novel block time.
+        if (number_of_nodes <= 20) {
+            BOOST_CHECK(!SelectNodeToEvict(GetRandomNodeEvictionCandidates(number_of_nodes, random_context)));
+        }
+
+        // Cases left to test:
+        // * "If any remaining peers are preferred for eviction consider only them. [...]"
+        // * "Identify the network group with the most connections and youngest member. [...]"
+    }
+}
+
+BOOST_AUTO_TEST_SUITE_END()
