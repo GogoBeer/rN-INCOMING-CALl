@@ -299,4 +299,122 @@ BOOST_AUTO_TEST_CASE(subnet_test)
     BOOST_CHECK_EQUAL(subnet.ToString(), "0.0.0.0/0");
 
     subnet = ResolveSubNet("1:2:3:4:5:6:7:8/ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff");
- 
+    BOOST_CHECK_EQUAL(subnet.ToString(), "1:2:3:4:5:6:7:8/128");
+    subnet = ResolveSubNet("1:2:3:4:5:6:7:8/ffff:0000:0000:0000:0000:0000:0000:0000");
+    BOOST_CHECK_EQUAL(subnet.ToString(), "1::/16");
+    subnet = ResolveSubNet("1:2:3:4:5:6:7:8/0000:0000:0000:0000:0000:0000:0000:0000");
+    BOOST_CHECK_EQUAL(subnet.ToString(), "::/0");
+    // Invalid netmasks (with 1-bits after 0-bits)
+    subnet = ResolveSubNet("1.2.3.4/255.255.232.0");
+    BOOST_CHECK(!subnet.IsValid());
+    subnet = ResolveSubNet("1.2.3.4/255.0.255.255");
+    BOOST_CHECK(!subnet.IsValid());
+    subnet = ResolveSubNet("1:2:3:4:5:6:7:8/ffff:ffff:ffff:fffe:ffff:ffff:ffff:ff0f");
+    BOOST_CHECK(!subnet.IsValid());
+}
+
+BOOST_AUTO_TEST_CASE(netbase_getgroup)
+{
+    std::vector<bool> asmap; // use /16
+    BOOST_CHECK(ResolveIP("127.0.0.1").GetGroup(asmap) == std::vector<unsigned char>({0})); // Local -> !Routable()
+    BOOST_CHECK(ResolveIP("257.0.0.1").GetGroup(asmap) == std::vector<unsigned char>({0})); // !Valid -> !Routable()
+    BOOST_CHECK(ResolveIP("10.0.0.1").GetGroup(asmap) == std::vector<unsigned char>({0})); // RFC1918 -> !Routable()
+    BOOST_CHECK(ResolveIP("169.254.1.1").GetGroup(asmap) == std::vector<unsigned char>({0})); // RFC3927 -> !Routable()
+    BOOST_CHECK(ResolveIP("1.2.3.4").GetGroup(asmap) == std::vector<unsigned char>({(unsigned char)NET_IPV4, 1, 2})); // IPv4
+    BOOST_CHECK(ResolveIP("::FFFF:0:102:304").GetGroup(asmap) == std::vector<unsigned char>({(unsigned char)NET_IPV4, 1, 2})); // RFC6145
+    BOOST_CHECK(ResolveIP("64:FF9B::102:304").GetGroup(asmap) == std::vector<unsigned char>({(unsigned char)NET_IPV4, 1, 2})); // RFC6052
+    BOOST_CHECK(ResolveIP("2002:102:304:9999:9999:9999:9999:9999").GetGroup(asmap) == std::vector<unsigned char>({(unsigned char)NET_IPV4, 1, 2})); // RFC3964
+    BOOST_CHECK(ResolveIP("2001:0:9999:9999:9999:9999:FEFD:FCFB").GetGroup(asmap) == std::vector<unsigned char>({(unsigned char)NET_IPV4, 1, 2})); // RFC4380
+    BOOST_CHECK(ResolveIP("2001:470:abcd:9999:9999:9999:9999:9999").GetGroup(asmap) == std::vector<unsigned char>({(unsigned char)NET_IPV6, 32, 1, 4, 112, 175})); //he.net
+    BOOST_CHECK(ResolveIP("2001:2001:9999:9999:9999:9999:9999:9999").GetGroup(asmap) == std::vector<unsigned char>({(unsigned char)NET_IPV6, 32, 1, 32, 1})); //IPv6
+
+    // baz.net sha256 hash: 12929400eb4607c4ac075f087167e75286b179c693eb059a01774b864e8fe505
+    std::vector<unsigned char> internal_group = {NET_INTERNAL, 0x12, 0x92, 0x94, 0x00, 0xeb, 0x46, 0x07, 0xc4, 0xac, 0x07};
+    BOOST_CHECK(CreateInternal("baz.net").GetGroup(asmap) == internal_group);
+}
+
+BOOST_AUTO_TEST_CASE(netbase_parsenetwork)
+{
+    BOOST_CHECK_EQUAL(ParseNetwork("ipv4"), NET_IPV4);
+    BOOST_CHECK_EQUAL(ParseNetwork("ipv6"), NET_IPV6);
+    BOOST_CHECK_EQUAL(ParseNetwork("onion"), NET_ONION);
+    BOOST_CHECK_EQUAL(ParseNetwork("tor"), NET_ONION);
+    BOOST_CHECK_EQUAL(ParseNetwork("cjdns"), NET_CJDNS);
+
+    BOOST_CHECK_EQUAL(ParseNetwork("IPv4"), NET_IPV4);
+    BOOST_CHECK_EQUAL(ParseNetwork("IPv6"), NET_IPV6);
+    BOOST_CHECK_EQUAL(ParseNetwork("ONION"), NET_ONION);
+    BOOST_CHECK_EQUAL(ParseNetwork("TOR"), NET_ONION);
+    BOOST_CHECK_EQUAL(ParseNetwork("CJDNS"), NET_CJDNS);
+
+    BOOST_CHECK_EQUAL(ParseNetwork(":)"), NET_UNROUTABLE);
+    BOOST_CHECK_EQUAL(ParseNetwork("tÖr"), NET_UNROUTABLE);
+    BOOST_CHECK_EQUAL(ParseNetwork("\xfe\xff"), NET_UNROUTABLE);
+    BOOST_CHECK_EQUAL(ParseNetwork(""), NET_UNROUTABLE);
+}
+
+BOOST_AUTO_TEST_CASE(netpermissions_test)
+{
+    bilingual_str error;
+    NetWhitebindPermissions whitebindPermissions;
+    NetWhitelistPermissions whitelistPermissions;
+
+    // Detect invalid white bind
+    BOOST_CHECK(!NetWhitebindPermissions::TryParse("", whitebindPermissions, error));
+    BOOST_CHECK(error.original.find("Cannot resolve -whitebind address") != std::string::npos);
+    BOOST_CHECK(!NetWhitebindPermissions::TryParse("127.0.0.1", whitebindPermissions, error));
+    BOOST_CHECK(error.original.find("Need to specify a port with -whitebind") != std::string::npos);
+    BOOST_CHECK(!NetWhitebindPermissions::TryParse("", whitebindPermissions, error));
+
+    // If no permission flags, assume backward compatibility
+    BOOST_CHECK(NetWhitebindPermissions::TryParse("1.2.3.4:32", whitebindPermissions, error));
+    BOOST_CHECK(error.empty());
+    BOOST_CHECK_EQUAL(whitebindPermissions.m_flags, NetPermissionFlags::Implicit);
+    BOOST_CHECK(NetPermissions::HasFlag(whitebindPermissions.m_flags, NetPermissionFlags::Implicit));
+    NetPermissions::ClearFlag(whitebindPermissions.m_flags, NetPermissionFlags::Implicit);
+    BOOST_CHECK(!NetPermissions::HasFlag(whitebindPermissions.m_flags, NetPermissionFlags::Implicit));
+    BOOST_CHECK_EQUAL(whitebindPermissions.m_flags, NetPermissionFlags::None);
+    NetPermissions::AddFlag(whitebindPermissions.m_flags, NetPermissionFlags::Implicit);
+    BOOST_CHECK(NetPermissions::HasFlag(whitebindPermissions.m_flags, NetPermissionFlags::Implicit));
+
+    // Can set one permission
+    BOOST_CHECK(NetWhitebindPermissions::TryParse("bloom@1.2.3.4:32", whitebindPermissions, error));
+    BOOST_CHECK_EQUAL(whitebindPermissions.m_flags, NetPermissionFlags::BloomFilter);
+    BOOST_CHECK(NetWhitebindPermissions::TryParse("@1.2.3.4:32", whitebindPermissions, error));
+    BOOST_CHECK_EQUAL(whitebindPermissions.m_flags, NetPermissionFlags::None);
+
+    NetWhitebindPermissions noban, noban_download, download_noban, download;
+
+    // "noban" implies "download"
+    BOOST_REQUIRE(NetWhitebindPermissions::TryParse("noban@1.2.3.4:32", noban, error));
+    BOOST_CHECK_EQUAL(noban.m_flags, NetPermissionFlags::NoBan);
+    BOOST_CHECK(NetPermissions::HasFlag(noban.m_flags, NetPermissionFlags::Download));
+    BOOST_CHECK(NetPermissions::HasFlag(noban.m_flags, NetPermissionFlags::NoBan));
+
+    // "noban,download" is equivalent to "noban"
+    BOOST_REQUIRE(NetWhitebindPermissions::TryParse("noban,download@1.2.3.4:32", noban_download, error));
+    BOOST_CHECK_EQUAL(noban_download.m_flags, noban.m_flags);
+
+    // "download,noban" is equivalent to "noban"
+    BOOST_REQUIRE(NetWhitebindPermissions::TryParse("download,noban@1.2.3.4:32", download_noban, error));
+    BOOST_CHECK_EQUAL(download_noban.m_flags, noban.m_flags);
+
+    // "download" excludes (does not imply) "noban"
+    BOOST_REQUIRE(NetWhitebindPermissions::TryParse("download@1.2.3.4:32", download, error));
+    BOOST_CHECK_EQUAL(download.m_flags, NetPermissionFlags::Download);
+    BOOST_CHECK(NetPermissions::HasFlag(download.m_flags, NetPermissionFlags::Download));
+    BOOST_CHECK(!NetPermissions::HasFlag(download.m_flags, NetPermissionFlags::NoBan));
+
+    // Happy path, can parse flags
+    BOOST_CHECK(NetWhitebindPermissions::TryParse("bloom,forcerelay@1.2.3.4:32", whitebindPermissions, error));
+    // forcerelay should also activate the relay permission
+    BOOST_CHECK_EQUAL(whitebindPermissions.m_flags, NetPermissionFlags::BloomFilter | NetPermissionFlags::ForceRelay | NetPermissionFlags::Relay);
+    BOOST_CHECK(NetWhitebindPermissions::TryParse("bloom,relay,noban@1.2.3.4:32", whitebindPermissions, error));
+    BOOST_CHECK_EQUAL(whitebindPermissions.m_flags, NetPermissionFlags::BloomFilter | NetPermissionFlags::Relay | NetPermissionFlags::NoBan);
+    BOOST_CHECK(NetWhitebindPermissions::TryParse("bloom,forcerelay,noban@1.2.3.4:32", whitebindPermissions, error));
+    BOOST_CHECK(NetWhitebindPermissions::TryParse("all@1.2.3.4:32", whitebindPermissions, error));
+    BOOST_CHECK_EQUAL(whitebindPermissions.m_flags, NetPermissionFlags::All);
+
+    // Allow dups
+    BOOST_CHECK(NetWhitebindPermissions::TryParse("bloom,relay,noban,noban@1.2.3.4:32", whitebindPermissions, error));
+    BOOST_CHECK_EQUAL(whitebindPermissions.m_flags, NetPermissi
