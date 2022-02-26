@@ -570,4 +570,10 @@ BOOST_AUTO_TEST_CASE(caddress_serialize_v2)
 BOOST_AUTO_TEST_CASE(caddress_unserialize_v2)
 {
     CDataStream s(ParseHex(stream_addrv2_hex), SER_NETWORK, PROTOCOL_VERSION | ADDRV2_FORMAT);
-    std::vector<CA
+    std::vector<CAddress> addresses_unserialized;
+
+    s >> addresses_unserialized;
+    BOOST_CHECK(fixture_addresses == addresses_unserialized);
+}
+
+BOOST_AUTO_TEST_SUITE_END()
