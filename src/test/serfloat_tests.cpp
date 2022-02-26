@@ -91,4 +91,40 @@ BOOST_AUTO_TEST_CASE(double_serfloat_tests) {
                 if (x & 256) v |= (uint64_t{1} << 63);
                 double f;
                 memcpy(&f, &v, 8);
-       
+                uint64_t v2 = TestDouble(f);
+                if (!std::isnan(f)) BOOST_CHECK_EQUAL(v, v2);
+            }
+        }
+    }
+}
+
+/*
+Python code to generate the below hashes:
+
+    def reversed_hex(x):
+        return bytes(reversed(x)).hex()
+
+    def dsha256(x):
+        return hashlib.sha256(hashlib.sha256(x).digest()).digest()
+
+    reversed_hex(dsha256(b''.join(struct.pack('<d', x) for x in range(0,1000)))) == '43d0c82591953c4eafe114590d392676a01585d25b25d433557f0d7878b23f96'
+*/
+BOOST_AUTO_TEST_CASE(doubles)
+{
+    CDataStream ss(SER_DISK, 0);
+    // encode
+    for (int i = 0; i < 1000; i++) {
+        ss << EncodeDouble(i);
+    }
+    BOOST_CHECK(Hash(ss) == uint256S("43d0c82591953c4eafe114590d392676a01585d25b25d433557f0d7878b23f96"));
+
+    // decode
+    for (int i = 0; i < 1000; i++) {
+        uint64_t val;
+        ss >> val;
+        double j = DecodeDouble(val);
+        BOOST_CHECK_MESSAGE(i == j, "decoded:" << j << " expected:" << i);
+    }
+}
+
+BOOST_AUTO_TEST_SUITE_END()
