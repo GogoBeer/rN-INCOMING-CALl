@@ -172,4 +172,87 @@ struct MergeTestingSetup : public BasicTestingSetup {
 
 // Regression test covering different ways config settings can be merged. The
 // test parses and merges settings, representing the results as strings that get
-// compared against an expected hash. To debug, the result strings can be du
+// compared against an expected hash. To debug, the result strings can be dumped
+// to a file (see comments below).
+BOOST_FIXTURE_TEST_CASE(Merge, MergeTestingSetup)
+{
+    CHash256 out_sha;
+    FILE* out_file = nullptr;
+    if (const char* out_path = getenv("SETTINGS_MERGE_TEST_OUT")) {
+        out_file = fsbridge::fopen(out_path, "w");
+        if (!out_file) throw std::system_error(errno, std::generic_category(), "fopen failed");
+    }
+
+    const std::string& network = CBaseChainParams::MAIN;
+    ForEachMergeSetup([&](const ActionList& arg_actions, const ActionList& conf_actions, bool force_set,
+                          bool ignore_default_section_config) {
+        std::string desc;
+        int value_suffix = 0;
+        util::Settings settings;
+
+        const std::string& name = ignore_default_section_config ? "wallet" : "server";
+        auto push_values = [&](Action action, const char* value_prefix, const std::string& name_prefix,
+                               std::vector<util::SettingsValue>& dest) {
+            if (action == SET || action == SECTION_SET) {
+                for (int i = 0; i < 2; ++i) {
+                    dest.push_back(value_prefix + ToString(++value_suffix));
+                    desc += " " + name_prefix + name + "=" + dest.back().get_str();
+                }
+            } else if (action == NEGATE || action == SECTION_NEGATE) {
+                dest.push_back(false);
+                desc += " " + name_prefix + "no" + name;
+            }
+        };
+
+        if (force_set) {
+            settings.forced_settings[name] = "forced";
+            desc += " " + name + "=forced";
+        }
+        for (Action arg_action : arg_actions) {
+            push_values(arg_action, "a", "-", settings.command_line_options[name]);
+        }
+        for (Action conf_action : conf_actions) {
+            bool use_section = conf_action == SECTION_SET || conf_action == SECTION_NEGATE;
+            push_values(conf_action, "c", use_section ? network + "." : "",
+                settings.ro_config[use_section ? network : ""][name]);
+        }
+
+        desc += " || ";
+        desc += GetSetting(settings, network, name, ignore_default_section_config, /* get_chain_name= */ false).write();
+        desc += " |";
+        for (const auto& s : GetSettingsList(settings, network, name, ignore_default_section_config)) {
+            desc += " ";
+            desc += s.write();
+        }
+        desc += " |";
+        if (OnlyHasDefaultSectionSetting(settings, network, name)) desc += " ignored";
+        desc += "\n";
+
+        out_sha.Write(MakeUCharSpan(desc));
+        if (out_file) {
+            BOOST_REQUIRE(fwrite(desc.data(), 1, desc.size(), out_file) == desc.size());
+        }
+    });
+
+    if (out_file) {
+        if (fclose(out_file)) throw std::system_error(errno, std::generic_category(), "fclose failed");
+        out_file = nullptr;
+    }
+
+    unsigned char out_sha_bytes[CSHA256::OUTPUT_SIZE];
+    out_sha.Finalize(out_sha_bytes);
+    std::string out_sha_hex = HexStr(out_sha_bytes);
+
+    // If check below fails, should manually dump the results with:
+    //
+    //   SETTINGS_MERGE_TEST_OUT=results.txt ./test_bitcoin --run_test=settings_tests/Merge
+    //
+    // And verify diff against previous results to make sure the changes are expected.
+    //
+    // Results file is formatted like:
+    //
+    //   <input> || GetSetting() | GetSettingsList() | OnlyHasDefaultSectionSetting()
+    BOOST_CHECK_EQUAL(out_sha_hex, "79db02d74e3e193196541b67c068b40ebd0c124a24b3ecbe9cbf7e85b1c4ba7a");
+}
+
+BOOST_AUTO_TEST_SUITE_END()
