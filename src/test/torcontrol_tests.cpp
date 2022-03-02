@@ -180,4 +180,23 @@ BOOST_AUTO_TEST_CASE(util_ParseTorReplyMapping)
     // takes a key=value pair followed by an OptArguments, making this valid.
     // Because an OptArguments contains no semantic data, there is no point in
     // parsing it.
-    CheckParseTorReplyM
+    CheckParseTorReplyMapping(
+        "SOME=args,here MORE optional=arguments  here", {
+            {"SOME", "args,here"},
+        });
+
+    // Inputs that are effectively invalid under the target grammar.
+    // PROTOCOLINFO accepts an OtherLine that is just an OptArguments, which
+    // would make these inputs valid. However,
+    // - This parser is never used in that situation, because the
+    //   SplitTorReplyLine parser enables OtherLine to be skipped.
+    // - Even if these were valid, an OptArguments contains no semantic data,
+    //   so there is no point in parsing it.
+    CheckParseTorReplyMapping("ARGS", {});
+    CheckParseTorReplyMapping("MORE ARGS", {});
+    CheckParseTorReplyMapping("MORE  ARGS", {});
+    CheckParseTorReplyMapping("EVEN more=ARGS", {});
+    CheckParseTorReplyMapping("EVEN+more ARGS", {});
+}
+
+BOOST_AUTO_TEST_SUITE_END()
