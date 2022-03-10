@@ -272,4 +272,137 @@ static void check_computeblockversion(const Consensus::Params& params, Consensus
 
     // always/never active deployments shouldn't need to be tested further
     if (nStartTime == Consensus::BIP9Deployment::ALWAYS_ACTIVE ||
-        nStartTime == Consensus::BIP9Deplo
+        nStartTime == Consensus::BIP9Deployment::NEVER_ACTIVE)
+    {
+        BOOST_CHECK_EQUAL(min_activation_height, 0);
+        return;
+    }
+
+    BOOST_REQUIRE(nStartTime < nTimeout);
+    BOOST_REQUIRE(nStartTime >= 0);
+    BOOST_REQUIRE(nTimeout <= std::numeric_limits<uint32_t>::max() || nTimeout == Consensus::BIP9Deployment::NO_TIMEOUT);
+    BOOST_REQUIRE(0 <= bit && bit < 32);
+    // Make sure that no deployment tries to set an invalid bit.
+    BOOST_REQUIRE(((1 << bit) & VERSIONBITS_TOP_MASK) == 0);
+    BOOST_REQUIRE(min_activation_height >= 0);
+    // Check min_activation_height is on a retarget boundary
+    BOOST_REQUIRE_EQUAL(min_activation_height % params.nMinerConfirmationWindow, 0U);
+
+    const uint32_t bitmask{g_versionbitscache.Mask(params, dep)};
+    BOOST_CHECK_EQUAL(bitmask, uint32_t{1} << bit);
+
+    // In the first chain, test that the bit is set by CBV until it has failed.
+    // In the second chain, test the bit is set by CBV while STARTED and
+    // LOCKED-IN, and then no longer set while ACTIVE.
+    VersionBitsTester firstChain, secondChain;
+
+    int64_t nTime = nStartTime;
+
+    const CBlockIndex *lastBlock = nullptr;
+
+    // Before MedianTimePast of the chain has crossed nStartTime, the bit
+    // should not be set.
+    if (nTime == 0) {
+        // since CBlockIndex::nTime is uint32_t we can't represent any
+        // earlier time, so will transition from DEFINED to STARTED at the
+        // end of the first period by mining blocks at nTime == 0
+        lastBlock = firstChain.Mine(params.nMinerConfirmationWindow - 1, nTime, VERSIONBITS_LAST_OLD_BLOCK_VERSION).Tip();
+        BOOST_CHECK_EQUAL(g_versionbitscache.ComputeBlockVersion(lastBlock, params) & (1 << bit), 0);
+        lastBlock = firstChain.Mine(params.nMinerConfirmationWindow, nTime, VERSIONBITS_LAST_OLD_BLOCK_VERSION).Tip();
+        BOOST_CHECK((g_versionbitscache.ComputeBlockVersion(lastBlock, params) & (1 << bit)) != 0);
+        // then we'll keep mining at nStartTime...
+    } else {
+        // use a time 1s earlier than start time to check we stay DEFINED
+        --nTime;
+
+        // Start generating blocks before nStartTime
+        lastBlock = firstChain.Mine(params.nMinerConfirmationWindow, nTime, VERSIONBITS_LAST_OLD_BLOCK_VERSION).Tip();
+        BOOST_CHECK_EQUAL(g_versionbitscache.ComputeBlockVersion(lastBlock, params) & (1 << bit), 0);
+
+        // Mine more blocks (4 less than the adjustment period) at the old time, and check that CBV isn't setting the bit yet.
+        for (uint32_t i = 1; i < params.nMinerConfirmationWindow - 4; i++) {
+            lastBlock = firstChain.Mine(params.nMinerConfirmationWindow + i, nTime, VERSIONBITS_LAST_OLD_BLOCK_VERSION).Tip();
+            BOOST_CHECK_EQUAL(g_versionbitscache.ComputeBlockVersion(lastBlock, params) & (1 << bit), 0);
+        }
+        // Now mine 5 more blocks at the start time -- MTP should not have passed yet, so
+        // CBV should still not yet set the bit.
+        nTime = nStartTime;
+        for (uint32_t i = params.nMinerConfirmationWindow - 4; i <= params.nMinerConfirmationWindow; i++) {
+            lastBlock = firstChain.Mine(params.nMinerConfirmationWindow + i, nTime, VERSIONBITS_LAST_OLD_BLOCK_VERSION).Tip();
+            BOOST_CHECK_EQUAL(g_versionbitscache.ComputeBlockVersion(lastBlock, params) & (1 << bit), 0);
+        }
+        // Next we will advance to the next period and transition to STARTED,
+    }
+
+    lastBlock = firstChain.Mine(params.nMinerConfirmationWindow * 3, nTime, VERSIONBITS_LAST_OLD_BLOCK_VERSION).Tip();
+    // so ComputeBlockVersion should now set the bit,
+    BOOST_CHECK((g_versionbitscache.ComputeBlockVersion(lastBlock, params) & (1 << bit)) != 0);
+    // and should also be using the VERSIONBITS_TOP_BITS.
+    BOOST_CHECK_EQUAL(g_versionbitscache.ComputeBlockVersion(lastBlock, params) & VERSIONBITS_TOP_MASK, VERSIONBITS_TOP_BITS);
+
+    // Check that ComputeBlockVersion will set the bit until nTimeout
+    nTime += 600;
+    uint32_t blocksToMine = params.nMinerConfirmationWindow * 2; // test blocks for up to 2 time periods
+    uint32_t nHeight = params.nMinerConfirmationWindow * 3;
+    // These blocks are all before nTimeout is reached.
+    while (nTime < nTimeout && blocksToMine > 0) {
+        lastBlock = firstChain.Mine(nHeight+1, nTime, VERSIONBITS_LAST_OLD_BLOCK_VERSION).Tip();
+        BOOST_CHECK((g_versionbitscache.ComputeBlockVersion(lastBlock, params) & (1 << bit)) != 0);
+        BOOST_CHECK_EQUAL(g_versionbitscache.ComputeBlockVersion(lastBlock, params) & VERSIONBITS_TOP_MASK, VERSIONBITS_TOP_BITS);
+        blocksToMine--;
+        nTime += 600;
+        nHeight += 1;
+    }
+
+    if (nTimeout != Consensus::BIP9Deployment::NO_TIMEOUT) {
+        // can reach any nTimeout other than NO_TIMEOUT due to earlier BOOST_REQUIRE
+
+        nTime = nTimeout;
+
+        // finish the last period before we start timing out
+        while (nHeight % params.nMinerConfirmationWindow != 0) {
+            lastBlock = firstChain.Mine(nHeight+1, nTime - 1, VERSIONBITS_LAST_OLD_BLOCK_VERSION).Tip();
+            BOOST_CHECK((g_versionbitscache.ComputeBlockVersion(lastBlock, params) & (1 << bit)) != 0);
+            nHeight += 1;
+        }
+
+        // FAILED is only triggered at the end of a period, so CBV should be setting
+        // the bit until the period transition.
+        for (uint32_t i = 0; i < params.nMinerConfirmationWindow - 1; i++) {
+            lastBlock = firstChain.Mine(nHeight+1, nTime, VERSIONBITS_LAST_OLD_BLOCK_VERSION).Tip();
+            BOOST_CHECK((g_versionbitscache.ComputeBlockVersion(lastBlock, params) & (1 << bit)) != 0);
+            nHeight += 1;
+        }
+        // The next block should trigger no longer setting the bit.
+        lastBlock = firstChain.Mine(nHeight+1, nTime, VERSIONBITS_LAST_OLD_BLOCK_VERSION).Tip();
+        BOOST_CHECK_EQUAL(g_versionbitscache.ComputeBlockVersion(lastBlock, params) & (1 << bit), 0);
+    }
+
+    // On a new chain:
+    // verify that the bit will be set after lock-in, and then stop being set
+    // after activation.
+    nTime = nStartTime;
+
+    // Mine one period worth of blocks, and check that the bit will be on for the
+    // next period.
+    lastBlock = secondChain.Mine(params.nMinerConfirmationWindow, nTime, VERSIONBITS_LAST_OLD_BLOCK_VERSION).Tip();
+    BOOST_CHECK((g_versionbitscache.ComputeBlockVersion(lastBlock, params) & (1 << bit)) != 0);
+
+    // Mine another period worth of blocks, signaling the new bit.
+    lastBlock = secondChain.Mine(params.nMinerConfirmationWindow * 2, nTime, VERSIONBITS_TOP_BITS | (1<<bit)).Tip();
+    // After one period of setting the bit on each block, it should have locked in.
+    // We keep setting the bit for one more period though, until activation.
+    BOOST_CHECK((g_versionbitscache.ComputeBlockVersion(lastBlock, params) & (1 << bit)) != 0);
+
+    // Now check that we keep mining the block until the end of this period, and
+    // then stop at the beginning of the next period.
+    lastBlock = secondChain.Mine((params.nMinerConfirmationWindow * 3) - 1, nTime, VERSIONBITS_LAST_OLD_BLOCK_VERSION).Tip();
+    BOOST_CHECK((g_versionbitscache.ComputeBlockVersion(lastBlock, params) & (1 << bit)) != 0);
+    lastBlock = secondChain.Mine(params.nMinerConfirmationWindow * 3, nTime, VERSIONBITS_LAST_OLD_BLOCK_VERSION).Tip();
+
+    if (lastBlock->nHeight + 1 < min_activation_height) {
+        // check signalling continues while min_activation_height is not reached
+        lastBlock = secondChain.Mine(min_activation_height - 1, nTime, VERSIONBITS_LAST_OLD_BLOCK_VERSION).Tip();
+        BOOST_CHECK((g_versionbitscache.ComputeBlockVersion(lastBlock, params) & (1 << bit)) != 0);
+        // then reach min_activation_height, which was already REQUIRE'd to start a new period
+        lastBlock
