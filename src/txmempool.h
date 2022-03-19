@@ -409,3 +409,159 @@ enum class MemPoolRemovalReason {
  * These happen in UpdateForRemoveFromMempool().  (Note that when removing a
  * transaction along with its descendants, we must calculate that set of
  * transactions to be removed before doing the removal, or else the mempool can
+ * be in an inconsistent state where it's impossible to walk the ancestors of
+ * a transaction.)
+ *
+ * In the event of a reorg, the assumption that a newly added tx has no
+ * in-mempool children is false.  In particular, the mempool is in an
+ * inconsistent state while new transactions are being added, because there may
+ * be descendant transactions of a tx coming from a disconnected block that are
+ * unreachable from just looking at transactions in the mempool (the linking
+ * transactions may also be in the disconnected block, waiting to be added).
+ * Because of this, there's not much benefit in trying to search for in-mempool
+ * children in addUnchecked().  Instead, in the special case of transactions
+ * being added from a disconnected block, we require the caller to clean up the
+ * state, to account for in-mempool, out-of-block descendants for all the
+ * in-block transactions by calling UpdateTransactionsFromBlock().  Note that
+ * until this is called, the mempool state is not consistent, and in particular
+ * mapLinks may not be correct (and therefore functions like
+ * CalculateMemPoolAncestors() and CalculateDescendants() that rely
+ * on them to walk the mempool are not generally safe to use).
+ *
+ * Computational limits:
+ *
+ * Updating all in-mempool ancestors of a newly added transaction can be slow,
+ * if no bound exists on how many in-mempool ancestors there may be.
+ * CalculateMemPoolAncestors() takes configurable limits that are designed to
+ * prevent these calculations from being too CPU intensive.
+ *
+ */
+class CTxMemPool
+{
+protected:
+    const int m_check_ratio; //!< Value n means that 1 times in n we check.
+    std::atomic<unsigned int> nTransactionsUpdated{0}; //!< Used by getblocktemplate to trigger CreateNewBlock() invocation
+    CBlockPolicyEstimator* const minerPolicyEstimator;
+
+    uint64_t totalTxSize GUARDED_BY(cs);      //!< sum of all mempool tx's virtual sizes. Differs from serialized tx size since witness data is discounted. Defined in BIP 141.
+    CAmount m_total_fee GUARDED_BY(cs);       //!< sum of all mempool tx's fees (NOT modified fee)
+    uint64_t cachedInnerUsage GUARDED_BY(cs); //!< sum of dynamic memory usage of all the map elements (NOT the maps themselves)
+
+    mutable int64_t lastRollingFeeUpdate GUARDED_BY(cs);
+    mutable bool blockSinceLastRollingFeeBump GUARDED_BY(cs);
+    mutable double rollingMinimumFeeRate GUARDED_BY(cs); //!< minimum fee to get into the pool, decreases exponentially
+    mutable Epoch m_epoch GUARDED_BY(cs);
+
+    // In-memory counter for external mempool tracking purposes.
+    // This number is incremented once every time a transaction
+    // is added or removed from the mempool for any reason.
+    mutable uint64_t m_sequence_number GUARDED_BY(cs){1};
+
+    void trackPackageRemoved(const CFeeRate& rate) EXCLUSIVE_LOCKS_REQUIRED(cs);
+
+    bool m_is_loaded GUARDED_BY(cs){false};
+
+public:
+
+    static const int ROLLING_FEE_HALFLIFE = 60 * 60 * 12; // public only for testing
+
+    typedef boost::multi_index_container<
+        CTxMemPoolEntry,
+        boost::multi_index::indexed_by<
+            // sorted by txid
+            boost::multi_index::hashed_unique<mempoolentry_txid, SaltedTxidHasher>,
+            // sorted by wtxid
+            boost::multi_index::hashed_unique<
+                boost::multi_index::tag<index_by_wtxid>,
+                mempoolentry_wtxid,
+                SaltedTxidHasher
+            >,
+            // sorted by fee rate
+            boost::multi_index::ordered_non_unique<
+                boost::multi_index::tag<descendant_score>,
+                boost::multi_index::identity<CTxMemPoolEntry>,
+                CompareTxMemPoolEntryByDescendantScore
+            >,
+            // sorted by entry time
+            boost::multi_index::ordered_non_unique<
+                boost::multi_index::tag<entry_time>,
+                boost::multi_index::identity<CTxMemPoolEntry>,
+                CompareTxMemPoolEntryByEntryTime
+            >,
+            // sorted by fee rate with ancestors
+            boost::multi_index::ordered_non_unique<
+                boost::multi_index::tag<ancestor_score>,
+                boost::multi_index::identity<CTxMemPoolEntry>,
+                CompareTxMemPoolEntryByAncestorFee
+            >
+        >
+    > indexed_transaction_set;
+
+    /**
+     * This mutex needs to be locked when accessing `mapTx` or other members
+     * that are guarded by it.
+     *
+     * @par Consistency guarantees
+     *
+     * By design, it is guaranteed that:
+     *
+     * 1. Locking both `cs_main` and `mempool.cs` will give a view of mempool
+     *    that is consistent with current chain tip (`ActiveChain()` and
+     *    `CoinsTip()`) and is fully populated. Fully populated means that if the
+     *    current active chain is missing transactions that were present in a
+     *    previously active chain, all the missing transactions will have been
+     *    re-added to the mempool and should be present if they meet size and
+     *    consistency constraints.
+     *
+     * 2. Locking `mempool.cs` without `cs_main` will give a view of a mempool
+     *    consistent with some chain that was active since `cs_main` was last
+     *    locked, and that is fully populated as described above. It is ok for
+     *    code that only needs to query or remove transactions from the mempool
+     *    to lock just `mempool.cs` without `cs_main`.
+     *
+     * To provide these guarantees, it is necessary to lock both `cs_main` and
+     * `mempool.cs` whenever adding transactions to the mempool and whenever
+     * changing the chain tip. It's necessary to keep both mutexes locked until
+     * the mempool is consistent with the new chain tip and fully populated.
+     */
+    mutable RecursiveMutex cs;
+    indexed_transaction_set mapTx GUARDED_BY(cs);
+
+    using txiter = indexed_transaction_set::nth_index<0>::type::const_iterator;
+    std::vector<std::pair<uint256, txiter>> vTxHashes GUARDED_BY(cs); //!< All tx witness hashes/entries in mapTx, in random order
+
+    typedef std::set<txiter, CompareIteratorByHash> setEntries;
+
+    uint64_t CalculateDescendantMaximum(txiter entry) const EXCLUSIVE_LOCKS_REQUIRED(cs);
+private:
+    typedef std::map<txiter, setEntries, CompareIteratorByHash> cacheMap;
+
+
+    void UpdateParent(txiter entry, txiter parent, bool add) EXCLUSIVE_LOCKS_REQUIRED(cs);
+    void UpdateChild(txiter entry, txiter child, bool add) EXCLUSIVE_LOCKS_REQUIRED(cs);
+
+    std::vector<indexed_transaction_set::const_iterator> GetSortedDepthAndScore() const EXCLUSIVE_LOCKS_REQUIRED(cs);
+
+    /**
+     * Track locally submitted transactions to periodically retry initial broadcast.
+     */
+    std::set<uint256> m_unbroadcast_txids GUARDED_BY(cs);
+
+
+    /**
+     * Helper function to calculate all in-mempool ancestors of staged_ancestors and apply ancestor
+     * and descendant limits (including staged_ancestors thsemselves, entry_size and entry_count).
+     * param@[in]   entry_size          Virtual size to include in the limits.
+     * param@[in]   entry_count         How many entries to include in the limits.
+     * param@[in]   staged_ancestors    Should contain entries in the mempool.
+     * param@[out]  setAncestors        Will be populated with all mempool ancestors.
+     */
+    bool CalculateAncestorsAndCheckLimits(size_t entry_size,
+                                          size_t entry_count,
+                                          setEntries& setAncestors,
+                                          CTxMemPoolEntry::Parents &staged_ancestors,
+                                          uint64_t limitAncestorCount,
+                                          uint64_t limitAncestorSize,
+                                          uint64_t limitDescendantCount,
+                                          uint64_t limitDescendantSize,
+                                          std::string &errString) const EXCLUSIV
