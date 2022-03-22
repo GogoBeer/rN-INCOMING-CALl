@@ -564,4 +564,128 @@ private:
                                           uint64_t limitAncestorSize,
                                           uint64_t limitDescendantCount,
                                           uint64_t limitDescendantSize,
-                                          std::string &errString) const EXCLUSIV
+                                          std::string &errString) const EXCLUSIVE_LOCKS_REQUIRED(cs);
+
+public:
+    indirectmap<COutPoint, const CTransaction*> mapNextTx GUARDED_BY(cs);
+    std::map<uint256, CAmount> mapDeltas GUARDED_BY(cs);
+
+    /** Create a new CTxMemPool.
+     * Sanity checks will be off by default for performance, because otherwise
+     * accepting transactions becomes O(N^2) where N is the number of transactions
+     * in the pool.
+     *
+     * @param[in] estimator is used to estimate appropriate transaction fees.
+     * @param[in] check_ratio is the ratio used to determine how often sanity checks will run.
+     */
+    explicit CTxMemPool(CBlockPolicyEstimator* estimator = nullptr, int check_ratio = 0);
+
+    /**
+     * If sanity-checking is turned on, check makes sure the pool is
+     * consistent (does not contain two transactions that spend the same inputs,
+     * all inputs are in the mapNextTx array). If sanity-checking is turned off,
+     * check does nothing.
+     */
+    void check(const CCoinsViewCache& active_coins_tip, int64_t spendheight) const EXCLUSIVE_LOCKS_REQUIRED(::cs_main);
+
+    // addUnchecked must updated state for all ancestors of a given transaction,
+    // to track size/count of descendant transactions.  First version of
+    // addUnchecked can be used to have it call CalculateMemPoolAncestors(), and
+    // then invoke the second version.
+    // Note that addUnchecked is ONLY called from ATMP outside of tests
+    // and any other callers may break wallet's in-mempool tracking (due to
+    // lack of CValidationInterface::TransactionAddedToMempool callbacks).
+    void addUnchecked(const CTxMemPoolEntry& entry, bool validFeeEstimate = true) EXCLUSIVE_LOCKS_REQUIRED(cs, cs_main);
+    void addUnchecked(const CTxMemPoolEntry& entry, setEntries& setAncestors, bool validFeeEstimate = true) EXCLUSIVE_LOCKS_REQUIRED(cs, cs_main);
+
+    void removeRecursive(const CTransaction& tx, MemPoolRemovalReason reason) EXCLUSIVE_LOCKS_REQUIRED(cs);
+    /** After reorg, check if mempool entries are now non-final, premature coinbase spends, or have
+     * invalid lockpoints. Update lockpoints and remove entries (and descendants of entries) that
+     * are no longer valid. */
+    void removeForReorg(CChain& chain, std::function<bool(txiter)> check_final_and_mature) EXCLUSIVE_LOCKS_REQUIRED(cs, cs_main);
+    void removeConflicts(const CTransaction& tx) EXCLUSIVE_LOCKS_REQUIRED(cs);
+    void removeForBlock(const std::vector<CTransactionRef>& vtx, unsigned int nBlockHeight) EXCLUSIVE_LOCKS_REQUIRED(cs);
+
+    void clear();
+    void _clear() EXCLUSIVE_LOCKS_REQUIRED(cs); //lock free
+    bool CompareDepthAndScore(const uint256& hasha, const uint256& hashb, bool wtxid=false);
+    void queryHashes(std::vector<uint256>& vtxid) const;
+    bool isSpent(const COutPoint& outpoint) const;
+    unsigned int GetTransactionsUpdated() const;
+    void AddTransactionsUpdated(unsigned int n);
+    /**
+     * Check that none of this transactions inputs are in the mempool, and thus
+     * the tx is not dependent on other mempool transactions to be included in a block.
+     */
+    bool HasNoInputsOf(const CTransaction& tx) const EXCLUSIVE_LOCKS_REQUIRED(cs);
+
+    /** Affect CreateNewBlock prioritisation of transactions */
+    void PrioritiseTransaction(const uint256& hash, const CAmount& nFeeDelta);
+    void ApplyDelta(const uint256& hash, CAmount &nFeeDelta) const EXCLUSIVE_LOCKS_REQUIRED(cs);
+    void ClearPrioritisation(const uint256& hash) EXCLUSIVE_LOCKS_REQUIRED(cs);
+
+    /** Get the transaction in the pool that spends the same prevout */
+    const CTransaction* GetConflictTx(const COutPoint& prevout) const EXCLUSIVE_LOCKS_REQUIRED(cs);
+
+    /** Returns an iterator to the given hash, if found */
+    std::optional<txiter> GetIter(const uint256& txid) const EXCLUSIVE_LOCKS_REQUIRED(cs);
+
+    /** Translate a set of hashes into a set of pool iterators to avoid repeated lookups */
+    setEntries GetIterSet(const std::set<uint256>& hashes) const EXCLUSIVE_LOCKS_REQUIRED(cs);
+
+    /** Remove a set of transactions from the mempool.
+     *  If a transaction is in this set, then all in-mempool descendants must
+     *  also be in the set, unless this transaction is being removed for being
+     *  in a block.
+     *  Set updateDescendants to true when removing a tx that was in a block, so
+     *  that any in-mempool descendants have their ancestor state updated.
+     */
+    void RemoveStaged(setEntries& stage, bool updateDescendants, MemPoolRemovalReason reason) EXCLUSIVE_LOCKS_REQUIRED(cs);
+
+    /** When adding transactions from a disconnected block back to the mempool,
+     *  new mempool entries may have children in the mempool (which is generally
+     *  not the case when otherwise adding transactions).
+     *  UpdateTransactionsFromBlock() will find child transactions and update the
+     *  descendant state for each transaction in vHashesToUpdate (excluding any
+     *  child transactions present in vHashesToUpdate, which are already accounted
+     *  for).  Note: vHashesToUpdate should be the set of transactions from the
+     *  disconnected block that have been accepted back into the mempool.
+     */
+    void UpdateTransactionsFromBlock(const std::vector<uint256>& vHashesToUpdate) EXCLUSIVE_LOCKS_REQUIRED(cs, cs_main) LOCKS_EXCLUDED(m_epoch);
+
+    /** Try to calculate all in-mempool ancestors of entry.
+     *  (these are all calculated including the tx itself)
+     *  limitAncestorCount = max number of ancestors
+     *  limitAncestorSize = max size of ancestors
+     *  limitDescendantCount = max number of descendants any ancestor can have
+     *  limitDescendantSize = max size of descendants any ancestor can have
+     *  errString = populated with error reason if any limits are hit
+     *  fSearchForParents = whether to search a tx's vin for in-mempool parents, or
+     *    look up parents from mapLinks. Must be true for entries not in the mempool
+     */
+    bool CalculateMemPoolAncestors(const CTxMemPoolEntry& entry, setEntries& setAncestors, uint64_t limitAncestorCount, uint64_t limitAncestorSize, uint64_t limitDescendantCount, uint64_t limitDescendantSize, std::string& errString, bool fSearchForParents = true) const EXCLUSIVE_LOCKS_REQUIRED(cs);
+
+    /** Calculate all in-mempool ancestors of a set of transactions not already in the mempool and
+     * check ancestor and descendant limits. Heuristics are used to estimate the ancestor and
+     * descendant count of all entries if the package were to be added to the mempool.  The limits
+     * are applied to the union of all package transactions. For example, if the package has 3
+     * transactions and limitAncestorCount = 25, the union of all 3 sets of ancestors (including the
+     * transactions themselves) must be <= 22.
+     * @param[in]       package                 Transaction package being evaluated for acceptance
+     *                                          to mempool. The transactions need not be direct
+     *                                          ancestors/descendants of each other.
+     * @param[in]       limitAncestorCount      Max number of txns including ancestors.
+     * @param[in]       limitAncestorSize       Max virtual size including ancestors.
+     * @param[in]       limitDescendantCount    Max number of txns including descendants.
+     * @param[in]       limitDescendantSize     Max virtual size including descendants.
+     * @param[out]      errString               Populated with error reason if a limit is hit.
+     */
+    bool CheckPackageLimits(const Package& package,
+                            uint64_t limitAncestorCount,
+                            uint64_t limitAncestorSize,
+                            uint64_t limitDescendantCount,
+                            uint64_t limitDescendantSize,
+                            std::string &errString) const EXCLUSIVE_LOCKS_REQUIRED(cs);
+
+    /** Populate setDescendants with all in-mempool descendants of hash.
+     *  Assumes that setDescendants includes all 
