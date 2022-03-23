@@ -688,4 +688,183 @@ public:
                             std::string &errString) const EXCLUSIVE_LOCKS_REQUIRED(cs);
 
     /** Populate setDescendants with all in-mempool descendants of hash.
-     *  Assumes that setDescendants includes all 
+     *  Assumes that setDescendants includes all in-mempool descendants of anything
+     *  already in it.  */
+    void CalculateDescendants(txiter it, setEntries& setDescendants) const EXCLUSIVE_LOCKS_REQUIRED(cs);
+
+    /** The minimum fee to get into the mempool, which may itself not be enough
+      *  for larger-sized transactions.
+      *  The incrementalRelayFee policy variable is used to bound the time it
+      *  takes the fee rate to go back down all the way to 0. When the feerate
+      *  would otherwise be half of this, it is set to 0 instead.
+      */
+    CFeeRate GetMinFee(size_t sizelimit) const;
+
+    /** Remove transactions from the mempool until its dynamic size is <= sizelimit.
+      *  pvNoSpendsRemaining, if set, will be populated with the list of outpoints
+      *  which are not in mempool which no longer have any spends in this mempool.
+      */
+    void TrimToSize(size_t sizelimit, std::vector<COutPoint>* pvNoSpendsRemaining = nullptr) EXCLUSIVE_LOCKS_REQUIRED(cs);
+
+    /** Expire all transaction (and their dependencies) in the mempool older than time. Return the number of removed transactions. */
+    int Expire(std::chrono::seconds time) EXCLUSIVE_LOCKS_REQUIRED(cs);
+
+    /**
+     * Calculate the ancestor and descendant count for the given transaction.
+     * The counts include the transaction itself.
+     * When ancestors is non-zero (ie, the transaction itself is in the mempool),
+     * ancestorsize and ancestorfees will also be set to the appropriate values.
+     */
+    void GetTransactionAncestry(const uint256& txid, size_t& ancestors, size_t& descendants, size_t* ancestorsize = nullptr, CAmount* ancestorfees = nullptr) const;
+
+    /** @returns true if the mempool is fully loaded */
+    bool IsLoaded() const;
+
+    /** Sets the current loaded state */
+    void SetIsLoaded(bool loaded);
+
+    unsigned long size() const
+    {
+        LOCK(cs);
+        return mapTx.size();
+    }
+
+    uint64_t GetTotalTxSize() const EXCLUSIVE_LOCKS_REQUIRED(cs)
+    {
+        AssertLockHeld(cs);
+        return totalTxSize;
+    }
+
+    CAmount GetTotalFee() const EXCLUSIVE_LOCKS_REQUIRED(cs)
+    {
+        AssertLockHeld(cs);
+        return m_total_fee;
+    }
+
+    bool exists(const GenTxid& gtxid) const
+    {
+        LOCK(cs);
+        if (gtxid.IsWtxid()) {
+            return (mapTx.get<index_by_wtxid>().count(gtxid.GetHash()) != 0);
+        }
+        return (mapTx.count(gtxid.GetHash()) != 0);
+    }
+
+    CTransactionRef get(const uint256& hash) const;
+    txiter get_iter_from_wtxid(const uint256& wtxid) const EXCLUSIVE_LOCKS_REQUIRED(cs)
+    {
+        AssertLockHeld(cs);
+        return mapTx.project<0>(mapTx.get<index_by_wtxid>().find(wtxid));
+    }
+    TxMempoolInfo info(const GenTxid& gtxid) const;
+    std::vector<TxMempoolInfo> infoAll() const;
+
+    size_t DynamicMemoryUsage() const;
+
+    /** Adds a transaction to the unbroadcast set */
+    void AddUnbroadcastTx(const uint256& txid)
+    {
+        LOCK(cs);
+        // Sanity check the transaction is in the mempool & insert into
+        // unbroadcast set.
+        if (exists(GenTxid::Txid(txid))) m_unbroadcast_txids.insert(txid);
+    };
+
+    /** Removes a transaction from the unbroadcast set */
+    void RemoveUnbroadcastTx(const uint256& txid, const bool unchecked = false);
+
+    /** Returns transactions in unbroadcast set */
+    std::set<uint256> GetUnbroadcastTxs() const
+    {
+        LOCK(cs);
+        return m_unbroadcast_txids;
+    }
+
+    /** Returns whether a txid is in the unbroadcast set */
+    bool IsUnbroadcastTx(const uint256& txid) const EXCLUSIVE_LOCKS_REQUIRED(cs)
+    {
+        AssertLockHeld(cs);
+        return m_unbroadcast_txids.count(txid) != 0;
+    }
+
+    /** Guards this internal counter for external reporting */
+    uint64_t GetAndIncrementSequence() const EXCLUSIVE_LOCKS_REQUIRED(cs) {
+        return m_sequence_number++;
+    }
+
+    uint64_t GetSequence() const EXCLUSIVE_LOCKS_REQUIRED(cs) {
+        return m_sequence_number;
+    }
+
+private:
+    /** UpdateForDescendants is used by UpdateTransactionsFromBlock to update
+     *  the descendants for a single transaction that has been added to the
+     *  mempool but may have child transactions in the mempool, eg during a
+     *  chain reorg.  setExclude is the set of descendant transactions in the
+     *  mempool that must not be accounted for (because any descendants in
+     *  setExclude were added to the mempool after the transaction being
+     *  updated and hence their state is already reflected in the parent
+     *  state).
+     *
+     *  cachedDescendants will be updated with the descendants of the transaction
+     *  being updated, so that future invocations don't need to walk the
+     *  same transaction again, if encountered in another transaction chain.
+     */
+    void UpdateForDescendants(txiter updateIt,
+            cacheMap &cachedDescendants,
+            const std::set<uint256> &setExclude) EXCLUSIVE_LOCKS_REQUIRED(cs);
+    /** Update ancestors of hash to add/remove it as a descendant transaction. */
+    void UpdateAncestorsOf(bool add, txiter hash, setEntries &setAncestors) EXCLUSIVE_LOCKS_REQUIRED(cs);
+    /** Set ancestor state for an entry */
+    void UpdateEntryForAncestors(txiter it, const setEntries &setAncestors) EXCLUSIVE_LOCKS_REQUIRED(cs);
+    /** For each transaction being removed, update ancestors and any direct children.
+      * If updateDescendants is true, then also update in-mempool descendants'
+      * ancestor state. */
+    void UpdateForRemoveFromMempool(const setEntries &entriesToRemove, bool updateDescendants) EXCLUSIVE_LOCKS_REQUIRED(cs);
+    /** Sever link between specified transaction and direct children. */
+    void UpdateChildrenForRemoval(txiter entry) EXCLUSIVE_LOCKS_REQUIRED(cs);
+
+    /** Before calling removeUnchecked for a given transaction,
+     *  UpdateForRemoveFromMempool must be called on the entire (dependent) set
+     *  of transactions being removed at the same time.  We use each
+     *  CTxMemPoolEntry's setMemPoolParents in order to walk ancestors of a
+     *  given transaction that is removed, so we can't remove intermediate
+     *  transactions in a chain before we've updated all the state for the
+     *  removal.
+     */
+    void removeUnchecked(txiter entry, MemPoolRemovalReason reason) EXCLUSIVE_LOCKS_REQUIRED(cs);
+public:
+    /** visited marks a CTxMemPoolEntry as having been traversed
+     * during the lifetime of the most recently created Epoch::Guard
+     * and returns false if we are the first visitor, true otherwise.
+     *
+     * An Epoch::Guard must be held when visited is called or an assert will be
+     * triggered.
+     *
+     */
+    bool visited(const txiter it) const EXCLUSIVE_LOCKS_REQUIRED(cs, m_epoch)
+    {
+        return m_epoch.visited(it->m_epoch_marker);
+    }
+
+    bool visited(std::optional<txiter> it) const EXCLUSIVE_LOCKS_REQUIRED(cs, m_epoch)
+    {
+        assert(m_epoch.guarded()); // verify guard even when it==nullopt
+        return !it || visited(*it);
+    }
+};
+
+/**
+ * CCoinsView that brings transactions from a mempool into view.
+ * It does not check for spendings by memory pool transactions.
+ * Instead, it provides access to all Coins which are either unspent in the
+ * base CCoinsView, are outputs from any mempool transaction, or are
+ * tracked temporarily to allow transaction dependencies in package validation.
+ * This allows transaction replacement to work as expected, as you want to
+ * have all inputs "available" to check signatures, and any cycles in the
+ * dependency graph are checked directly in AcceptToMemoryPool.
+ * It also allows you to sign a double-spend directly in
+ * signrawtransactionwithkey and signrawtransactionwithwallet,
+ * as long as the conflicting transaction is not yet confirmed.
+ */
+class CCoinsViewMemPool : public CCoinsV
