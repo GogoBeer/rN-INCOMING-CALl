@@ -84,4 +84,9 @@ protected:
     /** Orphan transactions in vector for quick random eviction */
     std::vector<OrphanMap::iterator> m_orphan_list GUARDED_BY(g_cs_orphans);
 
-    /** Index from wtxid 
+    /** Index from wtxid into the m_orphans to lookup orphan
+     *  transactions using their witness ids. */
+    std::map<uint256, OrphanMap::iterator> m_wtxid_to_orphan_it GUARDED_BY(g_cs_orphans);
+};
+
+#endif // BITCOIN_TXORPHANAGE_H
