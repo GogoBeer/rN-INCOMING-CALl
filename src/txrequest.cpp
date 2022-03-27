@@ -360,4 +360,153 @@ public:
         for (const Announcement& ann : m_index) {
             if (ann.IsWaiting()) {
                 // REQUESTED and CANDIDATE_DELAYED must have a time in the future (they should have been converted
-                // to COMPLETED/CANDIDA
+                // to COMPLETED/CANDIDATE_READY respectively).
+                assert(ann.m_time > now);
+            } else if (ann.IsSelectable()) {
+                // CANDIDATE_READY and CANDIDATE_BEST cannot have a time in the future (they should have remained
+                // CANDIDATE_DELAYED, or should have been converted back to it if time went backwards).
+                assert(ann.m_time <= now);
+            }
+        }
+    }
+
+private:
+    //! Wrapper around Index::...::erase that keeps m_peerinfo up to date.
+    template<typename Tag>
+    Iter<Tag> Erase(Iter<Tag> it)
+    {
+        auto peerit = m_peerinfo.find(it->m_peer);
+        peerit->second.m_completed -= it->GetState() == State::COMPLETED;
+        peerit->second.m_requested -= it->GetState() == State::REQUESTED;
+        if (--peerit->second.m_total == 0) m_peerinfo.erase(peerit);
+        return m_index.get<Tag>().erase(it);
+    }
+
+    //! Wrapper around Index::...::modify that keeps m_peerinfo up to date.
+    template<typename Tag, typename Modifier>
+    void Modify(Iter<Tag> it, Modifier modifier)
+    {
+        auto peerit = m_peerinfo.find(it->m_peer);
+        peerit->second.m_completed -= it->GetState() == State::COMPLETED;
+        peerit->second.m_requested -= it->GetState() == State::REQUESTED;
+        m_index.get<Tag>().modify(it, std::move(modifier));
+        peerit->second.m_completed += it->GetState() == State::COMPLETED;
+        peerit->second.m_requested += it->GetState() == State::REQUESTED;
+    }
+
+    //! Convert a CANDIDATE_DELAYED announcement into a CANDIDATE_READY. If this makes it the new best
+    //! CANDIDATE_READY (and no REQUESTED exists) and better than the CANDIDATE_BEST (if any), it becomes the new
+    //! CANDIDATE_BEST.
+    void PromoteCandidateReady(Iter<ByTxHash> it)
+    {
+        assert(it != m_index.get<ByTxHash>().end());
+        assert(it->GetState() == State::CANDIDATE_DELAYED);
+        // Convert CANDIDATE_DELAYED to CANDIDATE_READY first.
+        Modify<ByTxHash>(it, [](Announcement& ann){ ann.SetState(State::CANDIDATE_READY); });
+        // The following code relies on the fact that the ByTxHash is sorted by txhash, and then by state (first
+        // _DELAYED, then _READY, then _BEST/REQUESTED). Within the _READY announcements, the best one (highest
+        // priority) comes last. Thus, if an existing _BEST exists for the same txhash that this announcement may
+        // be preferred over, it must immediately follow the newly created _READY.
+        auto it_next = std::next(it);
+        if (it_next == m_index.get<ByTxHash>().end() || it_next->m_txhash != it->m_txhash ||
+            it_next->GetState() == State::COMPLETED) {
+            // This is the new best CANDIDATE_READY, and there is no IsSelected() announcement for this txhash
+            // already.
+            Modify<ByTxHash>(it, [](Announcement& ann){ ann.SetState(State::CANDIDATE_BEST); });
+        } else if (it_next->GetState() == State::CANDIDATE_BEST) {
+            Priority priority_old = m_computer(*it_next);
+            Priority priority_new = m_computer(*it);
+            if (priority_new > priority_old) {
+                // There is a CANDIDATE_BEST announcement already, but this one is better.
+                Modify<ByTxHash>(it_next, [](Announcement& ann){ ann.SetState(State::CANDIDATE_READY); });
+                Modify<ByTxHash>(it, [](Announcement& ann){ ann.SetState(State::CANDIDATE_BEST); });
+            }
+        }
+    }
+
+    //! Change the state of an announcement to something non-IsSelected(). If it was IsSelected(), the next best
+    //! announcement will be marked CANDIDATE_BEST.
+    void ChangeAndReselect(Iter<ByTxHash> it, State new_state)
+    {
+        assert(new_state == State::COMPLETED || new_state == State::CANDIDATE_DELAYED);
+        assert(it != m_index.get<ByTxHash>().end());
+        if (it->IsSelected() && it != m_index.get<ByTxHash>().begin()) {
+            auto it_prev = std::prev(it);
+            // The next best CANDIDATE_READY, if any, immediately precedes the REQUESTED or CANDIDATE_BEST
+            // announcement in the ByTxHash index.
+            if (it_prev->m_txhash == it->m_txhash && it_prev->GetState() == State::CANDIDATE_READY) {
+                // If one such CANDIDATE_READY exists (for this txhash), convert it to CANDIDATE_BEST.
+                Modify<ByTxHash>(it_prev, [](Announcement& ann){ ann.SetState(State::CANDIDATE_BEST); });
+            }
+        }
+        Modify<ByTxHash>(it, [new_state](Announcement& ann){ ann.SetState(new_state); });
+    }
+
+    //! Check if 'it' is the only announcement for a given txhash that isn't COMPLETED.
+    bool IsOnlyNonCompleted(Iter<ByTxHash> it)
+    {
+        assert(it != m_index.get<ByTxHash>().end());
+        assert(it->GetState() != State::COMPLETED); // Not allowed to call this on COMPLETED announcements.
+
+        // This announcement has a predecessor that belongs to the same txhash. Due to ordering, and the
+        // fact that 'it' is not COMPLETED, its predecessor cannot be COMPLETED here.
+        if (it != m_index.get<ByTxHash>().begin() && std::prev(it)->m_txhash == it->m_txhash) return false;
+
+        // This announcement has a successor that belongs to the same txhash, and is not COMPLETED.
+        if (std::next(it) != m_index.get<ByTxHash>().end() && std::next(it)->m_txhash == it->m_txhash &&
+            std::next(it)->GetState() != State::COMPLETED) return false;
+
+        return true;
+    }
+
+    /** Convert any announcement to a COMPLETED one. If there are no non-COMPLETED announcements left for this
+     *  txhash, they are deleted. If this was a REQUESTED announcement, and there are other CANDIDATEs left, the
+     *  best one is made CANDIDATE_BEST. Returns whether the announcement still exists. */
+    bool MakeCompleted(Iter<ByTxHash> it)
+    {
+        assert(it != m_index.get<ByTxHash>().end());
+
+        // Nothing to be done if it's already COMPLETED.
+        if (it->GetState() == State::COMPLETED) return true;
+
+        if (IsOnlyNonCompleted(it)) {
+            // This is the last non-COMPLETED announcement for this txhash. Delete all.
+            uint256 txhash = it->m_txhash;
+            do {
+                it = Erase<ByTxHash>(it);
+            } while (it != m_index.get<ByTxHash>().end() && it->m_txhash == txhash);
+            return false;
+        }
+
+        // Mark the announcement COMPLETED, and select the next best announcement (the first CANDIDATE_READY) if
+        // needed.
+        ChangeAndReselect(it, State::COMPLETED);
+
+        return true;
+    }
+
+    //! Make the data structure consistent with a given point in time:
+    //! - REQUESTED announcements with expiry <= now are turned into COMPLETED.
+    //! - CANDIDATE_DELAYED announcements with reqtime <= now are turned into CANDIDATE_{READY,BEST}.
+    //! - CANDIDATE_{READY,BEST} announcements with reqtime > now are turned into CANDIDATE_DELAYED.
+    void SetTimePoint(std::chrono::microseconds now, std::vector<std::pair<NodeId, GenTxid>>* expired)
+    {
+        if (expired) expired->clear();
+
+        // Iterate over all CANDIDATE_DELAYED and REQUESTED from old to new, as long as they're in the past,
+        // and convert them to CANDIDATE_READY and COMPLETED respectively.
+        while (!m_index.empty()) {
+            auto it = m_index.get<ByTime>().begin();
+            if (it->GetState() == State::CANDIDATE_DELAYED && it->m_time <= now) {
+                PromoteCandidateReady(m_index.project<ByTxHash>(it));
+            } else if (it->GetState() == State::REQUESTED && it->m_time <= now) {
+                if (expired) expired->emplace_back(it->m_peer, ToGenTxid(*it));
+                MakeCompleted(m_index.project<ByTxHash>(it));
+            } else {
+                break;
+            }
+        }
+
+        while (!m_index.empty()) {
+            // If time went backwards, we may need to demote CANDIDATE_BEST and CANDIDATE_READY announcements back
+            // 
