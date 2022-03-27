@@ -509,4 +509,143 @@ private:
 
         while (!m_index.empty()) {
             // If time went backwards, we may need to demote CANDIDATE_BEST and CANDIDATE_READY announcements back
-            // 
+            // to CANDIDATE_DELAYED. This is an unusual edge case, and unlikely to matter in production. However,
+            // it makes it much easier to specify and test TxRequestTracker::Impl's behaviour.
+            auto it = std::prev(m_index.get<ByTime>().end());
+            if (it->IsSelectable() && it->m_time > now) {
+                ChangeAndReselect(m_index.project<ByTxHash>(it), State::CANDIDATE_DELAYED);
+            } else {
+                break;
+            }
+        }
+    }
+
+public:
+    explicit Impl(bool deterministic) :
+        m_computer(deterministic),
+        // Explicitly initialize m_index as we need to pass a reference to m_computer to ByTxHashViewExtractor.
+        m_index(boost::make_tuple(
+            boost::make_tuple(ByPeerViewExtractor(), std::less<ByPeerView>()),
+            boost::make_tuple(ByTxHashViewExtractor(m_computer), std::less<ByTxHashView>()),
+            boost::make_tuple(ByTimeViewExtractor(), std::less<ByTimeView>())
+        )) {}
+
+    // Disable copying and assigning (a default copy won't work due the stateful ByTxHashViewExtractor).
+    Impl(const Impl&) = delete;
+    Impl& operator=(const Impl&) = delete;
+
+    void DisconnectedPeer(NodeId peer)
+    {
+        auto& index = m_index.get<ByPeer>();
+        auto it = index.lower_bound(ByPeerView{peer, false, uint256::ZERO});
+        while (it != index.end() && it->m_peer == peer) {
+            // Check what to continue with after this iteration. 'it' will be deleted in what follows, so we need to
+            // decide what to continue with afterwards. There are a number of cases to consider:
+            // - std::next(it) is end() or belongs to a different peer. In that case, this is the last iteration
+            //   of the loop (denote this by setting it_next to end()).
+            // - 'it' is not the only non-COMPLETED announcement for its txhash. This means it will be deleted, but
+            //   no other Announcement objects will be modified. Continue with std::next(it) if it belongs to the
+            //   same peer, but decide this ahead of time (as 'it' may change position in what follows).
+            // - 'it' is the only non-COMPLETED announcement for its txhash. This means it will be deleted along
+            //   with all other announcements for the same txhash - which may include std::next(it). However, other
+            //   than 'it', no announcements for the same peer can be affected (due to (peer, txhash) uniqueness).
+            //   In other words, the situation where std::next(it) is deleted can only occur if std::next(it)
+            //   belongs to a different peer but the same txhash as 'it'. This is covered by the first bulletpoint
+            //   already, and we'll have set it_next to end().
+            auto it_next = (std::next(it) == index.end() || std::next(it)->m_peer != peer) ? index.end() :
+                std::next(it);
+            // If the announcement isn't already COMPLETED, first make it COMPLETED (which will mark other
+            // CANDIDATEs as CANDIDATE_BEST, or delete all of a txhash's announcements if no non-COMPLETED ones are
+            // left).
+            if (MakeCompleted(m_index.project<ByTxHash>(it))) {
+                // Then actually delete the announcement (unless it was already deleted by MakeCompleted).
+                Erase<ByPeer>(it);
+            }
+            it = it_next;
+        }
+    }
+
+    void ForgetTxHash(const uint256& txhash)
+    {
+        auto it = m_index.get<ByTxHash>().lower_bound(ByTxHashView{txhash, State::CANDIDATE_DELAYED, 0});
+        while (it != m_index.get<ByTxHash>().end() && it->m_txhash == txhash) {
+            it = Erase<ByTxHash>(it);
+        }
+    }
+
+    void ReceivedInv(NodeId peer, const GenTxid& gtxid, bool preferred,
+        std::chrono::microseconds reqtime)
+    {
+        // Bail out if we already have a CANDIDATE_BEST announcement for this (txhash, peer) combination. The case
+        // where there is a non-CANDIDATE_BEST announcement already will be caught by the uniqueness property of the
+        // ByPeer index when we try to emplace the new object below.
+        if (m_index.get<ByPeer>().count(ByPeerView{peer, true, gtxid.GetHash()})) return;
+
+        // Try creating the announcement with CANDIDATE_DELAYED state (which will fail due to the uniqueness
+        // of the ByPeer index if a non-CANDIDATE_BEST announcement already exists with the same txhash and peer).
+        // Bail out in that case.
+        auto ret = m_index.get<ByPeer>().emplace(gtxid, peer, preferred, reqtime, m_current_sequence);
+        if (!ret.second) return;
+
+        // Update accounting metadata.
+        ++m_peerinfo[peer].m_total;
+        ++m_current_sequence;
+    }
+
+    //! Find the GenTxids to request now from peer.
+    std::vector<GenTxid> GetRequestable(NodeId peer, std::chrono::microseconds now,
+        std::vector<std::pair<NodeId, GenTxid>>* expired)
+    {
+        // Move time.
+        SetTimePoint(now, expired);
+
+        // Find all CANDIDATE_BEST announcements for this peer.
+        std::vector<const Announcement*> selected;
+        auto it_peer = m_index.get<ByPeer>().lower_bound(ByPeerView{peer, true, uint256::ZERO});
+        while (it_peer != m_index.get<ByPeer>().end() && it_peer->m_peer == peer &&
+            it_peer->GetState() == State::CANDIDATE_BEST) {
+            selected.emplace_back(&*it_peer);
+            ++it_peer;
+        }
+
+        // Sort by sequence number.
+        std::sort(selected.begin(), selected.end(), [](const Announcement* a, const Announcement* b) {
+            return a->m_sequence < b->m_sequence;
+        });
+
+        // Convert to GenTxid and return.
+        std::vector<GenTxid> ret;
+        ret.reserve(selected.size());
+        std::transform(selected.begin(), selected.end(), std::back_inserter(ret), [](const Announcement* ann) {
+            return ToGenTxid(*ann);
+        });
+        return ret;
+    }
+
+    void RequestedTx(NodeId peer, const uint256& txhash, std::chrono::microseconds expiry)
+    {
+        auto it = m_index.get<ByPeer>().find(ByPeerView{peer, true, txhash});
+        if (it == m_index.get<ByPeer>().end()) {
+            // There is no CANDIDATE_BEST announcement, look for a _READY or _DELAYED instead. If the caller only
+            // ever invokes RequestedTx with the values returned by GetRequestable, and no other non-const functions
+            // other than ForgetTxHash and GetRequestable in between, this branch will never execute (as txhashes
+            // returned by GetRequestable always correspond to CANDIDATE_BEST announcements).
+
+            it = m_index.get<ByPeer>().find(ByPeerView{peer, false, txhash});
+            if (it == m_index.get<ByPeer>().end() || (it->GetState() != State::CANDIDATE_DELAYED &&
+                                                      it->GetState() != State::CANDIDATE_READY)) {
+                // There is no CANDIDATE announcement tracked for this peer, so we have nothing to do. Either this
+                // txhash wasn't tracked at all (and the caller should have called ReceivedInv), or it was already
+                // requested and/or completed for other reasons and this is just a superfluous RequestedTx call.
+                return;
+            }
+
+            // Look for an existing CANDIDATE_BEST or REQUESTED with the same txhash. We only need to do this if the
+            // found announcement had a different state than CANDIDATE_BEST. If it did, invariants guarantee that no
+            // other CANDIDATE_BEST or REQUESTED can exist.
+            auto it_old = m_index.get<ByTxHash>().lower_bound(ByTxHashView{txhash, State::CANDIDATE_BEST, 0});
+            if (it_old != m_index.get<ByTxHash>().end() && it_old->m_txhash == txhash) {
+                if (it_old->GetState() == State::CANDIDATE_BEST) {
+                    // The data structure's invariants require that there can be at most one CANDIDATE_BEST or one
+                    // REQUESTED announcement per txhash (but not both simultaneously), so we have to convert any
+                    // existing CANDIDATE_BEST to anot
