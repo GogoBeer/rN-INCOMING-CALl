@@ -648,4 +648,108 @@ public:
                 if (it_old->GetState() == State::CANDIDATE_BEST) {
                     // The data structure's invariants require that there can be at most one CANDIDATE_BEST or one
                     // REQUESTED announcement per txhash (but not both simultaneously), so we have to convert any
-                    // existing CANDIDATE_BEST to anot
+                    // existing CANDIDATE_BEST to another CANDIDATE_* when constructing another REQUESTED.
+                    // It doesn't matter whether we pick CANDIDATE_READY or _DELAYED here, as SetTimePoint()
+                    // will correct it at GetRequestable() time. If time only goes forward, it will always be
+                    // _READY, so pick that to avoid extra work in SetTimePoint().
+                    Modify<ByTxHash>(it_old, [](Announcement& ann) { ann.SetState(State::CANDIDATE_READY); });
+                } else if (it_old->GetState() == State::REQUESTED) {
+                    // As we're no longer waiting for a response to the previous REQUESTED announcement, convert it
+                    // to COMPLETED. This also helps guaranteeing progress.
+                    Modify<ByTxHash>(it_old, [](Announcement& ann) { ann.SetState(State::COMPLETED); });
+                }
+            }
+        }
+
+        Modify<ByPeer>(it, [expiry](Announcement& ann) {
+            ann.SetState(State::REQUESTED);
+            ann.m_time = expiry;
+        });
+    }
+
+    void ReceivedResponse(NodeId peer, const uint256& txhash)
+    {
+        // We need to search the ByPeer index for both (peer, false, txhash) and (peer, true, txhash).
+        auto it = m_index.get<ByPeer>().find(ByPeerView{peer, false, txhash});
+        if (it == m_index.get<ByPeer>().end()) {
+            it = m_index.get<ByPeer>().find(ByPeerView{peer, true, txhash});
+        }
+        if (it != m_index.get<ByPeer>().end()) MakeCompleted(m_index.project<ByTxHash>(it));
+    }
+
+    size_t CountInFlight(NodeId peer) const
+    {
+        auto it = m_peerinfo.find(peer);
+        if (it != m_peerinfo.end()) return it->second.m_requested;
+        return 0;
+    }
+
+    size_t CountCandidates(NodeId peer) const
+    {
+        auto it = m_peerinfo.find(peer);
+        if (it != m_peerinfo.end()) return it->second.m_total - it->second.m_requested - it->second.m_completed;
+        return 0;
+    }
+
+    size_t Count(NodeId peer) const
+    {
+        auto it = m_peerinfo.find(peer);
+        if (it != m_peerinfo.end()) return it->second.m_total;
+        return 0;
+    }
+
+    //! Count how many announcements are being tracked in total across all peers and transactions.
+    size_t Size() const { return m_index.size(); }
+
+    uint64_t ComputePriority(const uint256& txhash, NodeId peer, bool preferred) const
+    {
+        // Return Priority as a uint64_t as Priority is internal.
+        return uint64_t{m_computer(txhash, peer, preferred)};
+    }
+
+};
+
+TxRequestTracker::TxRequestTracker(bool deterministic) :
+    m_impl{std::make_unique<TxRequestTracker::Impl>(deterministic)} {}
+
+TxRequestTracker::~TxRequestTracker() = default;
+
+void TxRequestTracker::ForgetTxHash(const uint256& txhash) { m_impl->ForgetTxHash(txhash); }
+void TxRequestTracker::DisconnectedPeer(NodeId peer) { m_impl->DisconnectedPeer(peer); }
+size_t TxRequestTracker::CountInFlight(NodeId peer) const { return m_impl->CountInFlight(peer); }
+size_t TxRequestTracker::CountCandidates(NodeId peer) const { return m_impl->CountCandidates(peer); }
+size_t TxRequestTracker::Count(NodeId peer) const { return m_impl->Count(peer); }
+size_t TxRequestTracker::Size() const { return m_impl->Size(); }
+void TxRequestTracker::SanityCheck() const { m_impl->SanityCheck(); }
+
+void TxRequestTracker::PostGetRequestableSanityCheck(std::chrono::microseconds now) const
+{
+    m_impl->PostGetRequestableSanityCheck(now);
+}
+
+void TxRequestTracker::ReceivedInv(NodeId peer, const GenTxid& gtxid, bool preferred,
+    std::chrono::microseconds reqtime)
+{
+    m_impl->ReceivedInv(peer, gtxid, preferred, reqtime);
+}
+
+void TxRequestTracker::RequestedTx(NodeId peer, const uint256& txhash, std::chrono::microseconds expiry)
+{
+    m_impl->RequestedTx(peer, txhash, expiry);
+}
+
+void TxRequestTracker::ReceivedResponse(NodeId peer, const uint256& txhash)
+{
+    m_impl->ReceivedResponse(peer, txhash);
+}
+
+std::vector<GenTxid> TxRequestTracker::GetRequestable(NodeId peer, std::chrono::microseconds now,
+    std::vector<std::pair<NodeId, GenTxid>>* expired)
+{
+    return m_impl->GetRequestable(peer, now, expired);
+}
+
+uint64_t TxRequestTracker::ComputePriority(const uint256& txhash, NodeId peer, bool preferred) const
+{
+    return m_impl->ComputePriority(txhash, peer, preferred);
+}
