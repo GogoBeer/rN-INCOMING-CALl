@@ -293,4 +293,128 @@ BOOST_AUTO_TEST_CASE(univalue_object)
     BOOST_CHECK_EQUAL(obj["last"].getValStr(), "Smith");
     BOOST_CHECK_EQUAL(obj["distance"].getValStr(), "25");
     BOOST_CHECK_EQUAL(obj["time"].getValStr(), "3600");
-    BOOST_CHECK_EQUAL(ob
+    BOOST_CHECK_EQUAL(obj["calories"].getValStr(), "12");
+    BOOST_CHECK_EQUAL(obj["temperature"].getValStr(), "90.012");
+    BOOST_CHECK_EQUAL(obj["moon"].getValStr(), "1");
+    BOOST_CHECK_EQUAL(obj["spoon"].getValStr(), "");
+    BOOST_CHECK_EQUAL(obj["cat1"].getValStr(), "9000");
+    BOOST_CHECK_EQUAL(obj["cat2"].getValStr(), "12345");
+
+    BOOST_CHECK_EQUAL(obj["nyuknyuknyuk"].getValStr(), "");
+
+    BOOST_CHECK(obj.exists("age"));
+    BOOST_CHECK(obj.exists("first"));
+    BOOST_CHECK(obj.exists("last"));
+    BOOST_CHECK(obj.exists("distance"));
+    BOOST_CHECK(obj.exists("time"));
+    BOOST_CHECK(obj.exists("calories"));
+    BOOST_CHECK(obj.exists("temperature"));
+    BOOST_CHECK(obj.exists("moon"));
+    BOOST_CHECK(obj.exists("spoon"));
+    BOOST_CHECK(obj.exists("cat1"));
+    BOOST_CHECK(obj.exists("cat2"));
+
+    BOOST_CHECK(!obj.exists("nyuknyuknyuk"));
+
+    std::map<std::string, UniValue::VType> objTypes;
+    objTypes["age"] = UniValue::VNUM;
+    objTypes["first"] = UniValue::VSTR;
+    objTypes["last"] = UniValue::VSTR;
+    objTypes["distance"] = UniValue::VNUM;
+    objTypes["time"] = UniValue::VNUM;
+    objTypes["calories"] = UniValue::VNUM;
+    objTypes["temperature"] = UniValue::VNUM;
+    objTypes["moon"] = UniValue::VBOOL;
+    objTypes["spoon"] = UniValue::VBOOL;
+    objTypes["cat1"] = UniValue::VNUM;
+    objTypes["cat2"] = UniValue::VNUM;
+    BOOST_CHECK(obj.checkObject(objTypes));
+
+    objTypes["cat2"] = UniValue::VSTR;
+    BOOST_CHECK(!obj.checkObject(objTypes));
+
+    obj.clear();
+    BOOST_CHECK(obj.empty());
+    BOOST_CHECK_EQUAL(obj.size(), 0);
+    BOOST_CHECK_EQUAL(obj.getType(), UniValue::VNULL);
+
+    BOOST_CHECK_EQUAL(obj.setObject(), true);
+    UniValue uv;
+    uv.setInt(42);
+    obj.__pushKV("age", uv);
+    BOOST_CHECK_EQUAL(obj.size(), 1);
+    BOOST_CHECK_EQUAL(obj["age"].getValStr(), "42");
+
+    uv.setInt(43);
+    obj.pushKV("age", uv);
+    BOOST_CHECK_EQUAL(obj.size(), 1);
+    BOOST_CHECK_EQUAL(obj["age"].getValStr(), "43");
+
+    obj.pushKV("name", "foo bar");
+
+    std::map<std::string,UniValue> kv;
+    obj.getObjMap(kv);
+    BOOST_CHECK_EQUAL(kv["age"].getValStr(), "43");
+    BOOST_CHECK_EQUAL(kv["name"].getValStr(), "foo bar");
+
+}
+
+static const char *json1 =
+"[1.10000000,{\"key1\":\"str\\u0000\",\"key2\":800,\"key3\":{\"name\":\"martian http://test.com\"}}]";
+
+BOOST_AUTO_TEST_CASE(univalue_readwrite)
+{
+    UniValue v;
+    BOOST_CHECK(v.read(json1));
+
+    std::string strJson1(json1);
+    BOOST_CHECK(v.read(strJson1));
+
+    BOOST_CHECK(v.isArray());
+    BOOST_CHECK_EQUAL(v.size(), 2);
+
+    BOOST_CHECK_EQUAL(v[0].getValStr(), "1.10000000");
+
+    UniValue obj = v[1];
+    BOOST_CHECK(obj.isObject());
+    BOOST_CHECK_EQUAL(obj.size(), 3);
+
+    BOOST_CHECK(obj["key1"].isStr());
+    std::string correctValue("str");
+    correctValue.push_back('\0');
+    BOOST_CHECK_EQUAL(obj["key1"].getValStr(), correctValue);
+    BOOST_CHECK(obj["key2"].isNum());
+    BOOST_CHECK_EQUAL(obj["key2"].getValStr(), "800");
+    BOOST_CHECK(obj["key3"].isObject());
+
+    BOOST_CHECK_EQUAL(strJson1, v.write());
+
+    /* Check for (correctly reporting) a parsing error if the initial
+       JSON construct is followed by more stuff.  Note that whitespace
+       is, of course, exempt.  */
+
+    BOOST_CHECK(v.read("  {}\n  "));
+    BOOST_CHECK(v.isObject());
+    BOOST_CHECK(v.read("  []\n  "));
+    BOOST_CHECK(v.isArray());
+
+    BOOST_CHECK(!v.read("@{}"));
+    BOOST_CHECK(!v.read("{} garbage"));
+    BOOST_CHECK(!v.read("[]{}"));
+    BOOST_CHECK(!v.read("{}[]"));
+    BOOST_CHECK(!v.read("{} 42"));
+}
+
+BOOST_AUTO_TEST_SUITE_END()
+
+int main (int argc, char *argv[])
+{
+    univalue_constructor();
+    univalue_typecheck();
+    univalue_set();
+    univalue_array();
+    univalue_object();
+    univalue_readwrite();
+    return 0;
+}
+
