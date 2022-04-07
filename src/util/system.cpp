@@ -892,3 +892,522 @@ bool ArgsManager::ReadConfigStream(std::istream& stream, const std::string& file
             }
         }
     }
+    return true;
+}
+
+bool ArgsManager::ReadConfigFiles(std::string& error, bool ignore_invalid_keys)
+{
+    {
+        LOCK(cs_args);
+        m_settings.ro_config.clear();
+        m_config_sections.clear();
+    }
+
+    const std::string confPath = GetArg("-conf", BITCOIN_CONF_FILENAME);
+    fsbridge::ifstream stream(GetConfigFile(confPath));
+
+    // not ok to have a config file specified that cannot be opened
+    if (IsArgSet("-conf") && !stream.good()) {
+        error = strprintf("specified config file \"%s\" could not be opened.", confPath);
+        return false;
+    }
+    // ok to not have a config file
+    if (stream.good()) {
+        if (!ReadConfigStream(stream, confPath, error, ignore_invalid_keys)) {
+            return false;
+        }
+        // `-includeconf` cannot be included in the command line arguments except
+        // as `-noincludeconf` (which indicates that no included conf file should be used).
+        bool use_conf_file{true};
+        {
+            LOCK(cs_args);
+            if (auto* includes = util::FindKey(m_settings.command_line_options, "includeconf")) {
+                // ParseParameters() fails if a non-negated -includeconf is passed on the command-line
+                assert(util::SettingsSpan(*includes).last_negated());
+                use_conf_file = false;
+            }
+        }
+        if (use_conf_file) {
+            std::string chain_id = GetChainName();
+            std::vector<std::string> conf_file_names;
+
+            auto add_includes = [&](const std::string& network, size_t skip = 0) {
+                size_t num_values = 0;
+                LOCK(cs_args);
+                if (auto* section = util::FindKey(m_settings.ro_config, network)) {
+                    if (auto* values = util::FindKey(*section, "includeconf")) {
+                        for (size_t i = std::max(skip, util::SettingsSpan(*values).negated()); i < values->size(); ++i) {
+                            conf_file_names.push_back((*values)[i].get_str());
+                        }
+                        num_values = values->size();
+                    }
+                }
+                return num_values;
+            };
+
+            // We haven't set m_network yet (that happens in SelectParams()), so manually check
+            // for network.includeconf args.
+            const size_t chain_includes = add_includes(chain_id);
+            const size_t default_includes = add_includes({});
+
+            for (const std::string& conf_file_name : conf_file_names) {
+                fsbridge::ifstream conf_file_stream(GetConfigFile(conf_file_name));
+                if (conf_file_stream.good()) {
+                    if (!ReadConfigStream(conf_file_stream, conf_file_name, error, ignore_invalid_keys)) {
+                        return false;
+                    }
+                    LogPrintf("Included configuration file %s\n", conf_file_name);
+                } else {
+                    error = "Failed to include configuration file " + conf_file_name;
+                    return false;
+                }
+            }
+
+            // Warn about recursive -includeconf
+            conf_file_names.clear();
+            add_includes(chain_id, /* skip= */ chain_includes);
+            add_includes({}, /* skip= */ default_includes);
+            std::string chain_id_final = GetChainName();
+            if (chain_id_final != chain_id) {
+                // Also warn about recursive includeconf for the chain that was specified in one of the includeconfs
+                add_includes(chain_id_final);
+            }
+            for (const std::string& conf_file_name : conf_file_names) {
+                tfm::format(std::cerr, "warning: -includeconf cannot be used from included files; ignoring -includeconf=%s\n", conf_file_name);
+            }
+        }
+    }
+
+    // If datadir is changed in .conf file:
+    gArgs.ClearPathCache();
+    if (!CheckDataDirOption()) {
+        error = strprintf("specified data directory \"%s\" does not exist.", GetArg("-datadir", ""));
+        return false;
+    }
+    return true;
+}
+
+std::string ArgsManager::GetChainName() const
+{
+    auto get_net = [&](const std::string& arg) {
+        LOCK(cs_args);
+        util::SettingsValue value = util::GetSetting(m_settings, /* section= */ "", SettingName(arg),
+            /* ignore_default_section_config= */ false,
+            /* get_chain_name= */ true);
+        return value.isNull() ? false : value.isBool() ? value.get_bool() : InterpretBool(value.get_str());
+    };
+
+    const bool fRegTest = get_net("-regtest");
+    const bool fSigNet  = get_net("-signet");
+    const bool fTestNet = get_net("-testnet");
+    const bool is_chain_arg_set = IsArgSet("-chain");
+
+    if ((int)is_chain_arg_set + (int)fRegTest + (int)fSigNet + (int)fTestNet > 1) {
+        throw std::runtime_error("Invalid combination of -regtest, -signet, -testnet and -chain. Can use at most one.");
+    }
+    if (fRegTest)
+        return CBaseChainParams::REGTEST;
+    if (fSigNet) {
+        return CBaseChainParams::SIGNET;
+    }
+    if (fTestNet)
+        return CBaseChainParams::TESTNET;
+
+    return GetArg("-chain", CBaseChainParams::MAIN);
+}
+
+bool ArgsManager::UseDefaultSection(const std::string& arg) const
+{
+    return m_network == CBaseChainParams::MAIN || m_network_only_args.count(arg) == 0;
+}
+
+util::SettingsValue ArgsManager::GetSetting(const std::string& arg) const
+{
+    LOCK(cs_args);
+    return util::GetSetting(
+        m_settings, m_network, SettingName(arg), !UseDefaultSection(arg), /* get_chain_name= */ false);
+}
+
+std::vector<util::SettingsValue> ArgsManager::GetSettingsList(const std::string& arg) const
+{
+    LOCK(cs_args);
+    return util::GetSettingsList(m_settings, m_network, SettingName(arg), !UseDefaultSection(arg));
+}
+
+void ArgsManager::logArgsPrefix(
+    const std::string& prefix,
+    const std::string& section,
+    const std::map<std::string, std::vector<util::SettingsValue>>& args) const
+{
+    std::string section_str = section.empty() ? "" : "[" + section + "] ";
+    for (const auto& arg : args) {
+        for (const auto& value : arg.second) {
+            std::optional<unsigned int> flags = GetArgFlags('-' + arg.first);
+            if (flags) {
+                std::string value_str = (*flags & SENSITIVE) ? "****" : value.write();
+                LogPrintf("%s %s%s=%s\n", prefix, section_str, arg.first, value_str);
+            }
+        }
+    }
+}
+
+void ArgsManager::LogArgs() const
+{
+    LOCK(cs_args);
+    for (const auto& section : m_settings.ro_config) {
+        logArgsPrefix("Config file arg:", section.first, section.second);
+    }
+    for (const auto& setting : m_settings.rw_settings) {
+        LogPrintf("Setting file arg: %s = %s\n", setting.first, setting.second.write());
+    }
+    logArgsPrefix("Command-line arg:", "", m_settings.command_line_options);
+}
+
+bool RenameOver(fs::path src, fs::path dest)
+{
+#ifdef WIN32
+    return MoveFileExW(src.wstring().c_str(), dest.wstring().c_str(),
+                       MOVEFILE_REPLACE_EXISTING) != 0;
+#else
+    int rc = std::rename(src.c_str(), dest.c_str());
+    return (rc == 0);
+#endif /* WIN32 */
+}
+
+/**
+ * Ignores exceptions thrown by Boost's create_directories if the requested directory exists.
+ * Specifically handles case where path p exists, but it wasn't possible for the user to
+ * write to the parent directory.
+ */
+bool TryCreateDirectories(const fs::path& p)
+{
+    try
+    {
+        return fs::create_directories(p);
+    } catch (const fs::filesystem_error&) {
+        if (!fs::exists(p) || !fs::is_directory(p))
+            throw;
+    }
+
+    // create_directories didn't create the directory, it had to have existed already
+    return false;
+}
+
+bool FileCommit(FILE *file)
+{
+    if (fflush(file) != 0) { // harmless if redundantly called
+        LogPrintf("%s: fflush failed: %d\n", __func__, errno);
+        return false;
+    }
+#ifdef WIN32
+    HANDLE hFile = (HANDLE)_get_osfhandle(_fileno(file));
+    if (FlushFileBuffers(hFile) == 0) {
+        LogPrintf("%s: FlushFileBuffers failed: %d\n", __func__, GetLastError());
+        return false;
+    }
+#elif defined(MAC_OSX) && defined(F_FULLFSYNC)
+    if (fcntl(fileno(file), F_FULLFSYNC, 0) == -1) { // Manpage says "value other than -1" is returned on success
+        LogPrintf("%s: fcntl F_FULLFSYNC failed: %d\n", __func__, errno);
+        return false;
+    }
+#elif HAVE_FDATASYNC
+    if (fdatasync(fileno(file)) != 0 && errno != EINVAL) { // Ignore EINVAL for filesystems that don't support sync
+        LogPrintf("%s: fdatasync failed: %d\n", __func__, errno);
+        return false;
+    }
+#else
+    if (fsync(fileno(file)) != 0 && errno != EINVAL) {
+        LogPrintf("%s: fsync failed: %d\n", __func__, errno);
+        return false;
+    }
+#endif
+    return true;
+}
+
+void DirectoryCommit(const fs::path &dirname)
+{
+#ifndef WIN32
+    FILE* file = fsbridge::fopen(dirname, "r");
+    if (file) {
+        fsync(fileno(file));
+        fclose(file);
+    }
+#endif
+}
+
+bool TruncateFile(FILE *file, unsigned int length) {
+#if defined(WIN32)
+    return _chsize(_fileno(file), length) == 0;
+#else
+    return ftruncate(fileno(file), length) == 0;
+#endif
+}
+
+/**
+ * this function tries to raise the file descriptor limit to the requested number.
+ * It returns the actual file descriptor limit (which may be more or less than nMinFD)
+ */
+int RaiseFileDescriptorLimit(int nMinFD) {
+#if defined(WIN32)
+    return 2048;
+#else
+    struct rlimit limitFD;
+    if (getrlimit(RLIMIT_NOFILE, &limitFD) != -1) {
+        if (limitFD.rlim_cur < (rlim_t)nMinFD) {
+            limitFD.rlim_cur = nMinFD;
+            if (limitFD.rlim_cur > limitFD.rlim_max)
+                limitFD.rlim_cur = limitFD.rlim_max;
+            setrlimit(RLIMIT_NOFILE, &limitFD);
+            getrlimit(RLIMIT_NOFILE, &limitFD);
+        }
+        return limitFD.rlim_cur;
+    }
+    return nMinFD; // getrlimit failed, assume it's fine
+#endif
+}
+
+/**
+ * this function tries to make a particular range of a file allocated (corresponding to disk space)
+ * it is advisory, and the range specified in the arguments will never contain live data
+ */
+void AllocateFileRange(FILE *file, unsigned int offset, unsigned int length) {
+#if defined(WIN32)
+    // Windows-specific version
+    HANDLE hFile = (HANDLE)_get_osfhandle(_fileno(file));
+    LARGE_INTEGER nFileSize;
+    int64_t nEndPos = (int64_t)offset + length;
+    nFileSize.u.LowPart = nEndPos & 0xFFFFFFFF;
+    nFileSize.u.HighPart = nEndPos >> 32;
+    SetFilePointerEx(hFile, nFileSize, 0, FILE_BEGIN);
+    SetEndOfFile(hFile);
+#elif defined(MAC_OSX)
+    // OSX specific version
+    // NOTE: Contrary to other OS versions, the OSX version assumes that
+    // NOTE: offset is the size of the file.
+    fstore_t fst;
+    fst.fst_flags = F_ALLOCATECONTIG;
+    fst.fst_posmode = F_PEOFPOSMODE;
+    fst.fst_offset = 0;
+    fst.fst_length = length; // mac os fst_length takes the # of free bytes to allocate, not desired file size
+    fst.fst_bytesalloc = 0;
+    if (fcntl(fileno(file), F_PREALLOCATE, &fst) == -1) {
+        fst.fst_flags = F_ALLOCATEALL;
+        fcntl(fileno(file), F_PREALLOCATE, &fst);
+    }
+    ftruncate(fileno(file), static_cast<off_t>(offset) + length);
+#else
+    #if defined(HAVE_POSIX_FALLOCATE)
+    // Version using posix_fallocate
+    off_t nEndPos = (off_t)offset + length;
+    if (0 == posix_fallocate(fileno(file), 0, nEndPos)) return;
+    #endif
+    // Fallback version
+    // TODO: just write one byte per block
+    static const char buf[65536] = {};
+    if (fseek(file, offset, SEEK_SET)) {
+        return;
+    }
+    while (length > 0) {
+        unsigned int now = 65536;
+        if (length < now)
+            now = length;
+        fwrite(buf, 1, now, file); // allowed to fail; this function is advisory anyway
+        length -= now;
+    }
+#endif
+}
+
+#ifdef WIN32
+fs::path GetSpecialFolderPath(int nFolder, bool fCreate)
+{
+    WCHAR pszPath[MAX_PATH] = L"";
+
+    if(SHGetSpecialFolderPathW(nullptr, pszPath, nFolder, fCreate))
+    {
+        return fs::path(pszPath);
+    }
+
+    LogPrintf("SHGetSpecialFolderPathW() failed, could not obtain requested path.\n");
+    return fs::path("");
+}
+#endif
+
+#ifndef WIN32
+std::string ShellEscape(const std::string& arg)
+{
+    std::string escaped = arg;
+    boost::replace_all(escaped, "'", "'\"'\"'");
+    return "'" + escaped + "'";
+}
+#endif
+
+#if HAVE_SYSTEM
+void runCommand(const std::string& strCommand)
+{
+    if (strCommand.empty()) return;
+#ifndef WIN32
+    int nErr = ::system(strCommand.c_str());
+#else
+    int nErr = ::_wsystem(std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>,wchar_t>().from_bytes(strCommand).c_str());
+#endif
+    if (nErr)
+        LogPrintf("runCommand error: system(%s) returned %d\n", strCommand, nErr);
+}
+#endif
+
+UniValue RunCommandParseJSON(const std::string& str_command, const std::string& str_std_in)
+{
+#ifdef ENABLE_EXTERNAL_SIGNER
+    namespace bp = boost::process;
+
+    UniValue result_json;
+    bp::opstream stdin_stream;
+    bp::ipstream stdout_stream;
+    bp::ipstream stderr_stream;
+
+    if (str_command.empty()) return UniValue::VNULL;
+
+    bp::child c(
+        str_command,
+        bp::std_out > stdout_stream,
+        bp::std_err > stderr_stream,
+        bp::std_in < stdin_stream
+    );
+    if (!str_std_in.empty()) {
+        stdin_stream << str_std_in << std::endl;
+    }
+    stdin_stream.pipe().close();
+
+    std::string result;
+    std::string error;
+    std::getline(stdout_stream, result);
+    std::getline(stderr_stream, error);
+
+    c.wait();
+    const int n_error = c.exit_code();
+    if (n_error) throw std::runtime_error(strprintf("RunCommandParseJSON error: process(%s) returned %d: %s\n", str_command, n_error, error));
+    if (!result_json.read(result)) throw std::runtime_error("Unable to parse JSON: " + result);
+
+    return result_json;
+#else
+    throw std::runtime_error("Compiled without external signing support (required for external signing).");
+#endif // ENABLE_EXTERNAL_SIGNER
+}
+
+void SetupEnvironment()
+{
+#ifdef HAVE_MALLOPT_ARENA_MAX
+    // glibc-specific: On 32-bit systems set the number of arenas to 1.
+    // By default, since glibc 2.10, the C library will create up to two heap
+    // arenas per core. This is known to cause excessive virtual address space
+    // usage in our usage. Work around it by setting the maximum number of
+    // arenas to 1.
+    if (sizeof(void*) == 4) {
+        mallopt(M_ARENA_MAX, 1);
+    }
+#endif
+    // On most POSIX systems (e.g. Linux, but not BSD) the environment's locale
+    // may be invalid, in which case the "C.UTF-8" locale is used as fallback.
+#if !defined(WIN32) && !defined(MAC_OSX) && !defined(__FreeBSD__) && !defined(__OpenBSD__) && !defined(__NetBSD__)
+    try {
+        std::locale(""); // Raises a runtime error if current locale is invalid
+    } catch (const std::runtime_error&) {
+        setenv("LC_ALL", "C.UTF-8", 1);
+    }
+#elif defined(WIN32)
+    // Set the default input/output charset is utf-8
+    SetConsoleCP(CP_UTF8);
+    SetConsoleOutputCP(CP_UTF8);
+#endif
+    // The path locale is lazy initialized and to avoid deinitialization errors
+    // in multithreading environments, it is set explicitly by the main thread.
+    // A dummy locale is used to extract the internal default locale, used by
+    // fs::path, which is then used to explicitly imbue the path.
+    std::locale loc = fs::path::imbue(std::locale::classic());
+#ifndef WIN32
+    fs::path::imbue(loc);
+#else
+    fs::path::imbue(std::locale(loc, new std::codecvt_utf8_utf16<wchar_t>()));
+#endif
+}
+
+bool SetupNetworking()
+{
+#ifdef WIN32
+    // Initialize Windows Sockets
+    WSADATA wsadata;
+    int ret = WSAStartup(MAKEWORD(2,2), &wsadata);
+    if (ret != NO_ERROR || LOBYTE(wsadata.wVersion ) != 2 || HIBYTE(wsadata.wVersion) != 2)
+        return false;
+#endif
+    return true;
+}
+
+int GetNumCores()
+{
+    return std::thread::hardware_concurrency();
+}
+
+std::string CopyrightHolders(const std::string& strPrefix)
+{
+    const auto copyright_devs = strprintf(_(COPYRIGHT_HOLDERS).translated, COPYRIGHT_HOLDERS_SUBSTITUTION);
+    std::string strCopyrightHolders = strPrefix + copyright_devs;
+
+    // Make sure Bitcoin Core copyright is not removed by accident
+    if (copyright_devs.find("Bitcoin Core") == std::string::npos) {
+        strCopyrightHolders += "\n" + strPrefix + "The Bitcoin Core developers";
+    }
+    return strCopyrightHolders;
+}
+
+// Obtain the application startup time (used for uptime calculation)
+int64_t GetStartupTime()
+{
+    return nStartupTime;
+}
+
+fs::path AbsPathForConfigVal(const fs::path& path, bool net_specific)
+{
+    if (path.is_absolute()) {
+        return path;
+    }
+    return fsbridge::AbsPathJoin(net_specific ? gArgs.GetDataDirNet() : gArgs.GetDataDirBase(), path);
+}
+
+void ScheduleBatchPriority()
+{
+#ifdef SCHED_BATCH
+    const static sched_param param{};
+    const int rc = pthread_setschedparam(pthread_self(), SCHED_BATCH, &param);
+    if (rc != 0) {
+        LogPrintf("Failed to pthread_setschedparam: %s\n", strerror(rc));
+    }
+#endif
+}
+
+namespace util {
+#ifdef WIN32
+WinCmdLineArgs::WinCmdLineArgs()
+{
+    wchar_t** wargv = CommandLineToArgvW(GetCommandLineW(), &argc);
+    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>, wchar_t> utf8_cvt;
+    argv = new char*[argc];
+    args.resize(argc);
+    for (int i = 0; i < argc; i++) {
+        args[i] = utf8_cvt.to_bytes(wargv[i]);
+        argv[i] = &*args[i].begin();
+    }
+    LocalFree(wargv);
+}
+
+WinCmdLineArgs::~WinCmdLineArgs()
+{
+    delete[] argv;
+}
+
+std::pair<int, char**> WinCmdLineArgs::get()
+{
+    return std::make_pair(argc, argv);
+}
+#endif
+} // namespace util
