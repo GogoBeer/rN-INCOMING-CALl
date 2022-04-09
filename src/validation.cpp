@@ -324,4 +324,160 @@ void CChainState::MaybeUpdateMempoolForReorg(
     }
     disconnectpool.queuedTx.clear();
     // AcceptToMemoryPool/addUnchecked all assume that new mempool entries have
-    // no in-mempool children, which is generally not true wh
+    // no in-mempool children, which is generally not true when adding
+    // previously-confirmed transactions back to the mempool.
+    // UpdateTransactionsFromBlock finds descendants of any transactions in
+    // the disconnectpool that were added back and cleans up the mempool state.
+    m_mempool->UpdateTransactionsFromBlock(vHashUpdate);
+
+    const auto check_final_and_mature = [this, flags=STANDARD_LOCKTIME_VERIFY_FLAGS](CTxMemPool::txiter it)
+        EXCLUSIVE_LOCKS_REQUIRED(m_mempool->cs, ::cs_main) {
+        bool should_remove = false;
+        AssertLockHeld(m_mempool->cs);
+        AssertLockHeld(::cs_main);
+        const CTransaction& tx = it->GetTx();
+        LockPoints lp = it->GetLockPoints();
+        const bool validLP{TestLockPointValidity(m_chain, lp)};
+        CCoinsViewMemPool view_mempool(&CoinsTip(), *m_mempool);
+        if (!CheckFinalTx(m_chain.Tip(), tx, flags)
+            || !CheckSequenceLocks(m_chain.Tip(), view_mempool, tx, flags, &lp, validLP)) {
+            // Note if CheckSequenceLocks fails the LockPoints may still be invalid
+            // So it's critical that we remove the tx and not depend on the LockPoints.
+            should_remove = true;
+        } else if (it->GetSpendsCoinbase()) {
+            for (const CTxIn& txin : tx.vin) {
+                auto it2 = m_mempool->mapTx.find(txin.prevout.hash);
+                if (it2 != m_mempool->mapTx.end())
+                    continue;
+                const Coin &coin = CoinsTip().AccessCoin(txin.prevout);
+                assert(!coin.IsSpent());
+                const auto mempool_spend_height{m_chain.Tip()->nHeight + 1};
+                if (coin.IsSpent() || (coin.IsCoinBase() && mempool_spend_height - coin.nHeight < COINBASE_MATURITY)) {
+                    should_remove = true;
+                    break;
+                }
+            }
+        }
+        // CheckSequenceLocks updates lp. Update the mempool entry LockPoints.
+        if (!validLP) m_mempool->mapTx.modify(it, update_lock_points(lp));
+        return should_remove;
+    };
+
+    // We also need to remove any now-immature transactions
+    m_mempool->removeForReorg(m_chain, check_final_and_mature);
+    // Re-limit mempool size, in case we added any transactions
+    LimitMempoolSize(
+        *m_mempool,
+        this->CoinsTip(),
+        gArgs.GetIntArg("-maxmempool", DEFAULT_MAX_MEMPOOL_SIZE) * 1000000,
+        std::chrono::hours{gArgs.GetIntArg("-mempoolexpiry", DEFAULT_MEMPOOL_EXPIRY)});
+}
+
+/**
+* Checks to avoid mempool polluting consensus critical paths since cached
+* signature and script validity results will be reused if we validate this
+* transaction again during block validation.
+* */
+static bool CheckInputsFromMempoolAndCache(const CTransaction& tx, TxValidationState& state,
+                const CCoinsViewCache& view, const CTxMemPool& pool,
+                unsigned int flags, PrecomputedTransactionData& txdata, CCoinsViewCache& coins_tip)
+                EXCLUSIVE_LOCKS_REQUIRED(cs_main, pool.cs)
+{
+    AssertLockHeld(cs_main);
+    AssertLockHeld(pool.cs);
+
+    assert(!tx.IsCoinBase());
+    for (const CTxIn& txin : tx.vin) {
+        const Coin& coin = view.AccessCoin(txin.prevout);
+
+        // This coin was checked in PreChecks and MemPoolAccept
+        // has been holding cs_main since then.
+        Assume(!coin.IsSpent());
+        if (coin.IsSpent()) return false;
+
+        // If the Coin is available, there are 2 possibilities:
+        // it is available in our current ChainstateActive UTXO set,
+        // or it's a UTXO provided by a transaction in our mempool.
+        // Ensure the scriptPubKeys in Coins from CoinsView are correct.
+        const CTransactionRef& txFrom = pool.get(txin.prevout.hash);
+        if (txFrom) {
+            assert(txFrom->GetHash() == txin.prevout.hash);
+            assert(txFrom->vout.size() > txin.prevout.n);
+            assert(txFrom->vout[txin.prevout.n] == coin.out);
+        } else {
+            const Coin& coinFromUTXOSet = coins_tip.AccessCoin(txin.prevout);
+            assert(!coinFromUTXOSet.IsSpent());
+            assert(coinFromUTXOSet.out == coin.out);
+        }
+    }
+
+    // Call CheckInputScripts() to cache signature and script validity against current tip consensus rules.
+    return CheckInputScripts(tx, state, view, flags, /* cacheSigStore= */ true, /* cacheFullScriptStore= */ true, txdata);
+}
+
+namespace {
+
+class MemPoolAccept
+{
+public:
+    explicit MemPoolAccept(CTxMemPool& mempool, CChainState& active_chainstate) : m_pool(mempool), m_view(&m_dummy), m_viewmempool(&active_chainstate.CoinsTip(), m_pool), m_active_chainstate(active_chainstate),
+        m_limit_ancestors(gArgs.GetIntArg("-limitancestorcount", DEFAULT_ANCESTOR_LIMIT)),
+        m_limit_ancestor_size(gArgs.GetIntArg("-limitancestorsize", DEFAULT_ANCESTOR_SIZE_LIMIT)*1000),
+        m_limit_descendants(gArgs.GetIntArg("-limitdescendantcount", DEFAULT_DESCENDANT_LIMIT)),
+        m_limit_descendant_size(gArgs.GetIntArg("-limitdescendantsize", DEFAULT_DESCENDANT_SIZE_LIMIT)*1000) {
+    }
+
+    // We put the arguments we're handed into a struct, so we can pass them
+    // around easier.
+    struct ATMPArgs {
+        const CChainParams& m_chainparams;
+        const int64_t m_accept_time;
+        const bool m_bypass_limits;
+        /*
+         * Return any outpoints which were not previously present in the coins
+         * cache, but were added as a result of validating the tx for mempool
+         * acceptance. This allows the caller to optionally remove the cache
+         * additions if the associated transaction ends up being rejected by
+         * the mempool.
+         */
+        std::vector<COutPoint>& m_coins_to_uncache;
+        const bool m_test_accept;
+        /** Whether we allow transactions to replace mempool transactions by BIP125 rules. If false,
+         * any transaction spending the same inputs as a transaction in the mempool is considered
+         * a conflict. */
+        const bool m_allow_bip125_replacement;
+        /** When true, the mempool will not be trimmed when individual transactions are submitted in
+         * Finalize(). Instead, limits should be enforced at the end to ensure the package is not
+         * partially submitted.
+         */
+        const bool m_package_submission;
+
+        /** Parameters for single transaction mempool validation. */
+        static ATMPArgs SingleAccept(const CChainParams& chainparams, int64_t accept_time,
+                                     bool bypass_limits, std::vector<COutPoint>& coins_to_uncache,
+                                     bool test_accept) {
+            return ATMPArgs{/* m_chainparams */ chainparams,
+                            /* m_accept_time */ accept_time,
+                            /* m_bypass_limits */ bypass_limits,
+                            /* m_coins_to_uncache */ coins_to_uncache,
+                            /* m_test_accept */ test_accept,
+                            /* m_allow_bip125_replacement */ true,
+                            /* m_package_submission */ false,
+            };
+        }
+
+        /** Parameters for test package mempool validation through testmempoolaccept. */
+        static ATMPArgs PackageTestAccept(const CChainParams& chainparams, int64_t accept_time,
+                                          std::vector<COutPoint>& coins_to_uncache) {
+            return ATMPArgs{/* m_chainparams */ chainparams,
+                            /* m_accept_time */ accept_time,
+                            /* m_bypass_limits */ false,
+                            /* m_coins_to_uncache */ coins_to_uncache,
+                            /* m_test_accept */ true,
+                            /* m_allow_bip125_replacement */ false,
+                            /* m_package_submission */ false, // not submitting to mempool
+            };
+        }
+
+        /** Parameters for child-with-unconfirmed-parents package validation. */
+        static ATMPArgs PackageChildWithParents
