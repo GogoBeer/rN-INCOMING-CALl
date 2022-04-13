@@ -915,4 +915,145 @@ bool MemPoolAccept::PackageMempoolChecks(const std::vector<CTransactionRef>& txn
 
     // CheckPackageLimits expects the package transactions to not already be in the mempool.
     assert(std::all_of(txns.cbegin(), txns.cend(), [this](const auto& tx)
-                       { return !m_pool.exist
+                       { return !m_pool.exists(GenTxid::Txid(tx->GetHash()));}));
+
+    std::string err_string;
+    if (!m_pool.CheckPackageLimits(txns, m_limit_ancestors, m_limit_ancestor_size, m_limit_descendants,
+                                   m_limit_descendant_size, err_string)) {
+        // This is a package-wide error, separate from an individual transaction error.
+        return package_state.Invalid(PackageValidationResult::PCKG_POLICY, "package-mempool-limits", err_string);
+    }
+   return true;
+}
+
+bool MemPoolAccept::PolicyScriptChecks(const ATMPArgs& args, Workspace& ws)
+{
+    const CTransaction& tx = *ws.m_ptx;
+    TxValidationState& state = ws.m_state;
+
+    constexpr unsigned int scriptVerifyFlags = STANDARD_SCRIPT_VERIFY_FLAGS;
+
+    // Check input scripts and signatures.
+    // This is done last to help prevent CPU exhaustion denial-of-service attacks.
+    if (!CheckInputScripts(tx, state, m_view, scriptVerifyFlags, true, false, ws.m_precomputed_txdata)) {
+        // SCRIPT_VERIFY_CLEANSTACK requires SCRIPT_VERIFY_WITNESS, so we
+        // need to turn both off, and compare against just turning off CLEANSTACK
+        // to see if the failure is specifically due to witness validation.
+        TxValidationState state_dummy; // Want reported failures to be from first CheckInputScripts
+        if (!tx.HasWitness() && CheckInputScripts(tx, state_dummy, m_view, scriptVerifyFlags & ~(SCRIPT_VERIFY_WITNESS | SCRIPT_VERIFY_CLEANSTACK), true, false, ws.m_precomputed_txdata) &&
+                !CheckInputScripts(tx, state_dummy, m_view, scriptVerifyFlags & ~SCRIPT_VERIFY_CLEANSTACK, true, false, ws.m_precomputed_txdata)) {
+            // Only the witness is missing, so the transaction itself may be fine.
+            state.Invalid(TxValidationResult::TX_WITNESS_STRIPPED,
+                    state.GetRejectReason(), state.GetDebugMessage());
+        }
+        return false; // state filled in by CheckInputScripts
+    }
+
+    return true;
+}
+
+bool MemPoolAccept::ConsensusScriptChecks(const ATMPArgs& args, Workspace& ws)
+{
+    const CTransaction& tx = *ws.m_ptx;
+    const uint256& hash = ws.m_hash;
+    TxValidationState& state = ws.m_state;
+    const CChainParams& chainparams = args.m_chainparams;
+
+    // Check again against the current block tip's script verification
+    // flags to cache our script execution flags. This is, of course,
+    // useless if the next block has different script flags from the
+    // previous one, but because the cache tracks script flags for us it
+    // will auto-invalidate and we'll just have a few blocks of extra
+    // misses on soft-fork activation.
+    //
+    // This is also useful in case of bugs in the standard flags that cause
+    // transactions to pass as valid when they're actually invalid. For
+    // instance the STRICTENC flag was incorrectly allowing certain
+    // CHECKSIG NOT scripts to pass, even though they were invalid.
+    //
+    // There is a similar check in CreateNewBlock() to prevent creating
+    // invalid blocks (using TestBlockValidity), however allowing such
+    // transactions into the mempool can be exploited as a DoS attack.
+    unsigned int currentBlockScriptVerifyFlags = GetBlockScriptFlags(m_active_chainstate.m_chain.Tip(), chainparams.GetConsensus());
+    if (!CheckInputsFromMempoolAndCache(tx, state, m_view, m_pool, currentBlockScriptVerifyFlags,
+                                        ws.m_precomputed_txdata, m_active_chainstate.CoinsTip())) {
+        LogPrintf("BUG! PLEASE REPORT THIS! CheckInputScripts failed against latest-block but not STANDARD flags %s, %s\n", hash.ToString(), state.ToString());
+        return Assume(false);
+    }
+
+    return true;
+}
+
+bool MemPoolAccept::Finalize(const ATMPArgs& args, Workspace& ws)
+{
+    const CTransaction& tx = *ws.m_ptx;
+    const uint256& hash = ws.m_hash;
+    TxValidationState& state = ws.m_state;
+    const bool bypass_limits = args.m_bypass_limits;
+
+    std::unique_ptr<CTxMemPoolEntry>& entry = ws.m_entry;
+
+    // Remove conflicting transactions from the mempool
+    for (CTxMemPool::txiter it : ws.m_all_conflicting)
+    {
+        LogPrint(BCLog::MEMPOOL, "replacing tx %s with %s for %s additional fees, %d delta bytes\n",
+                it->GetTx().GetHash().ToString(),
+                hash.ToString(),
+                FormatMoney(ws.m_modified_fees - ws.m_conflicting_fees),
+                (int)entry->GetTxSize() - (int)ws.m_conflicting_size);
+        ws.m_replaced_transactions.push_back(it->GetSharedTx());
+    }
+    m_pool.RemoveStaged(ws.m_all_conflicting, false, MemPoolRemovalReason::REPLACED);
+
+    // This transaction should only count for fee estimation if:
+    // - it's not being re-added during a reorg which bypasses typical mempool fee limits
+    // - the node is not behind
+    // - the transaction is not dependent on any other transactions in the mempool
+    // - it's not part of a package. Since package relay is not currently supported, this
+    // transaction has not necessarily been accepted to miners' mempools.
+    bool validForFeeEstimation = !bypass_limits && !args.m_package_submission && IsCurrentForFeeEstimation(m_active_chainstate) && m_pool.HasNoInputsOf(tx);
+
+    // Store transaction in memory
+    m_pool.addUnchecked(*entry, ws.m_ancestors, validForFeeEstimation);
+
+    // trim mempool and check if tx was trimmed
+    // If we are validating a package, don't trim here because we could evict a previous transaction
+    // in the package. LimitMempoolSize() should be called at the very end to make sure the mempool
+    // is still within limits and package submission happens atomically.
+    if (!args.m_package_submission && !bypass_limits) {
+        LimitMempoolSize(m_pool, m_active_chainstate.CoinsTip(), gArgs.GetIntArg("-maxmempool", DEFAULT_MAX_MEMPOOL_SIZE) * 1000000, std::chrono::hours{gArgs.GetIntArg("-mempoolexpiry", DEFAULT_MEMPOOL_EXPIRY)});
+        if (!m_pool.exists(GenTxid::Txid(hash)))
+            return state.Invalid(TxValidationResult::TX_MEMPOOL_POLICY, "mempool full");
+    }
+    return true;
+}
+
+bool MemPoolAccept::FinalizePackage(const ATMPArgs& args, std::vector<Workspace>& workspaces,
+                                    PackageValidationState& package_state,
+                                    std::map<const uint256, const MempoolAcceptResult>& results)
+{
+    AssertLockHeld(cs_main);
+    AssertLockHeld(m_pool.cs);
+    bool all_submitted = true;
+    // ConsensusScriptChecks adds to the script cache and is therefore consensus-critical;
+    // CheckInputsFromMempoolAndCache asserts that transactions only spend coins available from the
+    // mempool or UTXO set. Submit each transaction to the mempool immediately after calling
+    // ConsensusScriptChecks to make the outputs available for subsequent transactions.
+    for (Workspace& ws : workspaces) {
+        if (!ConsensusScriptChecks(args, ws)) {
+            results.emplace(ws.m_ptx->GetWitnessHash(), MempoolAcceptResult::Failure(ws.m_state));
+            // Since PolicyScriptChecks() passed, this should never fail.
+            all_submitted = Assume(false);
+        }
+
+        // Re-calculate mempool ancestors to call addUnchecked(). They may have changed since the
+        // last calculation done in PreChecks, since package ancestors have already been submitted.
+        std::string err_string;
+        if(!m_pool.CalculateMemPoolAncestors(*ws.m_entry, ws.m_ancestors, m_limit_ancestors,
+                                             m_limit_ancestor_size, m_limit_descendants,
+                                             m_limit_descendant_size, err_string)) {
+            results.emplace(ws.m_ptx->GetWitnessHash(), MempoolAcceptResult::Failure(ws.m_state));
+            // Since PreChecks() and PackageMempoolChecks() both enforce limits, this should never fail.
+            all_submitted = Assume(false);
+        }
+        // If we call LimitMempoolSize() for each individual Finalize(
