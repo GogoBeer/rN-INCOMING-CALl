@@ -784,4 +784,135 @@ bool MemPoolAccept::PreChecks(ATMPArgs& args, Workspace& ws)
     ws.m_vsize = entry->GetTxSize();
 
     if (nSigOpsCost > MAX_STANDARD_TX_SIGOPS_COST)
-        return state.Invalid(TxValidationResult::TX_NOT_STANDARD, 
+        return state.Invalid(TxValidationResult::TX_NOT_STANDARD, "bad-txns-too-many-sigops",
+                strprintf("%d", nSigOpsCost));
+
+    // No transactions are allowed below minRelayTxFee except from disconnected
+    // blocks
+    if (!bypass_limits && !CheckFeeRate(ws.m_vsize, ws.m_modified_fees, state)) return false;
+
+    ws.m_iters_conflicting = m_pool.GetIterSet(ws.m_conflicts);
+    // Calculate in-mempool ancestors, up to a limit.
+    if (ws.m_conflicts.size() == 1) {
+        // In general, when we receive an RBF transaction with mempool conflicts, we want to know whether we
+        // would meet the chain limits after the conflicts have been removed. However, there isn't a practical
+        // way to do this short of calculating the ancestor and descendant sets with an overlay cache of
+        // changed mempool entries. Due to both implementation and runtime complexity concerns, this isn't
+        // very realistic, thus we only ensure a limited set of transactions are RBF'able despite mempool
+        // conflicts here. Importantly, we need to ensure that some transactions which were accepted using
+        // the below carve-out are able to be RBF'ed, without impacting the security the carve-out provides
+        // for off-chain contract systems (see link in the comment below).
+        //
+        // Specifically, the subset of RBF transactions which we allow despite chain limits are those which
+        // conflict directly with exactly one other transaction (but may evict children of said transaction),
+        // and which are not adding any new mempool dependencies. Note that the "no new mempool dependencies"
+        // check is accomplished later, so we don't bother doing anything about it here, but if BIP 125 is
+        // amended, we may need to move that check to here instead of removing it wholesale.
+        //
+        // Such transactions are clearly not merging any existing packages, so we are only concerned with
+        // ensuring that (a) no package is growing past the package size (not count) limits and (b) we are
+        // not allowing something to effectively use the (below) carve-out spot when it shouldn't be allowed
+        // to.
+        //
+        // To check these we first check if we meet the RBF criteria, above, and increment the descendant
+        // limits by the direct conflict and its descendants (as these are recalculated in
+        // CalculateMempoolAncestors by assuming the new transaction being added is a new descendant, with no
+        // removals, of each parent's existing dependent set). The ancestor count limits are unmodified (as
+        // the ancestor limits should be the same for both our new transaction and any conflicts).
+        // We don't bother incrementing m_limit_descendants by the full removal count as that limit never comes
+        // into force here (as we're only adding a single transaction).
+        assert(ws.m_iters_conflicting.size() == 1);
+        CTxMemPool::txiter conflict = *ws.m_iters_conflicting.begin();
+
+        m_limit_descendants += 1;
+        m_limit_descendant_size += conflict->GetSizeWithDescendants();
+    }
+
+    std::string errString;
+    if (!m_pool.CalculateMemPoolAncestors(*entry, ws.m_ancestors, m_limit_ancestors, m_limit_ancestor_size, m_limit_descendants, m_limit_descendant_size, errString)) {
+        ws.m_ancestors.clear();
+        // If CalculateMemPoolAncestors fails second time, we want the original error string.
+        std::string dummy_err_string;
+        // Contracting/payment channels CPFP carve-out:
+        // If the new transaction is relatively small (up to 40k weight)
+        // and has at most one ancestor (ie ancestor limit of 2, including
+        // the new transaction), allow it if its parent has exactly the
+        // descendant limit descendants.
+        //
+        // This allows protocols which rely on distrusting counterparties
+        // being able to broadcast descendants of an unconfirmed transaction
+        // to be secure by simply only having two immediately-spendable
+        // outputs - one for each counterparty. For more info on the uses for
+        // this, see https://lists.linuxfoundation.org/pipermail/bitcoin-dev/2018-November/016518.html
+        if (ws.m_vsize > EXTRA_DESCENDANT_TX_SIZE_LIMIT ||
+                !m_pool.CalculateMemPoolAncestors(*entry, ws.m_ancestors, 2, m_limit_ancestor_size, m_limit_descendants + 1, m_limit_descendant_size + EXTRA_DESCENDANT_TX_SIZE_LIMIT, dummy_err_string)) {
+            return state.Invalid(TxValidationResult::TX_MEMPOOL_POLICY, "too-long-mempool-chain", errString);
+        }
+    }
+
+    // A transaction that spends outputs that would be replaced by it is invalid. Now
+    // that we have the set of all ancestors we can detect this
+    // pathological case by making sure ws.m_conflicts and ws.m_ancestors don't
+    // intersect.
+    if (const auto err_string{EntriesAndTxidsDisjoint(ws.m_ancestors, ws.m_conflicts, hash)}) {
+        // We classify this as a consensus error because a transaction depending on something it
+        // conflicts with would be inconsistent.
+        return state.Invalid(TxValidationResult::TX_CONSENSUS, "bad-txns-spends-conflicting-tx", *err_string);
+    }
+
+    m_rbf = !ws.m_conflicts.empty();
+    return true;
+}
+
+bool MemPoolAccept::ReplacementChecks(Workspace& ws)
+{
+    AssertLockHeld(cs_main);
+    AssertLockHeld(m_pool.cs);
+
+    const CTransaction& tx = *ws.m_ptx;
+    const uint256& hash = ws.m_hash;
+    TxValidationState& state = ws.m_state;
+
+    CFeeRate newFeeRate(ws.m_modified_fees, ws.m_vsize);
+    // It's possible that the replacement pays more fees than its direct conflicts but not more
+    // than all conflicts (i.e. the direct conflicts have high-fee descendants). However, if the
+    // replacement doesn't pay more fees than its direct conflicts, then we can be sure it's not
+    // more economically rational to mine. Before we go digging through the mempool for all
+    // transactions that would need to be removed (direct conflicts and all descendants), check
+    // that the replacement transaction pays more than its direct conflicts.
+    if (const auto err_string{PaysMoreThanConflicts(ws.m_iters_conflicting, newFeeRate, hash)}) {
+        return state.Invalid(TxValidationResult::TX_MEMPOOL_POLICY, "insufficient fee", *err_string);
+    }
+
+    // Calculate all conflicting entries and enforce BIP125 Rule #5.
+    if (const auto err_string{GetEntriesForConflicts(tx, m_pool, ws.m_iters_conflicting, ws.m_all_conflicting)}) {
+        return state.Invalid(TxValidationResult::TX_MEMPOOL_POLICY,
+                             "too many potential replacements", *err_string);
+    }
+    // Enforce BIP125 Rule #2.
+    if (const auto err_string{HasNoNewUnconfirmed(tx, m_pool, ws.m_iters_conflicting)}) {
+        return state.Invalid(TxValidationResult::TX_MEMPOOL_POLICY,
+                             "replacement-adds-unconfirmed", *err_string);
+    }
+    // Check if it's economically rational to mine this transaction rather than the ones it
+    // replaces and pays for its own relay fees. Enforce BIP125 Rules #3 and #4.
+    for (CTxMemPool::txiter it : ws.m_all_conflicting) {
+        ws.m_conflicting_fees += it->GetModifiedFee();
+        ws.m_conflicting_size += it->GetTxSize();
+    }
+    if (const auto err_string{PaysForRBF(ws.m_conflicting_fees, ws.m_modified_fees, ws.m_vsize,
+                                         ::incrementalRelayFee, hash)}) {
+        return state.Invalid(TxValidationResult::TX_MEMPOOL_POLICY, "insufficient fee", *err_string);
+    }
+    return true;
+}
+
+bool MemPoolAccept::PackageMempoolChecks(const std::vector<CTransactionRef>& txns,
+                                         PackageValidationState& package_state)
+{
+    AssertLockHeld(cs_main);
+    AssertLockHeld(m_pool.cs);
+
+    // CheckPackageLimits expects the package transactions to not already be in the mempool.
+    assert(std::all_of(txns.cbegin(), txns.cend(), [this](const auto& tx)
+                       { return !m_pool.exist
