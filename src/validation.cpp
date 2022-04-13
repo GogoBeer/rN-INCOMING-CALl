@@ -480,4 +480,150 @@ public:
         }
 
         /** Parameters for child-with-unconfirmed-parents package validation. */
-        static ATMPArgs PackageChildWithParents
+        static ATMPArgs PackageChildWithParents(const CChainParams& chainparams, int64_t accept_time,
+                                                std::vector<COutPoint>& coins_to_uncache) {
+            return ATMPArgs{/* m_chainparams */ chainparams,
+                            /* m_accept_time */ accept_time,
+                            /* m_bypass_limits */ false,
+                            /* m_coins_to_uncache */ coins_to_uncache,
+                            /* m_test_accept */ false,
+                            /* m_allow_bip125_replacement */ false,
+                            /* m_package_submission */ true,
+            };
+        }
+        // No default ctor to avoid exposing details to clients and allowing the possibility of
+        // mixing up the order of the arguments. Use static functions above instead.
+        ATMPArgs() = delete;
+    };
+
+    // Single transaction acceptance
+    MempoolAcceptResult AcceptSingleTransaction(const CTransactionRef& ptx, ATMPArgs& args) EXCLUSIVE_LOCKS_REQUIRED(cs_main);
+
+    /**
+    * Multiple transaction acceptance. Transactions may or may not be interdependent, but must not
+    * conflict with each other, and the transactions cannot already be in the mempool. Parents must
+    * come before children if any dependencies exist.
+    */
+    PackageMempoolAcceptResult AcceptMultipleTransactions(const std::vector<CTransactionRef>& txns, ATMPArgs& args) EXCLUSIVE_LOCKS_REQUIRED(cs_main);
+
+    /**
+     * Package (more specific than just multiple transactions) acceptance. Package must be a child
+     * with all of its unconfirmed parents, and topologically sorted.
+     */
+    PackageMempoolAcceptResult AcceptPackage(const Package& package, ATMPArgs& args) EXCLUSIVE_LOCKS_REQUIRED(cs_main);
+
+private:
+    // All the intermediate state that gets passed between the various levels
+    // of checking a given transaction.
+    struct Workspace {
+        explicit Workspace(const CTransactionRef& ptx) : m_ptx(ptx), m_hash(ptx->GetHash()) {}
+        /** Txids of mempool transactions that this transaction directly conflicts with. */
+        std::set<uint256> m_conflicts;
+        /** Iterators to mempool entries that this transaction directly conflicts with. */
+        CTxMemPool::setEntries m_iters_conflicting;
+        /** Iterators to all mempool entries that would be replaced by this transaction, including
+         * those it directly conflicts with and their descendants. */
+        CTxMemPool::setEntries m_all_conflicting;
+        /** All mempool ancestors of this transaction. */
+        CTxMemPool::setEntries m_ancestors;
+        /** Mempool entry constructed for this transaction. Constructed in PreChecks() but not
+         * inserted into the mempool until Finalize(). */
+        std::unique_ptr<CTxMemPoolEntry> m_entry;
+        /** Pointers to the transactions that have been removed from the mempool and replaced by
+         * this transaction, used to return to the MemPoolAccept caller. Only populated if
+         * validation is successful and the original transactions are removed. */
+        std::list<CTransactionRef> m_replaced_transactions;
+
+        /** Virtual size of the transaction as used by the mempool, calculated using serialized size
+         * of the transaction and sigops. */
+        int64_t m_vsize;
+        /** Fees paid by this transaction: total input amounts subtracted by total output amounts. */
+        CAmount m_base_fees;
+        /** Base fees + any fee delta set by the user with prioritisetransaction. */
+        CAmount m_modified_fees;
+        /** Total modified fees of all transactions being replaced. */
+        CAmount m_conflicting_fees{0};
+        /** Total virtual size of all transactions being replaced. */
+        size_t m_conflicting_size{0};
+
+        const CTransactionRef& m_ptx;
+        /** Txid. */
+        const uint256& m_hash;
+        TxValidationState m_state;
+        /** A temporary cache containing serialized transaction data for signature verification.
+         * Reused across PolicyScriptChecks and ConsensusScriptChecks. */
+        PrecomputedTransactionData m_precomputed_txdata;
+    };
+
+    // Run the policy checks on a given transaction, excluding any script checks.
+    // Looks up inputs, calculates feerate, considers replacement, evaluates
+    // package limits, etc. As this function can be invoked for "free" by a peer,
+    // only tests that are fast should be done here (to avoid CPU DoS).
+    bool PreChecks(ATMPArgs& args, Workspace& ws) EXCLUSIVE_LOCKS_REQUIRED(cs_main, m_pool.cs);
+
+    // Run checks for mempool replace-by-fee.
+    bool ReplacementChecks(Workspace& ws) EXCLUSIVE_LOCKS_REQUIRED(cs_main, m_pool.cs);
+
+    // Enforce package mempool ancestor/descendant limits (distinct from individual
+    // ancestor/descendant limits done in PreChecks).
+    bool PackageMempoolChecks(const std::vector<CTransactionRef>& txns,
+                              PackageValidationState& package_state) EXCLUSIVE_LOCKS_REQUIRED(cs_main, m_pool.cs);
+
+    // Run the script checks using our policy flags. As this can be slow, we should
+    // only invoke this on transactions that have otherwise passed policy checks.
+    bool PolicyScriptChecks(const ATMPArgs& args, Workspace& ws) EXCLUSIVE_LOCKS_REQUIRED(cs_main, m_pool.cs);
+
+    // Re-run the script checks, using consensus flags, and try to cache the
+    // result in the scriptcache. This should be done after
+    // PolicyScriptChecks(). This requires that all inputs either be in our
+    // utxo set or in the mempool.
+    bool ConsensusScriptChecks(const ATMPArgs& args, Workspace& ws) EXCLUSIVE_LOCKS_REQUIRED(cs_main, m_pool.cs);
+
+    // Try to add the transaction to the mempool, removing any conflicts first.
+    // Returns true if the transaction is in the mempool after any size
+    // limiting is performed, false otherwise.
+    bool Finalize(const ATMPArgs& args, Workspace& ws) EXCLUSIVE_LOCKS_REQUIRED(cs_main, m_pool.cs);
+
+    // Submit all transactions to the mempool and call ConsensusScriptChecks to add to the script
+    // cache - should only be called after successful validation of all transactions in the package.
+    // The package may end up partially-submitted after size limitting; returns true if all
+    // transactions are successfully added to the mempool, false otherwise.
+    bool FinalizePackage(const ATMPArgs& args, std::vector<Workspace>& workspaces, PackageValidationState& package_state,
+                         std::map<const uint256, const MempoolAcceptResult>& results)
+         EXCLUSIVE_LOCKS_REQUIRED(cs_main, m_pool.cs);
+
+    // Compare a package's feerate against minimum allowed.
+    bool CheckFeeRate(size_t package_size, CAmount package_fee, TxValidationState& state) EXCLUSIVE_LOCKS_REQUIRED(cs_main, m_pool.cs)
+    {
+        CAmount mempoolRejectFee = m_pool.GetMinFee(gArgs.GetIntArg("-maxmempool", DEFAULT_MAX_MEMPOOL_SIZE) * 1000000).GetFee(package_size);
+        if (mempoolRejectFee > 0 && package_fee < mempoolRejectFee) {
+            return state.Invalid(TxValidationResult::TX_MEMPOOL_POLICY, "mempool min fee not met", strprintf("%d < %d", package_fee, mempoolRejectFee));
+        }
+
+        if (package_fee < ::minRelayTxFee.GetFee(package_size)) {
+            return state.Invalid(TxValidationResult::TX_MEMPOOL_POLICY, "min relay fee not met", strprintf("%d < %d", package_fee, ::minRelayTxFee.GetFee(package_size)));
+        }
+        return true;
+    }
+
+private:
+    CTxMemPool& m_pool;
+    CCoinsViewCache m_view;
+    CCoinsViewMemPool m_viewmempool;
+    CCoinsView m_dummy;
+
+    CChainState& m_active_chainstate;
+
+    // The package limits in effect at the time of invocation.
+    const size_t m_limit_ancestors;
+    const size_t m_limit_ancestor_size;
+    // These may be modified while evaluating a transaction (eg to account for
+    // in-mempool conflicts; see below).
+    size_t m_limit_descendants;
+    size_t m_limit_descendant_size;
+
+    /** Whether the transaction(s) would replace any mempool transactions. If so, RBF rules apply. */
+    bool m_rbf{false};
+};
+
+bool MemPoolAccept::PreChecks(ATMPArgs& args
