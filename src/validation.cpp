@@ -1205,4 +1205,145 @@ PackageMempoolAcceptResult MemPoolAccept::AcceptPackage(const Package& package, 
     }
 
     const auto& child = package[package.size() - 1];
-    // The package must be 1 ch
+    // The package must be 1 child with all of its unconfirmed parents. The package is expected to
+    // be sorted, so the last transaction is the child.
+    std::unordered_set<uint256, SaltedTxidHasher> unconfirmed_parent_txids;
+    std::transform(package.cbegin(), package.end() - 1,
+                   std::inserter(unconfirmed_parent_txids, unconfirmed_parent_txids.end()),
+                   [](const auto& tx) { return tx->GetHash(); });
+
+    // All child inputs must refer to a preceding package transaction or a confirmed UTXO. The only
+    // way to verify this is to look up the child's inputs in our current coins view (not including
+    // mempool), and enforce that all parents not present in the package be available at chain tip.
+    // Since this check can bring new coins into the coins cache, keep track of these coins and
+    // uncache them if we don't end up submitting this package to the mempool.
+    const CCoinsViewCache& coins_tip_cache = m_active_chainstate.CoinsTip();
+    for (const auto& input : child->vin) {
+        if (!coins_tip_cache.HaveCoinInCache(input.prevout)) {
+            args.m_coins_to_uncache.push_back(input.prevout);
+        }
+    }
+    // Using the MemPoolAccept m_view cache allows us to look up these same coins faster later.
+    // This should be connecting directly to CoinsTip, not to m_viewmempool, because we specifically
+    // require inputs to be confirmed if they aren't in the package.
+    m_view.SetBackend(m_active_chainstate.CoinsTip());
+    const auto package_or_confirmed = [this, &unconfirmed_parent_txids](const auto& input) {
+         return unconfirmed_parent_txids.count(input.prevout.hash) > 0 || m_view.HaveCoin(input.prevout);
+    };
+    if (!std::all_of(child->vin.cbegin(), child->vin.cend(), package_or_confirmed)) {
+        package_state.Invalid(PackageValidationResult::PCKG_POLICY, "package-not-child-with-unconfirmed-parents");
+        return PackageMempoolAcceptResult(package_state, {});
+    }
+    // Protect against bugs where we pull more inputs from disk that miss being added to
+    // coins_to_uncache. The backend will be connected again when needed in PreChecks.
+    m_view.SetBackend(m_dummy);
+
+    LOCK(m_pool.cs);
+    std::map<const uint256, const MempoolAcceptResult> results;
+    // As node operators are free to set their mempool policies however they please, it's possible
+    // for package transaction(s) to already be in the mempool, and we don't want to reject the
+    // entire package in that case (as that could be a censorship vector).  Filter the transactions
+    // that are already in mempool and add their information to results, since we already have them.
+    std::vector<CTransactionRef> txns_new;
+    for (const auto& tx : package) {
+        const auto& wtxid = tx->GetWitnessHash();
+        const auto& txid = tx->GetHash();
+        // There are 3 possibilities: already in mempool, same-txid-diff-wtxid already in mempool,
+        // or not in mempool. An already confirmed tx is treated as one not in mempool, because all
+        // we know is that the inputs aren't available.
+        if (m_pool.exists(GenTxid::Wtxid(wtxid))) {
+            // Exact transaction already exists in the mempool.
+            auto iter = m_pool.GetIter(wtxid);
+            assert(iter != std::nullopt);
+            results.emplace(wtxid, MempoolAcceptResult::MempoolTx(iter.value()->GetTxSize(), iter.value()->GetFee()));
+        } else if (m_pool.exists(GenTxid::Txid(txid))) {
+            // Transaction with the same non-witness data but different witness (same txid,
+            // different wtxid) already exists in the mempool.
+            //
+            // We don't allow replacement transactions right now, so just swap the package
+            // transaction for the mempool one. Note that we are ignoring the validity of the
+            // package transaction passed in.
+            // TODO: allow witness replacement in packages.
+            auto iter = m_pool.GetIter(wtxid);
+            assert(iter != std::nullopt);
+            results.emplace(txid, MempoolAcceptResult::MempoolTx(iter.value()->GetTxSize(), iter.value()->GetFee()));
+        } else {
+            // Transaction does not already exist in the mempool.
+            txns_new.push_back(tx);
+        }
+    }
+
+    // Nothing to do if the entire package has already been submitted.
+    if (txns_new.empty()) return PackageMempoolAcceptResult(package_state, std::move(results));
+    // Validate the (deduplicated) transactions as a package.
+    auto submission_result = AcceptMultipleTransactions(txns_new, args);
+    // Include already-in-mempool transaction results in the final result.
+    for (const auto& [wtxid, mempoolaccept_res] : results) {
+        submission_result.m_tx_results.emplace(wtxid, mempoolaccept_res);
+    }
+    return submission_result;
+}
+
+} // anon namespace
+
+MempoolAcceptResult AcceptToMemoryPool(CChainState& active_chainstate, const CTransactionRef& tx,
+                                       int64_t accept_time, bool bypass_limits, bool test_accept)
+    EXCLUSIVE_LOCKS_REQUIRED(cs_main)
+{
+    const CChainParams& chainparams{active_chainstate.m_params};
+    assert(active_chainstate.GetMempool() != nullptr);
+    CTxMemPool& pool{*active_chainstate.GetMempool()};
+
+    std::vector<COutPoint> coins_to_uncache;
+    auto args = MemPoolAccept::ATMPArgs::SingleAccept(chainparams, accept_time, bypass_limits, coins_to_uncache, test_accept);
+    const MempoolAcceptResult result = MemPoolAccept(pool, active_chainstate).AcceptSingleTransaction(tx, args);
+    if (result.m_result_type != MempoolAcceptResult::ResultType::VALID) {
+        // Remove coins that were not present in the coins cache before calling
+        // AcceptSingleTransaction(); this is to prevent memory DoS in case we receive a large
+        // number of invalid transactions that attempt to overrun the in-memory coins cache
+        // (`CCoinsViewCache::cacheCoins`).
+
+        for (const COutPoint& hashTx : coins_to_uncache)
+            active_chainstate.CoinsTip().Uncache(hashTx);
+    }
+    // After we've (potentially) uncached entries, ensure our coins cache is still within its size limits
+    BlockValidationState state_dummy;
+    active_chainstate.FlushStateToDisk(state_dummy, FlushStateMode::PERIODIC);
+    return result;
+}
+
+PackageMempoolAcceptResult ProcessNewPackage(CChainState& active_chainstate, CTxMemPool& pool,
+                                                   const Package& package, bool test_accept)
+{
+    AssertLockHeld(cs_main);
+    assert(!package.empty());
+    assert(std::all_of(package.cbegin(), package.cend(), [](const auto& tx){return tx != nullptr;}));
+
+    std::vector<COutPoint> coins_to_uncache;
+    const CChainParams& chainparams = Params();
+    const auto result = [&]() EXCLUSIVE_LOCKS_REQUIRED(cs_main) {
+        AssertLockHeld(cs_main);
+        if (test_accept) {
+            auto args = MemPoolAccept::ATMPArgs::PackageTestAccept(chainparams, GetTime(), coins_to_uncache);
+            return MemPoolAccept(pool, active_chainstate).AcceptMultipleTransactions(package, args);
+        } else {
+            auto args = MemPoolAccept::ATMPArgs::PackageChildWithParents(chainparams, GetTime(), coins_to_uncache);
+            return MemPoolAccept(pool, active_chainstate).AcceptPackage(package, args);
+        }
+    }();
+
+    // Uncache coins pertaining to transactions that were not submitted to the mempool.
+    // Ensure the coins cache is still within limits.
+    if (test_accept || result.m_state.IsInvalid()) {
+        for (const COutPoint& hashTx : coins_to_uncache) {
+            active_chainstate.CoinsTip().Uncache(hashTx);
+        }
+    }
+    BlockValidationState state_dummy;
+    active_chainstate.FlushStateToDisk(state_dummy, FlushStateMode::PERIODIC);
+    return result;
+}
+
+CAmount GetBlockSubsidy(int nHeight, const Consensus::Params& consensusParams)
+{
+    int halvings = nHeight / consensusParams.nSubsidyHalvingInterva
