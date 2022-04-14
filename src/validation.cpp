@@ -1056,4 +1056,153 @@ bool MemPoolAccept::FinalizePackage(const ATMPArgs& args, std::vector<Workspace>
             // Since PreChecks() and PackageMempoolChecks() both enforce limits, this should never fail.
             all_submitted = Assume(false);
         }
-        // If we call LimitMempoolSize() for each individual Finalize(
+        // If we call LimitMempoolSize() for each individual Finalize(), the mempool will not take
+        // the transaction's descendant feerate into account because it hasn't seen them yet. Also,
+        // we risk evicting a transaction that a subsequent package transaction depends on. Instead,
+        // allow the mempool to temporarily bypass limits, the maximum package size) while
+        // submitting transactions individually and then trim at the very end.
+        if (!Finalize(args, ws)) {
+            results.emplace(ws.m_ptx->GetWitnessHash(), MempoolAcceptResult::Failure(ws.m_state));
+            // Since LimitMempoolSize() won't be called, this should never fail.
+            all_submitted = Assume(false);
+        }
+    }
+
+    // It may or may not be the case that all the transactions made it into the mempool. Regardless,
+    // make sure we haven't exceeded max mempool size.
+    LimitMempoolSize(m_pool, m_active_chainstate.CoinsTip(),
+                     gArgs.GetIntArg("-maxmempool", DEFAULT_MAX_MEMPOOL_SIZE) * 1000000,
+                     std::chrono::hours{gArgs.GetIntArg("-mempoolexpiry", DEFAULT_MEMPOOL_EXPIRY)});
+    if (!all_submitted) return false;
+
+    // Find the wtxids of the transactions that made it into the mempool. Allow partial submission,
+    // but don't report success unless they all made it into the mempool.
+    for (Workspace& ws : workspaces) {
+        if (m_pool.exists(GenTxid::Wtxid(ws.m_ptx->GetWitnessHash()))) {
+            results.emplace(ws.m_ptx->GetWitnessHash(),
+                MempoolAcceptResult::Success(std::move(ws.m_replaced_transactions), ws.m_vsize, ws.m_base_fees));
+            GetMainSignals().TransactionAddedToMempool(ws.m_ptx, m_pool.GetAndIncrementSequence());
+        } else {
+            all_submitted = false;
+            ws.m_state.Invalid(TxValidationResult::TX_MEMPOOL_POLICY, "mempool full");
+            results.emplace(ws.m_ptx->GetWitnessHash(), MempoolAcceptResult::Failure(ws.m_state));
+        }
+    }
+    return all_submitted;
+}
+
+MempoolAcceptResult MemPoolAccept::AcceptSingleTransaction(const CTransactionRef& ptx, ATMPArgs& args)
+{
+    AssertLockHeld(cs_main);
+    LOCK(m_pool.cs); // mempool "read lock" (held through GetMainSignals().TransactionAddedToMempool())
+
+    Workspace ws(ptx);
+
+    if (!PreChecks(args, ws)) return MempoolAcceptResult::Failure(ws.m_state);
+
+    if (m_rbf && !ReplacementChecks(ws)) return MempoolAcceptResult::Failure(ws.m_state);
+
+    // Perform the inexpensive checks first and avoid hashing and signature verification unless
+    // those checks pass, to mitigate CPU exhaustion denial-of-service attacks.
+    if (!PolicyScriptChecks(args, ws)) return MempoolAcceptResult::Failure(ws.m_state);
+
+    if (!ConsensusScriptChecks(args, ws)) return MempoolAcceptResult::Failure(ws.m_state);
+
+    // Tx was accepted, but not added
+    if (args.m_test_accept) {
+        return MempoolAcceptResult::Success(std::move(ws.m_replaced_transactions), ws.m_vsize, ws.m_base_fees);
+    }
+
+    if (!Finalize(args, ws)) return MempoolAcceptResult::Failure(ws.m_state);
+
+    GetMainSignals().TransactionAddedToMempool(ptx, m_pool.GetAndIncrementSequence());
+
+    return MempoolAcceptResult::Success(std::move(ws.m_replaced_transactions), ws.m_vsize, ws.m_base_fees);
+}
+
+PackageMempoolAcceptResult MemPoolAccept::AcceptMultipleTransactions(const std::vector<CTransactionRef>& txns, ATMPArgs& args)
+{
+    AssertLockHeld(cs_main);
+
+    // These context-free package limits can be done before taking the mempool lock.
+    PackageValidationState package_state;
+    if (!CheckPackage(txns, package_state)) return PackageMempoolAcceptResult(package_state, {});
+
+    std::vector<Workspace> workspaces{};
+    workspaces.reserve(txns.size());
+    std::transform(txns.cbegin(), txns.cend(), std::back_inserter(workspaces),
+                   [](const auto& tx) { return Workspace(tx); });
+    std::map<const uint256, const MempoolAcceptResult> results;
+
+    LOCK(m_pool.cs);
+
+    // Do all PreChecks first and fail fast to avoid running expensive script checks when unnecessary.
+    for (Workspace& ws : workspaces) {
+        if (!PreChecks(args, ws)) {
+            package_state.Invalid(PackageValidationResult::PCKG_TX, "transaction failed");
+            // Exit early to avoid doing pointless work. Update the failed tx result; the rest are unfinished.
+            results.emplace(ws.m_ptx->GetWitnessHash(), MempoolAcceptResult::Failure(ws.m_state));
+            return PackageMempoolAcceptResult(package_state, std::move(results));
+        }
+        // Make the coins created by this transaction available for subsequent transactions in the
+        // package to spend. Since we already checked conflicts in the package and we don't allow
+        // replacements, we don't need to track the coins spent. Note that this logic will need to be
+        // updated if package replace-by-fee is allowed in the future.
+        assert(!args.m_allow_bip125_replacement);
+        m_viewmempool.PackageAddTransaction(ws.m_ptx);
+    }
+
+    // Apply package mempool ancestor/descendant limits. Skip if there is only one transaction,
+    // because it's unnecessary. Also, CPFP carve out can increase the limit for individual
+    // transactions, but this exemption is not extended to packages in CheckPackageLimits().
+    std::string err_string;
+    if (txns.size() > 1 && !PackageMempoolChecks(txns, package_state)) {
+        return PackageMempoolAcceptResult(package_state, std::move(results));
+    }
+
+    for (Workspace& ws : workspaces) {
+        if (!PolicyScriptChecks(args, ws)) {
+            // Exit early to avoid doing pointless work. Update the failed tx result; the rest are unfinished.
+            package_state.Invalid(PackageValidationResult::PCKG_TX, "transaction failed");
+            results.emplace(ws.m_ptx->GetWitnessHash(), MempoolAcceptResult::Failure(ws.m_state));
+            return PackageMempoolAcceptResult(package_state, std::move(results));
+        }
+        if (args.m_test_accept) {
+            // When test_accept=true, transactions that pass PolicyScriptChecks are valid because there are
+            // no further mempool checks (passing PolicyScriptChecks implies passing ConsensusScriptChecks).
+            results.emplace(ws.m_ptx->GetWitnessHash(),
+                            MempoolAcceptResult::Success(std::move(ws.m_replaced_transactions),
+                                                         ws.m_vsize, ws.m_base_fees));
+        }
+    }
+
+    if (args.m_test_accept) return PackageMempoolAcceptResult(package_state, std::move(results));
+
+    if (!FinalizePackage(args, workspaces, package_state, results)) {
+        package_state.Invalid(PackageValidationResult::PCKG_TX, "submission failed");
+        return PackageMempoolAcceptResult(package_state, std::move(results));
+    }
+
+    return PackageMempoolAcceptResult(package_state, std::move(results));
+}
+
+PackageMempoolAcceptResult MemPoolAccept::AcceptPackage(const Package& package, ATMPArgs& args)
+{
+    AssertLockHeld(cs_main);
+    PackageValidationState package_state;
+
+    // Check that the package is well-formed. If it isn't, we won't try to validate any of the
+    // transactions and thus won't return any MempoolAcceptResults, just a package-wide error.
+
+    // Context-free package checks.
+    if (!CheckPackage(package, package_state)) return PackageMempoolAcceptResult(package_state, {});
+
+    // All transactions in the package must be a parent of the last transaction. This is just an
+    // opportunity for us to fail fast on a context-free check without taking the mempool lock.
+    if (!IsChildWithParents(package)) {
+        package_state.Invalid(PackageValidationResult::PCKG_POLICY, "package-not-child-with-parents");
+        return PackageMempoolAcceptResult(package_state, {});
+    }
+
+    const auto& child = package[package.size() - 1];
+    // The package must be 1 ch
