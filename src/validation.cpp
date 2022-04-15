@@ -1720,4 +1720,185 @@ DisconnectResult CChainState::DisconnectBlock(const CBlock& block, const CBlockI
                 COutPoint out(hash, o);
                 Coin coin;
                 bool is_spent = view.SpendCoin(out, &coin);
-                if (!is_spent || tx.vout[o] != coin.out || pindex->nHeight != coin.nHeight || 
+                if (!is_spent || tx.vout[o] != coin.out || pindex->nHeight != coin.nHeight || is_coinbase != coin.fCoinBase) {
+                    fClean = false; // transaction output mismatch
+                }
+            }
+        }
+
+        // restore inputs
+        if (i > 0) { // not coinbases
+            CTxUndo &txundo = blockUndo.vtxundo[i-1];
+            if (txundo.vprevout.size() != tx.vin.size()) {
+                error("DisconnectBlock(): transaction and undo data inconsistent");
+                return DISCONNECT_FAILED;
+            }
+            for (unsigned int j = tx.vin.size(); j-- > 0;) {
+                const COutPoint &out = tx.vin[j].prevout;
+                int res = ApplyTxInUndo(std::move(txundo.vprevout[j]), view, out);
+                if (res == DISCONNECT_FAILED) return DISCONNECT_FAILED;
+                fClean = fClean && res != DISCONNECT_UNCLEAN;
+            }
+            // At this point, all of txundo.vprevout should have been moved out.
+        }
+    }
+
+    // move best block pointer to prevout block
+    view.SetBestBlock(pindex->pprev->GetBlockHash());
+
+    return fClean ? DISCONNECT_OK : DISCONNECT_UNCLEAN;
+}
+
+static CCheckQueue<CScriptCheck> scriptcheckqueue(128);
+
+void StartScriptCheckWorkerThreads(int threads_num)
+{
+    scriptcheckqueue.StartWorkerThreads(threads_num);
+}
+
+void StopScriptCheckWorkerThreads()
+{
+    scriptcheckqueue.StopWorkerThreads();
+}
+
+/**
+ * Threshold condition checker that triggers when unknown versionbits are seen on the network.
+ */
+class WarningBitsConditionChecker : public AbstractThresholdConditionChecker
+{
+private:
+    int bit;
+
+public:
+    explicit WarningBitsConditionChecker(int bitIn) : bit(bitIn) {}
+
+    int64_t BeginTime(const Consensus::Params& params) const override { return 0; }
+    int64_t EndTime(const Consensus::Params& params) const override { return std::numeric_limits<int64_t>::max(); }
+    int Period(const Consensus::Params& params) const override { return params.nMinerConfirmationWindow; }
+    int Threshold(const Consensus::Params& params) const override { return params.nRuleChangeActivationThreshold; }
+
+    bool Condition(const CBlockIndex* pindex, const Consensus::Params& params) const override
+    {
+        return pindex->nHeight >= params.MinBIP9WarningHeight &&
+               ((pindex->nVersion & VERSIONBITS_TOP_MASK) == VERSIONBITS_TOP_BITS) &&
+               ((pindex->nVersion >> bit) & 1) != 0 &&
+               ((g_versionbitscache.ComputeBlockVersion(pindex->pprev, params) >> bit) & 1) == 0;
+    }
+};
+
+static ThresholdConditionCache warningcache[VERSIONBITS_NUM_BITS] GUARDED_BY(cs_main);
+
+static unsigned int GetBlockScriptFlags(const CBlockIndex* pindex, const Consensus::Params& consensusparams)
+{
+    unsigned int flags = SCRIPT_VERIFY_NONE;
+
+    // BIP16 didn't become active until Apr 1 2012 (on mainnet, and
+    // retroactively applied to testnet)
+    // However, only one historical block violated the P2SH rules (on both
+    // mainnet and testnet), so for simplicity, always leave P2SH
+    // on except for the one violating block.
+    if (consensusparams.BIP16Exception.IsNull() || // no bip16 exception on this chain
+        pindex->phashBlock == nullptr || // this is a new candidate block, eg from TestBlockValidity()
+        *pindex->phashBlock != consensusparams.BIP16Exception) // this block isn't the historical exception
+    {
+        // Enforce WITNESS rules whenever P2SH is in effect
+        flags |= SCRIPT_VERIFY_P2SH | SCRIPT_VERIFY_WITNESS;
+    }
+
+    // Enforce the DERSIG (BIP66) rule
+    if (DeploymentActiveAt(*pindex, consensusparams, Consensus::DEPLOYMENT_DERSIG)) {
+        flags |= SCRIPT_VERIFY_DERSIG;
+    }
+
+    // Enforce CHECKLOCKTIMEVERIFY (BIP65)
+    if (DeploymentActiveAt(*pindex, consensusparams, Consensus::DEPLOYMENT_CLTV)) {
+        flags |= SCRIPT_VERIFY_CHECKLOCKTIMEVERIFY;
+    }
+
+    // Enforce CHECKSEQUENCEVERIFY (BIP112)
+    if (DeploymentActiveAt(*pindex, consensusparams, Consensus::DEPLOYMENT_CSV)) {
+        flags |= SCRIPT_VERIFY_CHECKSEQUENCEVERIFY;
+    }
+
+    // Enforce Taproot (BIP340-BIP342)
+    if (DeploymentActiveAt(*pindex, consensusparams, Consensus::DEPLOYMENT_TAPROOT)) {
+        flags |= SCRIPT_VERIFY_TAPROOT;
+    }
+
+    // Enforce BIP147 NULLDUMMY (activated simultaneously with segwit)
+    if (DeploymentActiveAt(*pindex, consensusparams, Consensus::DEPLOYMENT_SEGWIT)) {
+        flags |= SCRIPT_VERIFY_NULLDUMMY;
+    }
+
+    return flags;
+}
+
+
+
+static int64_t nTimeCheck = 0;
+static int64_t nTimeForks = 0;
+static int64_t nTimeVerify = 0;
+static int64_t nTimeConnect = 0;
+static int64_t nTimeIndex = 0;
+static int64_t nTimeTotal = 0;
+static int64_t nBlocksTotal = 0;
+
+/** Apply the effects of this block (with given index) on the UTXO set represented by coins.
+ *  Validity checks that depend on the UTXO set are also done; ConnectBlock()
+ *  can fail if those validity checks fail (among other reasons). */
+bool CChainState::ConnectBlock(const CBlock& block, BlockValidationState& state, CBlockIndex* pindex,
+                               CCoinsViewCache& view, bool fJustCheck)
+{
+    AssertLockHeld(cs_main);
+    assert(pindex);
+    assert(*pindex->phashBlock == block.GetHash());
+    int64_t nTimeStart = GetTimeMicros();
+
+    // Check it again in case a previous version let a bad block in
+    // NOTE: We don't currently (re-)invoke ContextualCheckBlock() or
+    // ContextualCheckBlockHeader() here. This means that if we add a new
+    // consensus rule that is enforced in one of those two functions, then we
+    // may have let in a block that violates the rule prior to updating the
+    // software, and we would NOT be enforcing the rule here. Fully solving
+    // upgrade from one software version to the next after a consensus rule
+    // change is potentially tricky and issue-specific (see NeedsRedownload()
+    // for one approach that was used for BIP 141 deployment).
+    // Also, currently the rule against blocks more than 2 hours in the future
+    // is enforced in ContextualCheckBlockHeader(); we wouldn't want to
+    // re-enforce that rule here (at least until we make it impossible for
+    // GetAdjustedTime() to go backward).
+    if (!CheckBlock(block, state, m_params.GetConsensus(), !fJustCheck, !fJustCheck)) {
+        if (state.GetResult() == BlockValidationResult::BLOCK_MUTATED) {
+            // We don't write down blocks to disk if they may have been
+            // corrupted, so this should be impossible unless we're having hardware
+            // problems.
+            return AbortNode(state, "Corrupt block found indicating potential hardware failure; shutting down");
+        }
+        return error("%s: Consensus::CheckBlock: %s", __func__, state.ToString());
+    }
+
+    // verify that the view's current state corresponds to the previous block
+    uint256 hashPrevBlock = pindex->pprev == nullptr ? uint256() : pindex->pprev->GetBlockHash();
+    assert(hashPrevBlock == view.GetBestBlock());
+
+    nBlocksTotal++;
+
+    // Special case for the genesis block, skipping connection of its transactions
+    // (its coinbase is unspendable)
+    if (block.GetHash() == m_params.GetConsensus().hashGenesisBlock) {
+        if (!fJustCheck)
+            view.SetBestBlock(pindex->GetBlockHash());
+        return true;
+    }
+
+    bool fScriptChecks = true;
+    if (!hashAssumeValid.IsNull()) {
+        // We've been configured with the hash of a block which has been externally verified to have a valid history.
+        // A suitable default value is included with the software and updated from time to time.  Because validity
+        //  relative to a piece of software is an objective fact these defaults can be easily reviewed.
+        // This setting doesn't force the selection of any particular chain but makes validating some faster by
+        //  effectively caching the result of part of the verification.
+        BlockMap::const_iterator  it = m_blockman.m_block_index.find(hashAssumeValid);
+        if (it != m_blockman.m_block_index.end()) {
+            if (it->second->GetAncestor(pindex->nHeight) == pindex &&
+        
