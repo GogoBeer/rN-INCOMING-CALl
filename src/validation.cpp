@@ -2172,4 +2172,187 @@ CoinsCacheSizeState CChainState::GetCoinsCacheSizeState(
     //! No need to periodic flush if at least this much space still available.
     static constexpr int64_t MAX_BLOCK_COINSDB_USAGE_BYTES = 10 * 1024 * 1024;  // 10MB
     int64_t large_threshold =
-        std::max((9 * nTotalSpace) / 10, nTotalSp
+        std::max((9 * nTotalSpace) / 10, nTotalSpace - MAX_BLOCK_COINSDB_USAGE_BYTES);
+
+    if (cacheSize > nTotalSpace) {
+        LogPrintf("Cache size (%s) exceeds total space (%s)\n", cacheSize, nTotalSpace);
+        return CoinsCacheSizeState::CRITICAL;
+    } else if (cacheSize > large_threshold) {
+        return CoinsCacheSizeState::LARGE;
+    }
+    return CoinsCacheSizeState::OK;
+}
+
+bool CChainState::FlushStateToDisk(
+    BlockValidationState &state,
+    FlushStateMode mode,
+    int nManualPruneHeight)
+{
+    LOCK(cs_main);
+    assert(this->CanFlushToDisk());
+    static std::chrono::microseconds nLastWrite{0};
+    static std::chrono::microseconds nLastFlush{0};
+    std::set<int> setFilesToPrune;
+    bool full_flush_completed = false;
+
+    const size_t coins_count = CoinsTip().GetCacheSize();
+    const size_t coins_mem_usage = CoinsTip().DynamicMemoryUsage();
+
+    try {
+    {
+        bool fFlushForPrune = false;
+        bool fDoFullFlush = false;
+
+        CoinsCacheSizeState cache_state = GetCoinsCacheSizeState();
+        LOCK(m_blockman.cs_LastBlockFile);
+        if (fPruneMode && (m_blockman.m_check_for_pruning || nManualPruneHeight > 0) && !fReindex) {
+            // make sure we don't prune above the blockfilterindexes bestblocks
+            // pruning is height-based
+            int last_prune = m_chain.Height(); // last height we can prune
+            ForEachBlockFilterIndex([&](BlockFilterIndex& index) {
+               last_prune = std::max(1, std::min(last_prune, index.GetSummary().best_block_height));
+            });
+
+            if (nManualPruneHeight > 0) {
+                LOG_TIME_MILLIS_WITH_CATEGORY("find files to prune (manual)", BCLog::BENCH);
+
+                m_blockman.FindFilesToPruneManual(setFilesToPrune, std::min(last_prune, nManualPruneHeight), m_chain.Height());
+            } else {
+                LOG_TIME_MILLIS_WITH_CATEGORY("find files to prune", BCLog::BENCH);
+
+                m_blockman.FindFilesToPrune(setFilesToPrune, m_params.PruneAfterHeight(), m_chain.Height(), last_prune, IsInitialBlockDownload());
+                m_blockman.m_check_for_pruning = false;
+            }
+            if (!setFilesToPrune.empty()) {
+                fFlushForPrune = true;
+                if (!fHavePruned) {
+                    m_blockman.m_block_tree_db->WriteFlag("prunedblockfiles", true);
+                    fHavePruned = true;
+                }
+            }
+        }
+        const auto nNow = GetTime<std::chrono::microseconds>();
+        // Avoid writing/flushing immediately after startup.
+        if (nLastWrite.count() == 0) {
+            nLastWrite = nNow;
+        }
+        if (nLastFlush.count() == 0) {
+            nLastFlush = nNow;
+        }
+        // The cache is large and we're within 10% and 10 MiB of the limit, but we have time now (not in the middle of a block processing).
+        bool fCacheLarge = mode == FlushStateMode::PERIODIC && cache_state >= CoinsCacheSizeState::LARGE;
+        // The cache is over the limit, we have to write now.
+        bool fCacheCritical = mode == FlushStateMode::IF_NEEDED && cache_state >= CoinsCacheSizeState::CRITICAL;
+        // It's been a while since we wrote the block index to disk. Do this frequently, so we don't need to redownload after a crash.
+        bool fPeriodicWrite = mode == FlushStateMode::PERIODIC && nNow > nLastWrite + DATABASE_WRITE_INTERVAL;
+        // It's been very long since we flushed the cache. Do this infrequently, to optimize cache usage.
+        bool fPeriodicFlush = mode == FlushStateMode::PERIODIC && nNow > nLastFlush + DATABASE_FLUSH_INTERVAL;
+        // Combine all conditions that result in a full cache flush.
+        fDoFullFlush = (mode == FlushStateMode::ALWAYS) || fCacheLarge || fCacheCritical || fPeriodicFlush || fFlushForPrune;
+        // Write blocks and block index to disk.
+        if (fDoFullFlush || fPeriodicWrite) {
+            // Ensure we can write block index
+            if (!CheckDiskSpace(gArgs.GetBlocksDirPath())) {
+                return AbortNode(state, "Disk space is too low!", _("Disk space is too low!"));
+            }
+            {
+                LOG_TIME_MILLIS_WITH_CATEGORY("write block and undo data to disk", BCLog::BENCH);
+
+                // First make sure all block and undo data is flushed to disk.
+                m_blockman.FlushBlockFile();
+            }
+
+            // Then update all block file information (which may refer to block and undo files).
+            {
+                LOG_TIME_MILLIS_WITH_CATEGORY("write block index to disk", BCLog::BENCH);
+
+                if (!m_blockman.WriteBlockIndexDB()) {
+                    return AbortNode(state, "Failed to write to block index database");
+                }
+            }
+            // Finally remove any pruned files
+            if (fFlushForPrune) {
+                LOG_TIME_MILLIS_WITH_CATEGORY("unlink pruned files", BCLog::BENCH);
+
+                UnlinkPrunedFiles(setFilesToPrune);
+            }
+            nLastWrite = nNow;
+        }
+        // Flush best chain related state. This can only be done if the blocks / block index write was also done.
+        if (fDoFullFlush && !CoinsTip().GetBestBlock().IsNull()) {
+            LOG_TIME_MILLIS_WITH_CATEGORY(strprintf("write coins cache to disk (%d coins, %.2fkB)",
+                coins_count, coins_mem_usage / 1000), BCLog::BENCH);
+
+            // Typical Coin structures on disk are around 48 bytes in size.
+            // Pushing a new one to the database can cause it to be written
+            // twice (once in the log, and once in the tables). This is already
+            // an overestimation, as most will delete an existing entry or
+            // overwrite one. Still, use a conservative safety factor of 2.
+            if (!CheckDiskSpace(gArgs.GetDataDirNet(), 48 * 2 * 2 * CoinsTip().GetCacheSize())) {
+                return AbortNode(state, "Disk space is too low!", _("Disk space is too low!"));
+            }
+            // Flush the chainstate (which may refer to block index entries).
+            if (!CoinsTip().Flush())
+                return AbortNode(state, "Failed to write to coin database");
+            nLastFlush = nNow;
+            full_flush_completed = true;
+        }
+        TRACE6(utxocache, flush,
+               (int64_t)(GetTimeMicros() - nNow.count()), // in microseconds (µs)
+               (u_int32_t)mode,
+               (u_int64_t)coins_count,
+               (u_int64_t)coins_mem_usage,
+               (bool)fFlushForPrune,
+               (bool)fDoFullFlush);
+    }
+    if (full_flush_completed) {
+        // Update best block in wallet (so we can detect restored wallets).
+        GetMainSignals().ChainStateFlushed(m_chain.GetLocator());
+    }
+    } catch (const std::runtime_error& e) {
+        return AbortNode(state, std::string("System error while flushing: ") + e.what());
+    }
+    return true;
+}
+
+void CChainState::ForceFlushStateToDisk()
+{
+    BlockValidationState state;
+    if (!this->FlushStateToDisk(state, FlushStateMode::ALWAYS)) {
+        LogPrintf("%s: failed to flush state (%s)\n", __func__, state.ToString());
+    }
+}
+
+void CChainState::PruneAndFlush()
+{
+    BlockValidationState state;
+    m_blockman.m_check_for_pruning = true;
+    if (!this->FlushStateToDisk(state, FlushStateMode::NONE)) {
+        LogPrintf("%s: failed to flush state (%s)\n", __func__, state.ToString());
+    }
+}
+
+static void DoWarning(const bilingual_str& warning)
+{
+    static bool fWarned = false;
+    SetMiscWarning(warning);
+    if (!fWarned) {
+        AlertNotify(warning.original);
+        fWarned = true;
+    }
+}
+
+/** Private helper function that concatenates warning messages. */
+static void AppendWarning(bilingual_str& res, const bilingual_str& warn)
+{
+    if (!res.empty()) res += Untranslated(", ");
+    res += warn;
+}
+
+static void UpdateTipLog(
+    const CCoinsViewCache& coins_tip,
+    const CBlockIndex* tip,
+    const CChainParams& params,
+    const std::string& func_name,
+    const std::string& prefix,
+   
