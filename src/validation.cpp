@@ -2355,4 +2355,196 @@ static void UpdateTipLog(
     const CChainParams& params,
     const std::string& func_name,
     const std::string& prefix,
-   
+    const std::string& warning_messages) EXCLUSIVE_LOCKS_REQUIRED(::cs_main)
+{
+
+    AssertLockHeld(::cs_main);
+    LogPrintf("%s%s: new best=%s height=%d version=0x%08x log2_work=%f tx=%lu date='%s' progress=%f cache=%.1fMiB(%utxo)%s\n",
+        prefix, func_name,
+        tip->GetBlockHash().ToString(), tip->nHeight, tip->nVersion,
+        log(tip->nChainWork.getdouble()) / log(2.0), (unsigned long)tip->nChainTx,
+        FormatISO8601DateTime(tip->GetBlockTime()),
+        GuessVerificationProgress(params.TxData(), tip),
+        coins_tip.DynamicMemoryUsage() * (1.0 / (1 << 20)),
+        coins_tip.GetCacheSize(),
+        !warning_messages.empty() ? strprintf(" warning='%s'", warning_messages) : "");
+}
+
+void CChainState::UpdateTip(const CBlockIndex* pindexNew)
+{
+    const auto& coins_tip = this->CoinsTip();
+
+    // The remainder of the function isn't relevant if we are not acting on
+    // the active chainstate, so return if need be.
+    if (this != &m_chainman.ActiveChainstate()) {
+        // Only log every so often so that we don't bury log messages at the tip.
+        constexpr int BACKGROUND_LOG_INTERVAL = 2000;
+        if (pindexNew->nHeight % BACKGROUND_LOG_INTERVAL == 0) {
+            UpdateTipLog(coins_tip, pindexNew, m_params, __func__, "[background validation] ", "");
+        }
+        return;
+    }
+
+    // New best block
+    if (m_mempool) {
+        m_mempool->AddTransactionsUpdated(1);
+    }
+
+    {
+        LOCK(g_best_block_mutex);
+        g_best_block = pindexNew->GetBlockHash();
+        g_best_block_cv.notify_all();
+    }
+
+    bilingual_str warning_messages;
+    if (!this->IsInitialBlockDownload()) {
+        const CBlockIndex* pindex = pindexNew;
+        for (int bit = 0; bit < VERSIONBITS_NUM_BITS; bit++) {
+            WarningBitsConditionChecker checker(bit);
+            ThresholdState state = checker.GetStateFor(pindex, m_params.GetConsensus(), warningcache[bit]);
+            if (state == ThresholdState::ACTIVE || state == ThresholdState::LOCKED_IN) {
+                const bilingual_str warning = strprintf(_("Unknown new rules activated (versionbit %i)"), bit);
+                if (state == ThresholdState::ACTIVE) {
+                    DoWarning(warning);
+                } else {
+                    AppendWarning(warning_messages, warning);
+                }
+            }
+        }
+    }
+    UpdateTipLog(coins_tip, pindexNew, m_params, __func__, "", warning_messages.original);
+}
+
+/** Disconnect m_chain's tip.
+  * After calling, the mempool will be in an inconsistent state, with
+  * transactions from disconnected blocks being added to disconnectpool.  You
+  * should make the mempool consistent again by calling MaybeUpdateMempoolForReorg.
+  * with cs_main held.
+  *
+  * If disconnectpool is nullptr, then no disconnected transactions are added to
+  * disconnectpool (note that the caller is responsible for mempool consistency
+  * in any case).
+  */
+bool CChainState::DisconnectTip(BlockValidationState& state, DisconnectedBlockTransactions* disconnectpool)
+{
+    AssertLockHeld(cs_main);
+    if (m_mempool) AssertLockHeld(m_mempool->cs);
+
+    CBlockIndex *pindexDelete = m_chain.Tip();
+    assert(pindexDelete);
+    // Read block from disk.
+    std::shared_ptr<CBlock> pblock = std::make_shared<CBlock>();
+    CBlock& block = *pblock;
+    if (!ReadBlockFromDisk(block, pindexDelete, m_params.GetConsensus())) {
+        return error("DisconnectTip(): Failed to read block");
+    }
+    // Apply the block atomically to the chain state.
+    int64_t nStart = GetTimeMicros();
+    {
+        CCoinsViewCache view(&CoinsTip());
+        assert(view.GetBestBlock() == pindexDelete->GetBlockHash());
+        if (DisconnectBlock(block, pindexDelete, view) != DISCONNECT_OK)
+            return error("DisconnectTip(): DisconnectBlock %s failed", pindexDelete->GetBlockHash().ToString());
+        bool flushed = view.Flush();
+        assert(flushed);
+    }
+    LogPrint(BCLog::BENCH, "- Disconnect block: %.2fms\n", (GetTimeMicros() - nStart) * MILLI);
+    // Write the chain state to disk, if necessary.
+    if (!FlushStateToDisk(state, FlushStateMode::IF_NEEDED)) {
+        return false;
+    }
+
+    if (disconnectpool && m_mempool) {
+        // Save transactions to re-add to mempool at end of reorg
+        for (auto it = block.vtx.rbegin(); it != block.vtx.rend(); ++it) {
+            disconnectpool->addTransaction(*it);
+        }
+        while (disconnectpool->DynamicMemoryUsage() > MAX_DISCONNECTED_TX_POOL_SIZE * 1000) {
+            // Drop the earliest entry, and remove its children from the mempool.
+            auto it = disconnectpool->queuedTx.get<insertion_order>().begin();
+            m_mempool->removeRecursive(**it, MemPoolRemovalReason::REORG);
+            disconnectpool->removeEntry(it);
+        }
+    }
+
+    m_chain.SetTip(pindexDelete->pprev);
+
+    UpdateTip(pindexDelete->pprev);
+    // Let wallets know transactions went from 1-confirmed to
+    // 0-confirmed or conflicted:
+    GetMainSignals().BlockDisconnected(pblock, pindexDelete);
+    return true;
+}
+
+static int64_t nTimeReadFromDisk = 0;
+static int64_t nTimeConnectTotal = 0;
+static int64_t nTimeFlush = 0;
+static int64_t nTimeChainState = 0;
+static int64_t nTimePostConnect = 0;
+
+struct PerBlockConnectTrace {
+    CBlockIndex* pindex = nullptr;
+    std::shared_ptr<const CBlock> pblock;
+    PerBlockConnectTrace() {}
+};
+/**
+ * Used to track blocks whose transactions were applied to the UTXO state as a
+ * part of a single ActivateBestChainStep call.
+ *
+ * This class is single-use, once you call GetBlocksConnected() you have to throw
+ * it away and make a new one.
+ */
+class ConnectTrace {
+private:
+    std::vector<PerBlockConnectTrace> blocksConnected;
+
+public:
+    explicit ConnectTrace() : blocksConnected(1) {}
+
+    void BlockConnected(CBlockIndex* pindex, std::shared_ptr<const CBlock> pblock) {
+        assert(!blocksConnected.back().pindex);
+        assert(pindex);
+        assert(pblock);
+        blocksConnected.back().pindex = pindex;
+        blocksConnected.back().pblock = std::move(pblock);
+        blocksConnected.emplace_back();
+    }
+
+    std::vector<PerBlockConnectTrace>& GetBlocksConnected() {
+        // We always keep one extra block at the end of our list because
+        // blocks are added after all the conflicted transactions have
+        // been filled in. Thus, the last entry should always be an empty
+        // one waiting for the transactions from the next block. We pop
+        // the last entry here to make sure the list we return is sane.
+        assert(!blocksConnected.back().pindex);
+        blocksConnected.pop_back();
+        return blocksConnected;
+    }
+};
+
+/**
+ * Connect a new block to m_chain. pblock is either nullptr or a pointer to a CBlock
+ * corresponding to pindexNew, to bypass loading it again from disk.
+ *
+ * The block is added to connectTrace if connection succeeds.
+ */
+bool CChainState::ConnectTip(BlockValidationState& state, CBlockIndex* pindexNew, const std::shared_ptr<const CBlock>& pblock, ConnectTrace& connectTrace, DisconnectedBlockTransactions& disconnectpool)
+{
+    AssertLockHeld(cs_main);
+    if (m_mempool) AssertLockHeld(m_mempool->cs);
+
+    assert(pindexNew->pprev == m_chain.Tip());
+    // Read block from disk.
+    int64_t nTime1 = GetTimeMicros();
+    std::shared_ptr<const CBlock> pthisBlock;
+    if (!pblock) {
+        std::shared_ptr<CBlock> pblockNew = std::make_shared<CBlock>();
+        if (!ReadBlockFromDisk(*pblockNew, pindexNew, m_params.GetConsensus())) {
+            return AbortNode(state, "Failed to read block");
+        }
+        pthisBlock = pblockNew;
+    } else {
+        pthisBlock = pblock;
+    }
+    const CBlock& blockConnecting = *pthisBlock;
+    // Ap
