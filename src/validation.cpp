@@ -4059,4 +4059,146 @@ void CChainState::LoadExternalBlockFile(FILE* fileIn, FlatFilePos* dbp)
                     continue;
             } catch (const std::exception&) {
                 // no valid block header found; don't complain
-             
+                break;
+            }
+            try {
+                // read block
+                uint64_t nBlockPos = blkdat.GetPos();
+                if (dbp)
+                    dbp->nPos = nBlockPos;
+                blkdat.SetLimit(nBlockPos + nSize);
+                std::shared_ptr<CBlock> pblock = std::make_shared<CBlock>();
+                CBlock& block = *pblock;
+                blkdat >> block;
+                nRewind = blkdat.GetPos();
+
+                uint256 hash = block.GetHash();
+                {
+                    LOCK(cs_main);
+                    // detect out of order blocks, and store them for later
+                    if (hash != m_params.GetConsensus().hashGenesisBlock && !m_blockman.LookupBlockIndex(block.hashPrevBlock)) {
+                        LogPrint(BCLog::REINDEX, "%s: Out of order block %s, parent %s not known\n", __func__, hash.ToString(),
+                                block.hashPrevBlock.ToString());
+                        if (dbp)
+                            mapBlocksUnknownParent.insert(std::make_pair(block.hashPrevBlock, *dbp));
+                        continue;
+                    }
+
+                    // process in case the block isn't known yet
+                    CBlockIndex* pindex = m_blockman.LookupBlockIndex(hash);
+                    if (!pindex || (pindex->nStatus & BLOCK_HAVE_DATA) == 0) {
+                      BlockValidationState state;
+                      if (AcceptBlock(pblock, state, nullptr, true, dbp, nullptr)) {
+                          nLoaded++;
+                      }
+                      if (state.IsError()) {
+                          break;
+                      }
+                    } else if (hash != m_params.GetConsensus().hashGenesisBlock && pindex->nHeight % 1000 == 0) {
+                        LogPrint(BCLog::REINDEX, "Block Import: already had block %s at height %d\n", hash.ToString(), pindex->nHeight);
+                    }
+                }
+
+                // Activate the genesis block so normal node progress can continue
+                if (hash == m_params.GetConsensus().hashGenesisBlock) {
+                    BlockValidationState state;
+                    if (!ActivateBestChain(state, nullptr)) {
+                        break;
+                    }
+                }
+
+                NotifyHeaderTip(*this);
+
+                // Recursively process earlier encountered successors of this block
+                std::deque<uint256> queue;
+                queue.push_back(hash);
+                while (!queue.empty()) {
+                    uint256 head = queue.front();
+                    queue.pop_front();
+                    std::pair<std::multimap<uint256, FlatFilePos>::iterator, std::multimap<uint256, FlatFilePos>::iterator> range = mapBlocksUnknownParent.equal_range(head);
+                    while (range.first != range.second) {
+                        std::multimap<uint256, FlatFilePos>::iterator it = range.first;
+                        std::shared_ptr<CBlock> pblockrecursive = std::make_shared<CBlock>();
+                        if (ReadBlockFromDisk(*pblockrecursive, it->second, m_params.GetConsensus())) {
+                            LogPrint(BCLog::REINDEX, "%s: Processing out of order child %s of %s\n", __func__, pblockrecursive->GetHash().ToString(),
+                                    head.ToString());
+                            LOCK(cs_main);
+                            BlockValidationState dummy;
+                            if (AcceptBlock(pblockrecursive, dummy, nullptr, true, &it->second, nullptr)) {
+                                nLoaded++;
+                                queue.push_back(pblockrecursive->GetHash());
+                            }
+                        }
+                        range.first++;
+                        mapBlocksUnknownParent.erase(it);
+                        NotifyHeaderTip(*this);
+                    }
+                }
+            } catch (const std::exception& e) {
+                LogPrintf("%s: Deserialize or I/O error - %s\n", __func__, e.what());
+            }
+        }
+    } catch (const std::runtime_error& e) {
+        AbortNode(std::string("System error: ") + e.what());
+    }
+    LogPrintf("Loaded %i blocks from external file in %dms\n", nLoaded, GetTimeMillis() - nStart);
+}
+
+void CChainState::CheckBlockIndex()
+{
+    if (!fCheckBlockIndex) {
+        return;
+    }
+
+    LOCK(cs_main);
+
+    // During a reindex, we read the genesis block and call CheckBlockIndex before ActivateBestChain,
+    // so we have the genesis block in m_blockman.m_block_index but no active chain. (A few of the
+    // tests when iterating the block tree require that m_chain has been initialized.)
+    if (m_chain.Height() < 0) {
+        assert(m_blockman.m_block_index.size() <= 1);
+        return;
+    }
+
+    // Build forward-pointing map of the entire block tree.
+    std::multimap<CBlockIndex*,CBlockIndex*> forward;
+    for (const std::pair<const uint256, CBlockIndex*>& entry : m_blockman.m_block_index) {
+        forward.insert(std::make_pair(entry.second->pprev, entry.second));
+    }
+
+    assert(forward.size() == m_blockman.m_block_index.size());
+
+    std::pair<std::multimap<CBlockIndex*,CBlockIndex*>::iterator,std::multimap<CBlockIndex*,CBlockIndex*>::iterator> rangeGenesis = forward.equal_range(nullptr);
+    CBlockIndex *pindex = rangeGenesis.first->second;
+    rangeGenesis.first++;
+    assert(rangeGenesis.first == rangeGenesis.second); // There is only one index entry with parent nullptr.
+
+    // Iterate over the entire block tree, using depth-first search.
+    // Along the way, remember whether there are blocks on the path from genesis
+    // block being explored which are the first to have certain properties.
+    size_t nNodes = 0;
+    int nHeight = 0;
+    CBlockIndex* pindexFirstInvalid = nullptr; // Oldest ancestor of pindex which is invalid.
+    CBlockIndex* pindexFirstMissing = nullptr; // Oldest ancestor of pindex which does not have BLOCK_HAVE_DATA.
+    CBlockIndex* pindexFirstNeverProcessed = nullptr; // Oldest ancestor of pindex for which nTx == 0.
+    CBlockIndex* pindexFirstNotTreeValid = nullptr; // Oldest ancestor of pindex which does not have BLOCK_VALID_TREE (regardless of being valid or not).
+    CBlockIndex* pindexFirstNotTransactionsValid = nullptr; // Oldest ancestor of pindex which does not have BLOCK_VALID_TRANSACTIONS (regardless of being valid or not).
+    CBlockIndex* pindexFirstNotChainValid = nullptr; // Oldest ancestor of pindex which does not have BLOCK_VALID_CHAIN (regardless of being valid or not).
+    CBlockIndex* pindexFirstNotScriptsValid = nullptr; // Oldest ancestor of pindex which does not have BLOCK_VALID_SCRIPTS (regardless of being valid or not).
+    while (pindex != nullptr) {
+        nNodes++;
+        if (pindexFirstInvalid == nullptr && pindex->nStatus & BLOCK_FAILED_VALID) pindexFirstInvalid = pindex;
+        // Assumed-valid index entries will not have data since we haven't downloaded the
+        // full block yet.
+        if (pindexFirstMissing == nullptr && !(pindex->nStatus & BLOCK_HAVE_DATA) && !pindex->IsAssumedValid()) {
+            pindexFirstMissing = pindex;
+        }
+        if (pindexFirstNeverProcessed == nullptr && pindex->nTx == 0) pindexFirstNeverProcessed = pindex;
+        if (pindex->pprev != nullptr && pindexFirstNotTreeValid == nullptr && (pindex->nStatus & BLOCK_VALID_MASK) < BLOCK_VALID_TREE) pindexFirstNotTreeValid = pindex;
+
+        if (pindex->pprev != nullptr && !pindex->IsAssumedValid()) {
+            // Skip validity flag checks for BLOCK_ASSUMED_VALID index entries, since these
+            // *_VALID_MASK flags will not be present for index entries we are temporarily assuming
+            // valid.
+            if (pindexFirstNotTransactionsValid == nullptr &&
+                    (pindex->nStatus & BLOCK_VALID_MASK) < BLOCK_VALID_TRANSACTIONS)
