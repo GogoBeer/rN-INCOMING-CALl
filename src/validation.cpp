@@ -4507,4 +4507,228 @@ bool DumpMempool(const CTxMemPool& pool, FopenFn mockable_fopen_function, bool s
             mapDeltas[i.first] = i.second;
         }
         vinfo = pool.infoAll();
-        unbroadcast_txids = pool.
+        unbroadcast_txids = pool.GetUnbroadcastTxs();
+    }
+
+    int64_t mid = GetTimeMicros();
+
+    try {
+        FILE* filestr{mockable_fopen_function(gArgs.GetDataDirNet() / "mempool.dat.new", "wb")};
+        if (!filestr) {
+            return false;
+        }
+
+        CAutoFile file(filestr, SER_DISK, CLIENT_VERSION);
+
+        uint64_t version = MEMPOOL_DUMP_VERSION;
+        file << version;
+
+        file << (uint64_t)vinfo.size();
+        for (const auto& i : vinfo) {
+            file << *(i.tx);
+            file << int64_t{count_seconds(i.m_time)};
+            file << int64_t{i.nFeeDelta};
+            mapDeltas.erase(i.tx->GetHash());
+        }
+
+        file << mapDeltas;
+
+        LogPrintf("Writing %d unbroadcast transactions to disk.\n", unbroadcast_txids.size());
+        file << unbroadcast_txids;
+
+        if (!skip_file_commit && !FileCommit(file.Get()))
+            throw std::runtime_error("FileCommit failed");
+        file.fclose();
+        if (!RenameOver(gArgs.GetDataDirNet() / "mempool.dat.new", gArgs.GetDataDirNet() / "mempool.dat")) {
+            throw std::runtime_error("Rename failed");
+        }
+        int64_t last = GetTimeMicros();
+        LogPrintf("Dumped mempool: %gs to copy, %gs to dump\n", (mid-start)*MICRO, (last-mid)*MICRO);
+    } catch (const std::exception& e) {
+        LogPrintf("Failed to dump mempool: %s. Continuing anyway.\n", e.what());
+        return false;
+    }
+    return true;
+}
+
+//! Guess how far we are in the verification process at the given block index
+//! require cs_main if pindex has not been validated yet (because nChainTx might be unset)
+double GuessVerificationProgress(const ChainTxData& data, const CBlockIndex *pindex) {
+    if (pindex == nullptr)
+        return 0.0;
+
+    int64_t nNow = time(nullptr);
+
+    double fTxTotal;
+
+    if (pindex->nChainTx <= data.nTxCount) {
+        fTxTotal = data.nTxCount + (nNow - data.nTime) * data.dTxRate;
+    } else {
+        fTxTotal = pindex->nChainTx + (nNow - pindex->GetBlockTime()) * data.dTxRate;
+    }
+
+    return std::min<double>(pindex->nChainTx / fTxTotal, 1.0);
+}
+
+std::optional<uint256> ChainstateManager::SnapshotBlockhash() const
+{
+    LOCK(::cs_main);
+    if (m_active_chainstate && m_active_chainstate->m_from_snapshot_blockhash) {
+        // If a snapshot chainstate exists, it will always be our active.
+        return m_active_chainstate->m_from_snapshot_blockhash;
+    }
+    return std::nullopt;
+}
+
+std::vector<CChainState*> ChainstateManager::GetAll()
+{
+    LOCK(::cs_main);
+    std::vector<CChainState*> out;
+
+    if (!IsSnapshotValidated() && m_ibd_chainstate) {
+        out.push_back(m_ibd_chainstate.get());
+    }
+
+    if (m_snapshot_chainstate) {
+        out.push_back(m_snapshot_chainstate.get());
+    }
+
+    return out;
+}
+
+CChainState& ChainstateManager::InitializeChainstate(
+    CTxMemPool* mempool, const std::optional<uint256>& snapshot_blockhash)
+{
+    bool is_snapshot = snapshot_blockhash.has_value();
+    std::unique_ptr<CChainState>& to_modify =
+        is_snapshot ? m_snapshot_chainstate : m_ibd_chainstate;
+
+    if (to_modify) {
+        throw std::logic_error("should not be overwriting a chainstate");
+    }
+    to_modify.reset(new CChainState(mempool, m_blockman, *this, snapshot_blockhash));
+
+    // Snapshot chainstates and initial IBD chaintates always become active.
+    if (is_snapshot || (!is_snapshot && !m_active_chainstate)) {
+        LogPrintf("Switching active chainstate to %s\n", to_modify->ToString());
+        m_active_chainstate = to_modify.get();
+    } else {
+        throw std::logic_error("unexpected chainstate activation");
+    }
+
+    return *to_modify;
+}
+
+const AssumeutxoData* ExpectedAssumeutxo(
+    const int height, const CChainParams& chainparams)
+{
+    const MapAssumeutxo& valid_assumeutxos_map = chainparams.Assumeutxo();
+    const auto assumeutxo_found = valid_assumeutxos_map.find(height);
+
+    if (assumeutxo_found != valid_assumeutxos_map.end()) {
+        return &assumeutxo_found->second;
+    }
+    return nullptr;
+}
+
+bool ChainstateManager::ActivateSnapshot(
+        CAutoFile& coins_file,
+        const SnapshotMetadata& metadata,
+        bool in_memory)
+{
+    uint256 base_blockhash = metadata.m_base_blockhash;
+
+    if (this->SnapshotBlockhash()) {
+        LogPrintf("[snapshot] can't activate a snapshot-based chainstate more than once\n");
+        return false;
+    }
+
+    int64_t current_coinsdb_cache_size{0};
+    int64_t current_coinstip_cache_size{0};
+
+    // Cache percentages to allocate to each chainstate.
+    //
+    // These particular percentages don't matter so much since they will only be
+    // relevant during snapshot activation; caches are rebalanced at the conclusion of
+    // this function. We want to give (essentially) all available cache capacity to the
+    // snapshot to aid the bulk load later in this function.
+    static constexpr double IBD_CACHE_PERC = 0.01;
+    static constexpr double SNAPSHOT_CACHE_PERC = 0.99;
+
+    {
+        LOCK(::cs_main);
+        // Resize the coins caches to ensure we're not exceeding memory limits.
+        //
+        // Allocate the majority of the cache to the incoming snapshot chainstate, since
+        // (optimistically) getting to its tip will be the top priority. We'll need to call
+        // `MaybeRebalanceCaches()` once we're done with this function to ensure
+        // the right allocation (including the possibility that no snapshot was activated
+        // and that we should restore the active chainstate caches to their original size).
+        //
+        current_coinsdb_cache_size = this->ActiveChainstate().m_coinsdb_cache_size_bytes;
+        current_coinstip_cache_size = this->ActiveChainstate().m_coinstip_cache_size_bytes;
+
+        // Temporarily resize the active coins cache to make room for the newly-created
+        // snapshot chain.
+        this->ActiveChainstate().ResizeCoinsCaches(
+            static_cast<size_t>(current_coinstip_cache_size * IBD_CACHE_PERC),
+            static_cast<size_t>(current_coinsdb_cache_size * IBD_CACHE_PERC));
+    }
+
+    auto snapshot_chainstate = WITH_LOCK(::cs_main,
+        return std::make_unique<CChainState>(
+            /* mempool */ nullptr, m_blockman, *this, base_blockhash));
+
+    {
+        LOCK(::cs_main);
+        snapshot_chainstate->InitCoinsDB(
+            static_cast<size_t>(current_coinsdb_cache_size * SNAPSHOT_CACHE_PERC),
+            in_memory, false, "chainstate");
+        snapshot_chainstate->InitCoinsCache(
+            static_cast<size_t>(current_coinstip_cache_size * SNAPSHOT_CACHE_PERC));
+    }
+
+    const bool snapshot_ok = this->PopulateAndValidateSnapshot(
+        *snapshot_chainstate, coins_file, metadata);
+
+    if (!snapshot_ok) {
+        WITH_LOCK(::cs_main, this->MaybeRebalanceCaches());
+        return false;
+    }
+
+    {
+        LOCK(::cs_main);
+        assert(!m_snapshot_chainstate);
+        m_snapshot_chainstate.swap(snapshot_chainstate);
+        const bool chaintip_loaded = m_snapshot_chainstate->LoadChainTip();
+        assert(chaintip_loaded);
+
+        m_active_chainstate = m_snapshot_chainstate.get();
+
+        LogPrintf("[snapshot] successfully activated snapshot %s\n", base_blockhash.ToString());
+        LogPrintf("[snapshot] (%.2f MB)\n",
+            m_snapshot_chainstate->CoinsTip().DynamicMemoryUsage() / (1000 * 1000));
+
+        this->MaybeRebalanceCaches();
+    }
+    return true;
+}
+
+static void FlushSnapshotToDisk(CCoinsViewCache& coins_cache, bool snapshot_loaded)
+{
+    LOG_TIME_MILLIS_WITH_CATEGORY_MSG_ONCE(
+        strprintf("%s (%.2f MB)",
+                  snapshot_loaded ? "saving snapshot chainstate" : "flushing coins cache",
+                  coins_cache.DynamicMemoryUsage() / (1000 * 1000)),
+        BCLog::LogFlags::ALL);
+
+    coins_cache.Flush();
+}
+
+bool ChainstateManager::PopulateAndValidateSnapshot(
+    CChainState& snapshot_chainstate,
+    CAutoFile& coins_file,
+    const SnapshotMetadata& metadata)
+{
+    // It's okay to release cs_main before we're done using `coins_cache` because we know
+  
