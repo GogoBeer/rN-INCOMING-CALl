@@ -296,4 +296,226 @@ BerkeleyDatabase::~BerkeleyDatabase()
         LOCK(cs_db);
         env->CloseDb(strFile);
         assert(!m_db);
-        size_t erased = env->
+        size_t erased = env->m_databases.erase(strFile);
+        assert(erased == 1);
+        env->m_fileids.erase(strFile);
+    }
+}
+
+BerkeleyBatch::BerkeleyBatch(BerkeleyDatabase& database, const bool read_only, bool fFlushOnCloseIn) : pdb(nullptr), activeTxn(nullptr), m_cursor(nullptr), m_database(database)
+{
+    database.AddRef();
+    database.Open();
+    fReadOnly = read_only;
+    fFlushOnClose = fFlushOnCloseIn;
+    env = database.env.get();
+    pdb = database.m_db.get();
+    strFile = database.strFile;
+    if (!Exists(std::string("version"))) {
+        bool fTmp = fReadOnly;
+        fReadOnly = false;
+        Write(std::string("version"), CLIENT_VERSION);
+        fReadOnly = fTmp;
+    }
+}
+
+void BerkeleyDatabase::Open()
+{
+    unsigned int nFlags = DB_THREAD | DB_CREATE;
+
+    {
+        LOCK(cs_db);
+        bilingual_str open_err;
+        if (!env->Open(open_err))
+            throw std::runtime_error("BerkeleyDatabase: Failed to open database environment.");
+
+        if (m_db == nullptr) {
+            int ret;
+            std::unique_ptr<Db> pdb_temp = std::make_unique<Db>(env->dbenv.get(), 0);
+
+            bool fMockDb = env->IsMock();
+            if (fMockDb) {
+                DbMpoolFile* mpf = pdb_temp->get_mpf();
+                ret = mpf->set_flags(DB_MPOOL_NOFILE, 1);
+                if (ret != 0) {
+                    throw std::runtime_error(strprintf("BerkeleyDatabase: Failed to configure for no temp file backing for database %s", strFile));
+                }
+            }
+
+            ret = pdb_temp->open(nullptr,                             // Txn pointer
+                            fMockDb ? nullptr : strFile.c_str(),      // Filename
+                            fMockDb ? strFile.c_str() : "main",       // Logical db name
+                            DB_BTREE,                                 // Database type
+                            nFlags,                                   // Flags
+                            0);
+
+            if (ret != 0) {
+                throw std::runtime_error(strprintf("BerkeleyDatabase: Error %d, can't open database %s", ret, strFile));
+            }
+
+            // Call CheckUniqueFileid on the containing BDB environment to
+            // avoid BDB data consistency bugs that happen when different data
+            // files in the same environment have the same fileid.
+            CheckUniqueFileid(*env, strFile, *pdb_temp, this->env->m_fileids[strFile]);
+
+            m_db.reset(pdb_temp.release());
+
+        }
+    }
+}
+
+void BerkeleyBatch::Flush()
+{
+    if (activeTxn)
+        return;
+
+    // Flush database activity from memory pool to disk log
+    unsigned int nMinutes = 0;
+    if (fReadOnly)
+        nMinutes = 1;
+
+    if (env) { // env is nullptr for dummy databases (i.e. in tests). Don't actually flush if env is nullptr so we don't segfault
+        env->dbenv->txn_checkpoint(nMinutes ? gArgs.GetIntArg("-dblogsize", DEFAULT_WALLET_DBLOGSIZE) * 1024 : 0, nMinutes, 0);
+    }
+}
+
+void BerkeleyDatabase::IncrementUpdateCounter()
+{
+    ++nUpdateCounter;
+}
+
+BerkeleyBatch::~BerkeleyBatch()
+{
+    Close();
+    m_database.RemoveRef();
+}
+
+void BerkeleyBatch::Close()
+{
+    if (!pdb)
+        return;
+    if (activeTxn)
+        activeTxn->abort();
+    activeTxn = nullptr;
+    pdb = nullptr;
+    CloseCursor();
+
+    if (fFlushOnClose)
+        Flush();
+}
+
+void BerkeleyEnvironment::CloseDb(const std::string& strFile)
+{
+    {
+        LOCK(cs_db);
+        auto it = m_databases.find(strFile);
+        assert(it != m_databases.end());
+        BerkeleyDatabase& database = it->second.get();
+        if (database.m_db) {
+            // Close the database handle
+            database.m_db->close(0);
+            database.m_db.reset();
+        }
+    }
+}
+
+void BerkeleyEnvironment::ReloadDbEnv()
+{
+    // Make sure that no Db's are in use
+    AssertLockNotHeld(cs_db);
+    std::unique_lock<RecursiveMutex> lock(cs_db);
+    m_db_in_use.wait(lock, [this](){
+        for (auto& db : m_databases) {
+            if (db.second.get().m_refcount > 0) return false;
+        }
+        return true;
+    });
+
+    std::vector<std::string> filenames;
+    for (auto it : m_databases) {
+        filenames.push_back(it.first);
+    }
+    // Close the individual Db's
+    for (const std::string& filename : filenames) {
+        CloseDb(filename);
+    }
+    // Reset the environment
+    Flush(true); // This will flush and close the environment
+    Reset();
+    bilingual_str open_err;
+    Open(open_err);
+}
+
+bool BerkeleyDatabase::Rewrite(const char* pszSkip)
+{
+    while (true) {
+        {
+            LOCK(cs_db);
+            if (m_refcount <= 0) {
+                // Flush log data to the dat file
+                env->CloseDb(strFile);
+                env->CheckpointLSN(strFile);
+                m_refcount = -1;
+
+                bool fSuccess = true;
+                LogPrintf("BerkeleyBatch::Rewrite: Rewriting %s...\n", strFile);
+                std::string strFileRes = strFile + ".rewrite";
+                { // surround usage of db with extra {}
+                    BerkeleyBatch db(*this, true);
+                    std::unique_ptr<Db> pdbCopy = std::make_unique<Db>(env->dbenv.get(), 0);
+
+                    int ret = pdbCopy->open(nullptr,               // Txn pointer
+                                            strFileRes.c_str(), // Filename
+                                            "main",             // Logical db name
+                                            DB_BTREE,           // Database type
+                                            DB_CREATE,          // Flags
+                                            0);
+                    if (ret > 0) {
+                        LogPrintf("BerkeleyBatch::Rewrite: Can't create database file %s\n", strFileRes);
+                        fSuccess = false;
+                    }
+
+                    if (db.StartCursor()) {
+                        while (fSuccess) {
+                            CDataStream ssKey(SER_DISK, CLIENT_VERSION);
+                            CDataStream ssValue(SER_DISK, CLIENT_VERSION);
+                            bool complete;
+                            bool ret1 = db.ReadAtCursor(ssKey, ssValue, complete);
+                            if (complete) {
+                                break;
+                            } else if (!ret1) {
+                                fSuccess = false;
+                                break;
+                            }
+                            if (pszSkip &&
+                                strncmp((const char*)ssKey.data(), pszSkip, std::min(ssKey.size(), strlen(pszSkip))) == 0)
+                                continue;
+                            if (strncmp((const char*)ssKey.data(), "\x07version", 8) == 0) {
+                                // Update version:
+                                ssValue.clear();
+                                ssValue << CLIENT_VERSION;
+                            }
+                            Dbt datKey(ssKey.data(), ssKey.size());
+                            Dbt datValue(ssValue.data(), ssValue.size());
+                            int ret2 = pdbCopy->put(nullptr, &datKey, &datValue, DB_NOOVERWRITE);
+                            if (ret2 > 0)
+                                fSuccess = false;
+                        }
+                        db.CloseCursor();
+                    }
+                    if (fSuccess) {
+                        db.Close();
+                        env->CloseDb(strFile);
+                        if (pdbCopy->close(0))
+                            fSuccess = false;
+                    } else {
+                        pdbCopy->close(0);
+                    }
+                }
+                if (fSuccess) {
+                    Db dbA(env->dbenv.get(), 0);
+                    if (dbA.remove(strFile.c_str(), nullptr, 0))
+                        fSuccess = false;
+                    Db dbB(env->dbenv.get(), 0);
+                    if (dbB.rename(strFileRes.c_str(), nullptr, strFile.c_str(), 0))
+                        fSuccess 
