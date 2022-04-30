@@ -785,4 +785,64 @@ bool BerkeleyBatch::EraseKey(CDataStream&& key)
 
     SafeDbt datKey(key.data(), key.size());
 
-    int ret = pdb->d
+    int ret = pdb->del(activeTxn, datKey, 0);
+    return (ret == 0 || ret == DB_NOTFOUND);
+}
+
+bool BerkeleyBatch::HasKey(CDataStream&& key)
+{
+    if (!pdb)
+        return false;
+
+    SafeDbt datKey(key.data(), key.size());
+
+    int ret = pdb->exists(activeTxn, datKey, 0);
+    return ret == 0;
+}
+
+void BerkeleyDatabase::AddRef()
+{
+    LOCK(cs_db);
+    if (m_refcount < 0) {
+        m_refcount = 1;
+    } else {
+        m_refcount++;
+    }
+}
+
+void BerkeleyDatabase::RemoveRef()
+{
+    LOCK(cs_db);
+    m_refcount--;
+    if (env) env->m_db_in_use.notify_all();
+}
+
+std::unique_ptr<DatabaseBatch> BerkeleyDatabase::MakeBatch(bool flush_on_close)
+{
+    return std::make_unique<BerkeleyBatch>(*this, false, flush_on_close);
+}
+
+std::unique_ptr<BerkeleyDatabase> MakeBerkeleyDatabase(const fs::path& path, const DatabaseOptions& options, DatabaseStatus& status, bilingual_str& error)
+{
+    fs::path data_file = BDBDataFile(path);
+    std::unique_ptr<BerkeleyDatabase> db;
+    {
+        LOCK(cs_db); // Lock env.m_databases until insert in BerkeleyDatabase constructor
+        std::string data_filename = fs::PathToString(data_file.filename());
+        std::shared_ptr<BerkeleyEnvironment> env = GetBerkeleyEnv(data_file.parent_path());
+        if (env->m_databases.count(data_filename)) {
+            error = Untranslated(strprintf("Refusing to load database. Data file '%s' is already loaded.", fs::PathToString(env->Directory() / data_filename)));
+            status = DatabaseStatus::FAILED_ALREADY_LOADED;
+            return nullptr;
+        }
+        db = std::make_unique<BerkeleyDatabase>(std::move(env), std::move(data_filename));
+    }
+
+    if (options.verify && !db->Verify(error)) {
+        status = DatabaseStatus::FAILED_VERIFY;
+        return nullptr;
+    }
+
+    status = DatabaseStatus::SUCCESS;
+    return db;
+}
