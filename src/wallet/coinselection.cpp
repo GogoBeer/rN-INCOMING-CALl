@@ -97,3 +97,193 @@ std::optional<SelectionResult> SelectCoinsBnB(std::vector<OutputGroup>& utxo_poo
             backtrack = true;
         } else if (curr_value >= selection_target) {       // Selected value is within range
             curr_waste += (curr_value - selection_target); // This is the excess value which is added to the waste for the below comparison
+            // Adding another UTXO after this check could bring the waste down if the long term fee is higher than the current fee.
+            // However we are not going to explore that because this optimization for the waste is only done when we have hit our target
+            // value. Adding any more UTXOs will be just burning the UTXO; it will go entirely to fees. Thus we aren't going to
+            // explore any more UTXOs to avoid burning money like that.
+            if (curr_waste <= best_waste) {
+                best_selection = curr_selection;
+                best_selection.resize(utxo_pool.size());
+                best_waste = curr_waste;
+                if (best_waste == 0) {
+                    break;
+                }
+            }
+            curr_waste -= (curr_value - selection_target); // Remove the excess value as we will be selecting different coins now
+            backtrack = true;
+        }
+
+        // Backtracking, moving backwards
+        if (backtrack) {
+            // Walk backwards to find the last included UTXO that still needs to have its omission branch traversed.
+            while (!curr_selection.empty() && !curr_selection.back()) {
+                curr_selection.pop_back();
+                curr_available_value += utxo_pool.at(curr_selection.size()).GetSelectionAmount();
+            }
+
+            if (curr_selection.empty()) { // We have walked back to the first utxo and no branch is untraversed. All solutions searched
+                break;
+            }
+
+            // Output was included on previous iterations, try excluding now.
+            curr_selection.back() = false;
+            OutputGroup& utxo = utxo_pool.at(curr_selection.size() - 1);
+            curr_value -= utxo.GetSelectionAmount();
+            curr_waste -= utxo.fee - utxo.long_term_fee;
+        } else { // Moving forwards, continuing down this branch
+            OutputGroup& utxo = utxo_pool.at(curr_selection.size());
+
+            // Remove this utxo from the curr_available_value utxo amount
+            curr_available_value -= utxo.GetSelectionAmount();
+
+            // Avoid searching a branch if the previous UTXO has the same value and same waste and was excluded. Since the ratio of fee to
+            // long term fee is the same, we only need to check if one of those values match in order to know that the waste is the same.
+            if (!curr_selection.empty() && !curr_selection.back() &&
+                utxo.GetSelectionAmount() == utxo_pool.at(curr_selection.size() - 1).GetSelectionAmount() &&
+                utxo.fee == utxo_pool.at(curr_selection.size() - 1).fee) {
+                curr_selection.push_back(false);
+            } else {
+                // Inclusion branch first (Largest First Exploration)
+                curr_selection.push_back(true);
+                curr_value += utxo.GetSelectionAmount();
+                curr_waste += utxo.fee - utxo.long_term_fee;
+            }
+        }
+    }
+
+    // Check for solution
+    if (best_selection.empty()) {
+        return std::nullopt;
+    }
+
+    // Set output set
+    for (size_t i = 0; i < best_selection.size(); ++i) {
+        if (best_selection.at(i)) {
+            result.AddInput(utxo_pool.at(i));
+        }
+    }
+
+    return result;
+}
+
+std::optional<SelectionResult> SelectCoinsSRD(const std::vector<OutputGroup>& utxo_pool, CAmount target_value)
+{
+    SelectionResult result(target_value);
+
+    std::vector<size_t> indexes;
+    indexes.resize(utxo_pool.size());
+    std::iota(indexes.begin(), indexes.end(), 0);
+    Shuffle(indexes.begin(), indexes.end(), FastRandomContext());
+
+    CAmount selected_eff_value = 0;
+    for (const size_t i : indexes) {
+        const OutputGroup& group = utxo_pool.at(i);
+        Assume(group.GetSelectionAmount() > 0);
+        selected_eff_value += group.GetSelectionAmount();
+        result.AddInput(group);
+        if (selected_eff_value >= target_value) {
+            return result;
+        }
+    }
+    return std::nullopt;
+}
+
+static void ApproximateBestSubset(const std::vector<OutputGroup>& groups, const CAmount& nTotalLower, const CAmount& nTargetValue,
+                                  std::vector<char>& vfBest, CAmount& nBest, int iterations = 1000)
+{
+    std::vector<char> vfIncluded;
+
+    vfBest.assign(groups.size(), true);
+    nBest = nTotalLower;
+
+    FastRandomContext insecure_rand;
+
+    for (int nRep = 0; nRep < iterations && nBest != nTargetValue; nRep++)
+    {
+        vfIncluded.assign(groups.size(), false);
+        CAmount nTotal = 0;
+        bool fReachedTarget = false;
+        for (int nPass = 0; nPass < 2 && !fReachedTarget; nPass++)
+        {
+            for (unsigned int i = 0; i < groups.size(); i++)
+            {
+                //The solver here uses a randomized algorithm,
+                //the randomness serves no real security purpose but is just
+                //needed to prevent degenerate behavior and it is important
+                //that the rng is fast. We do not use a constant random sequence,
+                //because there may be some privacy improvement by making
+                //the selection random.
+                if (nPass == 0 ? insecure_rand.randbool() : !vfIncluded[i])
+                {
+                    nTotal += groups[i].GetSelectionAmount();
+                    vfIncluded[i] = true;
+                    if (nTotal >= nTargetValue)
+                    {
+                        fReachedTarget = true;
+                        if (nTotal < nBest)
+                        {
+                            nBest = nTotal;
+                            vfBest = vfIncluded;
+                        }
+                        nTotal -= groups[i].GetSelectionAmount();
+                        vfIncluded[i] = false;
+                    }
+                }
+            }
+        }
+    }
+}
+
+std::optional<SelectionResult> KnapsackSolver(std::vector<OutputGroup>& groups, const CAmount& nTargetValue)
+{
+    SelectionResult result(nTargetValue);
+
+    // List of values less than target
+    std::optional<OutputGroup> lowest_larger;
+    std::vector<OutputGroup> applicable_groups;
+    CAmount nTotalLower = 0;
+
+    Shuffle(groups.begin(), groups.end(), FastRandomContext());
+
+    for (const OutputGroup& group : groups) {
+        if (group.GetSelectionAmount() == nTargetValue) {
+            result.AddInput(group);
+            return result;
+        } else if (group.GetSelectionAmount() < nTargetValue + MIN_CHANGE) {
+            applicable_groups.push_back(group);
+            nTotalLower += group.GetSelectionAmount();
+        } else if (!lowest_larger || group.GetSelectionAmount() < lowest_larger->GetSelectionAmount()) {
+            lowest_larger = group;
+        }
+    }
+
+    if (nTotalLower == nTargetValue) {
+        for (const auto& group : applicable_groups) {
+            result.AddInput(group);
+        }
+        return result;
+    }
+
+    if (nTotalLower < nTargetValue) {
+        if (!lowest_larger) return std::nullopt;
+        result.AddInput(*lowest_larger);
+        return result;
+    }
+
+    // Solve subset sum by stochastic approximation
+    std::sort(applicable_groups.begin(), applicable_groups.end(), descending);
+    std::vector<char> vfBest;
+    CAmount nBest;
+
+    ApproximateBestSubset(applicable_groups, nTotalLower, nTargetValue, vfBest, nBest);
+    if (nBest != nTargetValue && nTotalLower >= nTargetValue + MIN_CHANGE) {
+        ApproximateBestSubset(applicable_groups, nTotalLower, nTargetValue + MIN_CHANGE, vfBest, nBest);
+    }
+
+    // If we have a bigger coin and (either the stochastic approximation didn't find a good solution,
+    //                                   or the next bigger coin is closer), return the bigger coin
+    if (lowest_larger &&
+        ((nBest != nTargetValue && nBest < nTargetValue + MIN_CHANGE) || lowest_larger->GetSelectionAmount() <= nBest)) {
+        result.AddInput(*lowest_larger);
+    } else {
+        for (unsi
