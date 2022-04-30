@@ -518,4 +518,271 @@ bool BerkeleyDatabase::Rewrite(const char* pszSkip)
                         fSuccess = false;
                     Db dbB(env->dbenv.get(), 0);
                     if (dbB.rename(strFileRes.c_str(), nullptr, strFile.c_str(), 0))
-                        fSuccess 
+                        fSuccess = false;
+                }
+                if (!fSuccess)
+                    LogPrintf("BerkeleyBatch::Rewrite: Failed to rewrite database file %s\n", strFileRes);
+                return fSuccess;
+            }
+        }
+        UninterruptibleSleep(std::chrono::milliseconds{100});
+    }
+}
+
+
+void BerkeleyEnvironment::Flush(bool fShutdown)
+{
+    int64_t nStart = GetTimeMillis();
+    // Flush log data to the actual data file on all files that are not in use
+    LogPrint(BCLog::WALLETDB, "BerkeleyEnvironment::Flush: [%s] Flush(%s)%s\n", strPath, fShutdown ? "true" : "false", fDbEnvInit ? "" : " database not started");
+    if (!fDbEnvInit)
+        return;
+    {
+        LOCK(cs_db);
+        bool no_dbs_accessed = true;
+        for (auto& db_it : m_databases) {
+            std::string strFile = db_it.first;
+            int nRefCount = db_it.second.get().m_refcount;
+            if (nRefCount < 0) continue;
+            LogPrint(BCLog::WALLETDB, "BerkeleyEnvironment::Flush: Flushing %s (refcount = %d)...\n", strFile, nRefCount);
+            if (nRefCount == 0) {
+                // Move log data to the dat file
+                CloseDb(strFile);
+                LogPrint(BCLog::WALLETDB, "BerkeleyEnvironment::Flush: %s checkpoint\n", strFile);
+                dbenv->txn_checkpoint(0, 0, 0);
+                LogPrint(BCLog::WALLETDB, "BerkeleyEnvironment::Flush: %s detach\n", strFile);
+                if (!fMockDb)
+                    dbenv->lsn_reset(strFile.c_str(), 0);
+                LogPrint(BCLog::WALLETDB, "BerkeleyEnvironment::Flush: %s closed\n", strFile);
+                nRefCount = -1;
+            } else {
+                no_dbs_accessed = false;
+            }
+        }
+        LogPrint(BCLog::WALLETDB, "BerkeleyEnvironment::Flush: Flush(%s)%s took %15dms\n", fShutdown ? "true" : "false", fDbEnvInit ? "" : " database not started", GetTimeMillis() - nStart);
+        if (fShutdown) {
+            char** listp;
+            if (no_dbs_accessed) {
+                dbenv->log_archive(&listp, DB_ARCH_REMOVE);
+                Close();
+                if (!fMockDb) {
+                    fs::remove_all(fs::PathFromString(strPath) / "database");
+                }
+            }
+        }
+    }
+}
+
+bool BerkeleyDatabase::PeriodicFlush()
+{
+    // Don't flush if we can't acquire the lock.
+    TRY_LOCK(cs_db, lockDb);
+    if (!lockDb) return false;
+
+    // Don't flush if any databases are in use
+    for (auto& it : env->m_databases) {
+        if (it.second.get().m_refcount > 0) return false;
+    }
+
+    // Don't flush if there haven't been any batch writes for this database.
+    if (m_refcount < 0) return false;
+
+    LogPrint(BCLog::WALLETDB, "Flushing %s\n", strFile);
+    int64_t nStart = GetTimeMillis();
+
+    // Flush wallet file so it's self contained
+    env->CloseDb(strFile);
+    env->CheckpointLSN(strFile);
+    m_refcount = -1;
+
+    LogPrint(BCLog::WALLETDB, "Flushed %s %dms\n", strFile, GetTimeMillis() - nStart);
+
+    return true;
+}
+
+bool BerkeleyDatabase::Backup(const std::string& strDest) const
+{
+    while (true)
+    {
+        {
+            LOCK(cs_db);
+            if (m_refcount <= 0)
+            {
+                // Flush log data to the dat file
+                env->CloseDb(strFile);
+                env->CheckpointLSN(strFile);
+
+                // Copy wallet file
+                fs::path pathSrc = env->Directory() / strFile;
+                fs::path pathDest(fs::PathFromString(strDest));
+                if (fs::is_directory(pathDest))
+                    pathDest /= fs::PathFromString(strFile);
+
+                try {
+                    if (fs::equivalent(pathSrc, pathDest)) {
+                        LogPrintf("cannot backup to wallet source file %s\n", fs::PathToString(pathDest));
+                        return false;
+                    }
+
+                    fs::copy_file(pathSrc, pathDest, fs::copy_option::overwrite_if_exists);
+                    LogPrintf("copied %s to %s\n", strFile, fs::PathToString(pathDest));
+                    return true;
+                } catch (const fs::filesystem_error& e) {
+                    LogPrintf("error copying %s to %s - %s\n", strFile, fs::PathToString(pathDest), fsbridge::get_filesystem_error_message(e));
+                    return false;
+                }
+            }
+        }
+        UninterruptibleSleep(std::chrono::milliseconds{100});
+    }
+}
+
+void BerkeleyDatabase::Flush()
+{
+    env->Flush(false);
+}
+
+void BerkeleyDatabase::Close()
+{
+    env->Flush(true);
+}
+
+void BerkeleyDatabase::ReloadDbEnv()
+{
+    env->ReloadDbEnv();
+}
+
+bool BerkeleyBatch::StartCursor()
+{
+    assert(!m_cursor);
+    if (!pdb)
+        return false;
+    int ret = pdb->cursor(nullptr, &m_cursor, 0);
+    return ret == 0;
+}
+
+bool BerkeleyBatch::ReadAtCursor(CDataStream& ssKey, CDataStream& ssValue, bool& complete)
+{
+    complete = false;
+    if (m_cursor == nullptr) return false;
+    // Read at cursor
+    SafeDbt datKey;
+    SafeDbt datValue;
+    int ret = m_cursor->get(datKey, datValue, DB_NEXT);
+    if (ret == DB_NOTFOUND) {
+        complete = true;
+    }
+    if (ret != 0)
+        return false;
+    else if (datKey.get_data() == nullptr || datValue.get_data() == nullptr)
+        return false;
+
+    // Convert to streams
+    ssKey.SetType(SER_DISK);
+    ssKey.clear();
+    ssKey.write((char*)datKey.get_data(), datKey.get_size());
+    ssValue.SetType(SER_DISK);
+    ssValue.clear();
+    ssValue.write((char*)datValue.get_data(), datValue.get_size());
+    return true;
+}
+
+void BerkeleyBatch::CloseCursor()
+{
+    if (!m_cursor) return;
+    m_cursor->close();
+    m_cursor = nullptr;
+}
+
+bool BerkeleyBatch::TxnBegin()
+{
+    if (!pdb || activeTxn)
+        return false;
+    DbTxn* ptxn = env->TxnBegin();
+    if (!ptxn)
+        return false;
+    activeTxn = ptxn;
+    return true;
+}
+
+bool BerkeleyBatch::TxnCommit()
+{
+    if (!pdb || !activeTxn)
+        return false;
+    int ret = activeTxn->commit(0);
+    activeTxn = nullptr;
+    return (ret == 0);
+}
+
+bool BerkeleyBatch::TxnAbort()
+{
+    if (!pdb || !activeTxn)
+        return false;
+    int ret = activeTxn->abort();
+    activeTxn = nullptr;
+    return (ret == 0);
+}
+
+bool BerkeleyDatabaseSanityCheck()
+{
+    int major, minor;
+    DbEnv::version(&major, &minor, nullptr);
+
+    /* If the major version differs, or the minor version of library is *older*
+     * than the header that was compiled against, flag an error.
+     */
+    if (major != DB_VERSION_MAJOR || minor < DB_VERSION_MINOR) {
+        LogPrintf("BerkeleyDB database version conflict: header version is %d.%d, library version is %d.%d\n",
+            DB_VERSION_MAJOR, DB_VERSION_MINOR, major, minor);
+        return false;
+    }
+
+    return true;
+}
+
+std::string BerkeleyDatabaseVersion()
+{
+    return DbEnv::version(nullptr, nullptr, nullptr);
+}
+
+bool BerkeleyBatch::ReadKey(CDataStream&& key, CDataStream& value)
+{
+    if (!pdb)
+        return false;
+
+    SafeDbt datKey(key.data(), key.size());
+
+    SafeDbt datValue;
+    int ret = pdb->get(activeTxn, datKey, datValue, 0);
+    if (ret == 0 && datValue.get_data() != nullptr) {
+        value.write((char*)datValue.get_data(), datValue.get_size());
+        return true;
+    }
+    return false;
+}
+
+bool BerkeleyBatch::WriteKey(CDataStream&& key, CDataStream&& value, bool overwrite)
+{
+    if (!pdb)
+        return false;
+    if (fReadOnly)
+        assert(!"Write called on database in read-only mode");
+
+    SafeDbt datKey(key.data(), key.size());
+
+    SafeDbt datValue(value.data(), value.size());
+
+    int ret = pdb->put(activeTxn, datKey, datValue, (overwrite ? 0 : DB_NOOVERWRITE));
+    return (ret == 0);
+}
+
+bool BerkeleyBatch::EraseKey(CDataStream&& key)
+{
+    if (!pdb)
+        return false;
+    if (fReadOnly)
+        assert(!"Erase called on database in read-only mode");
+
+    SafeDbt datKey(key.data(), key.size());
+
+    int ret = pdb->d
