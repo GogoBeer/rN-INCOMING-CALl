@@ -286,4 +286,146 @@ std::optional<SelectionResult> KnapsackSolver(std::vector<OutputGroup>& groups, 
         ((nBest != nTargetValue && nBest < nTargetValue + MIN_CHANGE) || lowest_larger->GetSelectionAmount() <= nBest)) {
         result.AddInput(*lowest_larger);
     } else {
-        for (unsi
+        for (unsigned int i = 0; i < applicable_groups.size(); i++) {
+            if (vfBest[i]) {
+                result.AddInput(applicable_groups[i]);
+            }
+        }
+
+        if (LogAcceptCategory(BCLog::SELECTCOINS)) {
+            std::string log_message{"Coin selection best subset: "};
+            for (unsigned int i = 0; i < applicable_groups.size(); i++) {
+                if (vfBest[i]) {
+                    log_message += strprintf("%s ", FormatMoney(applicable_groups[i].m_value));
+                }
+            }
+            LogPrint(BCLog::SELECTCOINS, "%stotal %s\n", log_message, FormatMoney(nBest));
+        }
+    }
+
+    return result;
+}
+
+/******************************************************************************
+
+ OutputGroup
+
+ ******************************************************************************/
+
+void OutputGroup::Insert(const CInputCoin& output, int depth, bool from_me, size_t ancestors, size_t descendants, bool positive_only) {
+    // Compute the effective value first
+    const CAmount coin_fee = output.m_input_bytes < 0 ? 0 : m_effective_feerate.GetFee(output.m_input_bytes);
+    const CAmount ev = output.txout.nValue - coin_fee;
+
+    // Filter for positive only here before adding the coin
+    if (positive_only && ev <= 0) return;
+
+    m_outputs.push_back(output);
+    CInputCoin& coin = m_outputs.back();
+
+    coin.m_fee = coin_fee;
+    fee += coin.m_fee;
+
+    coin.m_long_term_fee = coin.m_input_bytes < 0 ? 0 : m_long_term_feerate.GetFee(coin.m_input_bytes);
+    long_term_fee += coin.m_long_term_fee;
+
+    coin.effective_value = ev;
+    effective_value += coin.effective_value;
+
+    m_from_me &= from_me;
+    m_value += output.txout.nValue;
+    m_depth = std::min(m_depth, depth);
+    // ancestors here express the number of ancestors the new coin will end up having, which is
+    // the sum, rather than the max; this will overestimate in the cases where multiple inputs
+    // have common ancestors
+    m_ancestors += ancestors;
+    // descendants is the count as seen from the top ancestor, not the descendants as seen from the
+    // coin itself; thus, this value is counted as the max, not the sum
+    m_descendants = std::max(m_descendants, descendants);
+}
+
+bool OutputGroup::EligibleForSpending(const CoinEligibilityFilter& eligibility_filter) const
+{
+    return m_depth >= (m_from_me ? eligibility_filter.conf_mine : eligibility_filter.conf_theirs)
+        && m_ancestors <= eligibility_filter.max_ancestors
+        && m_descendants <= eligibility_filter.max_descendants;
+}
+
+CAmount OutputGroup::GetSelectionAmount() const
+{
+    return m_subtract_fee_outputs ? m_value : effective_value;
+}
+
+CAmount GetSelectionWaste(const std::set<CInputCoin>& inputs, CAmount change_cost, CAmount target, bool use_effective_value)
+{
+    // This function should not be called with empty inputs as that would mean the selection failed
+    assert(!inputs.empty());
+
+    // Always consider the cost of spending an input now vs in the future.
+    CAmount waste = 0;
+    CAmount selected_effective_value = 0;
+    for (const CInputCoin& coin : inputs) {
+        waste += coin.m_fee - coin.m_long_term_fee;
+        selected_effective_value += use_effective_value ? coin.effective_value : coin.txout.nValue;
+    }
+
+    if (change_cost) {
+        // Consider the cost of making change and spending it in the future
+        // If we aren't making change, the caller should've set change_cost to 0
+        assert(change_cost > 0);
+        waste += change_cost;
+    } else {
+        // When we are not making change (change_cost == 0), consider the excess we are throwing away to fees
+        assert(selected_effective_value >= target);
+        waste += selected_effective_value - target;
+    }
+
+    return waste;
+}
+
+void SelectionResult::ComputeAndSetWaste(CAmount change_cost)
+{
+    m_waste = GetSelectionWaste(m_selected_inputs, change_cost, m_target, m_use_effective);
+}
+
+CAmount SelectionResult::GetWaste() const
+{
+    return *Assert(m_waste);
+}
+
+CAmount SelectionResult::GetSelectedValue() const
+{
+    return std::accumulate(m_selected_inputs.cbegin(), m_selected_inputs.cend(), CAmount{0}, [](CAmount sum, const auto& coin) { return sum + coin.txout.nValue; });
+}
+
+void SelectionResult::Clear()
+{
+    m_selected_inputs.clear();
+    m_waste.reset();
+}
+
+void SelectionResult::AddInput(const OutputGroup& group)
+{
+    util::insert(m_selected_inputs, group.m_outputs);
+    m_use_effective = !group.m_subtract_fee_outputs;
+}
+
+const std::set<CInputCoin>& SelectionResult::GetInputSet() const
+{
+    return m_selected_inputs;
+}
+
+std::vector<CInputCoin> SelectionResult::GetShuffledInputVector() const
+{
+    std::vector<CInputCoin> coins(m_selected_inputs.begin(), m_selected_inputs.end());
+    Shuffle(coins.begin(), coins.end(), FastRandomContext());
+    return coins;
+}
+
+bool SelectionResult::operator<(SelectionResult other) const
+{
+    Assert(m_waste.has_value());
+    Assert(other.m_waste.has_value());
+    // As this operator is only used in std::min_element, we want the result that has more inputs when waste are equal.
+    return *m_waste < *other.m_waste || (*m_waste == *other.m_waste && m_selected_inputs.size() > other.m_selected_inputs.size());
+}
