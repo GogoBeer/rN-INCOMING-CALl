@@ -123,4 +123,114 @@ public:
 
     /** Back up the entire database to a file.
      */
-    virtual bool Backup(const std::string& strDest
+    virtual bool Backup(const std::string& strDest) const = 0;
+
+    /** Make sure all changes are flushed to database file.
+     */
+    virtual void Flush() = 0;
+    /** Flush to the database file and close the database.
+     *  Also close the environment if no other databases are open in it.
+     */
+    virtual void Close() = 0;
+    /* flush the wallet passively (TRY_LOCK)
+       ideal to be called periodically */
+    virtual bool PeriodicFlush() = 0;
+
+    virtual void IncrementUpdateCounter() = 0;
+
+    virtual void ReloadDbEnv() = 0;
+
+    /** Return path to main database file for logs and error messages. */
+    virtual std::string Filename() = 0;
+
+    virtual std::string Format() = 0;
+
+    std::atomic<unsigned int> nUpdateCounter;
+    unsigned int nLastSeen;
+    unsigned int nLastFlushed;
+    int64_t nLastWalletUpdate;
+
+    /** Make a DatabaseBatch connected to this database */
+    virtual std::unique_ptr<DatabaseBatch> MakeBatch(bool flush_on_close = true) = 0;
+};
+
+/** RAII class that provides access to a DummyDatabase. Never fails. */
+class DummyBatch : public DatabaseBatch
+{
+private:
+    bool ReadKey(CDataStream&& key, CDataStream& value) override { return true; }
+    bool WriteKey(CDataStream&& key, CDataStream&& value, bool overwrite=true) override { return true; }
+    bool EraseKey(CDataStream&& key) override { return true; }
+    bool HasKey(CDataStream&& key) override { return true; }
+
+public:
+    void Flush() override {}
+    void Close() override {}
+
+    bool StartCursor() override { return true; }
+    bool ReadAtCursor(CDataStream& ssKey, CDataStream& ssValue, bool& complete) override { return true; }
+    void CloseCursor() override {}
+    bool TxnBegin() override { return true; }
+    bool TxnCommit() override { return true; }
+    bool TxnAbort() override { return true; }
+};
+
+/** A dummy WalletDatabase that does nothing and never fails. Only used by unit tests.
+ **/
+class DummyDatabase : public WalletDatabase
+{
+public:
+    void Open() override {};
+    void AddRef() override {}
+    void RemoveRef() override {}
+    bool Rewrite(const char* pszSkip=nullptr) override { return true; }
+    bool Backup(const std::string& strDest) const override { return true; }
+    void Close() override {}
+    void Flush() override {}
+    bool PeriodicFlush() override { return true; }
+    void IncrementUpdateCounter() override { ++nUpdateCounter; }
+    void ReloadDbEnv() override {}
+    std::string Filename() override { return "dummy"; }
+    std::string Format() override { return "dummy"; }
+    std::unique_ptr<DatabaseBatch> MakeBatch(bool flush_on_close = true) override { return std::make_unique<DummyBatch>(); }
+};
+
+enum class DatabaseFormat {
+    BERKELEY,
+    SQLITE,
+};
+
+struct DatabaseOptions {
+    bool require_existing = false;
+    bool require_create = false;
+    std::optional<DatabaseFormat> require_format;
+    uint64_t create_flags = 0;
+    SecureString create_passphrase;
+    bool verify = true;
+};
+
+enum class DatabaseStatus {
+    SUCCESS,
+    FAILED_BAD_PATH,
+    FAILED_BAD_FORMAT,
+    FAILED_ALREADY_LOADED,
+    FAILED_ALREADY_EXISTS,
+    FAILED_NOT_FOUND,
+    FAILED_CREATE,
+    FAILED_LOAD,
+    FAILED_VERIFY,
+    FAILED_ENCRYPT,
+    FAILED_INVALID_BACKUP_FILE,
+};
+
+/** Recursively list database paths in directory. */
+std::vector<fs::path> ListDatabases(const fs::path& path);
+
+std::unique_ptr<WalletDatabase> MakeDatabase(const fs::path& path, const DatabaseOptions& options, DatabaseStatus& status, bilingual_str& error);
+
+fs::path BDBDataFile(const fs::path& path);
+fs::path SQLiteDataFile(const fs::path& path);
+bool IsBDBFile(const fs::path& path);
+bool IsSQLiteFile(const fs::path& path);
+
+#endif // BITCOIN_WALLET_DB_H
