@@ -48,4 +48,37 @@ ExternalSigner ExternalSignerScriptPubKeyMan::GetExternalSigner() {
     return signers[0];
 }
 
-bool ExternalSignerScriptPubKeyMan::DisplayAddress(const CScript scriptPubKey,
+bool ExternalSignerScriptPubKeyMan::DisplayAddress(const CScript scriptPubKey, const ExternalSigner &signer) const
+{
+    // TODO: avoid the need to infer a descriptor from inside a descriptor wallet
+    auto provider = GetSolvingProvider(scriptPubKey);
+    auto descriptor = InferDescriptor(scriptPubKey, *provider);
+
+    signer.DisplayAddress(descriptor->ToString());
+    // TODO inspect result
+    return true;
+}
+
+// If sign is true, transaction must previously have been filled
+TransactionError ExternalSignerScriptPubKeyMan::FillPSBT(PartiallySignedTransaction& psbt, const PrecomputedTransactionData& txdata, int sighash_type, bool sign, bool bip32derivs, int* n_signed, bool finalize) const
+{
+    if (!sign) {
+        return DescriptorScriptPubKeyMan::FillPSBT(psbt, txdata, sighash_type, false, bip32derivs, n_signed, finalize);
+    }
+
+    // Already complete if every input is now signed
+    bool complete = true;
+    for (const auto& input : psbt.inputs) {
+        // TODO: for multisig wallets, we should only care if all _our_ inputs are signed
+        complete &= PSBTInputSigned(input);
+    }
+    if (complete) return TransactionError::OK;
+
+    std::string strFailReason;
+    if(!GetExternalSigner().SignTransaction(psbt, strFailReason)) {
+        tfm::format(std::cerr, "Failed to sign: %s\n", strFailReason);
+        return TransactionError::EXTERNAL_SIGNER_FAILED;
+    }
+    if (finalize) FinalizePSBT(psbt); // This won't work in a multisig setup
+    return TransactionError::OK;
+}
