@@ -333,4 +333,198 @@ public:
         }
         num_blocks = m_wallet->GetLastBlockHeight();
         block_time = -1;
-        CHECK_NONFATAL(m_wallet->chain().findBlock(m_wallet->GetLastBlockHash(), FoundBlock().time(block_time))
+        CHECK_NONFATAL(m_wallet->chain().findBlock(m_wallet->GetLastBlockHash(), FoundBlock().time(block_time)));
+        tx_status = MakeWalletTxStatus(*m_wallet, mi->second);
+        return true;
+    }
+    WalletTx getWalletTxDetails(const uint256& txid,
+        WalletTxStatus& tx_status,
+        WalletOrderForm& order_form,
+        bool& in_mempool,
+        int& num_blocks) override
+    {
+        LOCK(m_wallet->cs_wallet);
+        auto mi = m_wallet->mapWallet.find(txid);
+        if (mi != m_wallet->mapWallet.end()) {
+            num_blocks = m_wallet->GetLastBlockHeight();
+            in_mempool = mi->second.InMempool();
+            order_form = mi->second.vOrderForm;
+            tx_status = MakeWalletTxStatus(*m_wallet, mi->second);
+            return MakeWalletTx(*m_wallet, mi->second);
+        }
+        return {};
+    }
+    TransactionError fillPSBT(int sighash_type,
+        bool sign,
+        bool bip32derivs,
+        size_t* n_signed,
+        PartiallySignedTransaction& psbtx,
+        bool& complete) override
+    {
+        return m_wallet->FillPSBT(psbtx, complete, sighash_type, sign, bip32derivs, n_signed);
+    }
+    WalletBalances getBalances() override
+    {
+        const auto bal = GetBalance(*m_wallet);
+        WalletBalances result;
+        result.balance = bal.m_mine_trusted;
+        result.unconfirmed_balance = bal.m_mine_untrusted_pending;
+        result.immature_balance = bal.m_mine_immature;
+        result.have_watch_only = haveWatchOnly();
+        if (result.have_watch_only) {
+            result.watch_only_balance = bal.m_watchonly_trusted;
+            result.unconfirmed_watch_only_balance = bal.m_watchonly_untrusted_pending;
+            result.immature_watch_only_balance = bal.m_watchonly_immature;
+        }
+        return result;
+    }
+    bool tryGetBalances(WalletBalances& balances, uint256& block_hash) override
+    {
+        TRY_LOCK(m_wallet->cs_wallet, locked_wallet);
+        if (!locked_wallet) {
+            return false;
+        }
+        block_hash = m_wallet->GetLastBlockHash();
+        balances = getBalances();
+        return true;
+    }
+    CAmount getBalance() override { return GetBalance(*m_wallet).m_mine_trusted; }
+    CAmount getAvailableBalance(const CCoinControl& coin_control) override
+    {
+        return GetAvailableBalance(*m_wallet, &coin_control);
+    }
+    isminetype txinIsMine(const CTxIn& txin) override
+    {
+        LOCK(m_wallet->cs_wallet);
+        return InputIsMine(*m_wallet, txin);
+    }
+    isminetype txoutIsMine(const CTxOut& txout) override
+    {
+        LOCK(m_wallet->cs_wallet);
+        return m_wallet->IsMine(txout);
+    }
+    CAmount getDebit(const CTxIn& txin, isminefilter filter) override
+    {
+        LOCK(m_wallet->cs_wallet);
+        return m_wallet->GetDebit(txin, filter);
+    }
+    CAmount getCredit(const CTxOut& txout, isminefilter filter) override
+    {
+        LOCK(m_wallet->cs_wallet);
+        return OutputGetCredit(*m_wallet, txout, filter);
+    }
+    CoinsList listCoins() override
+    {
+        LOCK(m_wallet->cs_wallet);
+        CoinsList result;
+        for (const auto& entry : ListCoins(*m_wallet)) {
+            auto& group = result[entry.first];
+            for (const auto& coin : entry.second) {
+                group.emplace_back(COutPoint(coin.tx->GetHash(), coin.i),
+                    MakeWalletTxOut(*m_wallet, *coin.tx, coin.i, coin.nDepth));
+            }
+        }
+        return result;
+    }
+    std::vector<WalletTxOut> getCoins(const std::vector<COutPoint>& outputs) override
+    {
+        LOCK(m_wallet->cs_wallet);
+        std::vector<WalletTxOut> result;
+        result.reserve(outputs.size());
+        for (const auto& output : outputs) {
+            result.emplace_back();
+            auto it = m_wallet->mapWallet.find(output.hash);
+            if (it != m_wallet->mapWallet.end()) {
+                int depth = m_wallet->GetTxDepthInMainChain(it->second);
+                if (depth >= 0) {
+                    result.back() = MakeWalletTxOut(*m_wallet, it->second, output.n, depth);
+                }
+            }
+        }
+        return result;
+    }
+    CAmount getRequiredFee(unsigned int tx_bytes) override { return GetRequiredFee(*m_wallet, tx_bytes); }
+    CAmount getMinimumFee(unsigned int tx_bytes,
+        const CCoinControl& coin_control,
+        int* returned_target,
+        FeeReason* reason) override
+    {
+        FeeCalculation fee_calc;
+        CAmount result;
+        result = GetMinimumFee(*m_wallet, tx_bytes, coin_control, &fee_calc);
+        if (returned_target) *returned_target = fee_calc.returnedTarget;
+        if (reason) *reason = fee_calc.reason;
+        return result;
+    }
+    unsigned int getConfirmTarget() override { return m_wallet->m_confirm_target; }
+    bool hdEnabled() override { return m_wallet->IsHDEnabled(); }
+    bool canGetAddresses() override { return m_wallet->CanGetAddresses(); }
+    bool hasExternalSigner() override { return m_wallet->IsWalletFlagSet(WALLET_FLAG_EXTERNAL_SIGNER); }
+    bool privateKeysDisabled() override { return m_wallet->IsWalletFlagSet(WALLET_FLAG_DISABLE_PRIVATE_KEYS); }
+    bool taprootEnabled() override {
+        if (m_wallet->IsLegacy()) return false;
+        auto spk_man = m_wallet->GetScriptPubKeyMan(OutputType::BECH32M, /*internal=*/false);
+        return spk_man != nullptr;
+    }
+    OutputType getDefaultAddressType() override { return m_wallet->m_default_address_type; }
+    CAmount getDefaultMaxTxFee() override { return m_wallet->m_default_max_tx_fee; }
+    void remove() override
+    {
+        RemoveWallet(m_context, m_wallet, false /* load_on_start */);
+    }
+    bool isLegacy() override { return m_wallet->IsLegacy(); }
+    std::unique_ptr<Handler> handleUnload(UnloadFn fn) override
+    {
+        return MakeHandler(m_wallet->NotifyUnload.connect(fn));
+    }
+    std::unique_ptr<Handler> handleShowProgress(ShowProgressFn fn) override
+    {
+        return MakeHandler(m_wallet->ShowProgress.connect(fn));
+    }
+    std::unique_ptr<Handler> handleStatusChanged(StatusChangedFn fn) override
+    {
+        return MakeHandler(m_wallet->NotifyStatusChanged.connect([fn](CWallet*) { fn(); }));
+    }
+    std::unique_ptr<Handler> handleAddressBookChanged(AddressBookChangedFn fn) override
+    {
+        return MakeHandler(m_wallet->NotifyAddressBookChanged.connect(
+            [fn](const CTxDestination& address, const std::string& label, bool is_mine,
+                 const std::string& purpose, ChangeType status) { fn(address, label, is_mine, purpose, status); }));
+    }
+    std::unique_ptr<Handler> handleTransactionChanged(TransactionChangedFn fn) override
+    {
+        return MakeHandler(m_wallet->NotifyTransactionChanged.connect(
+            [fn](const uint256& txid, ChangeType status) { fn(txid, status); }));
+    }
+    std::unique_ptr<Handler> handleWatchOnlyChanged(WatchOnlyChangedFn fn) override
+    {
+        return MakeHandler(m_wallet->NotifyWatchonlyChanged.connect(fn));
+    }
+    std::unique_ptr<Handler> handleCanGetAddressesChanged(CanGetAddressesChangedFn fn) override
+    {
+        return MakeHandler(m_wallet->NotifyCanGetAddressesChanged.connect(fn));
+    }
+    CWallet* wallet() override { return m_wallet.get(); }
+
+    WalletContext& m_context;
+    std::shared_ptr<CWallet> m_wallet;
+};
+
+class WalletLoaderImpl : public WalletLoader
+{
+public:
+    WalletLoaderImpl(Chain& chain, ArgsManager& args)
+    {
+        m_context.chain = &chain;
+        m_context.args = &args;
+    }
+    ~WalletLoaderImpl() override { UnloadWallets(m_context); }
+
+    //! ChainClient methods
+    void registerRpcs() override
+    {
+        for (const CRPCCommand& command : GetWalletRPCCommands()) {
+            m_rpc_commands.emplace_back(command.category, command.name, [this, &command](const JSONRPCRequest& request, UniValue& result, bool last_handler) {
+                JSONRPCRequest wallet_request = request;
+                wallet_request.context = &m_context;
+                return command.actor(wallet
