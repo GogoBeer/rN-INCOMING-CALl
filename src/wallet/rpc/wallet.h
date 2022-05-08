@@ -5,4 +5,10 @@
 #ifndef BITCOIN_WALLET_RPC_WALLET_H
 #define BITCOIN_WALLET_RPC_WALLET_H
 
-#include <span.
+#include <span.h>
+
+class CRPCCommand;
+
+Span<const CRPCCommand> GetWalletRPCCommands();
+
+#endif // BITCOIN_WALLET_RPC_WALLET_H
