@@ -632,4 +632,160 @@ static uint32_t GetLocktimeForNewTransaction(interfaces::Chain& chain, const uin
 static bool CreateTransactionInternal(
         CWallet& wallet,
         const std::vector<CRecipient>& vecSend,
-        CTra
+        CTransactionRef& tx,
+        CAmount& nFeeRet,
+        int& nChangePosInOut,
+        bilingual_str& error,
+        const CCoinControl& coin_control,
+        FeeCalculation& fee_calc_out,
+        bool sign) EXCLUSIVE_LOCKS_REQUIRED(wallet.cs_wallet)
+{
+    AssertLockHeld(wallet.cs_wallet);
+
+    CMutableTransaction txNew; // The resulting transaction that we make
+    txNew.nLockTime = GetLocktimeForNewTransaction(wallet.chain(), wallet.GetLastBlockHash(), wallet.GetLastBlockHeight());
+
+    CoinSelectionParams coin_selection_params; // Parameters for coin selection, init with dummy
+    coin_selection_params.m_avoid_partial_spends = coin_control.m_avoid_partial_spends;
+
+    // Set the long term feerate estimate to the wallet's consolidate feerate
+    coin_selection_params.m_long_term_feerate = wallet.m_consolidate_feerate;
+
+    CAmount recipients_sum = 0;
+    const OutputType change_type = wallet.TransactionChangeType(coin_control.m_change_type ? *coin_control.m_change_type : wallet.m_default_change_type, vecSend);
+    ReserveDestination reservedest(&wallet, change_type);
+    unsigned int outputs_to_subtract_fee_from = 0; // The number of outputs which we are subtracting the fee from
+    for (const auto& recipient : vecSend) {
+        recipients_sum += recipient.nAmount;
+
+        if (recipient.fSubtractFeeFromAmount) {
+            outputs_to_subtract_fee_from++;
+            coin_selection_params.m_subtract_fee_outputs = true;
+        }
+    }
+
+    // Create change script that will be used if we need change
+    // TODO: pass in scriptChange instead of reservedest so
+    // change transaction isn't always pay-to-bitcoin-address
+    CScript scriptChange;
+
+    // coin control: send change to custom address
+    if (!std::get_if<CNoDestination>(&coin_control.destChange)) {
+        scriptChange = GetScriptForDestination(coin_control.destChange);
+    } else { // no coin control: send change to newly generated address
+        // Note: We use a new key here to keep it from being obvious which side is the change.
+        //  The drawback is that by not reusing a previous key, the change may be lost if a
+        //  backup is restored, if the backup doesn't have the new private key for the change.
+        //  If we reused the old key, it would be possible to add code to look for and
+        //  rediscover unknown transactions that were written with keys of ours to recover
+        //  post-backup change.
+
+        // Reserve a new key pair from key pool. If it fails, provide a dummy
+        // destination in case we don't need change.
+        CTxDestination dest;
+        bilingual_str dest_err;
+        if (!reservedest.GetReservedDestination(dest, true, dest_err)) {
+            error = _("Transaction needs a change address, but we can't generate it.") + Untranslated(" ") + dest_err;
+        }
+        scriptChange = GetScriptForDestination(dest);
+        // A valid destination implies a change script (and
+        // vice-versa). An empty change script will abort later, if the
+        // change keypool ran out, but change is required.
+        CHECK_NONFATAL(IsValidDestination(dest) != scriptChange.empty());
+    }
+    CTxOut change_prototype_txout(0, scriptChange);
+    coin_selection_params.change_output_size = GetSerializeSize(change_prototype_txout);
+
+    // Get size of spending the change output
+    int change_spend_size = CalculateMaximumSignedInputSize(change_prototype_txout, &wallet);
+    // If the wallet doesn't know how to sign change output, assume p2sh-p2wpkh
+    // as lower-bound to allow BnB to do it's thing
+    if (change_spend_size == -1) {
+        coin_selection_params.change_spend_size = DUMMY_NESTED_P2WPKH_INPUT_SIZE;
+    } else {
+        coin_selection_params.change_spend_size = (size_t)change_spend_size;
+    }
+
+    // Set discard feerate
+    coin_selection_params.m_discard_feerate = GetDiscardRate(wallet);
+
+    // Get the fee rate to use effective values in coin selection
+    FeeCalculation feeCalc;
+    coin_selection_params.m_effective_feerate = GetMinimumFeeRate(wallet, coin_control, &feeCalc);
+    // Do not, ever, assume that it's fine to change the fee rate if the user has explicitly
+    // provided one
+    if (coin_control.m_feerate && coin_selection_params.m_effective_feerate > *coin_control.m_feerate) {
+        error = strprintf(_("Fee rate (%s) is lower than the minimum fee rate setting (%s)"), coin_control.m_feerate->ToString(FeeEstimateMode::SAT_VB), coin_selection_params.m_effective_feerate.ToString(FeeEstimateMode::SAT_VB));
+        return false;
+    }
+    if (feeCalc.reason == FeeReason::FALLBACK && !wallet.m_allow_fallback_fee) {
+        // eventually allow a fallback fee
+        error = _("Fee estimation failed. Fallbackfee is disabled. Wait a few blocks or enable -fallbackfee.");
+        return false;
+    }
+
+    // Calculate the cost of change
+    // Cost of change is the cost of creating the change output + cost of spending the change output in the future.
+    // For creating the change output now, we use the effective feerate.
+    // For spending the change output in the future, we use the discard feerate for now.
+    // So cost of change = (change output size * effective feerate) + (size of spending change output * discard feerate)
+    coin_selection_params.m_change_fee = coin_selection_params.m_effective_feerate.GetFee(coin_selection_params.change_output_size);
+    coin_selection_params.m_cost_of_change = coin_selection_params.m_discard_feerate.GetFee(coin_selection_params.change_spend_size) + coin_selection_params.m_change_fee;
+
+    // vouts to the payees
+    if (!coin_selection_params.m_subtract_fee_outputs) {
+        coin_selection_params.tx_noinputs_size = 11; // Static vsize overhead + outputs vsize. 4 nVersion, 4 nLocktime, 1 input count, 1 output count, 1 witness overhead (dummy, flag, stack size)
+    }
+    for (const auto& recipient : vecSend)
+    {
+        CTxOut txout(recipient.nAmount, recipient.scriptPubKey);
+
+        // Include the fee cost for outputs.
+        if (!coin_selection_params.m_subtract_fee_outputs) {
+            coin_selection_params.tx_noinputs_size += ::GetSerializeSize(txout, PROTOCOL_VERSION);
+        }
+
+        if (IsDust(txout, wallet.chain().relayDustFee()))
+        {
+            error = _("Transaction amount too small");
+            return false;
+        }
+        txNew.vout.push_back(txout);
+    }
+
+    // Include the fees for things that aren't inputs, excluding the change output
+    const CAmount not_input_fees = coin_selection_params.m_effective_feerate.GetFee(coin_selection_params.tx_noinputs_size);
+    CAmount selection_target = recipients_sum + not_input_fees;
+
+    // Get available coins
+    std::vector<COutput> vAvailableCoins;
+    AvailableCoins(wallet, vAvailableCoins, &coin_control, 1, MAX_MONEY, MAX_MONEY, 0);
+
+    // Choose coins to use
+    std::optional<SelectionResult> result = SelectCoins(wallet, vAvailableCoins, /* nTargetValue */ selection_target, coin_control, coin_selection_params);
+    if (!result) {
+        error = _("Insufficient funds");
+        return false;
+    }
+
+    // Always make a change output
+    // We will reduce the fee from this change output later, and remove the output if it is too small.
+    const CAmount change_and_fee = result->GetSelectedValue() - recipients_sum;
+    assert(change_and_fee >= 0);
+    CTxOut newTxOut(change_and_fee, scriptChange);
+
+    if (nChangePosInOut == -1)
+    {
+        // Insert change txn at random position:
+        nChangePosInOut = GetRandInt(txNew.vout.size()+1);
+    }
+    else if ((unsigned int)nChangePosInOut > txNew.vout.size())
+    {
+        error = _("Change index out of range");
+        return false;
+    }
+
+    assert(nChangePosInOut != -1);
+    auto change_position = txNew.vout.insert(txNew.vout.begin() + nChangePosInOut, newTxOut);
+
+    // Sh
