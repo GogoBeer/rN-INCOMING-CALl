@@ -482,4 +482,154 @@ std::optional<SelectionResult> SelectCoins(const CWallet& wallet, const std::vec
     }
 
     // remove preset inputs from vCoins so that Coin Selection doesn't pick them.
-    for (std::vector<COutput>::i
+    for (std::vector<COutput>::iterator it = vCoins.begin(); it != vCoins.end() && coin_control.HasSelected();)
+    {
+        if (setPresetCoins.count(it->GetInputCoin()))
+            it = vCoins.erase(it);
+        else
+            ++it;
+    }
+
+    unsigned int limit_ancestor_count = 0;
+    unsigned int limit_descendant_count = 0;
+    wallet.chain().getPackageLimits(limit_ancestor_count, limit_descendant_count);
+    const size_t max_ancestors = (size_t)std::max<int64_t>(1, limit_ancestor_count);
+    const size_t max_descendants = (size_t)std::max<int64_t>(1, limit_descendant_count);
+    const bool fRejectLongChains = gArgs.GetBoolArg("-walletrejectlongchains", DEFAULT_WALLET_REJECT_LONG_CHAINS);
+
+    // form groups from remaining coins; note that preset coins will not
+    // automatically have their associated (same address) coins included
+    if (coin_control.m_avoid_partial_spends && vCoins.size() > OUTPUT_GROUP_MAX_ENTRIES) {
+        // Cases where we have 101+ outputs all pointing to the same destination may result in
+        // privacy leaks as they will potentially be deterministically sorted. We solve that by
+        // explicitly shuffling the outputs before processing
+        Shuffle(vCoins.begin(), vCoins.end(), FastRandomContext());
+    }
+
+    // Coin Selection attempts to select inputs from a pool of eligible UTXOs to fund the
+    // transaction at a target feerate. If an attempt fails, more attempts may be made using a more
+    // permissive CoinEligibilityFilter.
+    std::optional<SelectionResult> res = [&] {
+        // Pre-selected inputs already cover the target amount.
+        if (value_to_select <= 0) return std::make_optional(SelectionResult(nTargetValue));
+
+        // If possible, fund the transaction with confirmed UTXOs only. Prefer at least six
+        // confirmations on outputs received from other wallets and only spend confirmed change.
+        if (auto r1{AttemptSelection(wallet, value_to_select, CoinEligibilityFilter(1, 6, 0), vCoins, coin_selection_params)}) return r1;
+        if (auto r2{AttemptSelection(wallet, value_to_select, CoinEligibilityFilter(1, 1, 0), vCoins, coin_selection_params)}) return r2;
+
+        // Fall back to using zero confirmation change (but with as few ancestors in the mempool as
+        // possible) if we cannot fund the transaction otherwise.
+        if (wallet.m_spend_zero_conf_change) {
+            if (auto r3{AttemptSelection(wallet, value_to_select, CoinEligibilityFilter(0, 1, 2), vCoins, coin_selection_params)}) return r3;
+            if (auto r4{AttemptSelection(wallet, value_to_select, CoinEligibilityFilter(0, 1, std::min((size_t)4, max_ancestors/3), std::min((size_t)4, max_descendants/3)),
+                                   vCoins, coin_selection_params)}) {
+                return r4;
+            }
+            if (auto r5{AttemptSelection(wallet, value_to_select, CoinEligibilityFilter(0, 1, max_ancestors/2, max_descendants/2),
+                                   vCoins, coin_selection_params)}) {
+                return r5;
+            }
+            // If partial groups are allowed, relax the requirement of spending OutputGroups (groups
+            // of UTXOs sent to the same address, which are obviously controlled by a single wallet)
+            // in their entirety.
+            if (auto r6{AttemptSelection(wallet, value_to_select, CoinEligibilityFilter(0, 1, max_ancestors-1, max_descendants-1, true /* include_partial_groups */),
+                                   vCoins, coin_selection_params)}) {
+                return r6;
+            }
+            // Try with unsafe inputs if they are allowed. This may spend unconfirmed outputs
+            // received from other wallets.
+            if (coin_control.m_include_unsafe_inputs) {
+                if (auto r7{AttemptSelection(wallet, value_to_select,
+                    CoinEligibilityFilter(0 /* conf_mine */, 0 /* conf_theirs */, max_ancestors-1, max_descendants-1, true /* include_partial_groups */),
+                    vCoins, coin_selection_params)}) {
+                    return r7;
+                }
+            }
+            // Try with unlimited ancestors/descendants. The transaction will still need to meet
+            // mempool ancestor/descendant policy to be accepted to mempool and broadcasted, but
+            // OutputGroups use heuristics that may overestimate ancestor/descendant counts.
+            if (!fRejectLongChains) {
+                if (auto r8{AttemptSelection(wallet, value_to_select,
+                                      CoinEligibilityFilter(0, 1, std::numeric_limits<uint64_t>::max(), std::numeric_limits<uint64_t>::max(), true /* include_partial_groups */),
+                                      vCoins, coin_selection_params)}) {
+                    return r8;
+                }
+            }
+        }
+        // Coin Selection failed.
+        return std::optional<SelectionResult>();
+    }();
+
+    if (!res) return std::nullopt;
+
+    // Add preset inputs to result
+    res->AddInput(preset_inputs);
+
+    return res;
+}
+
+static bool IsCurrentForAntiFeeSniping(interfaces::Chain& chain, const uint256& block_hash)
+{
+    if (chain.isInitialBlockDownload()) {
+        return false;
+    }
+    constexpr int64_t MAX_ANTI_FEE_SNIPING_TIP_AGE = 8 * 60 * 60; // in seconds
+    int64_t block_time;
+    CHECK_NONFATAL(chain.findBlock(block_hash, FoundBlock().time(block_time)));
+    if (block_time < (GetTime() - MAX_ANTI_FEE_SNIPING_TIP_AGE)) {
+        return false;
+    }
+    return true;
+}
+
+/**
+ * Return a height-based locktime for new transactions (uses the height of the
+ * current chain tip unless we are not synced with the current chain
+ */
+static uint32_t GetLocktimeForNewTransaction(interfaces::Chain& chain, const uint256& block_hash, int block_height)
+{
+    uint32_t locktime;
+    // Discourage fee sniping.
+    //
+    // For a large miner the value of the transactions in the best block and
+    // the mempool can exceed the cost of deliberately attempting to mine two
+    // blocks to orphan the current best block. By setting nLockTime such that
+    // only the next block can include the transaction, we discourage this
+    // practice as the height restricted and limited blocksize gives miners
+    // considering fee sniping fewer options for pulling off this attack.
+    //
+    // A simple way to think about this is from the wallet's point of view we
+    // always want the blockchain to move forward. By setting nLockTime this
+    // way we're basically making the statement that we only want this
+    // transaction to appear in the next block; we don't want to potentially
+    // encourage reorgs by allowing transactions to appear at lower heights
+    // than the next block in forks of the best chain.
+    //
+    // Of course, the subsidy is high enough, and transaction volume low
+    // enough, that fee sniping isn't a problem yet, but by implementing a fix
+    // now we ensure code won't be written that makes assumptions about
+    // nLockTime that preclude a fix later.
+    if (IsCurrentForAntiFeeSniping(chain, block_hash)) {
+        locktime = block_height;
+
+        // Secondly occasionally randomly pick a nLockTime even further back, so
+        // that transactions that are delayed after signing for whatever reason,
+        // e.g. high-latency mix networks and some CoinJoin implementations, have
+        // better privacy.
+        if (GetRandInt(10) == 0)
+            locktime = std::max(0, (int)locktime - GetRandInt(100));
+    } else {
+        // If our chain is lagging behind, we can't discourage fee sniping nor help
+        // the privacy of high-latency transactions. To avoid leaking a potentially
+        // unique "nLockTime fingerprint", set nLockTime to a constant.
+        locktime = 0;
+    }
+    assert(locktime < LOCKTIME_THRESHOLD);
+    return locktime;
+}
+
+static bool CreateTransactionInternal(
+        CWallet& wallet,
+        const std::vector<CRecipient>& vecSend,
+        CTra
