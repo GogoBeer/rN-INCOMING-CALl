@@ -331,4 +331,155 @@ std::vector<OutputGroup> GroupOutputs(const CWallet& wallet, const std::vector<C
         std::vector<OutputGroup>& groups = spk_to_groups_map[spk];
 
         if (groups.size() == 0) {
-            // No OutputGroups for this scriptPubKey yet,
+            // No OutputGroups for this scriptPubKey yet, add one
+            groups.emplace_back(coin_sel_params);
+        }
+
+        // Get the last OutputGroup in the vector so that we can add the CInputCoin to it
+        // A pointer is used here so that group can be reassigned later if it is full.
+        OutputGroup* group = &groups.back();
+
+        // Check if this OutputGroup is full. We limit to OUTPUT_GROUP_MAX_ENTRIES when using -avoidpartialspends
+        // to avoid surprising users with very high fees.
+        if (group->m_outputs.size() >= OUTPUT_GROUP_MAX_ENTRIES) {
+            // The last output group is full, add a new group to the vector and use that group for the insertion
+            groups.emplace_back(coin_sel_params);
+            group = &groups.back();
+        }
+
+        // Add the input_coin to group
+        group->Insert(input_coin, output.nDepth, CachedTxIsFromMe(wallet, *output.tx, ISMINE_ALL), ancestors, descendants, positive_only);
+    }
+
+    // Now we go through the entire map and pull out the OutputGroups
+    for (const auto& spk_and_groups_pair: spk_to_groups_map) {
+        const std::vector<OutputGroup>& groups_per_spk= spk_and_groups_pair.second;
+
+        // Go through the vector backwards. This allows for the first item we deal with being the partial group.
+        for (auto group_it = groups_per_spk.rbegin(); group_it != groups_per_spk.rend(); group_it++) {
+            const OutputGroup& group = *group_it;
+
+            // Don't include partial groups if there are full groups too and we don't want partial groups
+            if (group_it == groups_per_spk.rbegin() && groups_per_spk.size() > 1 && !filter.m_include_partial_groups) {
+                continue;
+            }
+
+            // Check the OutputGroup's eligibility. Only add the eligible ones.
+            if (positive_only && group.GetSelectionAmount() <= 0) continue;
+            if (group.m_outputs.size() > 0 && group.EligibleForSpending(filter)) groups_out.push_back(group);
+        }
+    }
+
+    return groups_out;
+}
+
+std::optional<SelectionResult> AttemptSelection(const CWallet& wallet, const CAmount& nTargetValue, const CoinEligibilityFilter& eligibility_filter, std::vector<COutput> coins,
+                               const CoinSelectionParams& coin_selection_params)
+{
+    // Vector of results. We will choose the best one based on waste.
+    std::vector<SelectionResult> results;
+
+    // Note that unlike KnapsackSolver, we do not include the fee for creating a change output as BnB will not create a change output.
+    std::vector<OutputGroup> positive_groups = GroupOutputs(wallet, coins, coin_selection_params, eligibility_filter, true /* positive_only */);
+    if (auto bnb_result{SelectCoinsBnB(positive_groups, nTargetValue, coin_selection_params.m_cost_of_change)}) {
+        bnb_result->ComputeAndSetWaste(CAmount(0));
+        results.push_back(*bnb_result);
+    }
+
+    // The knapsack solver has some legacy behavior where it will spend dust outputs. We retain this behavior, so don't filter for positive only here.
+    std::vector<OutputGroup> all_groups = GroupOutputs(wallet, coins, coin_selection_params, eligibility_filter, false /* positive_only */);
+    // While nTargetValue includes the transaction fees for non-input things, it does not include the fee for creating a change output.
+    // So we need to include that for KnapsackSolver as well, as we are expecting to create a change output.
+    if (auto knapsack_result{KnapsackSolver(all_groups, nTargetValue + coin_selection_params.m_change_fee)}) {
+        knapsack_result->ComputeAndSetWaste(coin_selection_params.m_cost_of_change);
+        results.push_back(*knapsack_result);
+    }
+
+    // We include the minimum final change for SRD as we do want to avoid making really small change.
+    // KnapsackSolver does not need this because it includes MIN_CHANGE internally.
+    const CAmount srd_target = nTargetValue + coin_selection_params.m_change_fee + MIN_FINAL_CHANGE;
+    if (auto srd_result{SelectCoinsSRD(positive_groups, srd_target)}) {
+        srd_result->ComputeAndSetWaste(coin_selection_params.m_cost_of_change);
+        results.push_back(*srd_result);
+    }
+
+    if (results.size() == 0) {
+        // No solution found
+        return std::nullopt;
+    }
+
+    // Choose the result with the least waste
+    // If the waste is the same, choose the one which spends more inputs.
+    auto& best_result = *std::min_element(results.begin(), results.end());
+    return best_result;
+}
+
+std::optional<SelectionResult> SelectCoins(const CWallet& wallet, const std::vector<COutput>& vAvailableCoins, const CAmount& nTargetValue, const CCoinControl& coin_control, const CoinSelectionParams& coin_selection_params)
+{
+    std::vector<COutput> vCoins(vAvailableCoins);
+    CAmount value_to_select = nTargetValue;
+
+    OutputGroup preset_inputs(coin_selection_params);
+
+    // coin control -> return all selected outputs (we want all selected to go into the transaction for sure)
+    if (coin_control.HasSelected() && !coin_control.fAllowOtherInputs)
+    {
+        for (const COutput& out : vCoins) {
+            if (!out.fSpendable) continue;
+            /* Set depth, from_me, ancestors, and descendants to 0 or false as these don't matter for preset inputs as no actual selection is being done.
+             * positive_only is set to false because we want to include all preset inputs, even if they are dust.
+             */
+            preset_inputs.Insert(out.GetInputCoin(), 0, false, 0, 0, false);
+        }
+        SelectionResult result(nTargetValue);
+        result.AddInput(preset_inputs);
+        if (result.GetSelectedValue() < nTargetValue) return std::nullopt;
+        return result;
+    }
+
+    // calculate value from preset inputs and store them
+    std::set<CInputCoin> setPresetCoins;
+
+    std::vector<COutPoint> vPresetInputs;
+    coin_control.ListSelected(vPresetInputs);
+    for (const COutPoint& outpoint : vPresetInputs) {
+        int input_bytes = -1;
+        CTxOut txout;
+        std::map<uint256, CWalletTx>::const_iterator it = wallet.mapWallet.find(outpoint.hash);
+        if (it != wallet.mapWallet.end()) {
+            const CWalletTx& wtx = it->second;
+            // Clearly invalid input, fail
+            if (wtx.tx->vout.size() <= outpoint.n) {
+                return std::nullopt;
+            }
+            input_bytes = GetTxSpendSize(wallet, wtx, outpoint.n, false);
+            txout = wtx.tx->vout.at(outpoint.n);
+        }
+        if (input_bytes == -1) {
+            // The input is external. We either did not find the tx in mapWallet, or we did but couldn't compute the input size with wallet data
+            if (!coin_control.GetExternalOutput(outpoint, txout)) {
+                // Not ours, and we don't have solving data.
+                return std::nullopt;
+            }
+            input_bytes = CalculateMaximumSignedInputSize(txout, &coin_control.m_external_provider, /* use_max_sig */ true);
+        }
+
+        CInputCoin coin(outpoint, txout, input_bytes);
+        if (coin.m_input_bytes == -1) {
+            return std::nullopt; // Not solvable, can't estimate size for fee
+        }
+        coin.effective_value = coin.txout.nValue - coin_selection_params.m_effective_feerate.GetFee(coin.m_input_bytes);
+        if (coin_selection_params.m_subtract_fee_outputs) {
+            value_to_select -= coin.txout.nValue;
+        } else {
+            value_to_select -= coin.effective_value;
+        }
+        setPresetCoins.insert(coin);
+        /* Set depth, from_me, ancestors, and descendants to 0 or false as don't matter for preset inputs as no actual selection is being done.
+         * positive_only is set to false because we want to include all preset inputs, even if they are dust.
+         */
+        preset_inputs.Insert(coin, 0, false, 0, 0, false);
+    }
+
+    // remove preset inputs from vCoins so that Coin Selection doesn't pick them.
+    for (std::vector<COutput>::i
