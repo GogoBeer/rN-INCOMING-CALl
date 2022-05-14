@@ -788,4 +788,174 @@ static bool CreateTransactionInternal(
     assert(nChangePosInOut != -1);
     auto change_position = txNew.vout.insert(txNew.vout.begin() + nChangePosInOut, newTxOut);
 
-    // Sh
+    // Shuffle selected coins and fill in final vin
+    std::vector<CInputCoin> selected_coins = result->GetShuffledInputVector();
+
+    // Note how the sequence number is set to non-maxint so that
+    // the nLockTime set above actually works.
+    //
+    // BIP125 defines opt-in RBF as any nSequence < maxint-1, so
+    // we use the highest possible value in that range (maxint-2)
+    // to avoid conflicting with other possible uses of nSequence,
+    // and in the spirit of "smallest possible change from prior
+    // behavior."
+    const uint32_t nSequence = coin_control.m_signal_bip125_rbf.value_or(wallet.m_signal_rbf) ? MAX_BIP125_RBF_SEQUENCE : (CTxIn::SEQUENCE_FINAL - 1);
+    for (const auto& coin : selected_coins) {
+        txNew.vin.push_back(CTxIn(coin.outpoint, CScript(), nSequence));
+    }
+
+    // Calculate the transaction fee
+    TxSize tx_sizes = CalculateMaximumSignedTxSize(CTransaction(txNew), &wallet, &coin_control);
+    int nBytes = tx_sizes.vsize;
+    if (nBytes == -1) {
+        error = _("Missing solving data for estimating transaction size");
+        return false;
+    }
+    nFeeRet = coin_selection_params.m_effective_feerate.GetFee(nBytes);
+
+    // Subtract fee from the change output if not subtracting it from recipient outputs
+    CAmount fee_needed = nFeeRet;
+    if (!coin_selection_params.m_subtract_fee_outputs) {
+        change_position->nValue -= fee_needed;
+    }
+
+    // We want to drop the change to fees if:
+    // 1. The change output would be dust
+    // 2. The change is within the (almost) exact match window, i.e. it is less than or equal to the cost of the change output (cost_of_change)
+    CAmount change_amount = change_position->nValue;
+    if (IsDust(*change_position, coin_selection_params.m_discard_feerate) || change_amount <= coin_selection_params.m_cost_of_change)
+    {
+        nChangePosInOut = -1;
+        change_amount = 0;
+        txNew.vout.erase(change_position);
+
+        // Because we have dropped this change, the tx size and required fee will be different, so let's recalculate those
+        tx_sizes = CalculateMaximumSignedTxSize(CTransaction(txNew), &wallet, &coin_control);
+        nBytes = tx_sizes.vsize;
+        fee_needed = coin_selection_params.m_effective_feerate.GetFee(nBytes);
+    }
+
+    // The only time that fee_needed should be less than the amount available for fees (in change_and_fee - change_amount) is when
+    // we are subtracting the fee from the outputs. If this occurs at any other time, it is a bug.
+    assert(coin_selection_params.m_subtract_fee_outputs || fee_needed <= change_and_fee - change_amount);
+
+    // Update nFeeRet in case fee_needed changed due to dropping the change output
+    if (fee_needed <= change_and_fee - change_amount) {
+        nFeeRet = change_and_fee - change_amount;
+    }
+
+    // Reduce output values for subtractFeeFromAmount
+    if (coin_selection_params.m_subtract_fee_outputs) {
+        CAmount to_reduce = fee_needed + change_amount - change_and_fee;
+        int i = 0;
+        bool fFirst = true;
+        for (const auto& recipient : vecSend)
+        {
+            if (i == nChangePosInOut) {
+                ++i;
+            }
+            CTxOut& txout = txNew.vout[i];
+
+            if (recipient.fSubtractFeeFromAmount)
+            {
+                txout.nValue -= to_reduce / outputs_to_subtract_fee_from; // Subtract fee equally from each selected recipient
+
+                if (fFirst) // first receiver pays the remainder not divisible by output count
+                {
+                    fFirst = false;
+                    txout.nValue -= to_reduce % outputs_to_subtract_fee_from;
+                }
+
+                // Error if this output is reduced to be below dust
+                if (IsDust(txout, wallet.chain().relayDustFee())) {
+                    if (txout.nValue < 0) {
+                        error = _("The transaction amount is too small to pay the fee");
+                    } else {
+                        error = _("The transaction amount is too small to send after the fee has been deducted");
+                    }
+                    return false;
+                }
+            }
+            ++i;
+        }
+        nFeeRet = fee_needed;
+    }
+
+    // Give up if change keypool ran out and change is required
+    if (scriptChange.empty() && nChangePosInOut != -1) {
+        return false;
+    }
+
+    if (sign && !wallet.SignTransaction(txNew)) {
+        error = _("Signing transaction failed");
+        return false;
+    }
+
+    // Return the constructed transaction data.
+    tx = MakeTransactionRef(std::move(txNew));
+
+    // Limit size
+    if ((sign && GetTransactionWeight(*tx) > MAX_STANDARD_TX_WEIGHT) ||
+        (!sign && tx_sizes.weight > MAX_STANDARD_TX_WEIGHT))
+    {
+        error = _("Transaction too large");
+        return false;
+    }
+
+    if (nFeeRet > wallet.m_default_max_tx_fee) {
+        error = TransactionErrorString(TransactionError::MAX_FEE_EXCEEDED);
+        return false;
+    }
+
+    if (gArgs.GetBoolArg("-walletrejectlongchains", DEFAULT_WALLET_REJECT_LONG_CHAINS)) {
+        // Lastly, ensure this tx will pass the mempool's chain limits
+        if (!wallet.chain().checkChainLimits(tx)) {
+            error = _("Transaction has too long of a mempool chain");
+            return false;
+        }
+    }
+
+    // Before we return success, we assume any change key will be used to prevent
+    // accidental re-use.
+    reservedest.KeepDestination();
+    fee_calc_out = feeCalc;
+
+    wallet.WalletLogPrintf("Fee Calculation: Fee:%d Bytes:%u Tgt:%d (requested %d) Reason:\"%s\" Decay %.5f: Estimation: (%g - %g) %.2f%% %.1f/(%.1f %d mem %.1f out) Fail: (%g - %g) %.2f%% %.1f/(%.1f %d mem %.1f out)\n",
+              nFeeRet, nBytes, feeCalc.returnedTarget, feeCalc.desiredTarget, StringForFeeReason(feeCalc.reason), feeCalc.est.decay,
+              feeCalc.est.pass.start, feeCalc.est.pass.end,
+              (feeCalc.est.pass.totalConfirmed + feeCalc.est.pass.inMempool + feeCalc.est.pass.leftMempool) > 0.0 ? 100 * feeCalc.est.pass.withinTarget / (feeCalc.est.pass.totalConfirmed + feeCalc.est.pass.inMempool + feeCalc.est.pass.leftMempool) : 0.0,
+              feeCalc.est.pass.withinTarget, feeCalc.est.pass.totalConfirmed, feeCalc.est.pass.inMempool, feeCalc.est.pass.leftMempool,
+              feeCalc.est.fail.start, feeCalc.est.fail.end,
+              (feeCalc.est.fail.totalConfirmed + feeCalc.est.fail.inMempool + feeCalc.est.fail.leftMempool) > 0.0 ? 100 * feeCalc.est.fail.withinTarget / (feeCalc.est.fail.totalConfirmed + feeCalc.est.fail.inMempool + feeCalc.est.fail.leftMempool) : 0.0,
+              feeCalc.est.fail.withinTarget, feeCalc.est.fail.totalConfirmed, feeCalc.est.fail.inMempool, feeCalc.est.fail.leftMempool);
+    return true;
+}
+
+bool CreateTransaction(
+        CWallet& wallet,
+        const std::vector<CRecipient>& vecSend,
+        CTransactionRef& tx,
+        CAmount& nFeeRet,
+        int& nChangePosInOut,
+        bilingual_str& error,
+        const CCoinControl& coin_control,
+        FeeCalculation& fee_calc_out,
+        bool sign)
+{
+    if (vecSend.empty()) {
+        error = _("Transaction must have at least one recipient");
+        return false;
+    }
+
+    if (std::any_of(vecSend.cbegin(), vecSend.cend(), [](const auto& recipient){ return recipient.nAmount < 0; })) {
+        error = _("Transaction amounts must not be negative");
+        return false;
+    }
+
+    LOCK(wallet.cs_wallet);
+
+    int nChangePosIn = nChangePosInOut;
+    Assert(!tx); // tx is an out-param. TODO change the return type from bool to tx (or nullptr)
+    bool res = CreateTransactionInternal(wallet, vecSend, tx, nFeeRet, nChangePosInOut, error, coin_control, fee_calc_out, sign);
+    // try with avoidpartialspends unless it's enabled already
+    if (res && nFeeRet > 0 /* 0 means non-functional fee rate estimation */ && wallet.m_max_aps_fee > -1 && !coin_control.m_avoid_partial_spends) {
