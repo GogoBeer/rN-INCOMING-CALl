@@ -959,3 +959,74 @@ bool CreateTransaction(
     bool res = CreateTransactionInternal(wallet, vecSend, tx, nFeeRet, nChangePosInOut, error, coin_control, fee_calc_out, sign);
     // try with avoidpartialspends unless it's enabled already
     if (res && nFeeRet > 0 /* 0 means non-functional fee rate estimation */ && wallet.m_max_aps_fee > -1 && !coin_control.m_avoid_partial_spends) {
+        CCoinControl tmp_cc = coin_control;
+        tmp_cc.m_avoid_partial_spends = true;
+        CAmount nFeeRet2;
+        CTransactionRef tx2;
+        int nChangePosInOut2 = nChangePosIn;
+        bilingual_str error2; // fired and forgotten; if an error occurs, we discard the results
+        if (CreateTransactionInternal(wallet, vecSend, tx2, nFeeRet2, nChangePosInOut2, error2, tmp_cc, fee_calc_out, sign)) {
+            // if fee of this alternative one is within the range of the max fee, we use this one
+            const bool use_aps = nFeeRet2 <= nFeeRet + wallet.m_max_aps_fee;
+            wallet.WalletLogPrintf("Fee non-grouped = %lld, grouped = %lld, using %s\n", nFeeRet, nFeeRet2, use_aps ? "grouped" : "non-grouped");
+            if (use_aps) {
+                tx = tx2;
+                nFeeRet = nFeeRet2;
+                nChangePosInOut = nChangePosInOut2;
+            }
+        }
+    }
+    return res;
+}
+
+bool FundTransaction(CWallet& wallet, CMutableTransaction& tx, CAmount& nFeeRet, int& nChangePosInOut, bilingual_str& error, bool lockUnspents, const std::set<int>& setSubtractFeeFromOutputs, CCoinControl coinControl)
+{
+    std::vector<CRecipient> vecSend;
+
+    // Turn the txout set into a CRecipient vector.
+    for (size_t idx = 0; idx < tx.vout.size(); idx++) {
+        const CTxOut& txOut = tx.vout[idx];
+        CRecipient recipient = {txOut.scriptPubKey, txOut.nValue, setSubtractFeeFromOutputs.count(idx) == 1};
+        vecSend.push_back(recipient);
+    }
+
+    coinControl.fAllowOtherInputs = true;
+
+    for (const CTxIn& txin : tx.vin) {
+        coinControl.Select(txin.prevout);
+    }
+
+    // Acquire the locks to prevent races to the new locked unspents between the
+    // CreateTransaction call and LockCoin calls (when lockUnspents is true).
+    LOCK(wallet.cs_wallet);
+
+    CTransactionRef tx_new;
+    FeeCalculation fee_calc_out;
+    if (!CreateTransaction(wallet, vecSend, tx_new, nFeeRet, nChangePosInOut, error, coinControl, fee_calc_out, false)) {
+        return false;
+    }
+
+    if (nChangePosInOut != -1) {
+        tx.vout.insert(tx.vout.begin() + nChangePosInOut, tx_new->vout[nChangePosInOut]);
+    }
+
+    // Copy output sizes from new transaction; they may have had the fee
+    // subtracted from them.
+    for (unsigned int idx = 0; idx < tx.vout.size(); idx++) {
+        tx.vout[idx].nValue = tx_new->vout[idx].nValue;
+    }
+
+    // Add new txins while keeping original txin scriptSig/order.
+    for (const CTxIn& txin : tx_new->vin) {
+        if (!coinControl.IsSelected(txin.prevout)) {
+            tx.vin.push_back(txin);
+
+        }
+        if (lockUnspents) {
+            wallet.LockCoin(txin.prevout);
+        }
+
+    }
+
+    return true;
+}
