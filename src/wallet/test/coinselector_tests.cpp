@@ -295,4 +295,152 @@ BOOST_AUTO_TEST_CASE(bnb_search_test)
         add_coin(i * CENT, i, utxo_pool);
     }
     // Run 100 times, to make sure it is never finding a solution
-    for (int i = 0; i < 100; +
+    for (int i = 0; i < 100; ++i) {
+        BOOST_CHECK(!SelectCoinsBnB(GroupCoins(utxo_pool), 1 * CENT, 2 * CENT));
+    }
+
+    // Make sure that effective value is working in AttemptSelection when BnB is used
+    CoinSelectionParams coin_selection_params_bnb(/* change_output_size= */ 0,
+                                                  /* change_spend_size= */ 0, /* effective_feerate= */ CFeeRate(3000),
+                                                  /* long_term_feerate= */ CFeeRate(1000), /* discard_feerate= */ CFeeRate(1000),
+                                                  /* tx_noinputs_size= */ 0, /* avoid_partial= */ false);
+    {
+        std::unique_ptr<CWallet> wallet = std::make_unique<CWallet>(m_node.chain.get(), "", m_args, CreateMockWalletDatabase());
+        wallet->LoadWallet();
+        LOCK(wallet->cs_wallet);
+        wallet->SetWalletFlag(WALLET_FLAG_DESCRIPTORS);
+        wallet->SetupDescriptorScriptPubKeyMans();
+
+        std::vector<COutput> coins;
+
+        add_coin(coins, *wallet, 1);
+        coins.at(0).nInputBytes = 40; // Make sure that it has a negative effective value. The next check should assert if this somehow got through. Otherwise it will fail
+        BOOST_CHECK(!SelectCoinsBnB(GroupCoins(coins), 1 * CENT, coin_selection_params_bnb.m_cost_of_change));
+
+        // Test fees subtracted from output:
+        coins.clear();
+        add_coin(coins, *wallet, 1 * CENT);
+        coins.at(0).nInputBytes = 40;
+        coin_selection_params_bnb.m_subtract_fee_outputs = true;
+        const auto result9 = SelectCoinsBnB(GroupCoins(coins), 1 * CENT, coin_selection_params_bnb.m_cost_of_change);
+        BOOST_CHECK(result9);
+        BOOST_CHECK_EQUAL(result9->GetSelectedValue(), 1 * CENT);
+    }
+
+    {
+        std::unique_ptr<CWallet> wallet = std::make_unique<CWallet>(m_node.chain.get(), "", m_args, CreateMockWalletDatabase());
+        wallet->LoadWallet();
+        LOCK(wallet->cs_wallet);
+        wallet->SetWalletFlag(WALLET_FLAG_DESCRIPTORS);
+        wallet->SetupDescriptorScriptPubKeyMans();
+
+        std::vector<COutput> coins;
+
+        add_coin(coins, *wallet, 5 * CENT, 6 * 24, false, 0, true);
+        add_coin(coins, *wallet, 3 * CENT, 6 * 24, false, 0, true);
+        add_coin(coins, *wallet, 2 * CENT, 6 * 24, false, 0, true);
+        CCoinControl coin_control;
+        coin_control.fAllowOtherInputs = true;
+        coin_control.Select(COutPoint(coins.at(0).tx->GetHash(), coins.at(0).i));
+        coin_selection_params_bnb.m_effective_feerate = CFeeRate(0);
+        const auto result10 = SelectCoins(*wallet, coins, 10 * CENT, coin_control, coin_selection_params_bnb);
+        BOOST_CHECK(result10);
+    }
+}
+
+BOOST_AUTO_TEST_CASE(knapsack_solver_test)
+{
+    std::unique_ptr<CWallet> wallet = std::make_unique<CWallet>(m_node.chain.get(), "", m_args, CreateMockWalletDatabase());
+    wallet->LoadWallet();
+    LOCK(wallet->cs_wallet);
+    wallet->SetWalletFlag(WALLET_FLAG_DESCRIPTORS);
+    wallet->SetupDescriptorScriptPubKeyMans();
+
+    std::vector<COutput> coins;
+
+    // test multiple times to allow for differences in the shuffle order
+    for (int i = 0; i < RUN_TESTS; i++)
+    {
+        coins.clear();
+
+        // with an empty wallet we can't even pay one cent
+        BOOST_CHECK(!KnapsackSolver(KnapsackGroupOutputs(coins, *wallet, filter_standard), 1 * CENT));
+
+        add_coin(coins, *wallet, 1*CENT, 4);        // add a new 1 cent coin
+
+        // with a new 1 cent coin, we still can't find a mature 1 cent
+        BOOST_CHECK(!KnapsackSolver(KnapsackGroupOutputs(coins, *wallet, filter_standard), 1 * CENT));
+
+        // but we can find a new 1 cent
+        const auto result1 = KnapsackSolver(KnapsackGroupOutputs(coins, *wallet, filter_confirmed), 1 * CENT);
+        BOOST_CHECK(result1);
+        BOOST_CHECK_EQUAL(result1->GetSelectedValue(), 1 * CENT);
+
+        add_coin(coins, *wallet, 2*CENT);           // add a mature 2 cent coin
+
+        // we can't make 3 cents of mature coins
+        BOOST_CHECK(!KnapsackSolver(KnapsackGroupOutputs(coins, *wallet, filter_standard), 3 * CENT));
+
+        // we can make 3 cents of new coins
+        const auto result2 = KnapsackSolver(KnapsackGroupOutputs(coins, *wallet, filter_confirmed), 3 * CENT);
+        BOOST_CHECK(result2);
+        BOOST_CHECK_EQUAL(result2->GetSelectedValue(), 3 * CENT);
+
+        add_coin(coins, *wallet, 5*CENT);           // add a mature 5 cent coin,
+        add_coin(coins, *wallet, 10*CENT, 3, true); // a new 10 cent coin sent from one of our own addresses
+        add_coin(coins, *wallet, 20*CENT);          // and a mature 20 cent coin
+
+        // now we have new: 1+10=11 (of which 10 was self-sent), and mature: 2+5+20=27.  total = 38
+
+        // we can't make 38 cents only if we disallow new coins:
+        BOOST_CHECK(!KnapsackSolver(KnapsackGroupOutputs(coins, *wallet, filter_standard), 38 * CENT));
+        // we can't even make 37 cents if we don't allow new coins even if they're from us
+        BOOST_CHECK(!KnapsackSolver(KnapsackGroupOutputs(coins, *wallet, filter_standard_extra), 38 * CENT));
+        // but we can make 37 cents if we accept new coins from ourself
+        const auto result3 = KnapsackSolver(KnapsackGroupOutputs(coins, *wallet, filter_standard), 37 * CENT);
+        BOOST_CHECK(result3);
+        BOOST_CHECK_EQUAL(result3->GetSelectedValue(), 37 * CENT);
+        // and we can make 38 cents if we accept all new coins
+        const auto result4 = KnapsackSolver(KnapsackGroupOutputs(coins, *wallet, filter_confirmed), 38 * CENT);
+        BOOST_CHECK(result4);
+        BOOST_CHECK_EQUAL(result4->GetSelectedValue(), 38 * CENT);
+
+        // try making 34 cents from 1,2,5,10,20 - we can't do it exactly
+        const auto result5 = KnapsackSolver(KnapsackGroupOutputs(coins, *wallet, filter_confirmed), 34 * CENT);
+        BOOST_CHECK(result5);
+        BOOST_CHECK_EQUAL(result5->GetSelectedValue(), 35 * CENT);       // but 35 cents is closest
+        BOOST_CHECK_EQUAL(result5->GetInputSet().size(), 3U);     // the best should be 20+10+5.  it's incredibly unlikely the 1 or 2 got included (but possible)
+
+        // when we try making 7 cents, the smaller coins (1,2,5) are enough.  We should see just 2+5
+        const auto result6 = KnapsackSolver(KnapsackGroupOutputs(coins, *wallet, filter_confirmed), 7 * CENT);
+        BOOST_CHECK(result6);
+        BOOST_CHECK_EQUAL(result6->GetSelectedValue(), 7 * CENT);
+        BOOST_CHECK_EQUAL(result6->GetInputSet().size(), 2U);
+
+        // when we try making 8 cents, the smaller coins (1,2,5) are exactly enough.
+        const auto result7 = KnapsackSolver(KnapsackGroupOutputs(coins, *wallet, filter_confirmed), 8 * CENT);
+        BOOST_CHECK(result7);
+        BOOST_CHECK(result7->GetSelectedValue() == 8 * CENT);
+        BOOST_CHECK_EQUAL(result7->GetInputSet().size(), 3U);
+
+        // when we try making 9 cents, no subset of smaller coins is enough, and we get the next bigger coin (10)
+        const auto result8 = KnapsackSolver(KnapsackGroupOutputs(coins, *wallet, filter_confirmed), 9 * CENT);
+        BOOST_CHECK(result8);
+        BOOST_CHECK_EQUAL(result8->GetSelectedValue(), 10 * CENT);
+        BOOST_CHECK_EQUAL(result8->GetInputSet().size(), 1U);
+
+        // now clear out the wallet and start again to test choosing between subsets of smaller coins and the next biggest coin
+        coins.clear();
+
+        add_coin(coins, *wallet,  6*CENT);
+        add_coin(coins, *wallet,  7*CENT);
+        add_coin(coins, *wallet,  8*CENT);
+        add_coin(coins, *wallet, 20*CENT);
+        add_coin(coins, *wallet, 30*CENT); // now we have 6+7+8+20+30 = 71 cents total
+
+        // check that we have 71 and not 72
+        const auto result9 = KnapsackSolver(KnapsackGroupOutputs(coins, *wallet, filter_confirmed), 71 * CENT);
+        BOOST_CHECK(result9);
+        BOOST_CHECK(!KnapsackSolver(KnapsackGroupOutputs(coins, *wallet, filter_confirmed), 72 * CENT));
+
+        // now try making 16 c
