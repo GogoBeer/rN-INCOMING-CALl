@@ -443,4 +443,141 @@ BOOST_AUTO_TEST_CASE(knapsack_solver_test)
         BOOST_CHECK(result9);
         BOOST_CHECK(!KnapsackSolver(KnapsackGroupOutputs(coins, *wallet, filter_confirmed), 72 * CENT));
 
-        // now try making 16 c
+        // now try making 16 cents.  the best smaller coins can do is 6+7+8 = 21; not as good at the next biggest coin, 20
+        const auto result10 = KnapsackSolver(KnapsackGroupOutputs(coins, *wallet, filter_confirmed), 16 * CENT);
+        BOOST_CHECK(result10);
+        BOOST_CHECK_EQUAL(result10->GetSelectedValue(), 20 * CENT); // we should get 20 in one coin
+        BOOST_CHECK_EQUAL(result10->GetInputSet().size(), 1U);
+
+        add_coin(coins, *wallet,  5*CENT); // now we have 5+6+7+8+20+30 = 75 cents total
+
+        // now if we try making 16 cents again, the smaller coins can make 5+6+7 = 18 cents, better than the next biggest coin, 20
+        const auto result11 = KnapsackSolver(KnapsackGroupOutputs(coins, *wallet, filter_confirmed), 16 * CENT);
+        BOOST_CHECK(result11);
+        BOOST_CHECK_EQUAL(result11->GetSelectedValue(), 18 * CENT); // we should get 18 in 3 coins
+        BOOST_CHECK_EQUAL(result11->GetInputSet().size(), 3U);
+
+        add_coin(coins, *wallet,  18*CENT); // now we have 5+6+7+8+18+20+30
+
+        // and now if we try making 16 cents again, the smaller coins can make 5+6+7 = 18 cents, the same as the next biggest coin, 18
+        const auto result12 = KnapsackSolver(KnapsackGroupOutputs(coins, *wallet, filter_confirmed), 16 * CENT);
+        BOOST_CHECK(result12);
+        BOOST_CHECK_EQUAL(result12->GetSelectedValue(), 18 * CENT);  // we should get 18 in 1 coin
+        BOOST_CHECK_EQUAL(result12->GetInputSet().size(), 1U); // because in the event of a tie, the biggest coin wins
+
+        // now try making 11 cents.  we should get 5+6
+        const auto result13 = KnapsackSolver(KnapsackGroupOutputs(coins, *wallet, filter_confirmed), 11 * CENT);
+        BOOST_CHECK(result13);
+        BOOST_CHECK_EQUAL(result13->GetSelectedValue(), 11 * CENT);
+        BOOST_CHECK_EQUAL(result13->GetInputSet().size(), 2U);
+
+        // check that the smallest bigger coin is used
+        add_coin(coins, *wallet,  1*COIN);
+        add_coin(coins, *wallet,  2*COIN);
+        add_coin(coins, *wallet,  3*COIN);
+        add_coin(coins, *wallet,  4*COIN); // now we have 5+6+7+8+18+20+30+100+200+300+400 = 1094 cents
+        const auto result14 = KnapsackSolver(KnapsackGroupOutputs(coins, *wallet, filter_confirmed), 95 * CENT);
+        BOOST_CHECK(result14);
+        BOOST_CHECK_EQUAL(result14->GetSelectedValue(), 1 * COIN);  // we should get 1 BTC in 1 coin
+        BOOST_CHECK_EQUAL(result14->GetInputSet().size(), 1U);
+
+        const auto result15 = KnapsackSolver(KnapsackGroupOutputs(coins, *wallet, filter_confirmed), 195 * CENT);
+        BOOST_CHECK(result15);
+        BOOST_CHECK_EQUAL(result15->GetSelectedValue(), 2 * COIN);  // we should get 2 BTC in 1 coin
+        BOOST_CHECK_EQUAL(result15->GetInputSet().size(), 1U);
+
+        // empty the wallet and start again, now with fractions of a cent, to test small change avoidance
+
+        coins.clear();
+        add_coin(coins, *wallet, MIN_CHANGE * 1 / 10);
+        add_coin(coins, *wallet, MIN_CHANGE * 2 / 10);
+        add_coin(coins, *wallet, MIN_CHANGE * 3 / 10);
+        add_coin(coins, *wallet, MIN_CHANGE * 4 / 10);
+        add_coin(coins, *wallet, MIN_CHANGE * 5 / 10);
+
+        // try making 1 * MIN_CHANGE from the 1.5 * MIN_CHANGE
+        // we'll get change smaller than MIN_CHANGE whatever happens, so can expect MIN_CHANGE exactly
+        const auto result16 = KnapsackSolver(KnapsackGroupOutputs(coins, *wallet, filter_confirmed), MIN_CHANGE);
+        BOOST_CHECK(result16);
+        BOOST_CHECK_EQUAL(result16->GetSelectedValue(), MIN_CHANGE);
+
+        // but if we add a bigger coin, small change is avoided
+        add_coin(coins, *wallet, 1111*MIN_CHANGE);
+
+        // try making 1 from 0.1 + 0.2 + 0.3 + 0.4 + 0.5 + 1111 = 1112.5
+        const auto result17 = KnapsackSolver(KnapsackGroupOutputs(coins, *wallet, filter_confirmed), 1 * MIN_CHANGE);
+        BOOST_CHECK(result17);
+        BOOST_CHECK_EQUAL(result17->GetSelectedValue(), 1 * MIN_CHANGE); // we should get the exact amount
+
+        // if we add more small coins:
+        add_coin(coins, *wallet, MIN_CHANGE * 6 / 10);
+        add_coin(coins, *wallet, MIN_CHANGE * 7 / 10);
+
+        // and try again to make 1.0 * MIN_CHANGE
+        const auto result18 = KnapsackSolver(KnapsackGroupOutputs(coins, *wallet, filter_confirmed), 1 * MIN_CHANGE);
+        BOOST_CHECK(result18);
+        BOOST_CHECK_EQUAL(result18->GetSelectedValue(), 1 * MIN_CHANGE); // we should get the exact amount
+
+        // run the 'mtgox' test (see https://blockexplorer.com/tx/29a3efd3ef04f9153d47a990bd7b048a4b2d213daaa5fb8ed670fb85f13bdbcf)
+        // they tried to consolidate 10 50k coins into one 500k coin, and ended up with 50k in change
+        coins.clear();
+        for (int j = 0; j < 20; j++)
+            add_coin(coins, *wallet, 50000 * COIN);
+
+        const auto result19 = KnapsackSolver(KnapsackGroupOutputs(coins, *wallet, filter_confirmed), 500000 * COIN);
+        BOOST_CHECK(result19);
+        BOOST_CHECK_EQUAL(result19->GetSelectedValue(), 500000 * COIN); // we should get the exact amount
+        BOOST_CHECK_EQUAL(result19->GetInputSet().size(), 10U); // in ten coins
+
+        // if there's not enough in the smaller coins to make at least 1 * MIN_CHANGE change (0.5+0.6+0.7 < 1.0+1.0),
+        // we need to try finding an exact subset anyway
+
+        // sometimes it will fail, and so we use the next biggest coin:
+        coins.clear();
+        add_coin(coins, *wallet, MIN_CHANGE * 5 / 10);
+        add_coin(coins, *wallet, MIN_CHANGE * 6 / 10);
+        add_coin(coins, *wallet, MIN_CHANGE * 7 / 10);
+        add_coin(coins, *wallet, 1111 * MIN_CHANGE);
+        const auto result20 = KnapsackSolver(KnapsackGroupOutputs(coins, *wallet, filter_confirmed), 1 * MIN_CHANGE);
+        BOOST_CHECK(result20);
+        BOOST_CHECK_EQUAL(result20->GetSelectedValue(), 1111 * MIN_CHANGE); // we get the bigger coin
+        BOOST_CHECK_EQUAL(result20->GetInputSet().size(), 1U);
+
+        // but sometimes it's possible, and we use an exact subset (0.4 + 0.6 = 1.0)
+        coins.clear();
+        add_coin(coins, *wallet, MIN_CHANGE * 4 / 10);
+        add_coin(coins, *wallet, MIN_CHANGE * 6 / 10);
+        add_coin(coins, *wallet, MIN_CHANGE * 8 / 10);
+        add_coin(coins, *wallet, 1111 * MIN_CHANGE);
+        const auto result21 = KnapsackSolver(KnapsackGroupOutputs(coins, *wallet, filter_confirmed), MIN_CHANGE);
+        BOOST_CHECK(result21);
+        BOOST_CHECK_EQUAL(result21->GetSelectedValue(), MIN_CHANGE);   // we should get the exact amount
+        BOOST_CHECK_EQUAL(result21->GetInputSet().size(), 2U); // in two coins 0.4+0.6
+
+        // test avoiding small change
+        coins.clear();
+        add_coin(coins, *wallet, MIN_CHANGE * 5 / 100);
+        add_coin(coins, *wallet, MIN_CHANGE * 1);
+        add_coin(coins, *wallet, MIN_CHANGE * 100);
+
+        // trying to make 100.01 from these three coins
+        const auto result22 = KnapsackSolver(KnapsackGroupOutputs(coins, *wallet, filter_confirmed), MIN_CHANGE * 10001 / 100);
+        BOOST_CHECK(result22);
+        BOOST_CHECK_EQUAL(result22->GetSelectedValue(), MIN_CHANGE * 10105 / 100); // we should get all coins
+        BOOST_CHECK_EQUAL(result22->GetInputSet().size(), 3U);
+
+        // but if we try to make 99.9, we should take the bigger of the two small coins to avoid small change
+        const auto result23 = KnapsackSolver(KnapsackGroupOutputs(coins, *wallet, filter_confirmed), MIN_CHANGE * 9990 / 100);
+        BOOST_CHECK(result23);
+        BOOST_CHECK_EQUAL(result23->GetSelectedValue(), 101 * MIN_CHANGE);
+        BOOST_CHECK_EQUAL(result23->GetInputSet().size(), 2U);
+    }
+
+    // test with many inputs
+    for (CAmount amt=1500; amt < COIN; amt*=10) {
+        coins.clear();
+        // Create 676 inputs (=  (old MAX_STANDARD_TX_SIZE == 100000)  / 148 bytes per input)
+        for (uint16_t j = 0; j < 676; j++)
+            add_coin(coins, *wallet, amt);
+
+        // We only create the wallet once to save time, but we sti
