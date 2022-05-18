@@ -580,4 +580,185 @@ BOOST_AUTO_TEST_CASE(knapsack_solver_test)
         for (uint16_t j = 0; j < 676; j++)
             add_coin(coins, *wallet, amt);
 
-        // We only create the wallet once to save time, but we sti
+        // We only create the wallet once to save time, but we still run the coin selection RUN_TESTS times.
+        for (int i = 0; i < RUN_TESTS; i++) {
+            const auto result24 = KnapsackSolver(KnapsackGroupOutputs(coins, *wallet, filter_confirmed), 2000);
+            BOOST_CHECK(result24);
+
+            if (amt - 2000 < MIN_CHANGE) {
+                // needs more than one input:
+                uint16_t returnSize = std::ceil((2000.0 + MIN_CHANGE)/amt);
+                CAmount returnValue = amt * returnSize;
+                BOOST_CHECK_EQUAL(result24->GetSelectedValue(), returnValue);
+                BOOST_CHECK_EQUAL(result24->GetInputSet().size(), returnSize);
+            } else {
+                // one input is sufficient:
+                BOOST_CHECK_EQUAL(result24->GetSelectedValue(), amt);
+                BOOST_CHECK_EQUAL(result24->GetInputSet().size(), 1U);
+            }
+        }
+    }
+
+    // test randomness
+    {
+        coins.clear();
+        for (int i2 = 0; i2 < 100; i2++)
+            add_coin(coins, *wallet, COIN);
+
+        // Again, we only create the wallet once to save time, but we still run the coin selection RUN_TESTS times.
+        for (int i = 0; i < RUN_TESTS; i++) {
+            // picking 50 from 100 coins doesn't depend on the shuffle,
+            // but does depend on randomness in the stochastic approximation code
+            const auto result25 = KnapsackSolver(GroupCoins(coins), 50 * COIN);
+            BOOST_CHECK(result25);
+            const auto result26 = KnapsackSolver(GroupCoins(coins), 50 * COIN);
+            BOOST_CHECK(result26);
+            BOOST_CHECK(!EqualResult(*result25, *result26));
+
+            int fails = 0;
+            for (int j = 0; j < RANDOM_REPEATS; j++)
+            {
+                // Test that the KnapsackSolver selects randomly from equivalent coins (same value and same input size).
+                // When choosing 1 from 100 identical coins, 1% of the time, this test will choose the same coin twice
+                // which will cause it to fail.
+                // To avoid that issue, run the test RANDOM_REPEATS times and only complain if all of them fail
+                const auto result27 = KnapsackSolver(GroupCoins(coins), COIN);
+                BOOST_CHECK(result27);
+                const auto result28 = KnapsackSolver(GroupCoins(coins), COIN);
+                BOOST_CHECK(result28);
+                if (EqualResult(*result27, *result28))
+                    fails++;
+            }
+            BOOST_CHECK_NE(fails, RANDOM_REPEATS);
+        }
+
+        // add 75 cents in small change.  not enough to make 90 cents,
+        // then try making 90 cents.  there are multiple competing "smallest bigger" coins,
+        // one of which should be picked at random
+        add_coin(coins, *wallet, 5 * CENT);
+        add_coin(coins, *wallet, 10 * CENT);
+        add_coin(coins, *wallet, 15 * CENT);
+        add_coin(coins, *wallet, 20 * CENT);
+        add_coin(coins, *wallet, 25 * CENT);
+
+        for (int i = 0; i < RUN_TESTS; i++) {
+            int fails = 0;
+            for (int j = 0; j < RANDOM_REPEATS; j++)
+            {
+                const auto result29 = KnapsackSolver(GroupCoins(coins), 90 * CENT);
+                BOOST_CHECK(result29);
+                const auto result30 = KnapsackSolver(GroupCoins(coins), 90 * CENT);
+                BOOST_CHECK(result30);
+                if (EqualResult(*result29, *result30))
+                    fails++;
+            }
+            BOOST_CHECK_NE(fails, RANDOM_REPEATS);
+        }
+    }
+}
+
+BOOST_AUTO_TEST_CASE(ApproximateBestSubset)
+{
+    std::unique_ptr<CWallet> wallet = std::make_unique<CWallet>(m_node.chain.get(), "", m_args, CreateMockWalletDatabase());
+    wallet->LoadWallet();
+    LOCK(wallet->cs_wallet);
+    wallet->SetWalletFlag(WALLET_FLAG_DESCRIPTORS);
+    wallet->SetupDescriptorScriptPubKeyMans();
+
+    std::vector<COutput> coins;
+
+    // Test vValue sort order
+    for (int i = 0; i < 1000; i++)
+        add_coin(coins, *wallet, 1000 * COIN);
+    add_coin(coins, *wallet, 3 * COIN);
+
+    const auto result = KnapsackSolver(KnapsackGroupOutputs(coins, *wallet, filter_standard), 1003 * COIN);
+    BOOST_CHECK(result);
+    BOOST_CHECK_EQUAL(result->GetSelectedValue(), 1003 * COIN);
+    BOOST_CHECK_EQUAL(result->GetInputSet().size(), 2U);
+}
+
+// Tests that with the ideal conditions, the coin selector will always be able to find a solution that can pay the target value
+BOOST_AUTO_TEST_CASE(SelectCoins_test)
+{
+    std::unique_ptr<CWallet> wallet = std::make_unique<CWallet>(m_node.chain.get(), "", m_args, CreateMockWalletDatabase());
+    wallet->LoadWallet();
+    LOCK(wallet->cs_wallet);
+    wallet->SetWalletFlag(WALLET_FLAG_DESCRIPTORS);
+    wallet->SetupDescriptorScriptPubKeyMans();
+
+    // Random generator stuff
+    std::default_random_engine generator;
+    std::exponential_distribution<double> distribution (100);
+    FastRandomContext rand;
+
+    // Run this test 100 times
+    for (int i = 0; i < 100; ++i)
+    {
+        std::vector<COutput> coins;
+        CAmount balance{0};
+
+        // Make a wallet with 1000 exponentially distributed random inputs
+        for (int j = 0; j < 1000; ++j)
+        {
+            CAmount val = distribution(generator)*10000000;
+            add_coin(coins, *wallet, val);
+            balance += val;
+        }
+
+        // Generate a random fee rate in the range of 100 - 400
+        CFeeRate rate(rand.randrange(300) + 100);
+
+        // Generate a random target value between 1000 and wallet balance
+        CAmount target = rand.randrange(balance - 1000) + 1000;
+
+        // Perform selection
+        CoinSelectionParams cs_params(/* change_output_size= */ 34,
+                                      /* change_spend_size= */ 148, /* effective_feerate= */ CFeeRate(0),
+                                      /* long_term_feerate= */ CFeeRate(0), /* discard_feerate= */ CFeeRate(0),
+                                      /* tx_noinputs_size= */ 0, /* avoid_partial= */ false);
+        CCoinControl cc;
+        const auto result = SelectCoins(*wallet, coins, target, cc, cs_params);
+        BOOST_CHECK(result);
+        BOOST_CHECK_GE(result->GetSelectedValue(), target);
+    }
+}
+
+BOOST_AUTO_TEST_CASE(waste_test)
+{
+    CoinSet selection;
+    const CAmount fee{100};
+    const CAmount change_cost{125};
+    const CAmount fee_diff{40};
+    const CAmount in_amt{3 * COIN};
+    const CAmount target{2 * COIN};
+    const CAmount excess{in_amt - fee * 2 - target};
+
+    // Waste with change is the change cost and difference between fee and long term fee
+    add_coin(1 * COIN, 1, selection, fee, fee - fee_diff);
+    add_coin(2 * COIN, 2, selection, fee, fee - fee_diff);
+    const CAmount waste1 = GetSelectionWaste(selection, change_cost, target);
+    BOOST_CHECK_EQUAL(fee_diff * 2 + change_cost, waste1);
+    selection.clear();
+
+    // Waste without change is the excess and difference between fee and long term fee
+    add_coin(1 * COIN, 1, selection, fee, fee - fee_diff);
+    add_coin(2 * COIN, 2, selection, fee, fee - fee_diff);
+    const CAmount waste_nochange1 = GetSelectionWaste(selection, 0, target);
+    BOOST_CHECK_EQUAL(fee_diff * 2 + excess, waste_nochange1);
+    selection.clear();
+
+    // Waste with change and fee == long term fee is just cost of change
+    add_coin(1 * COIN, 1, selection, fee, fee);
+    add_coin(2 * COIN, 2, selection, fee, fee);
+    BOOST_CHECK_EQUAL(change_cost, GetSelectionWaste(selection, change_cost, target));
+    selection.clear();
+
+    // Waste without change and fee == long term fee is just the excess
+    add_coin(1 * COIN, 1, selection, fee, fee);
+    add_coin(2 * COIN, 2, selection, fee, fee);
+    BOOST_CHECK_EQUAL(excess, GetSelectionWaste(selection, 0, target));
+    selection.clear();
+
+    // Waste will be greater when fee is greater, but long term fee is the same
+    add_coin(1 * COIN, 1, selection, fee * 2, fee - fee_diff);
