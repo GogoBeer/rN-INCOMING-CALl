@@ -849,4 +849,208 @@ bool CWallet::MarkReplaced(const uint256& originalHash, const uint256& newHash)
     // Ensure for now that we're not overwriting data
     assert(wtx.mapValue.count("replaced_by_txid") == 0);
 
-    wtx.mapValue["repl
+    wtx.mapValue["replaced_by_txid"] = newHash.ToString();
+
+    // Refresh mempool status without waiting for transactionRemovedFromMempool
+    RefreshMempoolStatus(wtx, chain());
+
+    WalletBatch batch(GetDatabase());
+
+    bool success = true;
+    if (!batch.WriteTx(wtx)) {
+        WalletLogPrintf("%s: Updating batch tx %s failed\n", __func__, wtx.GetHash().ToString());
+        success = false;
+    }
+
+    NotifyTransactionChanged(originalHash, CT_UPDATED);
+
+    return success;
+}
+
+void CWallet::SetSpentKeyState(WalletBatch& batch, const uint256& hash, unsigned int n, bool used, std::set<CTxDestination>& tx_destinations)
+{
+    AssertLockHeld(cs_wallet);
+    const CWalletTx* srctx = GetWalletTx(hash);
+    if (!srctx) return;
+
+    CTxDestination dst;
+    if (ExtractDestination(srctx->tx->vout[n].scriptPubKey, dst)) {
+        if (IsMine(dst)) {
+            if (used != IsAddressUsed(dst)) {
+                if (used) {
+                    tx_destinations.insert(dst);
+                }
+                SetAddressUsed(batch, dst, used);
+            }
+        }
+    }
+}
+
+bool CWallet::IsSpentKey(const uint256& hash, unsigned int n) const
+{
+    AssertLockHeld(cs_wallet);
+    const CWalletTx* srctx = GetWalletTx(hash);
+    if (srctx) {
+        assert(srctx->tx->vout.size() > n);
+        CTxDestination dest;
+        if (!ExtractDestination(srctx->tx->vout[n].scriptPubKey, dest)) {
+            return false;
+        }
+        if (IsAddressUsed(dest)) {
+            return true;
+        }
+        if (IsLegacy()) {
+            LegacyScriptPubKeyMan* spk_man = GetLegacyScriptPubKeyMan();
+            assert(spk_man != nullptr);
+            for (const auto& keyid : GetAffectedKeys(srctx->tx->vout[n].scriptPubKey, *spk_man)) {
+                WitnessV0KeyHash wpkh_dest(keyid);
+                if (IsAddressUsed(wpkh_dest)) {
+                    return true;
+                }
+                ScriptHash sh_wpkh_dest(GetScriptForDestination(wpkh_dest));
+                if (IsAddressUsed(sh_wpkh_dest)) {
+                    return true;
+                }
+                PKHash pkh_dest(keyid);
+                if (IsAddressUsed(pkh_dest)) {
+                    return true;
+                }
+            }
+        }
+    }
+    return false;
+}
+
+CWalletTx* CWallet::AddToWallet(CTransactionRef tx, const TxState& state, const UpdateWalletTxFn& update_wtx, bool fFlushOnClose, bool rescanning_old_block)
+{
+    LOCK(cs_wallet);
+
+    WalletBatch batch(GetDatabase(), fFlushOnClose);
+
+    uint256 hash = tx->GetHash();
+
+    if (IsWalletFlagSet(WALLET_FLAG_AVOID_REUSE)) {
+        // Mark used destinations
+        std::set<CTxDestination> tx_destinations;
+
+        for (const CTxIn& txin : tx->vin) {
+            const COutPoint& op = txin.prevout;
+            SetSpentKeyState(batch, op.hash, op.n, true, tx_destinations);
+        }
+
+        MarkDestinationsDirty(tx_destinations);
+    }
+
+    // Inserts only if not already there, returns tx inserted or tx found
+    auto ret = mapWallet.emplace(std::piecewise_construct, std::forward_as_tuple(hash), std::forward_as_tuple(tx, state));
+    CWalletTx& wtx = (*ret.first).second;
+    bool fInsertedNew = ret.second;
+    bool fUpdated = update_wtx && update_wtx(wtx, fInsertedNew);
+    if (fInsertedNew) {
+        wtx.nTimeReceived = GetTime();
+        wtx.nOrderPos = IncOrderPosNext(&batch);
+        wtx.m_it_wtxOrdered = wtxOrdered.insert(std::make_pair(wtx.nOrderPos, &wtx));
+        wtx.nTimeSmart = ComputeTimeSmart(wtx, rescanning_old_block);
+        if (IsFromMe(*tx.get())) {
+            AddToSpends(hash);
+        }
+    }
+
+    if (!fInsertedNew)
+    {
+        if (state.index() != wtx.m_state.index()) {
+            wtx.m_state = state;
+            fUpdated = true;
+        } else {
+            assert(TxStateSerializedIndex(wtx.m_state) == TxStateSerializedIndex(state));
+            assert(TxStateSerializedBlockHash(wtx.m_state) == TxStateSerializedBlockHash(state));
+        }
+        // If we have a witness-stripped version of this transaction, and we
+        // see a new version with a witness, then we must be upgrading a pre-segwit
+        // wallet.  Store the new version of the transaction with the witness,
+        // as the stripped-version must be invalid.
+        // TODO: Store all versions of the transaction, instead of just one.
+        if (tx->HasWitness() && !wtx.tx->HasWitness()) {
+            wtx.SetTx(tx);
+            fUpdated = true;
+        }
+    }
+
+    //// debug print
+    WalletLogPrintf("AddToWallet %s  %s%s\n", hash.ToString(), (fInsertedNew ? "new" : ""), (fUpdated ? "update" : ""));
+
+    // Write to disk
+    if (fInsertedNew || fUpdated)
+        if (!batch.WriteTx(wtx))
+            return nullptr;
+
+    // Break debit/credit balance caches:
+    wtx.MarkDirty();
+
+    // Notify UI of new or updated transaction
+    NotifyTransactionChanged(hash, fInsertedNew ? CT_NEW : CT_UPDATED);
+
+#if HAVE_SYSTEM
+    // notify an external script when a wallet transaction comes in or is updated
+    std::string strCmd = m_args.GetArg("-walletnotify", "");
+
+    if (!strCmd.empty())
+    {
+        boost::replace_all(strCmd, "%s", hash.GetHex());
+        if (auto* conf = wtx.state<TxStateConfirmed>())
+        {
+            boost::replace_all(strCmd, "%b", conf->confirmed_block_hash.GetHex());
+            boost::replace_all(strCmd, "%h", ToString(conf->confirmed_block_height));
+        } else {
+            boost::replace_all(strCmd, "%b", "unconfirmed");
+            boost::replace_all(strCmd, "%h", "-1");
+        }
+#ifndef WIN32
+        // Substituting the wallet name isn't currently supported on windows
+        // because windows shell escaping has not been implemented yet:
+        // https://github.com/bitcoin/bitcoin/pull/13339#issuecomment-537384875
+        // A few ways it could be implemented in the future are described in:
+        // https://github.com/bitcoin/bitcoin/pull/13339#issuecomment-461288094
+        boost::replace_all(strCmd, "%w", ShellEscape(GetName()));
+#endif
+        std::thread t(runCommand, strCmd);
+        t.detach(); // thread runs free
+    }
+#endif
+
+    return &wtx;
+}
+
+bool CWallet::LoadToWallet(const uint256& hash, const UpdateWalletTxFn& fill_wtx)
+{
+    const auto& ins = mapWallet.emplace(std::piecewise_construct, std::forward_as_tuple(hash), std::forward_as_tuple(nullptr, TxStateInactive{}));
+    CWalletTx& wtx = ins.first->second;
+    if (!fill_wtx(wtx, ins.second)) {
+        return false;
+    }
+    // If wallet doesn't have a chain (e.g wallet-tool), don't bother to update txn.
+    if (HaveChain()) {
+        bool active;
+        auto lookup_block = [&](const uint256& hash, int& height, TxState& state) {
+            // If tx block (or conflicting block) was reorged out of chain
+            // while the wallet was shutdown, change tx status to UNCONFIRMED
+            // and reset block height, hash, and index. ABANDONED tx don't have
+            // associated blocks and don't need to be updated. The case where a
+            // transaction was reorged out while online and then reconfirmed
+            // while offline is covered by the rescan logic.
+            if (!chain().findBlock(hash, FoundBlock().inActiveChain(active).height(height)) || !active) {
+                state = TxStateInactive{};
+            }
+        };
+        if (auto* conf = wtx.state<TxStateConfirmed>()) {
+            lookup_block(conf->confirmed_block_hash, conf->confirmed_block_height, wtx.m_state);
+        } else if (auto* conf = wtx.state<TxStateConflicted>()) {
+            lookup_block(conf->conflicting_block_hash, conf->conflicting_block_height, wtx.m_state);
+        }
+    }
+    if (/* insertion took place */ ins.second) {
+        wtx.m_it_wtxOrdered = wtxOrdered.insert(std::make_pair(wtx.nOrderPos, &wtx));
+    }
+    AddToSpends(hash);
+    for (const CTxIn& txin : wtx.tx->vin) {
+        auto it = mapWa
