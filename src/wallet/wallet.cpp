@@ -1453,4 +1453,199 @@ void CWallet::UnsetWalletFlagWithDB(WalletBatch& batch, uint64_t flag)
 {
     LOCK(cs_wallet);
     m_wallet_flags &= ~flag;
-    if (!ba
+    if (!batch.WriteWalletFlags(m_wallet_flags))
+        throw std::runtime_error(std::string(__func__) + ": writing wallet flags failed");
+}
+
+void CWallet::UnsetBlankWalletFlag(WalletBatch& batch)
+{
+    UnsetWalletFlagWithDB(batch, WALLET_FLAG_BLANK_WALLET);
+}
+
+bool CWallet::IsWalletFlagSet(uint64_t flag) const
+{
+    return (m_wallet_flags & flag);
+}
+
+bool CWallet::LoadWalletFlags(uint64_t flags)
+{
+    LOCK(cs_wallet);
+    if (((flags & KNOWN_WALLET_FLAGS) >> 32) ^ (flags >> 32)) {
+        // contains unknown non-tolerable wallet flags
+        return false;
+    }
+    m_wallet_flags = flags;
+
+    return true;
+}
+
+bool CWallet::AddWalletFlags(uint64_t flags)
+{
+    LOCK(cs_wallet);
+    // We should never be writing unknown non-tolerable wallet flags
+    assert(((flags & KNOWN_WALLET_FLAGS) >> 32) == (flags >> 32));
+    if (!WalletBatch(GetDatabase()).WriteWalletFlags(flags)) {
+        throw std::runtime_error(std::string(__func__) + ": writing wallet flags failed");
+    }
+
+    return LoadWalletFlags(flags);
+}
+
+// Helper for producing a max-sized low-S low-R signature (eg 71 bytes)
+// or a max-sized low-S signature (e.g. 72 bytes) if use_max_sig is true
+bool DummySignInput(const SigningProvider& provider, CTxIn &tx_in, const CTxOut &txout, bool use_max_sig)
+{
+    // Fill in dummy signatures for fee calculation.
+    const CScript& scriptPubKey = txout.scriptPubKey;
+    SignatureData sigdata;
+
+    if (!ProduceSignature(provider, use_max_sig ? DUMMY_MAXIMUM_SIGNATURE_CREATOR : DUMMY_SIGNATURE_CREATOR, scriptPubKey, sigdata)) {
+        return false;
+    }
+    UpdateInput(tx_in, sigdata);
+    return true;
+}
+
+// Helper for producing a bunch of max-sized low-S low-R signatures (eg 71 bytes)
+bool CWallet::DummySignTx(CMutableTransaction &txNew, const std::vector<CTxOut> &txouts, const CCoinControl* coin_control) const
+{
+    // Fill in dummy signatures for fee calculation.
+    int nIn = 0;
+    for (const auto& txout : txouts)
+    {
+        CTxIn& txin = txNew.vin[nIn];
+        // Use max sig if watch only inputs were used or if this particular input is an external input
+        // to ensure a sufficient fee is attained for the requested feerate.
+        const bool use_max_sig = coin_control && (coin_control->fAllowWatchOnly || coin_control->IsExternalSelected(txin.prevout));
+        const std::unique_ptr<SigningProvider> provider = GetSolvingProvider(txout.scriptPubKey);
+        if (!provider || !DummySignInput(*provider, txin, txout, use_max_sig)) {
+            if (!coin_control || !DummySignInput(coin_control->m_external_provider, txin, txout, use_max_sig)) {
+                return false;
+            }
+        }
+
+        nIn++;
+    }
+    return true;
+}
+
+bool CWallet::ImportScripts(const std::set<CScript> scripts, int64_t timestamp)
+{
+    auto spk_man = GetLegacyScriptPubKeyMan();
+    if (!spk_man) {
+        return false;
+    }
+    LOCK(spk_man->cs_KeyStore);
+    return spk_man->ImportScripts(scripts, timestamp);
+}
+
+bool CWallet::ImportPrivKeys(const std::map<CKeyID, CKey>& privkey_map, const int64_t timestamp)
+{
+    auto spk_man = GetLegacyScriptPubKeyMan();
+    if (!spk_man) {
+        return false;
+    }
+    LOCK(spk_man->cs_KeyStore);
+    return spk_man->ImportPrivKeys(privkey_map, timestamp);
+}
+
+bool CWallet::ImportPubKeys(const std::vector<CKeyID>& ordered_pubkeys, const std::map<CKeyID, CPubKey>& pubkey_map, const std::map<CKeyID, std::pair<CPubKey, KeyOriginInfo>>& key_origins, const bool add_keypool, const bool internal, const int64_t timestamp)
+{
+    auto spk_man = GetLegacyScriptPubKeyMan();
+    if (!spk_man) {
+        return false;
+    }
+    LOCK(spk_man->cs_KeyStore);
+    return spk_man->ImportPubKeys(ordered_pubkeys, pubkey_map, key_origins, add_keypool, internal, timestamp);
+}
+
+bool CWallet::ImportScriptPubKeys(const std::string& label, const std::set<CScript>& script_pub_keys, const bool have_solving_data, const bool apply_label, const int64_t timestamp)
+{
+    auto spk_man = GetLegacyScriptPubKeyMan();
+    if (!spk_man) {
+        return false;
+    }
+    LOCK(spk_man->cs_KeyStore);
+    if (!spk_man->ImportScriptPubKeys(script_pub_keys, have_solving_data, timestamp)) {
+        return false;
+    }
+    if (apply_label) {
+        WalletBatch batch(GetDatabase());
+        for (const CScript& script : script_pub_keys) {
+            CTxDestination dest;
+            ExtractDestination(script, dest);
+            if (IsValidDestination(dest)) {
+                SetAddressBookWithDB(batch, dest, label, "receive");
+            }
+        }
+    }
+    return true;
+}
+
+/**
+ * Scan active chain for relevant transactions after importing keys. This should
+ * be called whenever new keys are added to the wallet, with the oldest key
+ * creation time.
+ *
+ * @return Earliest timestamp that could be successfully scanned from. Timestamp
+ * returned will be higher than startTime if relevant blocks could not be read.
+ */
+int64_t CWallet::RescanFromTime(int64_t startTime, const WalletRescanReserver& reserver, bool update)
+{
+    // Find starting block. May be null if nCreateTime is greater than the
+    // highest blockchain timestamp, in which case there is nothing that needs
+    // to be scanned.
+    int start_height = 0;
+    uint256 start_block;
+    bool start = chain().findFirstBlockWithTimeAndHeight(startTime - TIMESTAMP_WINDOW, 0, FoundBlock().hash(start_block).height(start_height));
+    WalletLogPrintf("%s: Rescanning last %i blocks\n", __func__, start ? WITH_LOCK(cs_wallet, return GetLastBlockHeight()) - start_height + 1 : 0);
+
+    if (start) {
+        // TODO: this should take into account failure by ScanResult::USER_ABORT
+        ScanResult result = ScanForWalletTransactions(start_block, start_height, {} /* max_height */, reserver, update);
+        if (result.status == ScanResult::FAILURE) {
+            int64_t time_max;
+            CHECK_NONFATAL(chain().findBlock(result.last_failed_block, FoundBlock().maxTime(time_max)));
+            return time_max + TIMESTAMP_WINDOW + 1;
+        }
+    }
+    return startTime;
+}
+
+/**
+ * Scan the block chain (starting in start_block) for transactions
+ * from or to us. If fUpdate is true, found transactions that already
+ * exist in the wallet will be updated.
+ *
+ * @param[in] start_block Scan starting block. If block is not on the active
+ *                        chain, the scan will return SUCCESS immediately.
+ * @param[in] start_height Height of start_block
+ * @param[in] max_height  Optional max scanning height. If unset there is
+ *                        no maximum and scanning can continue to the tip
+ *
+ * @return ScanResult returning scan information and indicating success or
+ *         failure. Return status will be set to SUCCESS if scan was
+ *         successful. FAILURE if a complete rescan was not possible (due to
+ *         pruning or corruption). USER_ABORT if the rescan was aborted before
+ *         it could complete.
+ *
+ * @pre Caller needs to make sure start_block (and the optional stop_block) are on
+ * the main chain after to the addition of any new keys you want to detect
+ * transactions for.
+ */
+CWallet::ScanResult CWallet::ScanForWalletTransactions(const uint256& start_block, int start_height, std::optional<int> max_height, const WalletRescanReserver& reserver, bool fUpdate)
+{
+    int64_t nNow = GetTime();
+    int64_t start_time = GetTimeMillis();
+
+    assert(reserver.isReserved());
+
+    uint256 block_hash = start_block;
+    ScanResult result;
+
+    WalletLogPrintf("Rescan started from block %s...\n", start_block.ToString());
+
+    fAbortRescan = false;
+    ShowProgress(strprintf("%s " + _("Rescanning…").translated, GetDisplayName()), 0); // show rescan progress in GUI as dialog or on splashscreen, if rescan required on startup (e.g. due to corruption)
+    uint256 tip_hash = WITH_LOCK(cs_wallet, return GetLastBlockHash());
+    uint256 end
