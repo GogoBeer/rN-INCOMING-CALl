@@ -2277,4 +2277,226 @@ std::set<CTxDestination> CWallet::GetLabelAddresses(const std::string& label) co
     std::set<CTxDestination> result;
     for (const std::pair<const CTxDestination, CAddressBookData>& item : m_address_book)
     {
-        if (item.second.I
+        if (item.second.IsChange()) continue;
+        const CTxDestination& address = item.first;
+        const std::string& strName = item.second.GetLabel();
+        if (strName == label)
+            result.insert(address);
+    }
+    return result;
+}
+
+bool ReserveDestination::GetReservedDestination(CTxDestination& dest, bool internal, bilingual_str& error)
+{
+    m_spk_man = pwallet->GetScriptPubKeyMan(type, internal);
+    if (!m_spk_man) {
+        error = strprintf(_("Error: No %s addresses available."), FormatOutputType(type));
+        return false;
+    }
+
+
+    if (nIndex == -1)
+    {
+        m_spk_man->TopUp();
+
+        CKeyPool keypool;
+        if (!m_spk_man->GetReservedDestination(type, internal, address, nIndex, keypool, error)) {
+            return false;
+        }
+        fInternal = keypool.fInternal;
+    }
+    dest = address;
+    return true;
+}
+
+void ReserveDestination::KeepDestination()
+{
+    if (nIndex != -1) {
+        m_spk_man->KeepDestination(nIndex, type);
+    }
+    nIndex = -1;
+    address = CNoDestination();
+}
+
+void ReserveDestination::ReturnDestination()
+{
+    if (nIndex != -1) {
+        m_spk_man->ReturnDestination(nIndex, fInternal, address);
+    }
+    nIndex = -1;
+    address = CNoDestination();
+}
+
+bool CWallet::DisplayAddress(const CTxDestination& dest)
+{
+    CScript scriptPubKey = GetScriptForDestination(dest);
+    for (const auto& spk_man : GetScriptPubKeyMans(scriptPubKey)) {
+        auto signer_spk_man = dynamic_cast<ExternalSignerScriptPubKeyMan *>(spk_man);
+        if (signer_spk_man == nullptr) {
+            continue;
+        }
+        ExternalSigner signer = ExternalSignerScriptPubKeyMan::GetExternalSigner();
+        return signer_spk_man->DisplayAddress(scriptPubKey, signer);
+    }
+    return false;
+}
+
+bool CWallet::LockCoin(const COutPoint& output, WalletBatch* batch)
+{
+    AssertLockHeld(cs_wallet);
+    setLockedCoins.insert(output);
+    if (batch) {
+        return batch->WriteLockedUTXO(output);
+    }
+    return true;
+}
+
+bool CWallet::UnlockCoin(const COutPoint& output, WalletBatch* batch)
+{
+    AssertLockHeld(cs_wallet);
+    bool was_locked = setLockedCoins.erase(output);
+    if (batch && was_locked) {
+        return batch->EraseLockedUTXO(output);
+    }
+    return true;
+}
+
+bool CWallet::UnlockAllCoins()
+{
+    AssertLockHeld(cs_wallet);
+    bool success = true;
+    WalletBatch batch(GetDatabase());
+    for (auto it = setLockedCoins.begin(); it != setLockedCoins.end(); ++it) {
+        success &= batch.EraseLockedUTXO(*it);
+    }
+    setLockedCoins.clear();
+    return success;
+}
+
+bool CWallet::IsLockedCoin(uint256 hash, unsigned int n) const
+{
+    AssertLockHeld(cs_wallet);
+    COutPoint outpt(hash, n);
+
+    return (setLockedCoins.count(outpt) > 0);
+}
+
+void CWallet::ListLockedCoins(std::vector<COutPoint>& vOutpts) const
+{
+    AssertLockHeld(cs_wallet);
+    for (std::set<COutPoint>::iterator it = setLockedCoins.begin();
+         it != setLockedCoins.end(); it++) {
+        COutPoint outpt = (*it);
+        vOutpts.push_back(outpt);
+    }
+}
+
+/** @} */ // end of Actions
+
+void CWallet::GetKeyBirthTimes(std::map<CKeyID, int64_t>& mapKeyBirth) const {
+    AssertLockHeld(cs_wallet);
+    mapKeyBirth.clear();
+
+    // map in which we'll infer heights of other keys
+    std::map<CKeyID, const TxStateConfirmed*> mapKeyFirstBlock;
+    TxStateConfirmed max_confirm{uint256{}, /*height=*/-1, /*index=*/-1};
+    max_confirm.confirmed_block_height = GetLastBlockHeight() > 144 ? GetLastBlockHeight() - 144 : 0; // the tip can be reorganized; use a 144-block safety margin
+    CHECK_NONFATAL(chain().findAncestorByHeight(GetLastBlockHash(), max_confirm.confirmed_block_height, FoundBlock().hash(max_confirm.confirmed_block_hash)));
+
+    {
+        LegacyScriptPubKeyMan* spk_man = GetLegacyScriptPubKeyMan();
+        assert(spk_man != nullptr);
+        LOCK(spk_man->cs_KeyStore);
+
+        // get birth times for keys with metadata
+        for (const auto& entry : spk_man->mapKeyMetadata) {
+            if (entry.second.nCreateTime) {
+                mapKeyBirth[entry.first] = entry.second.nCreateTime;
+            }
+        }
+
+        // Prepare to infer birth heights for keys without metadata
+        for (const CKeyID &keyid : spk_man->GetKeys()) {
+            if (mapKeyBirth.count(keyid) == 0)
+                mapKeyFirstBlock[keyid] = &max_confirm;
+        }
+
+        // if there are no such keys, we're done
+        if (mapKeyFirstBlock.empty())
+            return;
+
+        // find first block that affects those keys, if there are any left
+        for (const auto& entry : mapWallet) {
+            // iterate over all wallet transactions...
+            const CWalletTx &wtx = entry.second;
+            if (auto* conf = wtx.state<TxStateConfirmed>()) {
+                // ... which are already in a block
+                for (const CTxOut &txout : wtx.tx->vout) {
+                    // iterate over all their outputs
+                    for (const auto &keyid : GetAffectedKeys(txout.scriptPubKey, *spk_man)) {
+                        // ... and all their affected keys
+                        auto rit = mapKeyFirstBlock.find(keyid);
+                        if (rit != mapKeyFirstBlock.end() && conf->confirmed_block_height < rit->second->confirmed_block_height) {
+                            rit->second = conf;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // Extract block timestamps for those keys
+    for (const auto& entry : mapKeyFirstBlock) {
+        int64_t block_time;
+        CHECK_NONFATAL(chain().findBlock(entry.second->confirmed_block_hash, FoundBlock().time(block_time)));
+        mapKeyBirth[entry.first] = block_time - TIMESTAMP_WINDOW; // block times can be 2h off
+    }
+}
+
+/**
+ * Compute smart timestamp for a transaction being added to the wallet.
+ *
+ * Logic:
+ * - If sending a transaction, assign its timestamp to the current time.
+ * - If receiving a transaction outside a block, assign its timestamp to the
+ *   current time.
+ * - If receiving a transaction during a rescanning process, assign all its
+ *   (not already known) transactions' timestamps to the block time.
+ * - If receiving a block with a future timestamp, assign all its (not already
+ *   known) transactions' timestamps to the current time.
+ * - If receiving a block with a past timestamp, before the most recent known
+ *   transaction (that we care about), assign all its (not already known)
+ *   transactions' timestamps to the same timestamp as that most-recent-known
+ *   transaction.
+ * - If receiving a block with a past timestamp, but after the most recent known
+ *   transaction, assign all its (not already known) transactions' timestamps to
+ *   the block time.
+ *
+ * For more information see CWalletTx::nTimeSmart,
+ * https://bitcointalk.org/?topic=54527, or
+ * https://github.com/bitcoin/bitcoin/pull/1393.
+ */
+unsigned int CWallet::ComputeTimeSmart(const CWalletTx& wtx, bool rescanning_old_block) const
+{
+    std::optional<uint256> block_hash;
+    if (auto* conf = wtx.state<TxStateConfirmed>()) {
+        block_hash = conf->confirmed_block_hash;
+    } else if (auto* conf = wtx.state<TxStateConflicted>()) {
+        block_hash = conf->conflicting_block_hash;
+    }
+
+    unsigned int nTimeSmart = wtx.nTimeReceived;
+    if (block_hash) {
+        int64_t blocktime;
+        int64_t block_max_time;
+        if (chain().findBlock(*block_hash, FoundBlock().time(blocktime).maxTime(block_max_time))) {
+            if (rescanning_old_block) {
+                nTimeSmart = block_max_time;
+            } else {
+                int64_t latestNow = wtx.nTimeReceived;
+                int64_t latestEntry = 0;
+
+                // Tolerate times up to the last timestamp in the wallet not more than 5 minutes into the future
+                int64_t latestTolerated = latestNow + 300;
+                const TxItems& txOrdered = wtxOrdered;
+                for (auto it = txOrdered.rbegin(); it != txOrdered.rend(); ++it) {
