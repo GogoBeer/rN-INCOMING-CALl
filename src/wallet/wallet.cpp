@@ -2035,4 +2035,246 @@ void CWallet::CommitTransaction(CTransactionRef tx, mapValue_t mapValue, std::ve
         CHECK_NONFATAL(wtx.vOrderForm.empty());
         wtx.mapValue = std::move(mapValue);
         wtx.vOrderForm = std::move(orderForm);
-        wtx.fTimeReceivedIsTxTime = tru
+        wtx.fTimeReceivedIsTxTime = true;
+        wtx.fFromMe = true;
+        return true;
+    });
+
+    // Notify that old coins are spent
+    for (const CTxIn& txin : tx->vin) {
+        CWalletTx &coin = mapWallet.at(txin.prevout.hash);
+        coin.MarkDirty();
+        NotifyTransactionChanged(coin.GetHash(), CT_UPDATED);
+    }
+
+    // Get the inserted-CWalletTx from mapWallet so that the
+    // wtx cached mempool state is updated correctly
+    CWalletTx& wtx = mapWallet.at(tx->GetHash());
+
+    if (!fBroadcastTransactions) {
+        // Don't submit tx to the mempool
+        return;
+    }
+
+    std::string err_string;
+    if (!SubmitTxMemoryPoolAndRelay(wtx, err_string, true)) {
+        WalletLogPrintf("CommitTransaction(): Transaction cannot be broadcast immediately, %s\n", err_string);
+        // TODO: if we expect the failure to be long term or permanent, instead delete wtx from the wallet and return failure.
+    }
+}
+
+DBErrors CWallet::LoadWallet()
+{
+    LOCK(cs_wallet);
+
+    DBErrors nLoadWalletRet = WalletBatch(GetDatabase()).LoadWallet(this);
+    if (nLoadWalletRet == DBErrors::NEED_REWRITE)
+    {
+        if (GetDatabase().Rewrite("\x04pool"))
+        {
+            for (const auto& spk_man_pair : m_spk_managers) {
+                spk_man_pair.second->RewriteDB();
+            }
+        }
+    }
+
+    if (m_spk_managers.empty()) {
+        assert(m_external_spk_managers.empty());
+        assert(m_internal_spk_managers.empty());
+    }
+
+    return nLoadWalletRet;
+}
+
+DBErrors CWallet::ZapSelectTx(std::vector<uint256>& vHashIn, std::vector<uint256>& vHashOut)
+{
+    AssertLockHeld(cs_wallet);
+    DBErrors nZapSelectTxRet = WalletBatch(GetDatabase()).ZapSelectTx(vHashIn, vHashOut);
+    for (const uint256& hash : vHashOut) {
+        const auto& it = mapWallet.find(hash);
+        wtxOrdered.erase(it->second.m_it_wtxOrdered);
+        for (const auto& txin : it->second.tx->vin)
+            mapTxSpends.erase(txin.prevout);
+        mapWallet.erase(it);
+        NotifyTransactionChanged(hash, CT_DELETED);
+    }
+
+    if (nZapSelectTxRet == DBErrors::NEED_REWRITE)
+    {
+        if (GetDatabase().Rewrite("\x04pool"))
+        {
+            for (const auto& spk_man_pair : m_spk_managers) {
+                spk_man_pair.second->RewriteDB();
+            }
+        }
+    }
+
+    if (nZapSelectTxRet != DBErrors::LOAD_OK)
+        return nZapSelectTxRet;
+
+    MarkDirty();
+
+    return DBErrors::LOAD_OK;
+}
+
+bool CWallet::SetAddressBookWithDB(WalletBatch& batch, const CTxDestination& address, const std::string& strName, const std::string& strPurpose)
+{
+    bool fUpdated = false;
+    bool is_mine;
+    {
+        LOCK(cs_wallet);
+        std::map<CTxDestination, CAddressBookData>::iterator mi = m_address_book.find(address);
+        fUpdated = (mi != m_address_book.end() && !mi->second.IsChange());
+        m_address_book[address].SetLabel(strName);
+        if (!strPurpose.empty()) /* update purpose only if requested */
+            m_address_book[address].purpose = strPurpose;
+        is_mine = IsMine(address) != ISMINE_NO;
+    }
+    NotifyAddressBookChanged(address, strName, is_mine,
+                             strPurpose, (fUpdated ? CT_UPDATED : CT_NEW));
+    if (!strPurpose.empty() && !batch.WritePurpose(EncodeDestination(address), strPurpose))
+        return false;
+    return batch.WriteName(EncodeDestination(address), strName);
+}
+
+bool CWallet::SetAddressBook(const CTxDestination& address, const std::string& strName, const std::string& strPurpose)
+{
+    WalletBatch batch(GetDatabase());
+    return SetAddressBookWithDB(batch, address, strName, strPurpose);
+}
+
+bool CWallet::DelAddressBook(const CTxDestination& address)
+{
+    bool is_mine;
+    WalletBatch batch(GetDatabase());
+    {
+        LOCK(cs_wallet);
+        // If we want to delete receiving addresses, we need to take care that DestData "used" (and possibly newer DestData) gets preserved (and the "deleted" address transformed into a change entry instead of actually being deleted)
+        // NOTE: This isn't a problem for sending addresses because they never have any DestData yet!
+        // When adding new DestData, it should be considered here whether to retain or delete it (or move it?).
+        if (IsMine(address)) {
+            WalletLogPrintf("%s called with IsMine address, NOT SUPPORTED. Please report this bug! %s\n", __func__, PACKAGE_BUGREPORT);
+            return false;
+        }
+        // Delete destdata tuples associated with address
+        std::string strAddress = EncodeDestination(address);
+        for (const std::pair<const std::string, std::string> &item : m_address_book[address].destdata)
+        {
+            batch.EraseDestData(strAddress, item.first);
+        }
+        m_address_book.erase(address);
+        is_mine = IsMine(address) != ISMINE_NO;
+    }
+
+    NotifyAddressBookChanged(address, "", is_mine, "", CT_DELETED);
+
+    batch.ErasePurpose(EncodeDestination(address));
+    return batch.EraseName(EncodeDestination(address));
+}
+
+size_t CWallet::KeypoolCountExternalKeys() const
+{
+    AssertLockHeld(cs_wallet);
+
+    auto legacy_spk_man = GetLegacyScriptPubKeyMan();
+    if (legacy_spk_man) {
+        return legacy_spk_man->KeypoolCountExternalKeys();
+    }
+
+    unsigned int count = 0;
+    for (auto spk_man : m_external_spk_managers) {
+        count += spk_man.second->GetKeyPoolSize();
+    }
+
+    return count;
+}
+
+unsigned int CWallet::GetKeyPoolSize() const
+{
+    AssertLockHeld(cs_wallet);
+
+    unsigned int count = 0;
+    for (auto spk_man : GetActiveScriptPubKeyMans()) {
+        count += spk_man->GetKeyPoolSize();
+    }
+    return count;
+}
+
+bool CWallet::TopUpKeyPool(unsigned int kpSize)
+{
+    LOCK(cs_wallet);
+    bool res = true;
+    for (auto spk_man : GetActiveScriptPubKeyMans()) {
+        res &= spk_man->TopUp(kpSize);
+    }
+    return res;
+}
+
+bool CWallet::GetNewDestination(const OutputType type, const std::string label, CTxDestination& dest, bilingual_str& error)
+{
+    LOCK(cs_wallet);
+    error.clear();
+    bool result = false;
+    auto spk_man = GetScriptPubKeyMan(type, false /* internal */);
+    if (spk_man) {
+        spk_man->TopUp();
+        result = spk_man->GetNewDestination(type, dest, error);
+    } else {
+        error = strprintf(_("Error: No %s addresses available."), FormatOutputType(type));
+    }
+    if (result) {
+        SetAddressBook(dest, label, "receive");
+    }
+
+    return result;
+}
+
+bool CWallet::GetNewChangeDestination(const OutputType type, CTxDestination& dest, bilingual_str& error)
+{
+    LOCK(cs_wallet);
+    error.clear();
+
+    ReserveDestination reservedest(this, type);
+    if (!reservedest.GetReservedDestination(dest, true, error)) {
+        return false;
+    }
+
+    reservedest.KeepDestination();
+    return true;
+}
+
+std::optional<int64_t> CWallet::GetOldestKeyPoolTime() const
+{
+    LOCK(cs_wallet);
+    if (m_spk_managers.empty()) {
+        return std::nullopt;
+    }
+
+    std::optional<int64_t> oldest_key{std::numeric_limits<int64_t>::max()};
+    for (const auto& spk_man_pair : m_spk_managers) {
+        oldest_key = std::min(oldest_key, spk_man_pair.second->GetOldestKeyPoolTime());
+    }
+    return oldest_key;
+}
+
+void CWallet::MarkDestinationsDirty(const std::set<CTxDestination>& destinations) {
+    for (auto& entry : mapWallet) {
+        CWalletTx& wtx = entry.second;
+        if (wtx.m_is_cache_empty) continue;
+        for (unsigned int i = 0; i < wtx.tx->vout.size(); i++) {
+            CTxDestination dst;
+            if (ExtractDestination(wtx.tx->vout[i].scriptPubKey, dst) && destinations.count(dst)) {
+                wtx.MarkDirty();
+                break;
+            }
+        }
+    }
+}
+
+std::set<CTxDestination> CWallet::GetLabelAddresses(const std::string& label) const
+{
+    AssertLockHeld(cs_wallet);
+    std::set<CTxDestination> result;
+    for (const std::pair<const CTxDestination, CAddressBookData>& item : m_address_book)
+    {
+        if (item.second.I
