@@ -2500,3 +2500,179 @@ unsigned int CWallet::ComputeTimeSmart(const CWalletTx& wtx, bool rescanning_old
                 int64_t latestTolerated = latestNow + 300;
                 const TxItems& txOrdered = wtxOrdered;
                 for (auto it = txOrdered.rbegin(); it != txOrdered.rend(); ++it) {
+                    CWalletTx* const pwtx = it->second;
+                    if (pwtx == &wtx) {
+                        continue;
+                    }
+                    int64_t nSmartTime;
+                    nSmartTime = pwtx->nTimeSmart;
+                    if (!nSmartTime) {
+                        nSmartTime = pwtx->nTimeReceived;
+                    }
+                    if (nSmartTime <= latestTolerated) {
+                        latestEntry = nSmartTime;
+                        if (nSmartTime > latestNow) {
+                            latestNow = nSmartTime;
+                        }
+                        break;
+                    }
+                }
+
+                nTimeSmart = std::max(latestEntry, std::min(blocktime, latestNow));
+            }
+        } else {
+            WalletLogPrintf("%s: found %s in block %s not in index\n", __func__, wtx.GetHash().ToString(), block_hash->ToString());
+        }
+    }
+    return nTimeSmart;
+}
+
+bool CWallet::SetAddressUsed(WalletBatch& batch, const CTxDestination& dest, bool used)
+{
+    const std::string key{"used"};
+    if (std::get_if<CNoDestination>(&dest))
+        return false;
+
+    if (!used) {
+        if (auto* data = util::FindKey(m_address_book, dest)) data->destdata.erase(key);
+        return batch.EraseDestData(EncodeDestination(dest), key);
+    }
+
+    const std::string value{"1"};
+    m_address_book[dest].destdata.insert(std::make_pair(key, value));
+    return batch.WriteDestData(EncodeDestination(dest), key, value);
+}
+
+void CWallet::LoadDestData(const CTxDestination &dest, const std::string &key, const std::string &value)
+{
+    m_address_book[dest].destdata.insert(std::make_pair(key, value));
+}
+
+bool CWallet::IsAddressUsed(const CTxDestination& dest) const
+{
+    const std::string key{"used"};
+    std::map<CTxDestination, CAddressBookData>::const_iterator i = m_address_book.find(dest);
+    if(i != m_address_book.end())
+    {
+        CAddressBookData::StringMap::const_iterator j = i->second.destdata.find(key);
+        if(j != i->second.destdata.end())
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+std::vector<std::string> CWallet::GetAddressReceiveRequests() const
+{
+    const std::string prefix{"rr"};
+    std::vector<std::string> values;
+    for (const auto& address : m_address_book) {
+        for (const auto& data : address.second.destdata) {
+            if (!data.first.compare(0, prefix.size(), prefix)) {
+                values.emplace_back(data.second);
+            }
+        }
+    }
+    return values;
+}
+
+bool CWallet::SetAddressReceiveRequest(WalletBatch& batch, const CTxDestination& dest, const std::string& id, const std::string& value)
+{
+    const std::string key{"rr" + id}; // "rr" prefix = "receive request" in destdata
+    CAddressBookData& data = m_address_book.at(dest);
+    if (value.empty()) {
+        if (!batch.EraseDestData(EncodeDestination(dest), key)) return false;
+        data.destdata.erase(key);
+    } else {
+        if (!batch.WriteDestData(EncodeDestination(dest), key, value)) return false;
+        data.destdata[key] = value;
+    }
+    return true;
+}
+
+std::unique_ptr<WalletDatabase> MakeWalletDatabase(const std::string& name, const DatabaseOptions& options, DatabaseStatus& status, bilingual_str& error_string)
+{
+    // Do some checking on wallet path. It should be either a:
+    //
+    // 1. Path where a directory can be created.
+    // 2. Path to an existing directory.
+    // 3. Path to a symlink to a directory.
+    // 4. For backwards compatibility, the name of a data file in -walletdir.
+    const fs::path wallet_path = fsbridge::AbsPathJoin(GetWalletDir(), fs::PathFromString(name));
+    fs::file_type path_type = fs::symlink_status(wallet_path).type();
+    if (!(path_type == fs::file_not_found || path_type == fs::directory_file ||
+          (path_type == fs::symlink_file && fs::is_directory(wallet_path)) ||
+          (path_type == fs::regular_file && fs::PathFromString(name).filename() == fs::PathFromString(name)))) {
+        error_string = Untranslated(strprintf(
+              "Invalid -wallet path '%s'. -wallet path should point to a directory where wallet.dat and "
+              "database/log.?????????? files can be stored, a location where such a directory could be created, "
+              "or (for backwards compatibility) the name of an existing data file in -walletdir (%s)",
+              name, fs::quoted(fs::PathToString(GetWalletDir()))));
+        status = DatabaseStatus::FAILED_BAD_PATH;
+        return nullptr;
+    }
+    return MakeDatabase(wallet_path, options, status, error_string);
+}
+
+std::shared_ptr<CWallet> CWallet::Create(WalletContext& context, const std::string& name, std::unique_ptr<WalletDatabase> database, uint64_t wallet_creation_flags, bilingual_str& error, std::vector<bilingual_str>& warnings)
+{
+    interfaces::Chain* chain = context.chain;
+    ArgsManager& args = *Assert(context.args);
+    const std::string& walletFile = database->Filename();
+
+    int64_t nStart = GetTimeMillis();
+    // TODO: Can't use std::make_shared because we need a custom deleter but
+    // should be possible to use std::allocate_shared.
+    const std::shared_ptr<CWallet> walletInstance(new CWallet(chain, name, args, std::move(database)), ReleaseWallet);
+    bool rescan_required = false;
+    DBErrors nLoadWalletRet = walletInstance->LoadWallet();
+    if (nLoadWalletRet != DBErrors::LOAD_OK) {
+        if (nLoadWalletRet == DBErrors::CORRUPT) {
+            error = strprintf(_("Error loading %s: Wallet corrupted"), walletFile);
+            return nullptr;
+        }
+        else if (nLoadWalletRet == DBErrors::NONCRITICAL_ERROR)
+        {
+            warnings.push_back(strprintf(_("Error reading %s! All keys read correctly, but transaction data"
+                                           " or address book entries might be missing or incorrect."),
+                walletFile));
+        }
+        else if (nLoadWalletRet == DBErrors::TOO_NEW) {
+            error = strprintf(_("Error loading %s: Wallet requires newer version of %s"), walletFile, PACKAGE_NAME);
+            return nullptr;
+        }
+        else if (nLoadWalletRet == DBErrors::NEED_REWRITE)
+        {
+            error = strprintf(_("Wallet needed to be rewritten: restart %s to complete"), PACKAGE_NAME);
+            return nullptr;
+        } else if (nLoadWalletRet == DBErrors::NEED_RESCAN) {
+            warnings.push_back(strprintf(_("Error reading %s! Transaction data may be missing or incorrect."
+                                           " Rescanning wallet."), walletFile));
+            rescan_required = true;
+        }
+        else {
+            error = strprintf(_("Error loading %s"), walletFile);
+            return nullptr;
+        }
+    }
+
+    // This wallet is in its first run if there are no ScriptPubKeyMans and it isn't blank or no privkeys
+    const bool fFirstRun = walletInstance->m_spk_managers.empty() &&
+                     !walletInstance->IsWalletFlagSet(WALLET_FLAG_DISABLE_PRIVATE_KEYS) &&
+                     !walletInstance->IsWalletFlagSet(WALLET_FLAG_BLANK_WALLET);
+    if (fFirstRun)
+    {
+        // ensure this wallet.dat can only be opened by clients supporting HD with chain split and expects no default key
+        walletInstance->SetMinVersion(FEATURE_LATEST);
+
+        walletInstance->AddWalletFlags(wallet_creation_flags);
+
+        // Only create LegacyScriptPubKeyMan when not descriptor wallet
+        if (!walletInstance->IsWalletFlagSet(WALLET_FLAG_DESCRIPTORS)) {
+            walletInstance->SetupLegacyScriptPubKeyMan();
+        }
+
+        if ((wallet_creation_flags & WALLET_FLAG_EXTERNAL_SIGNER) || !(wallet_creation_flags & (WALLET_FLAG_DISABLE_PRIVATE_KEYS | WALLET_FLAG_BLANK_WALLET))) {
+            LOCK(walletInstance->cs_wallet);
+            if
