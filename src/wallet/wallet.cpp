@@ -2831,4 +2831,193 @@ std::shared_ptr<CWallet> CWallet::Create(WalletContext& context, const std::stri
     }
 
     walletInstance->m_confirm_target = args.GetIntArg("-txconfirmtarget", DEFAULT_TX_CONFIRM_TARGET);
-    walletInstance->m_spend_zero_conf_change = args.GetBoolArg("-spendzeroco
+    walletInstance->m_spend_zero_conf_change = args.GetBoolArg("-spendzeroconfchange", DEFAULT_SPEND_ZEROCONF_CHANGE);
+    walletInstance->m_signal_rbf = args.GetBoolArg("-walletrbf", DEFAULT_WALLET_RBF);
+
+    walletInstance->WalletLogPrintf("Wallet completed loading in %15dms\n", GetTimeMillis() - nStart);
+
+    // Try to top up keypool. No-op if the wallet is locked.
+    walletInstance->TopUpKeyPool();
+
+    if (chain && !AttachChain(walletInstance, *chain, rescan_required, error, warnings)) {
+        return nullptr;
+    }
+
+    {
+        LOCK(context.wallets_mutex);
+        for (auto& load_wallet : context.wallet_load_fns) {
+            load_wallet(interfaces::MakeWallet(context, walletInstance));
+        }
+    }
+
+    {
+        LOCK(walletInstance->cs_wallet);
+        walletInstance->SetBroadcastTransactions(args.GetBoolArg("-walletbroadcast", DEFAULT_WALLETBROADCAST));
+        walletInstance->WalletLogPrintf("setKeyPool.size() = %u\n",      walletInstance->GetKeyPoolSize());
+        walletInstance->WalletLogPrintf("mapWallet.size() = %u\n",       walletInstance->mapWallet.size());
+        walletInstance->WalletLogPrintf("m_address_book.size() = %u\n",  walletInstance->m_address_book.size());
+    }
+
+    return walletInstance;
+}
+
+bool CWallet::AttachChain(const std::shared_ptr<CWallet>& walletInstance, interfaces::Chain& chain, const bool rescan_required, bilingual_str& error, std::vector<bilingual_str>& warnings)
+{
+    LOCK(walletInstance->cs_wallet);
+    // allow setting the chain if it hasn't been set already but prevent changing it
+    assert(!walletInstance->m_chain || walletInstance->m_chain == &chain);
+    walletInstance->m_chain = &chain;
+
+    // Register wallet with validationinterface. It's done before rescan to avoid
+    // missing block connections between end of rescan and validation subscribing.
+    // Because of wallet lock being hold, block connection notifications are going to
+    // be pending on the validation-side until lock release. It's likely to have
+    // block processing duplicata (if rescan block range overlaps with notification one)
+    // but we guarantee at least than wallet state is correct after notifications delivery.
+    // This is temporary until rescan and notifications delivery are unified under same
+    // interface.
+    walletInstance->m_chain_notifications_handler = walletInstance->chain().handleNotifications(walletInstance);
+
+    // If rescan_required = true, rescan_height remains equal to 0
+    int rescan_height = 0;
+    if (!rescan_required)
+    {
+        WalletBatch batch(walletInstance->GetDatabase());
+        CBlockLocator locator;
+        if (batch.ReadBestBlock(locator)) {
+            if (const std::optional<int> fork_height = chain.findLocatorFork(locator)) {
+                rescan_height = *fork_height;
+            }
+        }
+    }
+
+    const std::optional<int> tip_height = chain.getHeight();
+    if (tip_height) {
+        walletInstance->m_last_block_processed = chain.getBlockHash(*tip_height);
+        walletInstance->m_last_block_processed_height = *tip_height;
+    } else {
+        walletInstance->m_last_block_processed.SetNull();
+        walletInstance->m_last_block_processed_height = -1;
+    }
+
+    if (tip_height && *tip_height != rescan_height)
+    {
+        if (chain.havePruned()) {
+            int block_height = *tip_height;
+            while (block_height > 0 && chain.haveBlockOnDisk(block_height - 1) && rescan_height != block_height) {
+                --block_height;
+            }
+
+            if (rescan_height != block_height) {
+                // We can't rescan beyond non-pruned blocks, stop and throw an error.
+                // This might happen if a user uses an old wallet within a pruned node
+                // or if they ran -disablewallet for a longer time, then decided to re-enable
+                // Exit early and print an error.
+                // If a block is pruned after this check, we will load the wallet,
+                // but fail the rescan with a generic error.
+                error = _("Prune: last wallet synchronisation goes beyond pruned data. You need to -reindex (download the whole blockchain again in case of pruned node)");
+                return false;
+            }
+        }
+
+        chain.initMessage(_("Rescanning…").translated);
+        walletInstance->WalletLogPrintf("Rescanning last %i blocks (from block %i)...\n", *tip_height - rescan_height, rescan_height);
+
+        // No need to read and scan block if block was created before
+        // our wallet birthday (as adjusted for block time variability)
+        std::optional<int64_t> time_first_key;
+        for (auto spk_man : walletInstance->GetAllScriptPubKeyMans()) {
+            int64_t time = spk_man->GetTimeFirstKey();
+            if (!time_first_key || time < *time_first_key) time_first_key = time;
+        }
+        if (time_first_key) {
+            chain.findFirstBlockWithTimeAndHeight(*time_first_key - TIMESTAMP_WINDOW, rescan_height, FoundBlock().height(rescan_height));
+        }
+
+        {
+            WalletRescanReserver reserver(*walletInstance);
+            if (!reserver.reserve() || (ScanResult::SUCCESS != walletInstance->ScanForWalletTransactions(chain.getBlockHash(rescan_height), rescan_height, {} /* max height */, reserver, true /* update */).status)) {
+                error = _("Failed to rescan the wallet during initialization");
+                return false;
+            }
+        }
+        walletInstance->chainStateFlushed(chain.getTipLocator());
+        walletInstance->GetDatabase().IncrementUpdateCounter();
+    }
+
+    return true;
+}
+
+const CAddressBookData* CWallet::FindAddressBookEntry(const CTxDestination& dest, bool allow_change) const
+{
+    const auto& address_book_it = m_address_book.find(dest);
+    if (address_book_it == m_address_book.end()) return nullptr;
+    if ((!allow_change) && address_book_it->second.IsChange()) {
+        return nullptr;
+    }
+    return &address_book_it->second;
+}
+
+bool CWallet::UpgradeWallet(int version, bilingual_str& error)
+{
+    int prev_version = GetVersion();
+    if (version == 0) {
+        WalletLogPrintf("Performing wallet upgrade to %i\n", FEATURE_LATEST);
+        version = FEATURE_LATEST;
+    } else {
+        WalletLogPrintf("Allowing wallet upgrade up to %i\n", version);
+    }
+    if (version < prev_version) {
+        error = strprintf(_("Cannot downgrade wallet from version %i to version %i. Wallet version unchanged."), prev_version, version);
+        return false;
+    }
+
+    LOCK(cs_wallet);
+
+    // Do not upgrade versions to any version between HD_SPLIT and FEATURE_PRE_SPLIT_KEYPOOL unless already supporting HD_SPLIT
+    if (!CanSupportFeature(FEATURE_HD_SPLIT) && version >= FEATURE_HD_SPLIT && version < FEATURE_PRE_SPLIT_KEYPOOL) {
+        error = strprintf(_("Cannot upgrade a non HD split wallet from version %i to version %i without upgrading to support pre-split keypool. Please use version %i or no version specified."), prev_version, version, FEATURE_PRE_SPLIT_KEYPOOL);
+        return false;
+    }
+
+    // Permanently upgrade to the version
+    SetMinVersion(GetClosestWalletFeature(version));
+
+    for (auto spk_man : GetActiveScriptPubKeyMans()) {
+        if (!spk_man->Upgrade(prev_version, version, error)) {
+            return false;
+        }
+    }
+    return true;
+}
+
+void CWallet::postInitProcess()
+{
+    LOCK(cs_wallet);
+
+    // Add wallet transactions that aren't already in a block to mempool
+    // Do this here as mempool requires genesis block to be loaded
+    ReacceptWalletTransactions();
+
+    // Update wallet transactions with current mempool transactions.
+    chain().requestMempoolTransactions(*this);
+}
+
+bool CWallet::BackupWallet(const std::string& strDest) const
+{
+    return GetDatabase().Backup(strDest);
+}
+
+CKeyPool::CKeyPool()
+{
+    nTime = GetTime();
+    fInternal = false;
+    m_pre_split = false;
+}
+
+CKeyPool::CKeyPool(const CPubKey& vchPubKeyIn, bool internalIn)
+{
+    nTime = GetTime();
+    vchPubKey = vchPubKeyIn;
+    fInternal = internalIn;
+    m_pre_spli
