@@ -146,3 +146,76 @@ bool ExecuteWalletToolFunc(const ArgsManager& args, const std::string& command)
         bool make_descriptors = (!args.IsArgSet("-descriptors") && !args.IsArgSet("-legacy")) || (args.IsArgSet("-descriptors") && args.GetBoolArg("-descriptors", true));
         if (make_legacy && make_descriptors) {
             tfm::format(std::cerr, "Only one of -legacy or -descriptors can be set to true, not both\n");
+            return false;
+        }
+        if (!make_legacy && !make_descriptors) {
+            tfm::format(std::cerr, "One of -legacy or -descriptors must be set to true (or omitted)\n");
+            return false;
+        }
+        if (make_descriptors) {
+            options.create_flags |= WALLET_FLAG_DESCRIPTORS;
+            options.require_format = DatabaseFormat::SQLITE;
+        }
+
+        const std::shared_ptr<CWallet> wallet_instance = MakeWallet(name, path, args, options);
+        if (wallet_instance) {
+            WalletShowInfo(wallet_instance.get());
+            wallet_instance->Close();
+        }
+    } else if (command == "info") {
+        DatabaseOptions options;
+        options.require_existing = true;
+        const std::shared_ptr<CWallet> wallet_instance = MakeWallet(name, path, args, options);
+        if (!wallet_instance) return false;
+        WalletShowInfo(wallet_instance.get());
+        wallet_instance->Close();
+    } else if (command == "salvage") {
+#ifdef USE_BDB
+        bilingual_str error;
+        std::vector<bilingual_str> warnings;
+        bool ret = RecoverDatabaseFile(path, error, warnings);
+        if (!ret) {
+            for (const auto& warning : warnings) {
+                tfm::format(std::cerr, "%s\n", warning.original);
+            }
+            if (!error.empty()) {
+                tfm::format(std::cerr, "%s\n", error.original);
+            }
+        }
+        return ret;
+#else
+        tfm::format(std::cerr, "Salvage command is not available as BDB support is not compiled");
+        return false;
+#endif
+    } else if (command == "dump") {
+        DatabaseOptions options;
+        options.require_existing = true;
+        const std::shared_ptr<CWallet> wallet_instance = MakeWallet(name, path, args, options);
+        if (!wallet_instance) return false;
+        bilingual_str error;
+        bool ret = DumpWallet(*wallet_instance, error);
+        if (!ret && !error.empty()) {
+            tfm::format(std::cerr, "%s\n", error.original);
+            return ret;
+        }
+        tfm::format(std::cout, "The dumpfile may contain private keys. To ensure the safety of your Bitcoin, do not share the dumpfile.\n");
+        return ret;
+    } else if (command == "createfromdump") {
+        bilingual_str error;
+        std::vector<bilingual_str> warnings;
+        bool ret = CreateFromDump(name, path, error, warnings);
+        for (const auto& warning : warnings) {
+            tfm::format(std::cout, "%s\n", warning.original);
+        }
+        if (!ret && !error.empty()) {
+            tfm::format(std::cerr, "%s\n", error.original);
+        }
+        return ret;
+    } else {
+        tfm::format(std::cerr, "Invalid command: %s\n", command);
+        return false;
+    }
+
+    return true;
+}
+} // namespace WalletTool
