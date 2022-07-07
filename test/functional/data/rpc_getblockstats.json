@@ -179,3 +179,44 @@
       "totalfee": 4460,
       "txs": 2,
       "utxo_increase": 3,
+      "utxo_size_inc": 236
+    },
+    {
+      "avgfee": 24906,
+      "avgfeerate": 121,
+      "avgtxsize": 231,
+      "blockhash": "53e416e2538bc783c42a7aea566e884321afed893e9e58cf356d6429759dfa46",
+      "feerate_percentiles": [
+        20,
+        20,
+        20,
+        300,
+        300
+      ],
+      "height": 103,
+      "ins": 3,
+      "maxfee": 66900,
+      "maxfeerate": 300,
+      "maxtxsize": 249,
+      "medianfee": 4460,
+      "mediantime": 1525107243,
+      "mediantxsize": 223,
+      "minfee": 3360,
+      "minfeerate": 20,
+      "mintxsize": 223,
+      "outs": 8,
+      "subsidy": 5000000000,
+      "swtotal_size": 249,
+      "swtotal_weight": 669,
+      "swtxs": 1,
+      "time": 1525107243,
+      "total_out": 9999920820,
+      "total_size": 695,
+      "total_weight": 2453,
+      "totalfee": 74720,
+      "txs": 4,
+      "utxo_increase": 5,
+      "utxo_size_inc": 384
+    }
+  ]
+}
