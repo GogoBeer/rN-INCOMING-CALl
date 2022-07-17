@@ -299,4 +299,151 @@ class BIP68_112_113Test(BitcoinTestFramework):
         # add BIP 68 txs
         success_txs.extend(all_rlt_txs(bip68txs_v1))
         # add BIP 112 with seq=10 txs
-        success_txs.extend(all_rlt_txs(bip112tx
+        success_txs.extend(all_rlt_txs(bip112txs_vary_nSequence_v1))
+        success_txs.extend(all_rlt_txs(bip112txs_vary_OP_CSV_v1))
+        # try BIP 112 with seq=9 txs
+        success_txs.extend(all_rlt_txs(bip112txs_vary_nSequence_9_v1))
+        success_txs.extend(all_rlt_txs(bip112txs_vary_OP_CSV_9_v1))
+        self.send_blocks([self.create_test_block(success_txs)])
+        self.nodes[0].invalidateblock(self.nodes[0].getbestblockhash())
+
+        self.log.info("Test version 2 txs")
+
+        success_txs = []
+        # BIP113 tx, -1 CSV tx and empty stack CSV tx should succeed
+        bip113tx_v2.nLockTime = self.last_block_time - 600 * 5  # = MTP of prior block (not <) but < time put on current block
+        self.miniwallet.sign_tx(bip113tx_v2)
+        success_txs.append(bip113tx_v2)
+        success_txs.append(bip112tx_special_v2)
+        success_txs.append(bip112tx_emptystack_v2)
+        # add BIP 68 txs
+        success_txs.extend(all_rlt_txs(bip68txs_v2))
+        # add BIP 112 with seq=10 txs
+        success_txs.extend(all_rlt_txs(bip112txs_vary_nSequence_v2))
+        success_txs.extend(all_rlt_txs(bip112txs_vary_OP_CSV_v2))
+        # try BIP 112 with seq=9 txs
+        success_txs.extend(all_rlt_txs(bip112txs_vary_nSequence_9_v2))
+        success_txs.extend(all_rlt_txs(bip112txs_vary_OP_CSV_9_v2))
+        self.send_blocks([self.create_test_block(success_txs)])
+        self.nodes[0].invalidateblock(self.nodes[0].getbestblockhash())
+
+        # 1 more version 4 block to get us to height 432 so the fork should now be active for the next block
+        assert not softfork_active(self.nodes[0], 'csv')
+        test_blocks = self.generate_blocks(1)
+        self.send_blocks(test_blocks)
+        assert softfork_active(self.nodes[0], 'csv')
+
+        self.log.info("Post-Soft Fork Tests.")
+
+        self.log.info("BIP 113 tests")
+        # BIP 113 tests should now fail regardless of version number if nLockTime isn't satisfied by new rules
+        bip113tx_v1.nLockTime = self.last_block_time - 600 * 5  # = MTP of prior block (not <) but < time put on current block
+        self.miniwallet.sign_tx(bip113tx_v1)
+        bip113tx_v1.rehash()
+        bip113tx_v2.nLockTime = self.last_block_time - 600 * 5  # = MTP of prior block (not <) but < time put on current block
+        self.miniwallet.sign_tx(bip113tx_v2)
+        bip113tx_v2.rehash()
+        for bip113tx in [bip113tx_v1, bip113tx_v2]:
+            self.send_blocks([self.create_test_block([bip113tx])], success=False, reject_reason='bad-txns-nonfinal')
+
+        # BIP 113 tests should now pass if the locktime is < MTP
+        bip113tx_v1.nLockTime = self.last_block_time - 600 * 5 - 1  # < MTP of prior block
+        self.miniwallet.sign_tx(bip113tx_v1)
+        bip113tx_v1.rehash()
+        bip113tx_v2.nLockTime = self.last_block_time - 600 * 5 - 1  # < MTP of prior block
+        self.miniwallet.sign_tx(bip113tx_v2)
+        bip113tx_v2.rehash()
+        for bip113tx in [bip113tx_v1, bip113tx_v2]:
+            self.send_blocks([self.create_test_block([bip113tx])])
+            self.nodes[0].invalidateblock(self.nodes[0].getbestblockhash())
+
+        # Next block height = 437 after 4 blocks of random version
+        test_blocks = self.generate_blocks(4)
+        self.send_blocks(test_blocks)
+
+        self.log.info("BIP 68 tests")
+        self.log.info("Test version 1 txs - all should still pass")
+
+        success_txs = []
+        success_txs.extend(all_rlt_txs(bip68txs_v1))
+        self.send_blocks([self.create_test_block(success_txs)])
+        self.nodes[0].invalidateblock(self.nodes[0].getbestblockhash())
+
+        self.log.info("Test version 2 txs")
+
+        # All txs with SEQUENCE_LOCKTIME_DISABLE_FLAG set pass
+        bip68success_txs = [tx['tx'] for tx in bip68txs_v2 if tx['sdf']]
+        self.send_blocks([self.create_test_block(bip68success_txs)])
+        self.nodes[0].invalidateblock(self.nodes[0].getbestblockhash())
+
+        # All txs without flag fail as we are at delta height = 8 < 10 and delta time = 8 * 600 < 10 * 512
+        bip68timetxs = [tx['tx'] for tx in bip68txs_v2 if not tx['sdf'] and tx['stf']]
+        for tx in bip68timetxs:
+            self.send_blocks([self.create_test_block([tx])], success=False, reject_reason='bad-txns-nonfinal')
+
+        bip68heighttxs = [tx['tx'] for tx in bip68txs_v2 if not tx['sdf'] and not tx['stf']]
+        for tx in bip68heighttxs:
+            self.send_blocks([self.create_test_block([tx])], success=False, reject_reason='bad-txns-nonfinal')
+
+        # Advance one block to 438
+        test_blocks = self.generate_blocks(1)
+        self.send_blocks(test_blocks)
+
+        # Height txs should fail and time txs should now pass 9 * 600 > 10 * 512
+        bip68success_txs.extend(bip68timetxs)
+        self.send_blocks([self.create_test_block(bip68success_txs)])
+        self.nodes[0].invalidateblock(self.nodes[0].getbestblockhash())
+        for tx in bip68heighttxs:
+            self.send_blocks([self.create_test_block([tx])], success=False, reject_reason='bad-txns-nonfinal')
+
+        # Advance one block to 439
+        test_blocks = self.generate_blocks(1)
+        self.send_blocks(test_blocks)
+
+        # All BIP 68 txs should pass
+        bip68success_txs.extend(bip68heighttxs)
+        self.send_blocks([self.create_test_block(bip68success_txs)])
+        self.nodes[0].invalidateblock(self.nodes[0].getbestblockhash())
+
+        self.log.info("BIP 112 tests")
+        self.log.info("Test version 1 txs")
+
+        # -1 OP_CSV tx and (empty stack) OP_CSV tx should fail
+        self.send_blocks([self.create_test_block([bip112tx_special_v1])], success=False,
+                         reject_reason='non-mandatory-script-verify-flag (Negative locktime)')
+        self.send_blocks([self.create_test_block([bip112tx_emptystack_v1])], success=False,
+                         reject_reason='non-mandatory-script-verify-flag (Operation not valid with the current stack size)')
+        # If SEQUENCE_LOCKTIME_DISABLE_FLAG is set in argument to OP_CSV, version 1 txs should still pass
+
+        success_txs = [tx['tx'] for tx in bip112txs_vary_OP_CSV_v1 if tx['sdf']]
+        success_txs += [tx['tx'] for tx in bip112txs_vary_OP_CSV_9_v1 if tx['sdf']]
+        self.send_blocks([self.create_test_block(success_txs)])
+        self.nodes[0].invalidateblock(self.nodes[0].getbestblockhash())
+
+        # If SEQUENCE_LOCKTIME_DISABLE_FLAG is unset in argument to OP_CSV, version 1 txs should now fail
+        fail_txs = all_rlt_txs(bip112txs_vary_nSequence_v1)
+        fail_txs += all_rlt_txs(bip112txs_vary_nSequence_9_v1)
+        fail_txs += [tx['tx'] for tx in bip112txs_vary_OP_CSV_v1 if not tx['sdf']]
+        fail_txs += [tx['tx'] for tx in bip112txs_vary_OP_CSV_9_v1 if not tx['sdf']]
+        for tx in fail_txs:
+            self.send_blocks([self.create_test_block([tx])], success=False,
+                             reject_reason='non-mandatory-script-verify-flag (Locktime requirement not satisfied)')
+
+        self.log.info("Test version 2 txs")
+
+        # -1 OP_CSV tx and (empty stack) OP_CSV tx should fail
+        self.send_blocks([self.create_test_block([bip112tx_special_v2])], success=False,
+                         reject_reason='non-mandatory-script-verify-flag (Negative locktime)')
+        self.send_blocks([self.create_test_block([bip112tx_emptystack_v2])], success=False,
+                         reject_reason='non-mandatory-script-verify-flag (Operation not valid with the current stack size)')
+
+        # If SEQUENCE_LOCKTIME_DISABLE_FLAG is set in argument to OP_CSV, version 2 txs should pass (all sequence locks are met)
+        success_txs = [tx['tx'] for tx in bip112txs_vary_OP_CSV_v2 if tx['sdf']]
+        success_txs += [tx['tx'] for tx in bip112txs_vary_OP_CSV_9_v2 if tx['sdf']]
+
+        self.send_blocks([self.create_test_block(success_txs)])
+        self.nodes[0].invalidateblock(self.nodes[0].getbestblockhash())
+
+        # SEQUENCE_LOCKTIME_DISABLE_FLAG is unset in argument to OP_CSV for all remaining txs ##
+
+        # All txs with nSequence 9 sh
