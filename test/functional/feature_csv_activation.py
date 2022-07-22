@@ -446,4 +446,43 @@ class BIP68_112_113Test(BitcoinTestFramework):
 
         # SEQUENCE_LOCKTIME_DISABLE_FLAG is unset in argument to OP_CSV for all remaining txs ##
 
-        # All txs with nSequence 9 sh
+        # All txs with nSequence 9 should fail either due to earlier mismatch or failing the CSV check
+        fail_txs = all_rlt_txs(bip112txs_vary_nSequence_9_v2)
+        fail_txs += [tx['tx'] for tx in bip112txs_vary_OP_CSV_9_v2 if not tx['sdf']]
+        for tx in fail_txs:
+            self.send_blocks([self.create_test_block([tx])], success=False,
+                             reject_reason='non-mandatory-script-verify-flag (Locktime requirement not satisfied)')
+
+        # If SEQUENCE_LOCKTIME_DISABLE_FLAG is set in nSequence, tx should fail
+        fail_txs = [tx['tx'] for tx in bip112txs_vary_nSequence_v2 if tx['sdf']]
+        for tx in fail_txs:
+            self.send_blocks([self.create_test_block([tx])], success=False,
+                             reject_reason='non-mandatory-script-verify-flag (Locktime requirement not satisfied)')
+
+        # If sequencelock types mismatch, tx should fail
+        fail_txs = [tx['tx'] for tx in bip112txs_vary_nSequence_v2 if not tx['sdf'] and tx['stf']]
+        fail_txs += [tx['tx'] for tx in bip112txs_vary_OP_CSV_v2 if not tx['sdf'] and tx['stf']]
+        for tx in fail_txs:
+            self.send_blocks([self.create_test_block([tx])], success=False,
+                             reject_reason='non-mandatory-script-verify-flag (Locktime requirement not satisfied)')
+
+        # Remaining txs should pass, just test masking works properly
+        success_txs = [tx['tx'] for tx in bip112txs_vary_nSequence_v2 if not tx['sdf'] and not tx['stf']]
+        success_txs += [tx['tx'] for tx in bip112txs_vary_OP_CSV_v2 if not tx['sdf'] and not tx['stf']]
+        self.send_blocks([self.create_test_block(success_txs)])
+        self.nodes[0].invalidateblock(self.nodes[0].getbestblockhash())
+
+        # Additional test, of checking that comparison of two time types works properly
+        time_txs = []
+        for tx in [tx['tx'] for tx in bip112txs_vary_OP_CSV_v2 if not tx['sdf'] and tx['stf']]:
+            tx.vin[0].nSequence = BASE_RELATIVE_LOCKTIME | SEQ_TYPE_FLAG
+            self.miniwallet.sign_tx(tx)
+            tx.rehash()
+            time_txs.append(tx)
+
+        self.send_blocks([self.create_test_block(time_txs)])
+        self.nodes[0].invalidateblock(self.nodes[0].getbestblockhash())
+
+
+if __name__ == '__main__':
+    BIP68_112_113Test().main()
