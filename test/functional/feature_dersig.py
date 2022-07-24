@@ -136,4 +136,15 @@ class BIP66Test(BitcoinTestFramework):
             peer.sync_with_ping()
 
         self.log.info("Test that a block with a DERSIG-compliant transaction is accepted")
-        block.vtx[1] = self.create_tx(self.coinbase_txids[1
+        block.vtx[1] = self.create_tx(self.coinbase_txids[1])
+        block.hashMerkleRoot = block.calc_merkle_root()
+        block.solve()
+
+        self.test_dersig_info(is_active=True)  # Not active as of current tip, but next block must obey rules
+        peer.send_and_ping(msg_block(block))
+        self.test_dersig_info(is_active=True)  # Active as of current tip
+        assert_equal(int(self.nodes[0].getbestblockhash(), 16), block.sha256)
+
+
+if __name__ == '__main__':
+    BIP66Test().main()
