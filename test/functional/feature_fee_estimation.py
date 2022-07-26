@@ -183,4 +183,177 @@ class EstimateFeeTest(BitcoinTestFramework):
             for _ in range(random.randrange(100 - 50, 100 + 50)):
                 from_index = random.randint(1, 2)
                 (txhex, fee) = small_txpuzzle_randfee(
-                    self.nodes[from_inde
+                    self.nodes[from_index],
+                    self.confutxo,
+                    self.memutxo,
+                    Decimal("0.005"),
+                    min_fee,
+                    min_fee,
+                )
+                tx_kbytes = (len(txhex) // 2) / 1000.0
+                self.fees_per_kb.append(float(fee) / tx_kbytes)
+            self.sync_mempools(wait=0.1)
+            mined = mining_node.getblock(self.generate(mining_node, 1)[0], True)["tx"]
+            # update which txouts are confirmed
+            newmem = []
+            for utx in self.memutxo:
+                if utx["txid"] in mined:
+                    self.confutxo.append(utx)
+                else:
+                    newmem.append(utx)
+            self.memutxo = newmem
+
+    def initial_split(self, node):
+        """Split two coinbase UTxOs into many small coins"""
+        utxo_count = 2048
+        self.confutxo = []
+        splitted_amount = Decimal("0.04")
+        fee = Decimal("0.1")
+        change = Decimal("100") - splitted_amount * utxo_count - fee
+        tx = CTransaction()
+        tx.vin = [
+            CTxIn(COutPoint(int(cb["txid"], 16), cb["vout"]))
+            for cb in node.listunspent()[:2]
+        ]
+        tx.vout = [CTxOut(int(splitted_amount * COIN), P2SH) for _ in range(utxo_count)]
+        tx.vout.append(CTxOut(int(change * COIN), P2SH))
+        txhex = node.signrawtransactionwithwallet(tx.serialize().hex())["hex"]
+        txid = node.sendrawtransaction(txhex)
+        self.confutxo = [
+            {"txid": txid, "vout": i, "amount": splitted_amount}
+            for i in range(utxo_count)
+        ]
+        while len(node.getrawmempool()) > 0:
+            self.generate(node, 1, sync_fun=self.no_op)
+
+    def sanity_check_estimates_range(self):
+        """Populate estimation buckets, assert estimates are in a sane range and
+        are strictly increasing as the target decreases."""
+        self.fees_per_kb = []
+        self.memutxo = []
+        self.log.info("Will output estimates for 1/2/3/6/15/25 blocks")
+
+        for _ in range(2):
+            self.log.info(
+                "Creating transactions and mining them with a block size that can't keep up"
+            )
+            # Create transactions and mine 10 small blocks with node 2, but create txs faster than we can mine
+            self.transact_and_mine(10, self.nodes[2])
+            check_estimates(self.nodes[1], self.fees_per_kb)
+
+            self.log.info(
+                "Creating transactions and mining them at a block size that is just big enough"
+            )
+            # Generate transactions while mining 10 more blocks, this time with node1
+            # which mines blocks with capacity just above the rate that transactions are being created
+            self.transact_and_mine(10, self.nodes[1])
+            check_estimates(self.nodes[1], self.fees_per_kb)
+
+        # Finish by mining a normal-sized block:
+        while len(self.nodes[1].getrawmempool()) > 0:
+            self.generate(self.nodes[1], 1)
+
+        self.log.info("Final estimates after emptying mempools")
+        check_estimates(self.nodes[1], self.fees_per_kb)
+
+    def test_feerate_mempoolminfee(self):
+        high_val = 3 * self.nodes[1].estimatesmartfee(1)["feerate"]
+        self.restart_node(1, extra_args=[f"-minrelaytxfee={high_val}"])
+        check_estimates(self.nodes[1], self.fees_per_kb)
+        self.restart_node(1)
+
+    def sanity_check_rbf_estimates(self, utxos):
+        """During 5 blocks, broadcast low fee transactions. Only 10% of them get
+        confirmed and the remaining ones get RBF'd with a high fee transaction at
+        the next block.
+        The block policy estimator should return the high feerate.
+        """
+        # The broadcaster and block producer
+        node = self.nodes[0]
+        miner = self.nodes[1]
+        # In sat/vb
+        low_feerate = 1
+        high_feerate = 10
+        # Cache the utxos of which to replace the spender after it failed to get
+        # confirmed
+        utxos_to_respend = []
+        txids_to_replace = []
+
+        assert_greater_than_or_equal(len(utxos), 250)
+        for _ in range(5):
+            # Broadcast 45 low fee transactions that will need to be RBF'd
+            for _ in range(45):
+                u = utxos.pop(0)
+                txid = send_tx(node, u, low_feerate)
+                utxos_to_respend.append(u)
+                txids_to_replace.append(txid)
+            # Broadcast 5 low fee transaction which don't need to
+            for _ in range(5):
+                send_tx(node, utxos.pop(0), low_feerate)
+            # Mine the transactions on another node
+            self.sync_mempools(wait=0.1, nodes=[node, miner])
+            for txid in txids_to_replace:
+                miner.prioritisetransaction(txid=txid, fee_delta=-COIN)
+            self.generate(miner, 1)
+            # RBF the low-fee transactions
+            while len(utxos_to_respend) > 0:
+                u = utxos_to_respend.pop(0)
+                send_tx(node, u, high_feerate)
+
+        # Mine the last replacement txs
+        self.sync_mempools(wait=0.1, nodes=[node, miner])
+        self.generate(miner, 1)
+
+        # Only 10% of the transactions were really confirmed with a low feerate,
+        # the rest needed to be RBF'd. We must return the 90% conf rate feerate.
+        high_feerate_kvb = Decimal(high_feerate) / COIN * 10 ** 3
+        est_feerate = node.estimatesmartfee(2)["feerate"]
+        assert_equal(est_feerate, high_feerate_kvb)
+
+    def run_test(self):
+        self.log.info("This test is time consuming, please be patient")
+        self.log.info("Splitting inputs so we can generate tx's")
+
+        # Split two coinbases into many small utxos
+        self.start_node(0)
+        self.initial_split(self.nodes[0])
+        self.log.info("Finished splitting")
+
+        # Now we can connect the other nodes, didn't want to connect them earlier
+        # so the estimates would not be affected by the splitting transactions
+        self.start_node(1)
+        self.start_node(2)
+        self.connect_nodes(1, 0)
+        self.connect_nodes(0, 2)
+        self.connect_nodes(2, 1)
+        self.sync_all()
+
+        self.log.info("Testing estimates with single transactions.")
+        self.sanity_check_estimates_range()
+
+        # check that the effective feerate is greater than or equal to the mempoolminfee even for high mempoolminfee
+        self.log.info(
+            "Test fee rate estimation after restarting node with high MempoolMinFee"
+        )
+        self.test_feerate_mempoolminfee()
+
+        self.log.info("Restarting node with fresh estimation")
+        self.stop_node(0)
+        fee_dat = os.path.join(self.nodes[0].datadir, self.chain, "fee_estimates.dat")
+        os.remove(fee_dat)
+        self.start_node(0)
+        self.connect_nodes(0, 1)
+        self.connect_nodes(0, 2)
+
+        self.log.info("Testing estimates with RBF.")
+        self.sanity_check_rbf_estimates(self.confutxo + self.memutxo)
+
+        self.log.info("Testing that fee estimation is disabled in blocksonly.")
+        self.restart_node(0, ["-blocksonly"])
+        assert_raises_rpc_error(
+            -32603, "Fee estimation disabled", self.nodes[0].estimatesmartfee, 2
+        )
+
+
+if __name__ == "__main__":
+    EstimateFeeTest().main()
