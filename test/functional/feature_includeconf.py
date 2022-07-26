@@ -69,4 +69,20 @@ class IncludeConfTest(BitcoinTestFramework):
 
         self.log.info("-includeconf cannot be invalid path")
         os.remove(os.path.join(self.options.tmpdir, "node0", "relative.conf"))
-        self.nodes[0].
+        self.nodes[0].assert_start_raises_init_error(expected_msg="Error: Error reading configuration file: Failed to include configuration file relative.conf")
+
+        self.log.info("multiple -includeconf args can be used from the base config file. subversion should end with 'main; relative; relative2)/'")
+        with open(os.path.join(self.options.tmpdir, "node0", "relative.conf"), "w", encoding="utf8") as f:
+            # Restore initial file contents
+            f.write("uacomment=relative\n")
+
+        with open(os.path.join(self.options.tmpdir, "node0", "bitcoin.conf"), "a", encoding='utf8') as f:
+            f.write("includeconf=relative2.conf\n")
+
+        self.start_node(0)
+
+        subversion = self.nodes[0].getnetworkinfo()["subversion"]
+        assert subversion.endswith("main; relative; relative2)/")
+
+if __name__ == '__main__':
+    IncludeConfTest().main()
