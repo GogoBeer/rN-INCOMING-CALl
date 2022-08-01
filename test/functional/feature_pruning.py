@@ -150,4 +150,152 @@ class PruneTest(BitcoinTestFramework):
         # Pruning doesn't run until we're allocating another chunk, 20 full blocks past the height cutoff will ensure this
         mine_large_blocks(self.nodes[0], 25)
 
-        # Wait for bl
+        # Wait for blk00000.dat to be pruned
+        self.wait_until(lambda: not os.path.isfile(os.path.join(self.prunedir, "blk00000.dat")), timeout=30)
+
+        self.log.info("Success")
+        usage = calc_usage(self.prunedir)
+        self.log.info(f"Usage should be below target: {usage}")
+        assert_greater_than(550, usage)
+
+    def create_chain_with_staleblocks(self):
+        # Create stale blocks in manageable sized chunks
+        self.log.info("Mine 24 (stale) blocks on Node 1, followed by 25 (main chain) block reorg from Node 0, for 12 rounds")
+
+        for _ in range(12):
+            # Disconnect node 0 so it can mine a longer reorg chain without knowing about node 1's soon-to-be-stale chain
+            # Node 2 stays connected, so it hears about the stale blocks and then reorg's when node0 reconnects
+            self.disconnect_nodes(0, 1)
+            self.disconnect_nodes(0, 2)
+            # Mine 24 blocks in node 1
+            mine_large_blocks(self.nodes[1], 24)
+
+            # Reorg back with 25 block chain from node 0
+            mine_large_blocks(self.nodes[0], 25)
+
+            # Create connections in the order so both nodes can see the reorg at the same time
+            self.connect_nodes(0, 1)
+            self.connect_nodes(0, 2)
+            self.sync_blocks(self.nodes[0:3])
+
+        self.log.info(f"Usage can be over target because of high stale rate: {calc_usage(self.prunedir)}")
+
+    def reorg_test(self):
+        # Node 1 will mine a 300 block chain starting 287 blocks back from Node 0 and Node 2's tip
+        # This will cause Node 2 to do a reorg requiring 288 blocks of undo data to the reorg_test chain
+
+        height = self.nodes[1].getblockcount()
+        self.log.info(f"Current block height: {height}")
+
+        self.forkheight = height - 287
+        self.forkhash = self.nodes[1].getblockhash(self.forkheight)
+        self.log.info(f"Invalidating block {self.forkhash} at height {self.forkheight}")
+        self.nodes[1].invalidateblock(self.forkhash)
+
+        # We've now switched to our previously mined-24 block fork on node 1, but that's not what we want
+        # So invalidate that fork as well, until we're on the same chain as node 0/2 (but at an ancestor 288 blocks ago)
+        mainchainhash = self.nodes[0].getblockhash(self.forkheight - 1)
+        curhash = self.nodes[1].getblockhash(self.forkheight - 1)
+        while curhash != mainchainhash:
+            self.nodes[1].invalidateblock(curhash)
+            curhash = self.nodes[1].getblockhash(self.forkheight - 1)
+
+        assert self.nodes[1].getblockcount() == self.forkheight - 1
+        self.log.info(f"New best height: {self.nodes[1].getblockcount()}")
+
+        # Disconnect node1 and generate the new chain
+        self.disconnect_nodes(0, 1)
+        self.disconnect_nodes(1, 2)
+
+        self.log.info("Generating new longer chain of 300 more blocks")
+        self.generate(self.nodes[1], 300, sync_fun=self.no_op)
+
+        self.log.info("Reconnect nodes")
+        self.connect_nodes(0, 1)
+        self.connect_nodes(1, 2)
+        self.sync_blocks(self.nodes[0:3], timeout=120)
+
+        self.log.info(f"Verify height on node 2: {self.nodes[2].getblockcount()}")
+        self.log.info(f"Usage possibly still high because of stale blocks in block files: {calc_usage(self.prunedir)}")
+
+        self.log.info("Mine 220 more large blocks so we have requisite history")
+
+        mine_large_blocks(self.nodes[0], 220)
+        self.sync_blocks(self.nodes[0:3], timeout=120)
+
+        usage = calc_usage(self.prunedir)
+        self.log.info(f"Usage should be below target: {usage}")
+        assert_greater_than(550, usage)
+
+    def reorg_back(self):
+        # Verify that a block on the old main chain fork has been pruned away
+        assert_raises_rpc_error(-1, "Block not available (pruned data)", self.nodes[2].getblock, self.forkhash)
+        with self.nodes[2].assert_debug_log(expected_msgs=['block verification stopping at height', '(pruning, no data)']):
+            self.nodes[2].verifychain(checklevel=4, nblocks=0)
+        self.log.info(f"Will need to redownload block {self.forkheight}")
+
+        # Verify that we have enough history to reorg back to the fork point
+        # Although this is more than 288 blocks, because this chain was written more recently
+        # and only its other 299 small and 220 large blocks are in the block files after it,
+        # it is expected to still be retained
+        self.nodes[2].getblock(self.nodes[2].getblockhash(self.forkheight))
+
+        first_reorg_height = self.nodes[2].getblockcount()
+        curchainhash = self.nodes[2].getblockhash(self.mainchainheight)
+        self.nodes[2].invalidateblock(curchainhash)
+        goalbestheight = self.mainchainheight
+        goalbesthash = self.mainchainhash2
+
+        # As of 0.10 the current block download logic is not able to reorg to the original chain created in
+        # create_chain_with_stale_blocks because it doesn't know of any peer that's on that chain from which to
+        # redownload its missing blocks.
+        # Invalidate the reorg_test chain in node 0 as well, it can successfully switch to the original chain
+        # because it has all the block data.
+        # However it must mine enough blocks to have a more work chain than the reorg_test chain in order
+        # to trigger node 2's block download logic.
+        # At this point node 2 is within 288 blocks of the fork point so it will preserve its ability to reorg
+        if self.nodes[2].getblockcount() < self.mainchainheight:
+            blocks_to_mine = first_reorg_height + 1 - self.mainchainheight
+            self.log.info(f"Rewind node 0 to prev main chain to mine longer chain to trigger redownload. Blocks needed: {blocks_to_mine}")
+            self.nodes[0].invalidateblock(curchainhash)
+            assert_equal(self.nodes[0].getblockcount(), self.mainchainheight)
+            assert_equal(self.nodes[0].getbestblockhash(), self.mainchainhash2)
+            goalbesthash = self.generate(self.nodes[0], blocks_to_mine, sync_fun=self.no_op)[-1]
+            goalbestheight = first_reorg_height + 1
+
+        self.log.info("Verify node 2 reorged back to the main chain, some blocks of which it had to redownload")
+        # Wait for Node 2 to reorg to proper height
+        self.wait_until(lambda: self.nodes[2].getblockcount() >= goalbestheight, timeout=900)
+        assert_equal(self.nodes[2].getbestblockhash(), goalbesthash)
+        # Verify we can now have the data for a block previously pruned
+        assert_equal(self.nodes[2].getblock(self.forkhash)["height"], self.forkheight)
+
+    def manual_test(self, node_number, use_timestamp):
+        # at this point, node has 995 blocks and has not yet run in prune mode
+        self.start_node(node_number)
+        node = self.nodes[node_number]
+        assert_equal(node.getblockcount(), 995)
+        assert_raises_rpc_error(-1, "Cannot prune blocks because node is not in prune mode", node.pruneblockchain, 500)
+
+        # now re-start in manual pruning mode
+        self.restart_node(node_number, extra_args=["-prune=1"])
+        node = self.nodes[node_number]
+        assert_equal(node.getblockcount(), 995)
+
+        def height(index):
+            if use_timestamp:
+                return node.getblockheader(node.getblockhash(index))["time"] + TIMESTAMP_WINDOW
+            else:
+                return index
+
+        def prune(index):
+            ret = node.pruneblockchain(height=height(index))
+            assert_equal(ret, node.getblockchaininfo()['pruneheight'])
+
+        def has_block(index):
+            return os.path.isfile(os.path.join(self.nodes[node_number].datadir, self.chain, "blocks", f"blk{index:05}.dat"))
+
+        # should not prune because chain tip of node 3 (995) < PruneAfterHeight (1000)
+        assert_raises_rpc_error(-1, "Blockchain is too short for pruning", node.pruneblockchain, height(500))
+
+        # Save block transa
