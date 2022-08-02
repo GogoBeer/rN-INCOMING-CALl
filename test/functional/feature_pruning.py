@@ -469,4 +469,17 @@ class PruneTest(BitcoinTestFramework):
         self.log.info("Test manual pruning with block indices")
         self.manual_test(3, use_timestamp=False)
 
-       
+        self.log.info("Test manual pruning with timestamps")
+        self.manual_test(4, use_timestamp=True)
+
+        if self.is_wallet_compiled():
+            self.log.info("Test wallet re-scan")
+            self.wallet_test()
+
+        self.log.info("Test invalid pruning command line options")
+        self.test_invalid_command_line_options()
+
+        self.log.info("Done")
+
+if __name__ == '__main__':
+    PruneTest().main()
