@@ -384,4 +384,179 @@ class ReplaceByFeeTest(BitcoinTestFramework):
         double_tx = CTransaction()
         double_tx.vin = inputs
         double_tx.vout = [CTxOut(double_spend_value, CScript([b'a']))]
-  
+        double_tx_hex = double_tx.serialize().hex()
+
+        # This will raise an exception
+        assert_raises_rpc_error(-26, "too many potential replacements", self.nodes[0].sendrawtransaction, double_tx_hex, 0)
+
+        # If we remove an input, it should pass
+        double_tx = CTransaction()
+        double_tx.vin = inputs[0:-1]
+        double_tx.vout = [CTxOut(double_spend_value, CScript([b'a']))]
+        double_tx_hex = double_tx.serialize().hex()
+        self.nodes[0].sendrawtransaction(double_tx_hex, 0)
+
+    def test_opt_in(self):
+        """Replacing should only work if orig tx opted in"""
+        tx0_outpoint = self.make_utxo(self.nodes[0], int(1.1 * COIN))
+
+        # Create a non-opting in transaction
+        tx1a = CTransaction()
+        tx1a.vin = [CTxIn(tx0_outpoint, nSequence=0xffffffff)]
+        tx1a.vout = [CTxOut(1 * COIN, DUMMY_P2WPKH_SCRIPT)]
+        tx1a_hex = tx1a.serialize().hex()
+        tx1a_txid = self.nodes[0].sendrawtransaction(tx1a_hex, 0)
+
+        # This transaction isn't shown as replaceable
+        assert_equal(self.nodes[0].getmempoolentry(tx1a_txid)['bip125-replaceable'], False)
+
+        # Shouldn't be able to double-spend
+        tx1b = CTransaction()
+        tx1b.vin = [CTxIn(tx0_outpoint, nSequence=0)]
+        tx1b.vout = [CTxOut(int(0.9 * COIN), DUMMY_P2WPKH_SCRIPT)]
+        tx1b_hex = tx1b.serialize().hex()
+
+        # This will raise an exception
+        assert_raises_rpc_error(-26, "txn-mempool-conflict", self.nodes[0].sendrawtransaction, tx1b_hex, 0)
+
+        tx1_outpoint = self.make_utxo(self.nodes[0], int(1.1 * COIN))
+
+        # Create a different non-opting in transaction
+        tx2a = CTransaction()
+        tx2a.vin = [CTxIn(tx1_outpoint, nSequence=0xfffffffe)]
+        tx2a.vout = [CTxOut(1 * COIN, DUMMY_P2WPKH_SCRIPT)]
+        tx2a_hex = tx2a.serialize().hex()
+        tx2a_txid = self.nodes[0].sendrawtransaction(tx2a_hex, 0)
+
+        # Still shouldn't be able to double-spend
+        tx2b = CTransaction()
+        tx2b.vin = [CTxIn(tx1_outpoint, nSequence=0)]
+        tx2b.vout = [CTxOut(int(0.9 * COIN), DUMMY_P2WPKH_SCRIPT)]
+        tx2b_hex = tx2b.serialize().hex()
+
+        # This will raise an exception
+        assert_raises_rpc_error(-26, "txn-mempool-conflict", self.nodes[0].sendrawtransaction, tx2b_hex, 0)
+
+        # Now create a new transaction that spends from tx1a and tx2a
+        # opt-in on one of the inputs
+        # Transaction should be replaceable on either input
+
+        tx1a_txid = int(tx1a_txid, 16)
+        tx2a_txid = int(tx2a_txid, 16)
+
+        tx3a = CTransaction()
+        tx3a.vin = [CTxIn(COutPoint(tx1a_txid, 0), nSequence=0xffffffff),
+                    CTxIn(COutPoint(tx2a_txid, 0), nSequence=0xfffffffd)]
+        tx3a.vout = [CTxOut(int(0.9 * COIN), CScript([b'c'])), CTxOut(int(0.9 * COIN), CScript([b'd']))]
+        tx3a_hex = tx3a.serialize().hex()
+
+        tx3a_txid = self.nodes[0].sendrawtransaction(tx3a_hex, 0)
+
+        # This transaction is shown as replaceable
+        assert_equal(self.nodes[0].getmempoolentry(tx3a_txid)['bip125-replaceable'], True)
+
+        tx3b = CTransaction()
+        tx3b.vin = [CTxIn(COutPoint(tx1a_txid, 0), nSequence=0)]
+        tx3b.vout = [CTxOut(int(0.5 * COIN), DUMMY_P2WPKH_SCRIPT)]
+        tx3b_hex = tx3b.serialize().hex()
+
+        tx3c = CTransaction()
+        tx3c.vin = [CTxIn(COutPoint(tx2a_txid, 0), nSequence=0)]
+        tx3c.vout = [CTxOut(int(0.5 * COIN), DUMMY_P2WPKH_SCRIPT)]
+        tx3c_hex = tx3c.serialize().hex()
+
+        self.nodes[0].sendrawtransaction(tx3b_hex, 0)
+        # If tx3b was accepted, tx3c won't look like a replacement,
+        # but make sure it is accepted anyway
+        self.nodes[0].sendrawtransaction(tx3c_hex, 0)
+
+    def test_prioritised_transactions(self):
+        # Ensure that fee deltas used via prioritisetransaction are
+        # correctly used by replacement logic
+
+        # 1. Check that feeperkb uses modified fees
+        tx0_outpoint = self.make_utxo(self.nodes[0], int(1.1 * COIN))
+
+        tx1a = CTransaction()
+        tx1a.vin = [CTxIn(tx0_outpoint, nSequence=0)]
+        tx1a.vout = [CTxOut(1 * COIN, DUMMY_P2WPKH_SCRIPT)]
+        tx1a_hex = tx1a.serialize().hex()
+        tx1a_txid = self.nodes[0].sendrawtransaction(tx1a_hex, 0)
+
+        # Higher fee, but the actual fee per KB is much lower.
+        tx1b = CTransaction()
+        tx1b.vin = [CTxIn(tx0_outpoint, nSequence=0)]
+        tx1b.vout = [CTxOut(int(0.001 * COIN), CScript([b'a' * 740000]))]
+        tx1b_hex = tx1b.serialize().hex()
+
+        # Verify tx1b cannot replace tx1a.
+        assert_raises_rpc_error(-26, "insufficient fee", self.nodes[0].sendrawtransaction, tx1b_hex, 0)
+
+        # Use prioritisetransaction to set tx1a's fee to 0.
+        self.nodes[0].prioritisetransaction(txid=tx1a_txid, fee_delta=int(-0.1 * COIN))
+
+        # Now tx1b should be able to replace tx1a
+        tx1b_txid = self.nodes[0].sendrawtransaction(tx1b_hex, 0)
+
+        assert tx1b_txid in self.nodes[0].getrawmempool()
+
+        # 2. Check that absolute fee checks use modified fee.
+        tx1_outpoint = self.make_utxo(self.nodes[0], int(1.1 * COIN))
+
+        tx2a = CTransaction()
+        tx2a.vin = [CTxIn(tx1_outpoint, nSequence=0)]
+        tx2a.vout = [CTxOut(1 * COIN, DUMMY_P2WPKH_SCRIPT)]
+        tx2a_hex = tx2a.serialize().hex()
+        self.nodes[0].sendrawtransaction(tx2a_hex, 0)
+
+        # Lower fee, but we'll prioritise it
+        tx2b = CTransaction()
+        tx2b.vin = [CTxIn(tx1_outpoint, nSequence=0)]
+        tx2b.vout = [CTxOut(int(1.01 * COIN), DUMMY_P2WPKH_SCRIPT)]
+        tx2b.rehash()
+        tx2b_hex = tx2b.serialize().hex()
+
+        # Verify tx2b cannot replace tx2a.
+        assert_raises_rpc_error(-26, "insufficient fee", self.nodes[0].sendrawtransaction, tx2b_hex, 0)
+
+        # Now prioritise tx2b to have a higher modified fee
+        self.nodes[0].prioritisetransaction(txid=tx2b.hash, fee_delta=int(0.1 * COIN))
+
+        # tx2b should now be accepted
+        tx2b_txid = self.nodes[0].sendrawtransaction(tx2b_hex, 0)
+
+        assert tx2b_txid in self.nodes[0].getrawmempool()
+
+    def test_rpc(self):
+        us0 = self.wallet.get_utxo()
+        ins = [us0]
+        outs = {ADDRESS_BCRT1_UNSPENDABLE: Decimal(1.0000000)}
+        rawtx0 = self.nodes[0].createrawtransaction(ins, outs, 0, True)
+        rawtx1 = self.nodes[0].createrawtransaction(ins, outs, 0, False)
+        json0 = self.nodes[0].decoderawtransaction(rawtx0)
+        json1 = self.nodes[0].decoderawtransaction(rawtx1)
+        assert_equal(json0["vin"][0]["sequence"], 4294967293)
+        assert_equal(json1["vin"][0]["sequence"], 4294967295)
+
+        if self.is_specified_wallet_compiled():
+            self.init_wallet(node=0)
+            rawtx2 = self.nodes[0].createrawtransaction([], outs)
+            frawtx2a = self.nodes[0].fundrawtransaction(rawtx2, {"replaceable": True})
+            frawtx2b = self.nodes[0].fundrawtransaction(rawtx2, {"replaceable": False})
+
+            json0 = self.nodes[0].decoderawtransaction(frawtx2a['hex'])
+            json1 = self.nodes[0].decoderawtransaction(frawtx2b['hex'])
+            assert_equal(json0["vin"][0]["sequence"], 4294967293)
+            assert_equal(json1["vin"][0]["sequence"], 4294967294)
+
+    def test_no_inherited_signaling(self):
+        confirmed_utxo = self.wallet.get_utxo()
+
+        # Create an explicitly opt-in parent transaction
+        optin_parent_tx = self.wallet.send_self_transfer(
+            from_node=self.nodes[0],
+            utxo_to_spend=confirmed_utxo,
+            sequence=BIP125_SEQUENCE_NUMBER,
+            fee_rate=Decimal('0.01'),
+        )
+        assert_equal(True, self.nodes[0].getmempoolentry(optin_
