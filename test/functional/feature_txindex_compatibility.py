@@ -69,4 +69,24 @@ class MempoolCompatibilityTest(BitcoinTestFramework):
         shutil.rmtree(drop_index_chain_dir)
         shutil.copytree(legacy_chain_dir, drop_index_chain_dir)
         self.nodes[1].assert_start_raises_init_error(
-            extra_ar
+            extra_args=["-txindex"],
+            expected_msg="Error: The block index db contains a legacy 'txindex'. To clear the occupied disk space, run a full -reindex, otherwise ignore this error. This error message will not be displayed again.",
+        )
+        # Build txindex from scratch and check there is no error this time
+        self.start_node(1, extra_args=["-txindex"])
+        self.nodes[2].getrawtransaction(txid=spend_utxo["txid"])  # Requires -txindex
+
+        self.stop_nodes()
+
+        self.log.info("Check migrated txindex can not be read by legacy node")
+        err_msg = f": You need to rebuild the database using -reindex to change -txindex.{os.linesep}Please restart with -reindex or -reindex-chainstate to recover."
+        shutil.rmtree(legacy_chain_dir)
+        shutil.copytree(migrate_chain_dir, legacy_chain_dir)
+        self.nodes[0].assert_start_raises_init_error(extra_args=["-txindex"], expected_msg=err_msg)
+        shutil.rmtree(legacy_chain_dir)
+        shutil.copytree(drop_index_chain_dir, legacy_chain_dir)
+        self.nodes[0].assert_start_raises_init_error(extra_args=["-txindex"], expected_msg=err_msg)
+
+
+if __name__ == "__main__":
+    MempoolCompatibilityTest().main()
