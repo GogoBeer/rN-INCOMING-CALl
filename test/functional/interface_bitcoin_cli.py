@@ -101,4 +101,125 @@ class TestBitcoinCli(BitcoinTestFramework):
         assert_raises_process_error(1, "Could not locate RPC credentials", self.nodes[0].cli('-rpccookiefile=does-not-exist', '-rpcpassword=').echo)
 
         self.log.info("Test -getinfo with arguments fails")
-        assert_raises_process_error(1, "-getinfo takes no arguments", self.nodes[0].cli('-getinfo').hel
+        assert_raises_process_error(1, "-getinfo takes no arguments", self.nodes[0].cli('-getinfo').help)
+
+        self.log.info("Test -getinfo with -color=never does not return ANSI escape codes")
+        assert "\u001b[0m" not in self.nodes[0].cli('-getinfo', '-color=never').send_cli()
+
+        self.log.info("Test -getinfo with -color=always returns ANSI escape codes")
+        assert "\u001b[0m" in self.nodes[0].cli('-getinfo', '-color=always').send_cli()
+
+        self.log.info("Test -getinfo with invalid value for -color option")
+        assert_raises_process_error(1, "Invalid value for -color option. Valid values: always, auto, never.", self.nodes[0].cli('-getinfo', '-color=foo').send_cli)
+
+        self.log.info("Test -getinfo returns expected network and blockchain info")
+        if self.is_specified_wallet_compiled():
+            self.nodes[0].encryptwallet(password)
+        cli_get_info_string = self.nodes[0].cli('-getinfo').send_cli()
+        cli_get_info = cli_get_info_string_to_dict(cli_get_info_string)
+
+        network_info = self.nodes[0].getnetworkinfo()
+        blockchain_info = self.nodes[0].getblockchaininfo()
+        assert_equal(int(cli_get_info['Version']), network_info['version'])
+        assert_equal(cli_get_info['Verification progress'], "%.4f%%" % (blockchain_info['verificationprogress'] * 100))
+        assert_equal(int(cli_get_info['Blocks']), blockchain_info['blocks'])
+        assert_equal(int(cli_get_info['Headers']), blockchain_info['headers'])
+        assert_equal(int(cli_get_info['Time offset (s)']), network_info['timeoffset'])
+        expected_network_info = f"in {network_info['connections_in']}, out {network_info['connections_out']}, total {network_info['connections']}"
+        assert_equal(cli_get_info["Network"], expected_network_info)
+        assert_equal(cli_get_info['Proxies'], network_info['networks'][0]['proxy'])
+        assert_equal(Decimal(cli_get_info['Difficulty']), blockchain_info['difficulty'])
+        assert_equal(cli_get_info['Chain'], blockchain_info['chain'])
+
+        self.log.info("Test -getinfo and bitcoin-cli return all proxies")
+        self.restart_node(0, extra_args=["-proxy=127.0.0.1:9050", "-i2psam=127.0.0.1:7656"])
+        network_info = self.nodes[0].getnetworkinfo()
+        cli_get_info_string = self.nodes[0].cli('-getinfo').send_cli()
+        cli_get_info = cli_get_info_string_to_dict(cli_get_info_string)
+        assert_equal(cli_get_info["Proxies"], "127.0.0.1:9050 (ipv4, ipv6, onion, cjdns), 127.0.0.1:7656 (i2p)")
+
+        if self.is_specified_wallet_compiled():
+            self.log.info("Test -getinfo and bitcoin-cli getwalletinfo return expected wallet info")
+            # Explicitly set the output type in order to have consistent tx vsize / fees
+            # for both legacy and descriptor wallets (disables the change address type detection algorithm)
+            self.restart_node(0, extra_args=["-addresstype=bech32", "-changetype=bech32"])
+            assert_equal(Decimal(cli_get_info['Balance']), BALANCE)
+            assert 'Balances' not in cli_get_info_string
+            wallet_info = self.nodes[0].getwalletinfo()
+            assert_equal(int(cli_get_info['Keypool size']), wallet_info['keypoolsize'])
+            assert_equal(int(cli_get_info['Unlocked until']), wallet_info['unlocked_until'])
+            assert_equal(Decimal(cli_get_info['Transaction fee rate (-paytxfee) (BTC/kvB)']), wallet_info['paytxfee'])
+            assert_equal(Decimal(cli_get_info['Min tx relay fee rate (BTC/kvB)']), network_info['relayfee'])
+            assert_equal(self.nodes[0].cli.getwalletinfo(), wallet_info)
+
+            # Setup to test -getinfo, -generate, and -rpcwallet= with multiple wallets.
+            wallets = [self.default_wallet_name, 'Encrypted', 'secret']
+            amounts = [BALANCE + Decimal('9.999928'), Decimal(9), Decimal(31)]
+            self.nodes[0].createwallet(wallet_name=wallets[1])
+            self.nodes[0].createwallet(wallet_name=wallets[2])
+            w1 = self.nodes[0].get_wallet_rpc(wallets[0])
+            w2 = self.nodes[0].get_wallet_rpc(wallets[1])
+            w3 = self.nodes[0].get_wallet_rpc(wallets[2])
+            rpcwallet2 = f'-rpcwallet={wallets[1]}'
+            rpcwallet3 = f'-rpcwallet={wallets[2]}'
+            w1.walletpassphrase(password, self.rpc_timeout)
+            w2.encryptwallet(password)
+            w1.sendtoaddress(w2.getnewaddress(), amounts[1])
+            w1.sendtoaddress(w3.getnewaddress(), amounts[2])
+
+            # Mine a block to confirm; adds a block reward (50 BTC) to the default wallet.
+            self.generate(self.nodes[0], 1)
+
+            self.log.info("Test -getinfo with multiple wallets and -rpcwallet returns specified wallet balance")
+            for i in range(len(wallets)):
+                cli_get_info_string = self.nodes[0].cli('-getinfo', f'-rpcwallet={wallets[i]}').send_cli()
+                cli_get_info = cli_get_info_string_to_dict(cli_get_info_string)
+                assert 'Balances' not in cli_get_info_string
+                assert_equal(cli_get_info["Wallet"], wallets[i])
+                assert_equal(Decimal(cli_get_info['Balance']), amounts[i])
+
+            self.log.info("Test -getinfo with multiple wallets and -rpcwallet=non-existing-wallet returns no balances")
+            cli_get_info_string = self.nodes[0].cli('-getinfo', '-rpcwallet=does-not-exist').send_cli()
+            assert 'Balance' not in cli_get_info_string
+            assert 'Balances' not in cli_get_info_string
+
+            self.log.info("Test -getinfo with multiple wallets returns all loaded wallet names and balances")
+            assert_equal(set(self.nodes[0].listwallets()), set(wallets))
+            cli_get_info_string = self.nodes[0].cli('-getinfo').send_cli()
+            cli_get_info = cli_get_info_string_to_dict(cli_get_info_string)
+            assert 'Balance' not in cli_get_info
+            for k, v in zip(wallets, amounts):
+                assert_equal(Decimal(cli_get_info['Balances'][k]), v)
+
+            # Unload the default wallet and re-verify.
+            self.nodes[0].unloadwallet(wallets[0])
+            assert wallets[0] not in self.nodes[0].listwallets()
+            cli_get_info_string = self.nodes[0].cli('-getinfo').send_cli()
+            cli_get_info = cli_get_info_string_to_dict(cli_get_info_string)
+            assert 'Balance' not in cli_get_info
+            assert 'Balances' in cli_get_info_string
+            for k, v in zip(wallets[1:], amounts[1:]):
+                assert_equal(Decimal(cli_get_info['Balances'][k]), v)
+            assert wallets[0] not in cli_get_info
+
+            self.log.info("Test -getinfo after unloading all wallets except a non-default one returns its balance")
+            self.nodes[0].unloadwallet(wallets[2])
+            assert_equal(self.nodes[0].listwallets(), [wallets[1]])
+            cli_get_info_string = self.nodes[0].cli('-getinfo').send_cli()
+            cli_get_info = cli_get_info_string_to_dict(cli_get_info_string)
+            assert 'Balances' not in cli_get_info_string
+            assert_equal(cli_get_info['Wallet'], wallets[1])
+            assert_equal(Decimal(cli_get_info['Balance']), amounts[1])
+
+            self.log.info("Test -getinfo with -rpcwallet=remaining-non-default-wallet returns only its balance")
+            cli_get_info_string = self.nodes[0].cli('-getinfo', rpcwallet2).send_cli()
+            cli_get_info = cli_get_info_string_to_dict(cli_get_info_string)
+            assert 'Balances' not in cli_get_info_string
+            assert_equal(cli_get_info['Wallet'], wallets[1])
+            assert_equal(Decimal(cli_get_info['Balance']), amounts[1])
+
+            self.log.info("Test -getinfo with -rpcwallet=unloaded wallet returns no balances")
+            cli_get_info_string = self.nodes[0].cli('-getinfo', rpcwallet3).send_cli()
+            cli_get_info_keys = cli_get_info_string_to_dict(cli_get_info_string)
+            assert 'Balance' not in cli_get_info_keys
+            assert 'Balances' not 
