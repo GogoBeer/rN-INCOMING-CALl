@@ -227,4 +227,119 @@ class RESTTest (BitcoinTestFramework):
 
         # Check block hex format
         response_hex = self.test_rest_request(f"/block/{bb_hash}", req_type=ReqType.HEX, ret_type=RetType.OBJ)
-        assert_greater_than(int(response_he
+        assert_greater_than(int(response_hex.getheader('content-length')), BLOCK_HEADER_SIZE*2)
+        response_hex_bytes = response_hex.read().strip(b'\n')
+        assert_equal(response_bytes.hex().encode(), response_hex_bytes)
+
+        # Compare with hex block header
+        response_header_hex = self.test_rest_request(f"/headers/1/{bb_hash}", req_type=ReqType.HEX, ret_type=RetType.OBJ)
+        assert_greater_than(int(response_header_hex.getheader('content-length')), BLOCK_HEADER_SIZE*2)
+        response_header_hex_bytes = response_header_hex.read(BLOCK_HEADER_SIZE*2)
+        assert_equal(response_bytes[:BLOCK_HEADER_SIZE].hex().encode(), response_header_hex_bytes)
+
+        # Check json format
+        block_json_obj = self.test_rest_request(f"/block/{bb_hash}")
+        assert_equal(block_json_obj['hash'], bb_hash)
+        assert_equal(self.test_rest_request(f"/blockhashbyheight/{block_json_obj['height']}")['blockhash'], bb_hash)
+
+        # Check hex/bin format
+        resp_hex = self.test_rest_request(f"/blockhashbyheight/{block_json_obj['height']}", req_type=ReqType.HEX, ret_type=RetType.OBJ)
+        assert_equal(resp_hex.read().decode('utf-8').rstrip(), bb_hash)
+        resp_bytes = self.test_rest_request(f"/blockhashbyheight/{block_json_obj['height']}", req_type=ReqType.BIN, ret_type=RetType.BYTES)
+        blockhash = resp_bytes[::-1].hex()
+        assert_equal(blockhash, bb_hash)
+
+        # Check invalid blockhashbyheight requests
+        resp = self.test_rest_request("/blockhashbyheight/abc", ret_type=RetType.OBJ, status=400)
+        assert_equal(resp.read().decode('utf-8').rstrip(), "Invalid height: abc")
+        resp = self.test_rest_request("/blockhashbyheight/1000000", ret_type=RetType.OBJ, status=404)
+        assert_equal(resp.read().decode('utf-8').rstrip(), "Block height out of range")
+        resp = self.test_rest_request("/blockhashbyheight/-1", ret_type=RetType.OBJ, status=400)
+        assert_equal(resp.read().decode('utf-8').rstrip(), "Invalid height: -1")
+        self.test_rest_request("/blockhashbyheight/", ret_type=RetType.OBJ, status=400)
+
+        # Compare with json block header
+        json_obj = self.test_rest_request(f"/headers/1/{bb_hash}")
+        assert_equal(len(json_obj), 1)  # ensure that there is one header in the json response
+        assert_equal(json_obj[0]['hash'], bb_hash)  # request/response hash should be the same
+
+        # Compare with normal RPC block response
+        rpc_block_json = self.nodes[0].getblock(bb_hash)
+        for key in ['hash', 'confirmations', 'height', 'version', 'merkleroot', 'time', 'nonce', 'bits', 'difficulty', 'chainwork', 'previousblockhash']:
+            assert_equal(json_obj[0][key], rpc_block_json[key])
+
+        # See if we can get 5 headers in one response
+        self.generate(self.nodes[1], 5)
+        json_obj = self.test_rest_request(f"/headers/5/{bb_hash}")
+        assert_equal(len(json_obj), 5)  # now we should have 5 header objects
+        json_obj = self.test_rest_request(f"/blockfilterheaders/basic/5/{bb_hash}")
+        first_filter_header = json_obj[0]
+        assert_equal(len(json_obj), 5)  # now we should have 5 filter header objects
+        json_obj = self.test_rest_request(f"/blockfilter/basic/{bb_hash}")
+
+        # Compare with normal RPC blockfilter response
+        rpc_blockfilter = self.nodes[0].getblockfilter(bb_hash)
+        assert_equal(first_filter_header, rpc_blockfilter['header'])
+        assert_equal(json_obj['filter'], rpc_blockfilter['filter'])
+
+        # Test number parsing
+        for num in ['5a', '-5', '0', '2001', '99999999999999999999999999999999999']:
+            assert_equal(
+                bytes(f'Header count is invalid or out of acceptable range (1-2000): {num}\r\n', 'ascii'),
+                self.test_rest_request(f"/headers/{num}/{bb_hash}", ret_type=RetType.BYTES, status=400),
+            )
+
+        self.log.info("Test tx inclusion in the /mempool and /block URIs")
+
+        # Make 3 tx and mine them on node 1
+        txs = []
+        txs.append(self.nodes[0].sendtoaddress(not_related_address, 11))
+        txs.append(self.nodes[0].sendtoaddress(not_related_address, 11))
+        txs.append(self.nodes[0].sendtoaddress(not_related_address, 11))
+        self.sync_all()
+
+        # Check that there are exactly 3 transactions in the TX memory pool before generating the block
+        json_obj = self.test_rest_request("/mempool/info")
+        assert_equal(json_obj['size'], 3)
+        # the size of the memory pool should be greater than 3x ~100 bytes
+        assert_greater_than(json_obj['bytes'], 300)
+
+        # Check that there are our submitted transactions in the TX memory pool
+        json_obj = self.test_rest_request("/mempool/contents")
+        for i, tx in enumerate(txs):
+            assert tx in json_obj
+            assert_equal(json_obj[tx]['spentby'], txs[i + 1:i + 2])
+            assert_equal(json_obj[tx]['depends'], txs[i - 1:i])
+
+        # Now mine the transactions
+        newblockhash = self.generate(self.nodes[1], 1)
+
+        # Check if the 3 tx show up in the new block
+        json_obj = self.test_rest_request(f"/block/{newblockhash[0]}")
+        non_coinbase_txs = {tx['txid'] for tx in json_obj['tx']
+                            if 'coinbase' not in tx['vin'][0]}
+        assert_equal(non_coinbase_txs, set(txs))
+
+        # Verify that the non-coinbase tx has "prevout" key set
+        for tx_obj in json_obj["tx"]:
+            for vin in tx_obj["vin"]:
+                if "coinbase" not in vin:
+                    assert "prevout" in vin
+                    assert_equal(vin["prevout"]["generated"], False)
+                else:
+                    assert "prevout" not in vin
+
+        # Check the same but without tx details
+        json_obj = self.test_rest_request(f"/block/notxdetails/{newblockhash[0]}")
+        for tx in txs:
+            assert tx in json_obj['tx']
+
+        self.log.info("Test the /chaininfo URI")
+
+        bb_hash = self.nodes[0].getbestblockhash()
+
+        json_obj = self.test_rest_request("/chaininfo")
+        assert_equal(json_obj['bestblockhash'], bb_hash)
+
+if __name__ == '__main__':
+    RESTTest().main()
