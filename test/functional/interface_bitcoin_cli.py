@@ -222,4 +222,105 @@ class TestBitcoinCli(BitcoinTestFramework):
             cli_get_info_string = self.nodes[0].cli('-getinfo', rpcwallet3).send_cli()
             cli_get_info_keys = cli_get_info_string_to_dict(cli_get_info_string)
             assert 'Balance' not in cli_get_info_keys
-            assert 'Balances' not 
+            assert 'Balances' not in cli_get_info_string
+
+            # Test bitcoin-cli -generate.
+            n1 = 3
+            n2 = 4
+            w2.walletpassphrase(password, self.rpc_timeout)
+            blocks = self.nodes[0].getblockcount()
+
+            self.log.info('Test -generate with no args')
+            generate = self.nodes[0].cli('-generate').send_cli()
+            assert_equal(set(generate.keys()), {'address', 'blocks'})
+            assert_equal(len(generate["blocks"]), 1)
+            assert_equal(self.nodes[0].getblockcount(), blocks + 1)
+
+            self.log.info('Test -generate with bad args')
+            assert_raises_process_error(1, JSON_PARSING_ERROR, self.nodes[0].cli('-generate', 'foo').echo)
+            assert_raises_process_error(1, BLOCKS_VALUE_OF_ZERO, self.nodes[0].cli('-generate', 0).echo)
+            assert_raises_process_error(1, TOO_MANY_ARGS, self.nodes[0].cli('-generate', 1, 2, 3).echo)
+
+            self.log.info('Test -generate with nblocks')
+            generate = self.nodes[0].cli('-generate', n1).send_cli()
+            assert_equal(set(generate.keys()), {'address', 'blocks'})
+            assert_equal(len(generate["blocks"]), n1)
+            assert_equal(self.nodes[0].getblockcount(), blocks + 1 + n1)
+
+            self.log.info('Test -generate with nblocks and maxtries')
+            generate = self.nodes[0].cli('-generate', n2, 1000000).send_cli()
+            assert_equal(set(generate.keys()), {'address', 'blocks'})
+            assert_equal(len(generate["blocks"]), n2)
+            assert_equal(self.nodes[0].getblockcount(), blocks + 1 + n1 + n2)
+
+            self.log.info('Test -generate -rpcwallet in single-wallet mode')
+            generate = self.nodes[0].cli(rpcwallet2, '-generate').send_cli()
+            assert_equal(set(generate.keys()), {'address', 'blocks'})
+            assert_equal(len(generate["blocks"]), 1)
+            assert_equal(self.nodes[0].getblockcount(), blocks + 2 + n1 + n2)
+
+            self.log.info('Test -generate -rpcwallet=unloaded wallet raises RPC error')
+            assert_raises_rpc_error(-18, WALLET_NOT_LOADED, self.nodes[0].cli(rpcwallet3, '-generate').echo)
+            assert_raises_rpc_error(-18, WALLET_NOT_LOADED, self.nodes[0].cli(rpcwallet3, '-generate', 'foo').echo)
+            assert_raises_rpc_error(-18, WALLET_NOT_LOADED, self.nodes[0].cli(rpcwallet3, '-generate', 0).echo)
+            assert_raises_rpc_error(-18, WALLET_NOT_LOADED, self.nodes[0].cli(rpcwallet3, '-generate', 1, 2, 3).echo)
+
+            # Test bitcoin-cli -generate with -rpcwallet in multiwallet mode.
+            self.nodes[0].loadwallet(wallets[2])
+            n3 = 4
+            n4 = 10
+            blocks = self.nodes[0].getblockcount()
+
+            self.log.info('Test -generate -rpcwallet with no args')
+            generate = self.nodes[0].cli(rpcwallet2, '-generate').send_cli()
+            assert_equal(set(generate.keys()), {'address', 'blocks'})
+            assert_equal(len(generate["blocks"]), 1)
+            assert_equal(self.nodes[0].getblockcount(), blocks + 1)
+
+            self.log.info('Test -generate -rpcwallet with bad args')
+            assert_raises_process_error(1, JSON_PARSING_ERROR, self.nodes[0].cli(rpcwallet2, '-generate', 'foo').echo)
+            assert_raises_process_error(1, BLOCKS_VALUE_OF_ZERO, self.nodes[0].cli(rpcwallet2, '-generate', 0).echo)
+            assert_raises_process_error(1, TOO_MANY_ARGS, self.nodes[0].cli(rpcwallet2, '-generate', 1, 2, 3).echo)
+
+            self.log.info('Test -generate -rpcwallet with nblocks')
+            generate = self.nodes[0].cli(rpcwallet2, '-generate', n3).send_cli()
+            assert_equal(set(generate.keys()), {'address', 'blocks'})
+            assert_equal(len(generate["blocks"]), n3)
+            assert_equal(self.nodes[0].getblockcount(), blocks + 1 + n3)
+
+            self.log.info('Test -generate -rpcwallet with nblocks and maxtries')
+            generate = self.nodes[0].cli(rpcwallet2, '-generate', n4, 1000000).send_cli()
+            assert_equal(set(generate.keys()), {'address', 'blocks'})
+            assert_equal(len(generate["blocks"]), n4)
+            assert_equal(self.nodes[0].getblockcount(), blocks + 1 + n3 + n4)
+
+            self.log.info('Test -generate without -rpcwallet in multiwallet mode raises RPC error')
+            assert_raises_rpc_error(-19, WALLET_NOT_SPECIFIED, self.nodes[0].cli('-generate').echo)
+            assert_raises_rpc_error(-19, WALLET_NOT_SPECIFIED, self.nodes[0].cli('-generate', 'foo').echo)
+            assert_raises_rpc_error(-19, WALLET_NOT_SPECIFIED, self.nodes[0].cli('-generate', 0).echo)
+            assert_raises_rpc_error(-19, WALLET_NOT_SPECIFIED, self.nodes[0].cli('-generate', 1, 2, 3).echo)
+        else:
+            self.log.info("*** Wallet not compiled; cli getwalletinfo and -getinfo wallet tests skipped")
+            self.generate(self.nodes[0], 25)  # maintain block parity with the wallet_compiled conditional branch
+
+        self.log.info("Test -version with node stopped")
+        self.stop_node(0)
+        cli_response = self.nodes[0].cli('-version').send_cli()
+        assert f"{self.config['environment']['PACKAGE_NAME']} RPC client version" in cli_response
+
+        self.log.info("Test -rpcwait option successfully waits for RPC connection")
+        self.nodes[0].start()  # start node without RPC connection
+        self.nodes[0].wait_for_cookie_credentials()  # ensure cookie file is available to avoid race condition
+        blocks = self.nodes[0].cli('-rpcwait').send_cli('getblockcount')
+        self.nodes[0].wait_for_rpc_connection()
+        assert_equal(blocks, BLOCKS + 25)
+
+        self.log.info("Test -rpcwait option waits at most -rpcwaittimeout seconds for startup")
+        self.stop_node(0)  # stop the node so we time out
+        start_time = time.time()
+        assert_raises_process_error(1, "Could not connect to the server", self.nodes[0].cli('-rpcwait', '-rpcwaittimeout=5').echo)
+        assert_greater_than_or_equal(time.time(), start_time + 5)
+
+
+if __name__ == '__main__':
+    TestBitcoinCli().main()
