@@ -71,4 +71,22 @@ class MempoolLimitTest(BitcoinTestFramework):
         self.log.info("Fill up the mempool with txs with higher fee rate")
         for batch_of_txid in range(num_of_batches):
             fee = (batch_of_txid + 1) * base_fee
-            sel
+            self.send_large_txs(node, miniwallet, txouts, fee, tx_batch_size)
+
+        self.log.info('The tx should be evicted by now')
+        # The number of transactions created should be greater than the ones present in the mempool
+        assert_greater_than(tx_batch_size * num_of_batches, len(node.getrawmempool()))
+        # Initial tx created should not be present in the mempool anymore as it had a lower fee rate
+        assert tx_to_be_evicted_id not in node.getrawmempool()
+
+        self.log.info('Check that mempoolminfee is larger than minrelaytxfee')
+        assert_equal(node.getmempoolinfo()['minrelaytxfee'], Decimal('0.00001000'))
+        assert_greater_than(node.getmempoolinfo()['mempoolminfee'], Decimal('0.00001000'))
+
+        # Deliberately try to create a tx with a fee less than the minimum mempool fee to assert that it does not get added to the mempool
+        self.log.info('Create a mempool tx that will not pass mempoolminfee')
+        assert_raises_rpc_error(-26, "mempool min fee not met", miniwallet.send_self_transfer, from_node=node, fee_rate=relayfee, mempool_valid=False)
+
+
+if __name__ == '__main__':
+    MempoolLimitTest().main()
