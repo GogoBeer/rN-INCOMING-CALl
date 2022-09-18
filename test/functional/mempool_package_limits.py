@@ -350,4 +350,165 @@ class MempoolPackageLimitsTest(BitcoinTestFramework):
         pc_spk = pc_tx.vout[0].scriptPubKey.hex()
 
         # Child Pd
-        (_, pd_h
+        (_, pd_hex, _, _) = make_chain(node, self.address, self.privkeys, pc_tx.rehash(), pc_value, 0, pc_spk)
+
+        assert_equal(24, node.getmempoolinfo()["size"])
+        testres_too_long = node.testmempoolaccept(rawtxs=[pc_hex, pd_hex])
+        for txres in testres_too_long:
+            assert_equal(txres["package-error"], "package-mempool-limits")
+
+        # Clear mempool and check that the package passes now
+        self.generate(node, 1)
+        assert all([res["allowed"] for res in node.testmempoolaccept(rawtxs=[pc_hex, pd_hex])])
+
+    def test_anc_count_limits_bushy(self):
+        """Create a tree with 20 transactions in the mempool and 6 in the package:
+        M1...M4 M5...M8 M9...M12 M13...M16 M17...M20
+            ^      ^       ^        ^         ^             (each with 4 parents)
+            P0     P1      P2      P3        P4
+             ^     ^       ^       ^         ^              (5 parents)
+                           PC
+        Where M(4i+1)...M+(4i+4) are the parents of Pi and P0, P1, P2, P3, and P4 are the parents of PC.
+        P0... P4 individually only have 4 parents each, and PC has no in-mempool parents. But
+        combined, PC has 25 in-mempool and in-package parents.
+        """
+        node = self.nodes[0]
+        assert_equal(0, node.getmempoolinfo()["size"])
+        package_hex = []
+        parent_txns = []
+        parent_values = []
+        scripts = []
+        for _ in range(5): # Make package transactions P0 ... P4
+            gp_tx = []
+            gp_values = []
+            gp_scripts = []
+            for _ in range(4): # Make mempool transactions M(4i+1)...M(4i+4)
+                parent_coin = self.coins.pop()
+                value = parent_coin["amount"]
+                txid = parent_coin["txid"]
+                (tx, txhex, value, spk) = make_chain(node, self.address, self.privkeys, txid, value)
+                gp_tx.append(tx)
+                gp_values.append(value)
+                gp_scripts.append(spk)
+                node.sendrawtransaction(txhex)
+            # Package transaction Pi
+            pi_hex = create_child_with_parents(node, self.address, self.privkeys, gp_tx, gp_values, gp_scripts)
+            package_hex.append(pi_hex)
+            pi_tx = tx_from_hex(pi_hex)
+            parent_txns.append(pi_tx)
+            parent_values.append(Decimal(pi_tx.vout[0].nValue) / COIN)
+            scripts.append(pi_tx.vout[0].scriptPubKey.hex())
+        # Package transaction PC
+        package_hex.append(create_child_with_parents(node, self.address, self.privkeys, parent_txns, parent_values, scripts))
+
+        assert_equal(20, node.getmempoolinfo()["size"])
+        assert_equal(6, len(package_hex))
+        testres = node.testmempoolaccept(rawtxs=package_hex)
+        for txres in testres:
+            assert_equal(txres["package-error"], "package-mempool-limits")
+
+        # Clear mempool and check that the package passes now
+        self.generate(node, 1)
+        assert all([res["allowed"] for res in node.testmempoolaccept(rawtxs=package_hex)])
+
+    def test_anc_size_limits(self):
+        """Test Case with 2 independent transactions in the mempool and a parent + child in the
+        package, where the package parent is the child of both mempool transactions (30KvB each):
+              A     B
+               ^   ^
+                 C
+                 ^
+                 D
+        The lowest descendant, D, exceeds ancestor size limits, but only if the in-mempool
+        and in-package ancestors are all considered together.
+        """
+        node = self.nodes[0]
+        assert_equal(0, node.getmempoolinfo()["size"])
+        parents_tx = []
+        values = []
+        scripts = []
+        target_weight = WITNESS_SCALE_FACTOR * 1000 * 30 # 30KvB
+        high_fee = Decimal("0.003") # 10 sats/vB
+        self.log.info("Check that in-mempool and in-package ancestor size limits are calculated properly in packages")
+        # Mempool transactions A and B
+        for _ in range(2):
+            spk = None
+            top_coin = self.coins.pop()
+            txid = top_coin["txid"]
+            value = top_coin["amount"]
+            (tx, _, _, _) = make_chain(node, self.address, self.privkeys, txid, value, 0, spk, high_fee)
+            bulked_tx = bulk_transaction(tx, node, target_weight, self.privkeys)
+            node.sendrawtransaction(bulked_tx.serialize().hex())
+            parents_tx.append(bulked_tx)
+            values.append(Decimal(bulked_tx.vout[0].nValue) / COIN)
+            scripts.append(bulked_tx.vout[0].scriptPubKey.hex())
+
+        # Package transaction C
+        small_pc_hex = create_child_with_parents(node, self.address, self.privkeys, parents_tx, values, scripts, high_fee)
+        pc_tx = bulk_transaction(tx_from_hex(small_pc_hex), node, target_weight, self.privkeys)
+        pc_value = Decimal(pc_tx.vout[0].nValue) / COIN
+        pc_spk = pc_tx.vout[0].scriptPubKey.hex()
+        pc_hex = pc_tx.serialize().hex()
+
+        # Package transaction D
+        (small_pd, _, val, spk) = make_chain(node, self.address, self.privkeys, pc_tx.rehash(), pc_value, 0, pc_spk, high_fee)
+        prevtxs = [{
+            "txid": pc_tx.rehash(),
+            "vout": 0,
+            "scriptPubKey": spk,
+            "amount": val,
+        }]
+        pd_tx = bulk_transaction(small_pd, node, target_weight, self.privkeys, prevtxs)
+        pd_hex = pd_tx.serialize().hex()
+
+        assert_equal(2, node.getmempoolinfo()["size"])
+        testres_too_heavy = node.testmempoolaccept(rawtxs=[pc_hex, pd_hex])
+        for txres in testres_too_heavy:
+            assert_equal(txres["package-error"], "package-mempool-limits")
+
+        # Clear mempool and check that the package passes now
+        self.generate(node, 1)
+        assert all([res["allowed"] for res in node.testmempoolaccept(rawtxs=[pc_hex, pd_hex])])
+
+    def test_desc_size_limits(self):
+        """Create 3 mempool transactions and 2 package transactions (25KvB each):
+              Ma
+             ^ ^
+            Mb  Mc
+           ^     ^
+          Pd      Pe
+        The top ancestor in the package exceeds descendant size limits but only if the in-mempool
+        and in-package descendants are all considered together.
+        """
+        node = self.nodes[0]
+        assert_equal(0, node.getmempoolinfo()["size"])
+        target_weight = 21 * 1000 * WITNESS_SCALE_FACTOR
+        high_fee = Decimal("0.0021") # 10 sats/vB
+        self.log.info("Check that in-mempool and in-package descendant sizes are calculated properly in packages")
+        # Top parent in mempool, Ma
+        first_coin = self.coins.pop()
+        parent_value = (first_coin["amount"] - high_fee) / 2 # Deduct fee and make 2 outputs
+        inputs = [{"txid": first_coin["txid"], "vout": 0}]
+        outputs = [{self.address : parent_value}, {ADDRESS_BCRT1_P2WSH_OP_TRUE:  parent_value}]
+        rawtx = node.createrawtransaction(inputs, outputs)
+        parent_tx = bulk_transaction(tx_from_hex(rawtx), node, target_weight, self.privkeys)
+        node.sendrawtransaction(parent_tx.serialize().hex())
+
+        package_hex = []
+        for j in range(2): # Two legs (left and right)
+            # Mempool transaction (Mb and Mc)
+            mempool_tx = CTransaction()
+            spk = parent_tx.vout[j].scriptPubKey.hex()
+            value = Decimal(parent_tx.vout[j].nValue) / COIN
+            txid = parent_tx.rehash()
+            prevtxs = [{
+                "txid": txid,
+                "vout": j,
+                "scriptPubKey": spk,
+                "amount": value,
+            }]
+            if j == 0: # normal key
+                (tx_small, _, _, _) = make_chain(node, self.address, self.privkeys, txid, value, j, spk, high_fee)
+                mempool_tx = bulk_transaction(tx_small, node, target_weight, self.privkeys, prevtxs)
+            else: # OP_TRUE
+                inputs = [{
