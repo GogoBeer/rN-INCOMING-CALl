@@ -511,4 +511,35 @@ class MempoolPackageLimitsTest(BitcoinTestFramework):
                 (tx_small, _, _, _) = make_chain(node, self.address, self.privkeys, txid, value, j, spk, high_fee)
                 mempool_tx = bulk_transaction(tx_small, node, target_weight, self.privkeys, prevtxs)
             else: # OP_TRUE
-                inputs = [{
+                inputs = [{"txid": txid, "vout": 1}]
+                outputs = {self.address: value - high_fee}
+                small_tx = tx_from_hex(node.createrawtransaction(inputs, outputs))
+                mempool_tx = bulk_transaction(small_tx, node, target_weight, None, prevtxs)
+            node.sendrawtransaction(mempool_tx.serialize().hex())
+
+            # Package transaction (Pd and Pe)
+            spk = mempool_tx.vout[0].scriptPubKey.hex()
+            value = Decimal(mempool_tx.vout[0].nValue) / COIN
+            txid = mempool_tx.rehash()
+            (tx_small, _, _, _) = make_chain(node, self.address, self.privkeys, txid, value, 0, spk, high_fee)
+            prevtxs = [{
+                "txid": txid,
+                "vout": 0,
+                "scriptPubKey": spk,
+                "amount": value,
+            }]
+            package_tx = bulk_transaction(tx_small, node, target_weight, self.privkeys, prevtxs)
+            package_hex.append(package_tx.serialize().hex())
+
+        assert_equal(3, node.getmempoolinfo()["size"])
+        assert_equal(2, len(package_hex))
+        testres_too_heavy = node.testmempoolaccept(rawtxs=package_hex)
+        for txres in testres_too_heavy:
+            assert_equal(txres["package-error"], "package-mempool-limits")
+
+        # Clear mempool and check that the package passes now
+        self.generate(node, 1)
+        assert all([res["allowed"] for res in node.testmempoolaccept(rawtxs=package_hex)])
+
+if __name__ == "__main__":
+    MempoolPackageLimitsTest().main()
