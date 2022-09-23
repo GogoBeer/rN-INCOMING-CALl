@@ -89,4 +89,25 @@ class MempoolCoinbaseTest(BitcoinTestFramework):
         spend_1_id = self.nodes[0].sendrawtransaction(spend_1['hex'])
         spend_2_1_id = self.nodes[0].sendrawtransaction(spend_2_1['hex'])
 
-        assert_equal(set(self.
+        assert_equal(set(self.nodes[0].getrawmempool()), {spend_1_id, spend_2_1_id, timelock_tx_id})
+        self.sync_all()
+
+        self.log.info("invalidate the last block")
+        for node in self.nodes:
+            node.invalidateblock(last_block[0])
+        self.log.info("The time-locked transaction is now too immature and has been removed from the mempool")
+        self.log.info("spend_3_1 has been re-orged out of the chain and is back in the mempool")
+        assert_equal(set(self.nodes[0].getrawmempool()), {spend_1_id, spend_2_1_id, spend_3_1_id})
+
+        self.log.info("Use invalidateblock to re-org back and make all those coinbase spends immature/invalid")
+        b = self.nodes[0].getblockhash(first_block + 100)
+        for node in self.nodes:
+            node.invalidateblock(b)
+
+        self.log.info("Check that the mempool is empty")
+        assert_equal(set(self.nodes[0].getrawmempool()), set())
+        self.sync_all()
+
+
+if __name__ == '__main__':
+    MempoolCoinbaseTest().main()
