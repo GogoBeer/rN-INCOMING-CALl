@@ -102,4 +102,160 @@ class MiningTest(BitcoinTestFramework):
         assert 'default_witness_commitment' in tmpl
         witness_commitment = tmpl['default_witness_commitment']
 
-  
+        # Check that default_witness_commitment is correct.
+        witness_root = CBlock.get_merkle_root([ser_uint256(0),
+                                               ser_uint256(txid)])
+        script = get_witness_script(witness_root, 0)
+        assert_equal(witness_commitment, script.hex())
+
+        # Mine a block to leave initial block download and clear the mempool
+        self.generatetoaddress(node, 1, node.get_deterministic_priv_key().address)
+        tmpl = node.getblocktemplate(NORMAL_GBT_REQUEST_PARAMS)
+        self.log.info("getblocktemplate: Test capability advertised")
+        assert 'proposal' in tmpl['capabilities']
+        assert 'coinbasetxn' not in tmpl
+
+        next_height = int(tmpl["height"])
+        coinbase_tx = create_coinbase(height=next_height)
+        # sequence numbers must not be max for nLockTime to have effect
+        coinbase_tx.vin[0].nSequence = 2**32 - 2
+        coinbase_tx.rehash()
+
+        block = CBlock()
+        block.nVersion = tmpl["version"]
+        block.hashPrevBlock = int(tmpl["previousblockhash"], 16)
+        block.nTime = tmpl["curtime"]
+        block.nBits = int(tmpl["bits"], 16)
+        block.nNonce = 0
+        block.vtx = [coinbase_tx]
+
+        self.log.info("getblocktemplate: segwit rule must be set")
+        assert_raises_rpc_error(-8, "getblocktemplate must be called with the segwit rule set", node.getblocktemplate)
+
+        self.log.info("getblocktemplate: Test valid block")
+        assert_template(node, block, None)
+
+        self.log.info("submitblock: Test block decode failure")
+        assert_raises_rpc_error(-22, "Block decode failed", node.submitblock, block.serialize()[:-15].hex())
+
+        self.log.info("getblocktemplate: Test bad input hash for coinbase transaction")
+        bad_block = copy.deepcopy(block)
+        bad_block.vtx[0].vin[0].prevout.hash += 1
+        bad_block.vtx[0].rehash()
+        assert_template(node, bad_block, 'bad-cb-missing')
+
+        self.log.info("submitblock: Test invalid coinbase transaction")
+        assert_raises_rpc_error(-22, "Block does not start with a coinbase", node.submitblock, bad_block.serialize().hex())
+
+        self.log.info("getblocktemplate: Test truncated final transaction")
+        assert_raises_rpc_error(-22, "Block decode failed", node.getblocktemplate, {
+            'data': block.serialize()[:-1].hex(),
+            'mode': 'proposal',
+            'rules': ['segwit'],
+        })
+
+        self.log.info("getblocktemplate: Test duplicate transaction")
+        bad_block = copy.deepcopy(block)
+        bad_block.vtx.append(bad_block.vtx[0])
+        assert_template(node, bad_block, 'bad-txns-duplicate')
+        assert_submitblock(bad_block, 'bad-txns-duplicate', 'bad-txns-duplicate')
+
+        self.log.info("getblocktemplate: Test invalid transaction")
+        bad_block = copy.deepcopy(block)
+        bad_tx = copy.deepcopy(bad_block.vtx[0])
+        bad_tx.vin[0].prevout.hash = 255
+        bad_tx.rehash()
+        bad_block.vtx.append(bad_tx)
+        assert_template(node, bad_block, 'bad-txns-inputs-missingorspent')
+        assert_submitblock(bad_block, 'bad-txns-inputs-missingorspent')
+
+        self.log.info("getblocktemplate: Test nonfinal transaction")
+        bad_block = copy.deepcopy(block)
+        bad_block.vtx[0].nLockTime = 2**32 - 1
+        bad_block.vtx[0].rehash()
+        assert_template(node, bad_block, 'bad-txns-nonfinal')
+        assert_submitblock(bad_block, 'bad-txns-nonfinal')
+
+        self.log.info("getblocktemplate: Test bad tx count")
+        # The tx count is immediately after the block header
+        bad_block_sn = bytearray(block.serialize())
+        assert_equal(bad_block_sn[BLOCK_HEADER_SIZE], 1)
+        bad_block_sn[BLOCK_HEADER_SIZE] += 1
+        assert_raises_rpc_error(-22, "Block decode failed", node.getblocktemplate, {
+            'data': bad_block_sn.hex(),
+            'mode': 'proposal',
+            'rules': ['segwit'],
+        })
+
+        self.log.info("getblocktemplate: Test bad bits")
+        bad_block = copy.deepcopy(block)
+        bad_block.nBits = 469762303  # impossible in the real world
+        assert_template(node, bad_block, 'bad-diffbits')
+
+        self.log.info("getblocktemplate: Test bad merkle root")
+        bad_block = copy.deepcopy(block)
+        bad_block.hashMerkleRoot += 1
+        assert_template(node, bad_block, 'bad-txnmrklroot', False)
+        assert_submitblock(bad_block, 'bad-txnmrklroot', 'bad-txnmrklroot')
+
+        self.log.info("getblocktemplate: Test bad timestamps")
+        bad_block = copy.deepcopy(block)
+        bad_block.nTime = 2**31 - 1
+        assert_template(node, bad_block, 'time-too-new')
+        assert_submitblock(bad_block, 'time-too-new', 'time-too-new')
+        bad_block.nTime = 0
+        assert_template(node, bad_block, 'time-too-old')
+        assert_submitblock(bad_block, 'time-too-old', 'time-too-old')
+
+        self.log.info("getblocktemplate: Test not best block")
+        bad_block = copy.deepcopy(block)
+        bad_block.hashPrevBlock = 123
+        assert_template(node, bad_block, 'inconclusive-not-best-prevblk')
+        assert_submitblock(bad_block, 'prev-blk-not-found', 'prev-blk-not-found')
+
+        self.log.info('submitheader tests')
+        assert_raises_rpc_error(-22, 'Block header decode failed', lambda: node.submitheader(hexdata='xx' * BLOCK_HEADER_SIZE))
+        assert_raises_rpc_error(-22, 'Block header decode failed', lambda: node.submitheader(hexdata='ff' * (BLOCK_HEADER_SIZE-2)))
+        assert_raises_rpc_error(-25, 'Must submit previous header', lambda: node.submitheader(hexdata=super(CBlock, bad_block).serialize().hex()))
+
+        block.nTime += 1
+        block.solve()
+
+        def chain_tip(b_hash, *, status='headers-only', branchlen=1):
+            return {'hash': b_hash, 'height': 202, 'branchlen': branchlen, 'status': status}
+
+        assert chain_tip(block.hash) not in node.getchaintips()
+        node.submitheader(hexdata=block.serialize().hex())
+        assert chain_tip(block.hash) in node.getchaintips()
+        node.submitheader(hexdata=CBlockHeader(block).serialize().hex())  # Noop
+        assert chain_tip(block.hash) in node.getchaintips()
+
+        bad_block_root = copy.deepcopy(block)
+        bad_block_root.hashMerkleRoot += 2
+        bad_block_root.solve()
+        assert chain_tip(bad_block_root.hash) not in node.getchaintips()
+        node.submitheader(hexdata=CBlockHeader(bad_block_root).serialize().hex())
+        assert chain_tip(bad_block_root.hash) in node.getchaintips()
+        # Should still reject invalid blocks, even if we have the header:
+        assert_equal(node.submitblock(hexdata=bad_block_root.serialize().hex()), 'bad-txnmrklroot')
+        assert_equal(node.submitblock(hexdata=bad_block_root.serialize().hex()), 'bad-txnmrklroot')
+        assert chain_tip(bad_block_root.hash) in node.getchaintips()
+        # We know the header for this invalid block, so should just return early without error:
+        node.submitheader(hexdata=CBlockHeader(bad_block_root).serialize().hex())
+        assert chain_tip(bad_block_root.hash) in node.getchaintips()
+
+        bad_block_lock = copy.deepcopy(block)
+        bad_block_lock.vtx[0].nLockTime = 2**32 - 1
+        bad_block_lock.vtx[0].rehash()
+        bad_block_lock.hashMerkleRoot = bad_block_lock.calc_merkle_root()
+        bad_block_lock.solve()
+        assert_equal(node.submitblock(hexdata=bad_block_lock.serialize().hex()), 'bad-txns-nonfinal')
+        assert_equal(node.submitblock(hexdata=bad_block_lock.serialize().hex()), 'duplicate-invalid')
+        # Build a "good" block on top of the submitted bad block
+        bad_block2 = copy.deepcopy(block)
+        bad_block2.hashPrevBlock = bad_block_lock.sha256
+        bad_block2.solve()
+        assert_raises_rpc_error(-25, 'bad-prevblk', lambda: node.submitheader(hexdata=CBlockHeader(bad_block2).serialize().hex()))
+
+        # Should reject invalid header right away
+        bad_block_time = copy.deepcopy(block)
