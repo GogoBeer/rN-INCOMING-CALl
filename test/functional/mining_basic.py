@@ -259,3 +259,25 @@ class MiningTest(BitcoinTestFramework):
 
         # Should reject invalid header right away
         bad_block_time = copy.deepcopy(block)
+        bad_block_time.nTime = 1
+        bad_block_time.solve()
+        assert_raises_rpc_error(-25, 'time-too-old', lambda: node.submitheader(hexdata=CBlockHeader(bad_block_time).serialize().hex()))
+
+        # Should ask for the block from a p2p node, if they announce the header as well:
+        peer = node.add_p2p_connection(P2PDataStore())
+        peer.wait_for_getheaders(timeout=5)  # Drop the first getheaders
+        peer.send_blocks_and_test(blocks=[block], node=node)
+        # Must be active now:
+        assert chain_tip(block.hash, status='active', branchlen=0) in node.getchaintips()
+
+        # Building a few blocks should give the same results
+        self.generatetoaddress(node, 10, node.get_deterministic_priv_key().address)
+        assert_raises_rpc_error(-25, 'time-too-old', lambda: node.submitheader(hexdata=CBlockHeader(bad_block_time).serialize().hex()))
+        assert_raises_rpc_error(-25, 'bad-prevblk', lambda: node.submitheader(hexdata=CBlockHeader(bad_block2).serialize().hex()))
+        node.submitheader(hexdata=CBlockHeader(block).serialize().hex())
+        node.submitheader(hexdata=CBlockHeader(bad_block_root).serialize().hex())
+        assert_equal(node.submitblock(hexdata=block.serialize().hex()), 'duplicate')  # valid
+
+
+if __name__ == '__main__':
+    MiningTest().main()
