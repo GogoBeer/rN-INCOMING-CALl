@@ -85,4 +85,18 @@ parser_displayaddress = subparsers.add_parser('displayaddress', help='display ad
 parser_displayaddress.add_argument('--desc', metavar='desc')
 parser_displayaddress.set_defaults(func=displayaddress)
 
-parser_signtx = subparsers.add_parser('signtx
+parser_signtx = subparsers.add_parser('signtx')
+parser_signtx.add_argument('psbt', metavar='psbt')
+
+parser_signtx.set_defaults(func=signtx)
+
+if not sys.stdin.isatty():
+    buffer = sys.stdin.read()
+    if buffer and buffer.rstrip() != "":
+        sys.argv.extend(buffer.rstrip().split(" "))
+
+args = parser.parse_args()
+
+perform_pre_checks()
+
+args.func(args)
