@@ -55,4 +55,33 @@ class RejectLowDifficultyHeadersTest(BitcoinTestFramework):
             'status': 'headers-only',
         } in self.nodes[0].getchaintips()
 
-        self.log.info("Feed a
+        self.log.info("Feed all fork headers (fails due to checkpoint)")
+        with self.nodes[0].assert_debug_log(['bad-fork-prior-to-checkpoint']):
+            peer_checkpoint.send_message(msg_headers(self.headers_fork))
+            peer_checkpoint.wait_for_disconnect()
+
+        self.log.info("Feed all fork headers (succeeds without checkpoint)")
+        # On node 0 it succeeds because checkpoints are disabled
+        self.restart_node(0, extra_args=['-nocheckpoints'])
+        peer_no_checkpoint = self.nodes[0].add_p2p_connection(P2PInterface())
+        peer_no_checkpoint.send_and_ping(msg_headers(self.headers_fork))
+        assert {
+            "height": 2,
+            "hash": "00000000b0494bd6c3d5ff79c497cfce40831871cbf39b1bc28bd1dac817dc39",
+            "branchlen": 2,
+            "status": "headers-only",
+        } in self.nodes[0].getchaintips()
+
+        # On node 1 it succeeds because no checkpoint has been reached yet by a chain tip
+        peer_before_checkpoint = self.nodes[1].add_p2p_connection(P2PInterface())
+        peer_before_checkpoint.send_and_ping(msg_headers(self.headers_fork))
+        assert {
+            "height": 2,
+            "hash": "00000000b0494bd6c3d5ff79c497cfce40831871cbf39b1bc28bd1dac817dc39",
+            "branchlen": 2,
+            "status": "headers-only",
+        } in self.nodes[1].getchaintips()
+
+
+if __name__ == '__main__':
+    RejectLowDifficultyHeadersTest().main()
