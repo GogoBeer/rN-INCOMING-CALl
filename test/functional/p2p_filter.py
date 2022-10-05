@@ -157,4 +157,90 @@ class FilterTest(BitcoinTestFramework):
 
     def test_filter(self, filter_peer):
         # Set the bloomfilter using filterload
-        filter_peer.send_and_ping(filter_peer.watch_filter_
+        filter_peer.send_and_ping(filter_peer.watch_filter_init)
+        # If fRelay is not already True, sending filterload sets it to True
+        assert self.nodes[0].getpeerinfo()[0]['relaytxes']
+
+        self.log.info('Check that we receive merkleblock and tx if the filter matches a tx in a block')
+        block_hash = self.generatetoscriptpubkey(filter_peer.watch_script_pubkey)
+        txid = self.nodes[0].getblock(block_hash)['tx'][0]
+        filter_peer.wait_for_merkleblock(block_hash)
+        filter_peer.wait_for_tx(txid)
+
+        self.log.info('Check that we only receive a merkleblock if the filter does not match a tx in a block')
+        filter_peer.tx_received = False
+        block_hash = self.generatetoscriptpubkey(getnewdestination()[1])
+        filter_peer.wait_for_merkleblock(block_hash)
+        assert not filter_peer.tx_received
+
+        self.log.info('Check that we not receive a tx if the filter does not match a mempool tx')
+        filter_peer.merkleblock_received = False
+        filter_peer.tx_received = False
+        self.wallet.send_to(from_node=self.nodes[0], scriptPubKey=getnewdestination()[1], amount=7 * COIN)
+        filter_peer.sync_send_with_ping()
+        assert not filter_peer.merkleblock_received
+        assert not filter_peer.tx_received
+
+        self.log.info('Check that we receive a tx if the filter matches a mempool tx')
+        filter_peer.merkleblock_received = False
+        txid, _ = self.wallet.send_to(from_node=self.nodes[0], scriptPubKey=filter_peer.watch_script_pubkey, amount=9 * COIN)
+        filter_peer.wait_for_tx(txid)
+        assert not filter_peer.merkleblock_received
+
+        self.log.info('Check that after deleting filter all txs get relayed again')
+        filter_peer.send_and_ping(msg_filterclear())
+        for _ in range(5):
+            txid, _ = self.wallet.send_to(from_node=self.nodes[0], scriptPubKey=getnewdestination()[1], amount=7 * COIN)
+            filter_peer.wait_for_tx(txid)
+
+        self.log.info('Check that request for filtered blocks is ignored if no filter is set')
+        filter_peer.merkleblock_received = False
+        filter_peer.tx_received = False
+        with self.nodes[0].assert_debug_log(expected_msgs=['received getdata']):
+            block_hash = self.generatetoscriptpubkey(getnewdestination()[1])
+            filter_peer.wait_for_inv([CInv(MSG_BLOCK, int(block_hash, 16))])
+            filter_peer.sync_with_ping()
+            assert not filter_peer.merkleblock_received
+            assert not filter_peer.tx_received
+
+        self.log.info('Check that sending "filteradd" if no filter is set is treated as misbehavior')
+        with self.nodes[0].assert_debug_log(['Misbehaving']):
+            filter_peer.send_and_ping(msg_filteradd(data=b'letsmisbehave'))
+
+        self.log.info("Check that division-by-zero remote crash bug [CVE-2013-5700] is fixed")
+        filter_peer.send_and_ping(msg_filterload(data=b'', nHashFuncs=1))
+        filter_peer.send_and_ping(msg_filteradd(data=b'letstrytocrashthisnode'))
+        self.nodes[0].disconnect_p2ps()
+
+    def run_test(self):
+        self.wallet = MiniWallet(self.nodes[0])
+        self.wallet.rescan_utxos()
+
+        filter_peer = self.nodes[0].add_p2p_connection(P2PBloomFilter())
+        self.log.info('Test filter size limits')
+        self.test_size_limits(filter_peer)
+
+        self.log.info('Test BIP 37 for a node with fRelay = True (default)')
+        self.test_filter(filter_peer)
+        self.nodes[0].disconnect_p2ps()
+
+        self.log.info('Test BIP 37 for a node with fRelay = False')
+        # Add peer but do not send version yet
+        filter_peer_without_nrelay = self.nodes[0].add_p2p_connection(P2PBloomFilter(), send_version=False, wait_for_verack=False)
+        # Send version with relay=False
+        version_without_fRelay = msg_version()
+        version_without_fRelay.nVersion = P2P_VERSION
+        version_without_fRelay.strSubVer = P2P_SUBVERSION
+        version_without_fRelay.nServices = P2P_SERVICES
+        version_without_fRelay.relay = 0
+        filter_peer_without_nrelay.send_message(version_without_fRelay)
+        filter_peer_without_nrelay.wait_for_verack()
+        assert not self.nodes[0].getpeerinfo()[0]['relaytxes']
+        self.test_frelay_false(filter_peer_without_nrelay)
+        self.test_filter(filter_peer_without_nrelay)
+
+        self.test_msg_mempool()
+
+
+if __name__ == '__main__':
+    FilterTest().main()
