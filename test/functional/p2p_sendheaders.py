@@ -238,4 +238,163 @@ class SendHeadersTest(BitcoinTestFramework):
         self.test_nonnull_locators(test_node, inv_node)
 
     def test_null_locators(self, test_node, inv_node):
-        tip = self.nodes[0].getblockheader(self.generatetoaddress(self.nodes[0], 1, self.nodes[0].get_deterministic_priv_key().a
+        tip = self.nodes[0].getblockheader(self.generatetoaddress(self.nodes[0], 1, self.nodes[0].get_deterministic_priv_key().address)[0])
+        tip_hash = int(tip["hash"], 16)
+
+        inv_node.check_last_inv_announcement(inv=[tip_hash])
+        test_node.check_last_inv_announcement(inv=[tip_hash])
+
+        self.log.info("Verify getheaders with null locator and valid hashstop returns headers.")
+        test_node.clear_block_announcements()
+        test_node.send_get_headers(locator=[], hashstop=tip_hash)
+        test_node.check_last_headers_announcement(headers=[tip_hash])
+
+        self.log.info("Verify getheaders with null locator and invalid hashstop does not return headers.")
+        block = create_block(int(tip["hash"], 16), create_coinbase(tip["height"] + 1), tip["mediantime"] + 1)
+        block.solve()
+        test_node.send_header_for_blocks([block])
+        test_node.clear_block_announcements()
+        test_node.send_get_headers(locator=[], hashstop=int(block.hash, 16))
+        test_node.sync_with_ping()
+        assert_equal(test_node.block_announced, False)
+        inv_node.clear_block_announcements()
+        test_node.send_message(msg_block(block))
+        inv_node.check_last_inv_announcement(inv=[int(block.hash, 16)])
+
+    def test_nonnull_locators(self, test_node, inv_node):
+        tip = int(self.nodes[0].getbestblockhash(), 16)
+
+        # PART 1
+        # 1. Mine a block; expect inv announcements each time
+        self.log.info("Part 1: headers don't start before sendheaders message...")
+        for i in range(4):
+            self.log.debug("Part 1.{}: starting...".format(i))
+            old_tip = tip
+            tip = self.mine_blocks(1)
+            inv_node.check_last_inv_announcement(inv=[tip])
+            test_node.check_last_inv_announcement(inv=[tip])
+            # Try a few different responses; none should affect next announcement
+            if i == 0:
+                # first request the block
+                test_node.send_get_data([tip])
+                test_node.wait_for_block(tip)
+            elif i == 1:
+                # next try requesting header and block
+                test_node.send_get_headers(locator=[old_tip], hashstop=tip)
+                test_node.send_get_data([tip])
+                test_node.wait_for_block(tip)
+                test_node.clear_block_announcements()  # since we requested headers...
+            elif i == 2:
+                # this time announce own block via headers
+                inv_node.clear_block_announcements()
+                height = self.nodes[0].getblockcount()
+                last_time = self.nodes[0].getblock(self.nodes[0].getbestblockhash())['time']
+                block_time = last_time + 1
+                new_block = create_block(tip, create_coinbase(height + 1), block_time)
+                new_block.solve()
+                test_node.send_header_for_blocks([new_block])
+                test_node.wait_for_getdata([new_block.sha256])
+                test_node.send_and_ping(msg_block(new_block))  # make sure this block is processed
+                inv_node.wait_until(lambda: inv_node.block_announced)
+                inv_node.clear_block_announcements()
+                test_node.clear_block_announcements()
+
+        self.log.info("Part 1: success!")
+        self.log.info("Part 2: announce blocks with headers after sendheaders message...")
+        # PART 2
+        # 2. Send a sendheaders message and test that headers announcements
+        # commence and keep working.
+        test_node.send_message(msg_sendheaders())
+        prev_tip = int(self.nodes[0].getbestblockhash(), 16)
+        test_node.send_get_headers(locator=[prev_tip], hashstop=0)
+        test_node.sync_with_ping()
+
+        # Now that we've synced headers, headers announcements should work
+        tip = self.mine_blocks(1)
+        inv_node.check_last_inv_announcement(inv=[tip])
+        test_node.check_last_headers_announcement(headers=[tip])
+
+        height = self.nodes[0].getblockcount() + 1
+        block_time += 10  # Advance far enough ahead
+        for i in range(10):
+            self.log.debug("Part 2.{}: starting...".format(i))
+            # Mine i blocks, and alternate announcing either via
+            # inv (of tip) or via headers. After each, new blocks
+            # mined by the node should successfully be announced
+            # with block header, even though the blocks are never requested
+            for j in range(2):
+                self.log.debug("Part 2.{}.{}: starting...".format(i, j))
+                blocks = []
+                for _ in range(i + 1):
+                    blocks.append(create_block(tip, create_coinbase(height), block_time))
+                    blocks[-1].solve()
+                    tip = blocks[-1].sha256
+                    block_time += 1
+                    height += 1
+                if j == 0:
+                    # Announce via inv
+                    test_node.send_block_inv(tip)
+                    test_node.wait_for_getheaders()
+                    # Should have received a getheaders now
+                    test_node.send_header_for_blocks(blocks)
+                    # Test that duplicate inv's won't result in duplicate
+                    # getdata requests, or duplicate headers announcements
+                    [inv_node.send_block_inv(x.sha256) for x in blocks]
+                    test_node.wait_for_getdata([x.sha256 for x in blocks])
+                    inv_node.sync_with_ping()
+                else:
+                    # Announce via headers
+                    test_node.send_header_for_blocks(blocks)
+                    test_node.wait_for_getdata([x.sha256 for x in blocks])
+                    # Test that duplicate headers won't result in duplicate
+                    # getdata requests (the check is further down)
+                    inv_node.send_header_for_blocks(blocks)
+                    inv_node.sync_with_ping()
+                [test_node.send_message(msg_block(x)) for x in blocks]
+                test_node.sync_with_ping()
+                inv_node.sync_with_ping()
+                # This block should not be announced to the inv node (since it also
+                # broadcast it)
+                assert "inv" not in inv_node.last_message
+                assert "headers" not in inv_node.last_message
+                tip = self.mine_blocks(1)
+                inv_node.check_last_inv_announcement(inv=[tip])
+                test_node.check_last_headers_announcement(headers=[tip])
+                height += 1
+                block_time += 1
+
+        self.log.info("Part 2: success!")
+
+        self.log.info("Part 3: headers announcements can stop after large reorg, and resume after headers/inv from peer...")
+
+        # PART 3.  Headers announcements can stop after large reorg, and resume after
+        # getheaders or inv from peer.
+        for j in range(2):
+            self.log.debug("Part 3.{}: starting...".format(j))
+            # First try mining a reorg that can propagate with header announcement
+            new_block_hashes = self.mine_reorg(length=7)
+            tip = new_block_hashes[-1]
+            inv_node.check_last_inv_announcement(inv=[tip])
+            test_node.check_last_headers_announcement(headers=new_block_hashes)
+
+            block_time += 8
+
+            # Mine a too-large reorg, which should be announced with a single inv
+            new_block_hashes = self.mine_reorg(length=8)
+            tip = new_block_hashes[-1]
+            inv_node.check_last_inv_announcement(inv=[tip])
+            test_node.check_last_inv_announcement(inv=[tip])
+
+            block_time += 9
+
+            fork_point = self.nodes[0].getblock("%064x" % new_block_hashes[0])["previousblockhash"]
+            fork_point = int(fork_point, 16)
+
+            # Use getblocks/getdata
+            test_node.send_getblocks(locator=[fork_point])
+            test_node.check_last_inv_announcement(inv=new_block_hashes)
+            test_node.send_get_data(new_block_hashes)
+            test_node.wait_for_block(new_block_hashes[-1])
+
+            for i in range(3):
+                self.log.debug("
