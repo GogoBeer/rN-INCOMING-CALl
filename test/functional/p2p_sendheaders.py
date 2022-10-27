@@ -573,4 +573,20 @@ class SendHeadersTest(BitcoinTestFramework):
             # Send a header that doesn't connect, check that we get a getheaders.
             with p2p_lock:
                 test_node.last_message.pop("getheaders", None)
-            test_node.send_header_for_blocks([
+            test_node.send_header_for_blocks([blocks[i % len(blocks)]])
+            test_node.wait_for_getheaders()
+
+        # Eventually this stops working.
+        test_node.send_header_for_blocks([blocks[-1]])
+
+        # Should get disconnected
+        test_node.wait_for_disconnect()
+
+        self.log.info("Part 5: success!")
+
+        # Finally, check that the inv node never received a getdata request,
+        # throughout the test
+        assert "getdata" not in inv_node.last_message
+
+if __name__ == '__main__':
+    SendHeadersTest().main()
