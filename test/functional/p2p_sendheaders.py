@@ -397,4 +397,180 @@ class SendHeadersTest(BitcoinTestFramework):
             test_node.wait_for_block(new_block_hashes[-1])
 
             for i in range(3):
-                self.log.debug("
+                self.log.debug("Part 3.{}.{}: starting...".format(j, i))
+
+                # Mine another block, still should get only an inv
+                tip = self.mine_blocks(1)
+                inv_node.check_last_inv_announcement(inv=[tip])
+                test_node.check_last_inv_announcement(inv=[tip])
+                if i == 0:
+                    # Just get the data -- shouldn't cause headers announcements to resume
+                    test_node.send_get_data([tip])
+                    test_node.wait_for_block(tip)
+                elif i == 1:
+                    # Send a getheaders message that shouldn't trigger headers announcements
+                    # to resume (best header sent will be too old)
+                    test_node.send_get_headers(locator=[fork_point], hashstop=new_block_hashes[1])
+                    test_node.send_get_data([tip])
+                    test_node.wait_for_block(tip)
+                elif i == 2:
+                    # This time, try sending either a getheaders to trigger resumption
+                    # of headers announcements, or mine a new block and inv it, also
+                    # triggering resumption of headers announcements.
+                    test_node.send_get_data([tip])
+                    test_node.wait_for_block(tip)
+                    if j == 0:
+                        test_node.send_get_headers(locator=[tip], hashstop=0)
+                        test_node.sync_with_ping()
+                    else:
+                        test_node.send_block_inv(tip)
+                        test_node.sync_with_ping()
+            # New blocks should now be announced with header
+            tip = self.mine_blocks(1)
+            inv_node.check_last_inv_announcement(inv=[tip])
+            test_node.check_last_headers_announcement(headers=[tip])
+
+        self.log.info("Part 3: success!")
+
+        self.log.info("Part 4: Testing direct fetch behavior...")
+        tip = self.mine_blocks(1)
+        height = self.nodes[0].getblockcount() + 1
+        last_time = self.nodes[0].getblock(self.nodes[0].getbestblockhash())['time']
+        block_time = last_time + 1
+
+        # Create 2 blocks.  Send the blocks, then send the headers.
+        blocks = []
+        for _ in range(2):
+            blocks.append(create_block(tip, create_coinbase(height), block_time))
+            blocks[-1].solve()
+            tip = blocks[-1].sha256
+            block_time += 1
+            height += 1
+            inv_node.send_message(msg_block(blocks[-1]))
+
+        inv_node.sync_with_ping()  # Make sure blocks are processed
+        test_node.last_message.pop("getdata", None)
+        test_node.send_header_for_blocks(blocks)
+        test_node.sync_with_ping()
+        # should not have received any getdata messages
+        with p2p_lock:
+            assert "getdata" not in test_node.last_message
+
+        # This time, direct fetch should work
+        blocks = []
+        for _ in range(3):
+            blocks.append(create_block(tip, create_coinbase(height), block_time))
+            blocks[-1].solve()
+            tip = blocks[-1].sha256
+            block_time += 1
+            height += 1
+
+        test_node.send_header_for_blocks(blocks)
+        test_node.sync_with_ping()
+        test_node.wait_for_getdata([x.sha256 for x in blocks], timeout=DIRECT_FETCH_RESPONSE_TIME)
+
+        [test_node.send_message(msg_block(x)) for x in blocks]
+
+        test_node.sync_with_ping()
+
+        # Now announce a header that forks the last two blocks
+        tip = blocks[0].sha256
+        height -= 2
+        blocks = []
+
+        # Create extra blocks for later
+        for _ in range(20):
+            blocks.append(create_block(tip, create_coinbase(height), block_time))
+            blocks[-1].solve()
+            tip = blocks[-1].sha256
+            block_time += 1
+            height += 1
+
+        # Announcing one block on fork should not trigger direct fetch
+        # (less work than tip)
+        test_node.last_message.pop("getdata", None)
+        test_node.send_header_for_blocks(blocks[0:1])
+        test_node.sync_with_ping()
+        with p2p_lock:
+            assert "getdata" not in test_node.last_message
+
+        # Announcing one more block on fork should trigger direct fetch for
+        # both blocks (same work as tip)
+        test_node.send_header_for_blocks(blocks[1:2])
+        test_node.sync_with_ping()
+        test_node.wait_for_getdata([x.sha256 for x in blocks[0:2]], timeout=DIRECT_FETCH_RESPONSE_TIME)
+
+        # Announcing 16 more headers should trigger direct fetch for 14 more
+        # blocks
+        test_node.send_header_for_blocks(blocks[2:18])
+        test_node.sync_with_ping()
+        test_node.wait_for_getdata([x.sha256 for x in blocks[2:16]], timeout=DIRECT_FETCH_RESPONSE_TIME)
+
+        # Announcing 1 more header should not trigger any response
+        test_node.last_message.pop("getdata", None)
+        test_node.send_header_for_blocks(blocks[18:19])
+        test_node.sync_with_ping()
+        with p2p_lock:
+            assert "getdata" not in test_node.last_message
+
+        self.log.info("Part 4: success!")
+
+        # Now deliver all those blocks we announced.
+        [test_node.send_message(msg_block(x)) for x in blocks]
+
+        self.log.info("Part 5: Testing handling of unconnecting headers")
+        # First we test that receipt of an unconnecting header doesn't prevent
+        # chain sync.
+        for i in range(10):
+            self.log.debug("Part 5.{}: starting...".format(i))
+            test_node.last_message.pop("getdata", None)
+            blocks = []
+            # Create two more blocks.
+            for _ in range(2):
+                blocks.append(create_block(tip, create_coinbase(height), block_time))
+                blocks[-1].solve()
+                tip = blocks[-1].sha256
+                block_time += 1
+                height += 1
+            # Send the header of the second block -> this won't connect.
+            with p2p_lock:
+                test_node.last_message.pop("getheaders", None)
+            test_node.send_header_for_blocks([blocks[1]])
+            test_node.wait_for_getheaders()
+            test_node.send_header_for_blocks(blocks)
+            test_node.wait_for_getdata([x.sha256 for x in blocks])
+            [test_node.send_message(msg_block(x)) for x in blocks]
+            test_node.sync_with_ping()
+            assert_equal(int(self.nodes[0].getbestblockhash(), 16), blocks[1].sha256)
+
+        blocks = []
+        # Now we test that if we repeatedly don't send connecting headers, we
+        # don't go into an infinite loop trying to get them to connect.
+        MAX_UNCONNECTING_HEADERS = 10
+        for _ in range(MAX_UNCONNECTING_HEADERS + 1):
+            blocks.append(create_block(tip, create_coinbase(height), block_time))
+            blocks[-1].solve()
+            tip = blocks[-1].sha256
+            block_time += 1
+            height += 1
+
+        for i in range(1, MAX_UNCONNECTING_HEADERS):
+            # Send a header that doesn't connect, check that we get a getheaders.
+            with p2p_lock:
+                test_node.last_message.pop("getheaders", None)
+            test_node.send_header_for_blocks([blocks[i]])
+            test_node.wait_for_getheaders()
+
+        # Next header will connect, should re-set our count:
+        test_node.send_header_for_blocks([blocks[0]])
+
+        # Remove the first two entries (blocks[1] would connect):
+        blocks = blocks[2:]
+
+        # Now try to see how many unconnecting headers we can send
+        # before we get disconnected.  Should be 5*MAX_UNCONNECTING_HEADERS
+        for i in range(5 * MAX_UNCONNECTING_HEADERS - 1):
+            # Send a header that doesn't connect, check that we get a getheaders.
+            with p2p_lock:
+                test_node.last_message.pop("getheaders", None)
+            test_node.send_header_for_blocks([
