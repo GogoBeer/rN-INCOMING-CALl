@@ -248,4 +248,43 @@ class AcceptBlockTest(BitcoinTestFramework):
         assert tip_entry_found
         assert_raises_rpc_error(-1, "Block not found on disk", self.nodes[0].getblock, block_292.hash)
 
-        test_node.send_message(
+        test_node.send_message(msg_block(block_289f))
+        test_node.send_and_ping(msg_block(block_290f))
+
+        self.nodes[0].getblock(block_289f.hash)
+        self.nodes[0].getblock(block_290f.hash)
+
+        test_node.send_message(msg_block(block_291))
+
+        # At this point we've sent an obviously-bogus block, wait for full processing
+        # without assuming whether we will be disconnected or not
+        try:
+            # Only wait a short while so the test doesn't take forever if we do get
+            # disconnected
+            test_node.sync_with_ping(timeout=1)
+        except AssertionError:
+            test_node.wait_for_disconnect()
+
+            self.nodes[0].disconnect_p2ps()
+            test_node = self.nodes[0].add_p2p_connection(P2PInterface())
+
+        # We should have failed reorg and switched back to 290 (but have block 291)
+        assert_equal(self.nodes[0].getblockcount(), 290)
+        assert_equal(self.nodes[0].getbestblockhash(), all_blocks[286].hash)
+        assert_equal(self.nodes[0].getblock(block_291.hash)["confirmations"], -1)
+
+        # Now send a new header on the invalid chain, indicating we're forked off, and expect to get disconnected
+        block_293 = create_block(block_292.sha256, create_coinbase(293), block_292.nTime+1)
+        block_293.solve()
+        headers_message = msg_headers()
+        headers_message.headers.append(CBlockHeader(block_293))
+        test_node.send_message(headers_message)
+        test_node.wait_for_disconnect()
+
+        # 9. Connect node1 to node0 and ensure it is able to sync
+        self.connect_nodes(0, 1)
+        self.sync_blocks([self.nodes[0], self.nodes[1]])
+        self.log.info("Successfully synced nodes 1 and 0")
+
+if __name__ == '__main__':
+    AcceptBlockTest().main()
