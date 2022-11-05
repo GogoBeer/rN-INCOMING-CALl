@@ -86,4 +86,120 @@ class DecodeScriptTest(BitcoinTestFramework):
         self.log.info("- multisig")
         # <m> <A pubkey> <B pubkey> <C pubkey> <n> OP_CHECKMULTISIG
         # just imagine that the pub keys used below are different.
-        # for our pur
+        # for our purposes here it does not matter that they are the same even though it is unrealistic.
+        multisig_script = '52' + push_public_key + push_public_key + push_public_key + '53ae'
+        rpc_result = self.nodes[0].decodescript(multisig_script)
+        assert_equal('multisig', rpc_result['type'])
+        assert_equal('2 ' + public_key + ' ' + public_key + ' ' + public_key +  ' 3 OP_CHECKMULTISIG', rpc_result['asm'])
+        # multisig in P2WSH
+        multisig_script_hash = sha256(bytes.fromhex(multisig_script)).hex()
+        assert_equal('witness_v0_scripthash', rpc_result['segwit']['type'])
+        assert_equal('0 ' + multisig_script_hash, rpc_result['segwit']['asm'])
+
+        self.log.info ("- P2SH")
+        # OP_HASH160 <Hash160(redeemScript)> OP_EQUAL.
+        # push_public_key_hash here should actually be the hash of a redeem script.
+        # but this works the same for purposes of this test.
+        rpc_result = self.nodes[0].decodescript('a9' + push_public_key_hash + '87')
+        assert_equal('scripthash', rpc_result['type'])
+        assert_equal('OP_HASH160 ' + public_key_hash + ' OP_EQUAL', rpc_result['asm'])
+        # P2SH does not work in segwit secripts. decodescript should not return a result for it.
+        assert 'segwit' not in rpc_result
+
+        self.log.info("- null data")
+        # use a signature look-alike here to make sure that we do not decode random data as a signature.
+        # this matters if/when signature sighash decoding comes along.
+        # would want to make sure that no such decoding takes place in this case.
+        signature_imposter = '48304502207fa7a6d1e0ee81132a269ad84e68d695483745cde8b541e3bf630749894e342a022100c1f7ab20e13e22fb95281a870f3dcf38d782e53023ee313d741ad0cfbc0c509001'
+        # OP_RETURN <data>
+        rpc_result = self.nodes[0].decodescript('6a' + signature_imposter)
+        assert_equal('nulldata', rpc_result['type'])
+        assert_equal('OP_RETURN ' + signature_imposter[2:], rpc_result['asm'])
+
+        self.log.info("- CLTV redeem script")
+        # redeem scripts are in-effect scriptPubKey scripts, so adding a test here.
+        # OP_NOP2 is also known as OP_CHECKLOCKTIMEVERIFY.
+        # just imagine that the pub keys used below are different.
+        # for our purposes here it does not matter that they are the same even though it is unrealistic.
+        #
+        # OP_IF
+        #   <receiver-pubkey> OP_CHECKSIGVERIFY
+        # OP_ELSE
+        #   <lock-until> OP_CHECKLOCKTIMEVERIFY OP_DROP
+        # OP_ENDIF
+        # <sender-pubkey> OP_CHECKSIG
+        #
+        # lock until block 500,000
+        cltv_script = '63' + push_public_key + 'ad670320a107b17568' + push_public_key + 'ac'
+        rpc_result = self.nodes[0].decodescript(cltv_script)
+        assert_equal('nonstandard', rpc_result['type'])
+        assert_equal('OP_IF ' + public_key + ' OP_CHECKSIGVERIFY OP_ELSE 500000 OP_CHECKLOCKTIMEVERIFY OP_DROP OP_ENDIF ' + public_key + ' OP_CHECKSIG', rpc_result['asm'])
+        # CLTV script in P2WSH
+        cltv_script_hash = sha256(bytes.fromhex(cltv_script)).hex()
+        assert_equal('0 ' + cltv_script_hash, rpc_result['segwit']['asm'])
+
+        self.log.info("- P2PK with uncompressed pubkey")
+        # <pubkey> OP_CHECKSIG
+        rpc_result = self.nodes[0].decodescript(push_uncompressed_public_key + 'ac')
+        assert_equal('pubkey', rpc_result['type'])
+        assert_equal(uncompressed_public_key + ' OP_CHECKSIG', rpc_result['asm'])
+        # uncompressed pubkeys are invalid for checksigs in segwit scripts.
+        # decodescript should not return a P2WPKH equivalent.
+        assert 'segwit' not in rpc_result
+
+        self.log.info("- multisig with uncompressed pubkey")
+        # <m> <A pubkey> <B pubkey> <n> OP_CHECKMULTISIG
+        # just imagine that the pub keys used below are different.
+        # the purpose of this test is to check that a segwit script is not returned for bare multisig scripts
+        # with an uncompressed pubkey in them.
+        rpc_result = self.nodes[0].decodescript('52' + push_public_key + push_uncompressed_public_key +'52ae')
+        assert_equal('multisig', rpc_result['type'])
+        assert_equal('2 ' + public_key + ' ' + uncompressed_public_key + ' 2 OP_CHECKMULTISIG', rpc_result['asm'])
+        # uncompressed pubkeys are invalid for checksigs in segwit scripts.
+        # decodescript should not return a P2WPKH equivalent.
+        assert 'segwit' not in rpc_result
+
+        self.log.info("- P2WPKH")
+        # 0 <PubKeyHash>
+        rpc_result = self.nodes[0].decodescript('00' + push_public_key_hash)
+        assert_equal('witness_v0_keyhash', rpc_result['type'])
+        assert_equal('0 ' + public_key_hash, rpc_result['asm'])
+        # segwit scripts do not work nested into each other.
+        # a nested segwit script should not be returned in the results.
+        assert 'segwit' not in rpc_result
+
+        self.log.info("- P2WSH")
+        # 0 <ScriptHash>
+        # even though this hash is of a P2PK script which is better used as bare P2WPKH, it should not matter
+        # for the purpose of this test.
+        rpc_result = self.nodes[0].decodescript('0020' + p2wsh_p2pk_script_hash)
+        assert_equal('witness_v0_scripthash', rpc_result['type'])
+        assert_equal('0 ' + p2wsh_p2pk_script_hash, rpc_result['asm'])
+        # segwit scripts do not work nested into each other.
+        # a nested segwit script should not be returned in the results.
+        assert 'segwit' not in rpc_result
+
+        self.log.info("- P2TR")
+        # 1 <x-only pubkey>
+        xonly_public_key = '01'*32  # first ever P2TR output on mainnet
+        rpc_result = self.nodes[0].decodescript('5120' + xonly_public_key)
+        assert_equal('witness_v1_taproot', rpc_result['type'])
+        assert_equal('1 ' + xonly_public_key, rpc_result['asm'])
+        assert 'segwit' not in rpc_result
+
+    def decoderawtransaction_asm_sighashtype(self):
+        """Test decoding scripts via RPC command "decoderawtransaction".
+
+        This test is in with the "decodescript" tests because they are testing the same "asm" script decodes.
+        """
+
+        self.log.info("- various mainnet txs")
+        # this test case uses a mainnet transaction that has a P2SH input and both P2PKH and P2SH outputs.
+        tx = '0100000001696a20784a2c70143f634e95227dbdfdf0ecd51647052e70854512235f5986ca010000008a47304402207174775824bec6c2700023309a168231ec80b82c6069282f5133e6f11cbb04460220570edc55c7c5da2ca687ebd0372d3546ebc3f810516a002350cac72dfe192dfb014104d3f898e6487787910a690410b7a917ef198905c27fb9d3b0a42da12aceae0544fc7088d239d9a48f2828a15a09e84043001f27cc80d162cb95404e1210161536ffffffff0100e1f505000000001976a914eb6c6e0cdb2d256a32d97b8df1fc75d1920d9bca88ac00000000'
+        rpc_result = self.nodes[0].decoderawtransaction(tx)
+        assert_equal('304402207174775824bec6c2700023309a168231ec80b82c6069282f5133e6f11cbb04460220570edc55c7c5da2ca687ebd0372d3546ebc3f810516a002350cac72dfe192dfb[ALL] 04d3f898e6487787910a690410b7a917ef198905c27fb9d3b0a42da12aceae0544fc7088d239d9a48f2828a15a09e84043001f27cc80d162cb95404e1210161536', rpc_result['vin'][0]['scriptSig']['asm'])
+
+        # this test case uses a mainnet transaction that has a P2SH input and both P2PKH and P2SH outputs.
+        # it's from James D'Angelo's awesome introductory videos about multisig: https://www.youtube.com/watch?v=zIbUSaZBJgU and https://www.youtube.com/watch?v=OSA1pwlaypc
+        # verify that we have not altered scriptPubKey decoding.
+        tx = '01000000018d1f5635abd06e2c7e2ddf58dc85b3de111e4ad6e0ab51bb0dcf5e84126d927300000000fdfe0000483045022100ae3b4e589dfc9d48cb82d41008dc5fa6a86f94d5c54f9935531924602730ab8002202f88cf464414c4ed9fa11b773c5ee944f66e9b05cc1e51d97abc22ce098937ea01483045022100b44883be035600e9328a01b66c7d8439b74db64187e76b99a68f7893b701d5380220225bf286493e4c4adcf928c40f785422572eb232f84a0b83b0dea823c3a
