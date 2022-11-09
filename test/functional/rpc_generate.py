@@ -28,4 +28,9 @@ class RPCGenerateTest(BitcoinTestFramework):
         self.log.info("Test rpc generate help prints message to use cli option")
         assert_equal(message, self.nodes[0].help("generate"))
 
-    
+        self.log.info("Test rpc generate is a hidden command not discoverable in general help")
+        assert message not in self.nodes[0].help()
+
+
+if __name__ == "__main__":
+    RPCGenerateTest().main()
