@@ -298,4 +298,13 @@ class RPCPackagesTest(BitcoinTestFramework):
         self.log.info("Test that packages cannot conflict with mempool transactions, even if a valid BIP125 RBF")
         node.sendrawtransaction(signed_replaceable_tx["hex"])
         testres_rbf_single = node.testmempoolaccept([signed_replacement_tx["hex"]])
-        # This transaction is a valid BIP
+        # This transaction is a valid BIP125 replace-by-fee
+        assert testres_rbf_single[0]["allowed"]
+        testres_rbf_package = self.independent_txns_testres_blank + [{
+            "txid": replacement_tx.rehash(), "wtxid": replacement_tx.getwtxid(), "allowed": False,
+            "reject-reason": "bip125-replacement-disallowed"
+        }]
+        self.assert_testres_equal(self.independent_txns_hex + [signed_replacement_tx["hex"]], testres_rbf_package)
+
+if __name__ == "__main__":
+    RPCPackagesTest().main()
