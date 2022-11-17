@@ -144,4 +144,130 @@ class SignRawTransactionsTest(BitcoinTestFramework):
         assert 'vout' in rawTxSigned['errors'][0]
         assert 'witness' in rawTxSigned['errors'][0]
         assert 'scriptSig' in rawTxSigned['errors'][0]
-        assert 'se
+        assert 'sequence' in rawTxSigned['errors'][0]
+        assert 'error' in rawTxSigned['errors'][0]
+
+        # 6) The verification errors refer to the invalid (vin 1) and missing input (vin 2)
+        assert_equal(rawTxSigned['errors'][0]['txid'], inputs[1]['txid'])
+        assert_equal(rawTxSigned['errors'][0]['vout'], inputs[1]['vout'])
+        assert_equal(rawTxSigned['errors'][1]['txid'], inputs[2]['txid'])
+        assert_equal(rawTxSigned['errors'][1]['vout'], inputs[2]['vout'])
+        assert not rawTxSigned['errors'][0]['witness']
+
+        # Now test signing failure for transaction with input witnesses
+        p2wpkh_raw_tx = "01000000000102fff7f7881a8099afa6940d42d1e7f6362bec38171ea3edf433541db4e4ad969f00000000494830450221008b9d1dc26ba6a9cb62127b02742fa9d754cd3bebf337f7a55d114c8e5cdd30be022040529b194ba3f9281a99f2b1c0a19c0489bc22ede944ccf4ecbab4cc618ef3ed01eeffffffef51e1b804cc89d182d279655c3aa89e815b1b309fe287d9b2b55d57b90ec68a0100000000ffffffff02202cb206000000001976a9148280b37df378db99f66f85c95a783a76ac7a6d5988ac9093510d000000001976a9143bde42dbee7e4dbe6a21b2d50ce2f0167faa815988ac000247304402203609e17b84f6a7d30c80bfa610b5b4542f32a8a0d5447a12fb1366d7f01cc44a0220573a954c4518331561406f90300e8f3358f51928d43c212a8caed02de67eebee0121025476c2e83188368da1ff3e292e7acafcdb3566bb0ad253f62fc70f07aeee635711000000"
+
+        rawTxSigned = self.nodes[0].signrawtransactionwithwallet(p2wpkh_raw_tx)
+
+        # 7) The transaction has no complete set of signatures
+        assert not rawTxSigned['complete']
+
+        # 8) Two script verification errors occurred
+        assert 'errors' in rawTxSigned
+        assert_equal(len(rawTxSigned['errors']), 2)
+
+        # 9) Script verification errors have certain properties
+        assert 'txid' in rawTxSigned['errors'][0]
+        assert 'vout' in rawTxSigned['errors'][0]
+        assert 'witness' in rawTxSigned['errors'][0]
+        assert 'scriptSig' in rawTxSigned['errors'][0]
+        assert 'sequence' in rawTxSigned['errors'][0]
+        assert 'error' in rawTxSigned['errors'][0]
+
+        # Non-empty witness checked here
+        assert_equal(rawTxSigned['errors'][1]['witness'], ["304402203609e17b84f6a7d30c80bfa610b5b4542f32a8a0d5447a12fb1366d7f01cc44a0220573a954c4518331561406f90300e8f3358f51928d43c212a8caed02de67eebee01", "025476c2e83188368da1ff3e292e7acafcdb3566bb0ad253f62fc70f07aeee6357"])
+        assert not rawTxSigned['errors'][0]['witness']
+
+    def test_fully_signed_tx(self):
+        self.log.info("Test signing a fully signed transaction does nothing")
+        self.nodes[0].walletpassphrase("password", 9999)
+        self.generate(self.nodes[0], COINBASE_MATURITY + 1)
+        rawtx = self.nodes[0].createrawtransaction([], [{self.nodes[0].getnewaddress(): 10}])
+        fundedtx = self.nodes[0].fundrawtransaction(rawtx)
+        signedtx = self.nodes[0].signrawtransactionwithwallet(fundedtx["hex"])
+        assert_equal(signedtx["complete"], True)
+        signedtx2 = self.nodes[0].signrawtransactionwithwallet(signedtx["hex"])
+        assert_equal(signedtx2["complete"], True)
+        assert_equal(signedtx["hex"], signedtx2["hex"])
+        self.nodes[0].walletlock()
+
+    def witness_script_test(self):
+        self.log.info("Test signing transaction to P2SH-P2WSH addresses without wallet")
+        # Create a new P2SH-P2WSH 1-of-1 multisig address:
+        eckey = ECKey()
+        eckey.generate()
+        embedded_privkey = bytes_to_wif(eckey.get_bytes())
+        embedded_pubkey = eckey.get_pubkey().get_bytes().hex()
+        p2sh_p2wsh_address = self.nodes[1].createmultisig(1, [embedded_pubkey], "p2sh-segwit")
+        # send transaction to P2SH-P2WSH 1-of-1 multisig address
+        self.generate(self.nodes[0], COINBASE_MATURITY + 1)
+        self.nodes[0].sendtoaddress(p2sh_p2wsh_address["address"], 49.999)
+        self.generate(self.nodes[0], 1)
+        # Get the UTXO info from scantxoutset
+        unspent_output = self.nodes[1].scantxoutset('start', [p2sh_p2wsh_address['descriptor']])['unspents'][0]
+        spk = script_to_p2sh_p2wsh_script(p2sh_p2wsh_address['redeemScript']).hex()
+        unspent_output['witnessScript'] = p2sh_p2wsh_address['redeemScript']
+        unspent_output['redeemScript'] = script_to_p2wsh_script(unspent_output['witnessScript']).hex()
+        assert_equal(spk, unspent_output['scriptPubKey'])
+        # Now create and sign a transaction spending that output on node[0], which doesn't know the scripts or keys
+        spending_tx = self.nodes[0].createrawtransaction([unspent_output], {self.nodes[1].get_wallet_rpc(self.default_wallet_name).getnewaddress(): Decimal("49.998")})
+        spending_tx_signed = self.nodes[0].signrawtransactionwithkey(spending_tx, [embedded_privkey], [unspent_output])
+        # Check the signing completed successfully
+        assert 'complete' in spending_tx_signed
+        assert_equal(spending_tx_signed['complete'], True)
+
+        # Now test with P2PKH and P2PK scripts as the witnessScript
+        for tx_type in ['P2PKH', 'P2PK']:  # these tests are order-independent
+            self.verify_txn_with_witness_script(tx_type)
+
+    def verify_txn_with_witness_script(self, tx_type):
+        self.log.info("Test with a {} script as the witnessScript".format(tx_type))
+        eckey = ECKey()
+        eckey.generate()
+        embedded_privkey = bytes_to_wif(eckey.get_bytes())
+        embedded_pubkey = eckey.get_pubkey().get_bytes().hex()
+        witness_script = {
+            'P2PKH': key_to_p2pkh_script(embedded_pubkey).hex(),
+            'P2PK': key_to_p2pk_script(embedded_pubkey).hex()
+        }.get(tx_type, "Invalid tx_type")
+        redeem_script = script_to_p2wsh_script(witness_script).hex()
+        addr = script_to_p2sh(redeem_script)
+        script_pub_key = self.nodes[1].validateaddress(addr)['scriptPubKey']
+        # Fund that address
+        txid = self.nodes[0].sendtoaddress(addr, 10)
+        vout = find_vout_for_address(self.nodes[0], txid, addr)
+        self.generate(self.nodes[0], 1)
+        # Now create and sign a transaction spending that output on node[0], which doesn't know the scripts or keys
+        spending_tx = self.nodes[0].createrawtransaction([{'txid': txid, 'vout': vout}], {self.nodes[1].getnewaddress(): Decimal("9.999")})
+        spending_tx_signed = self.nodes[0].signrawtransactionwithkey(spending_tx, [embedded_privkey], [{'txid': txid, 'vout': vout, 'scriptPubKey': script_pub_key, 'redeemScript': redeem_script, 'witnessScript': witness_script, 'amount': 10}])
+        # Check the signing completed successfully
+        assert 'complete' in spending_tx_signed
+        assert_equal(spending_tx_signed['complete'], True)
+        self.nodes[0].sendrawtransaction(spending_tx_signed['hex'])
+
+    def OP_1NEGATE_test(self):
+        self.log.info("Test OP_1NEGATE (0x4f) satisfies BIP62 minimal push standardness rule")
+        hex_str = (
+            "0200000001FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
+            "FFFFFFFF00000000044F024F9CFDFFFFFF01F0B9F5050000000023210277777777"
+            "77777777777777777777777777777777777777777777777777777777AC66030000"
+        )
+        prev_txs = [
+            {
+                "txid": "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF",
+                "vout": 0,
+                "scriptPubKey": "A914AE44AB6E9AA0B71F1CD2B453B69340E9BFBAEF6087",
+                "redeemScript": "4F9C",
+                "amount": 1,
+            }
+        ]
+        txn = self.nodes[0].signrawtransactionwithwallet(hex_str, prev_txs)
+        assert txn["complete"]
+
+    def test_signing_with_csv(self):
+        self.log.info("Test signing a transaction containing a fully signed CSV input")
+        self.nodes[0].walletpassphrase("password", 9999)
+        getcontext().prec = 8
+
+        # Make sure CSV is active
+     
