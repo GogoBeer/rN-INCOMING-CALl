@@ -36,4 +36,288 @@ MAX_BLOCK_WEIGHT = 4000000
 MAX_BLOOM_FILTER_SIZE = 36000
 MAX_BLOOM_HASH_FUNCS = 50
 
-COIN = 100000000  # 1 b
+COIN = 100000000  # 1 btc in satoshis
+MAX_MONEY = 21000000 * COIN
+
+BIP125_SEQUENCE_NUMBER = 0xfffffffd  # Sequence number that is rbf-opt-in (BIP 125) and csv-opt-out (BIP 68)
+
+MAX_PROTOCOL_MESSAGE_LENGTH = 4000000  # Maximum length of incoming protocol messages
+MAX_HEADERS_RESULTS = 2000  # Number of headers sent in one getheaders result
+MAX_INV_SIZE = 50000  # Maximum number of entries in an 'inv' protocol message
+
+NODE_NETWORK = (1 << 0)
+NODE_BLOOM = (1 << 2)
+NODE_WITNESS = (1 << 3)
+NODE_COMPACT_FILTERS = (1 << 6)
+NODE_NETWORK_LIMITED = (1 << 10)
+
+MSG_TX = 1
+MSG_BLOCK = 2
+MSG_FILTERED_BLOCK = 3
+MSG_CMPCT_BLOCK = 4
+MSG_WTX = 5
+MSG_WITNESS_FLAG = 1 << 30
+MSG_TYPE_MASK = 0xffffffff >> 2
+MSG_WITNESS_TX = MSG_TX | MSG_WITNESS_FLAG
+
+FILTER_TYPE_BASIC = 0
+
+WITNESS_SCALE_FACTOR = 4
+
+
+def sha256(s):
+    return hashlib.sha256(s).digest()
+
+
+def hash256(s):
+    return sha256(sha256(s))
+
+
+def ser_compact_size(l):
+    r = b""
+    if l < 253:
+        r = struct.pack("B", l)
+    elif l < 0x10000:
+        r = struct.pack("<BH", 253, l)
+    elif l < 0x100000000:
+        r = struct.pack("<BI", 254, l)
+    else:
+        r = struct.pack("<BQ", 255, l)
+    return r
+
+def deser_compact_size(f):
+    nit = struct.unpack("<B", f.read(1))[0]
+    if nit == 253:
+        nit = struct.unpack("<H", f.read(2))[0]
+    elif nit == 254:
+        nit = struct.unpack("<I", f.read(4))[0]
+    elif nit == 255:
+        nit = struct.unpack("<Q", f.read(8))[0]
+    return nit
+
+def deser_string(f):
+    nit = deser_compact_size(f)
+    return f.read(nit)
+
+def ser_string(s):
+    return ser_compact_size(len(s)) + s
+
+def deser_uint256(f):
+    r = 0
+    for i in range(8):
+        t = struct.unpack("<I", f.read(4))[0]
+        r += t << (i * 32)
+    return r
+
+
+def ser_uint256(u):
+    rs = b""
+    for _ in range(8):
+        rs += struct.pack("<I", u & 0xFFFFFFFF)
+        u >>= 32
+    return rs
+
+
+def uint256_from_str(s):
+    r = 0
+    t = struct.unpack("<IIIIIIII", s[:32])
+    for i in range(8):
+        r += t[i] << (i * 32)
+    return r
+
+
+def uint256_from_compact(c):
+    nbytes = (c >> 24) & 0xFF
+    v = (c & 0xFFFFFF) << (8 * (nbytes - 3))
+    return v
+
+
+# deser_function_name: Allow for an alternate deserialization function on the
+# entries in the vector.
+def deser_vector(f, c, deser_function_name=None):
+    nit = deser_compact_size(f)
+    r = []
+    for _ in range(nit):
+        t = c()
+        if deser_function_name:
+            getattr(t, deser_function_name)(f)
+        else:
+            t.deserialize(f)
+        r.append(t)
+    return r
+
+
+# ser_function_name: Allow for an alternate serialization function on the
+# entries in the vector (we use this for serializing the vector of transactions
+# for a witness block).
+def ser_vector(l, ser_function_name=None):
+    r = ser_compact_size(len(l))
+    for i in l:
+        if ser_function_name:
+            r += getattr(i, ser_function_name)()
+        else:
+            r += i.serialize()
+    return r
+
+
+def deser_uint256_vector(f):
+    nit = deser_compact_size(f)
+    r = []
+    for _ in range(nit):
+        t = deser_uint256(f)
+        r.append(t)
+    return r
+
+
+def ser_uint256_vector(l):
+    r = ser_compact_size(len(l))
+    for i in l:
+        r += ser_uint256(i)
+    return r
+
+
+def deser_string_vector(f):
+    nit = deser_compact_size(f)
+    r = []
+    for _ in range(nit):
+        t = deser_string(f)
+        r.append(t)
+    return r
+
+
+def ser_string_vector(l):
+    r = ser_compact_size(len(l))
+    for sv in l:
+        r += ser_string(sv)
+    return r
+
+
+def from_hex(obj, hex_string):
+    """Deserialize from a hex string representation (e.g. from RPC)
+
+    Note that there is no complementary helper like e.g. `to_hex` for the
+    inverse operation. To serialize a message object to a hex string, simply
+    use obj.serialize().hex()"""
+    obj.deserialize(BytesIO(bytes.fromhex(hex_string)))
+    return obj
+
+
+def tx_from_hex(hex_string):
+    """Deserialize from hex string to a transaction object"""
+    return from_hex(CTransaction(), hex_string)
+
+
+# Objects that map to bitcoind objects, which can be serialized/deserialized
+
+
+class CAddress:
+    __slots__ = ("net", "ip", "nServices", "port", "time")
+
+    # see https://github.com/bitcoin/bips/blob/master/bip-0155.mediawiki
+    NET_IPV4 = 1
+    NET_I2P = 5
+
+    ADDRV2_NET_NAME = {
+        NET_IPV4: "IPv4",
+        NET_I2P: "I2P"
+    }
+
+    ADDRV2_ADDRESS_LENGTH = {
+        NET_IPV4: 4,
+        NET_I2P: 32
+    }
+
+    I2P_PAD = "===="
+
+    def __init__(self):
+        self.time = 0
+        self.nServices = 1
+        self.net = self.NET_IPV4
+        self.ip = "0.0.0.0"
+        self.port = 0
+
+    def __eq__(self, other):
+        return self.net == other.net and self.ip == other.ip and self.nServices == other.nServices and self.port == other.port and self.time == other.time
+
+    def deserialize(self, f, *, with_time=True):
+        """Deserialize from addrv1 format (pre-BIP155)"""
+        if with_time:
+            # VERSION messages serialize CAddress objects without time
+            self.time = struct.unpack("<I", f.read(4))[0]
+        self.nServices = struct.unpack("<Q", f.read(8))[0]
+        # We only support IPv4 which means skip 12 bytes and read the next 4 as IPv4 address.
+        f.read(12)
+        self.net = self.NET_IPV4
+        self.ip = socket.inet_ntoa(f.read(4))
+        self.port = struct.unpack(">H", f.read(2))[0]
+
+    def serialize(self, *, with_time=True):
+        """Serialize in addrv1 format (pre-BIP155)"""
+        assert self.net == self.NET_IPV4
+        r = b""
+        if with_time:
+            # VERSION messages serialize CAddress objects without time
+            r += struct.pack("<I", self.time)
+        r += struct.pack("<Q", self.nServices)
+        r += b"\x00" * 10 + b"\xff" * 2
+        r += socket.inet_aton(self.ip)
+        r += struct.pack(">H", self.port)
+        return r
+
+    def deserialize_v2(self, f):
+        """Deserialize from addrv2 format (BIP155)"""
+        self.time = struct.unpack("<I", f.read(4))[0]
+
+        self.nServices = deser_compact_size(f)
+
+        self.net = struct.unpack("B", f.read(1))[0]
+        assert self.net in (self.NET_IPV4, self.NET_I2P)
+
+        address_length = deser_compact_size(f)
+        assert address_length == self.ADDRV2_ADDRESS_LENGTH[self.net]
+
+        addr_bytes = f.read(address_length)
+        if self.net == self.NET_IPV4:
+            self.ip = socket.inet_ntoa(addr_bytes)
+        else:
+            self.ip = b32encode(addr_bytes)[0:-len(self.I2P_PAD)].decode("ascii").lower() + ".b32.i2p"
+
+        self.port = struct.unpack(">H", f.read(2))[0]
+
+    def serialize_v2(self):
+        """Serialize in addrv2 format (BIP155)"""
+        assert self.net in (self.NET_IPV4, self.NET_I2P)
+        r = b""
+        r += struct.pack("<I", self.time)
+        r += ser_compact_size(self.nServices)
+        r += struct.pack("B", self.net)
+        r += ser_compact_size(self.ADDRV2_ADDRESS_LENGTH[self.net])
+        if self.net == self.NET_IPV4:
+            r += socket.inet_aton(self.ip)
+        else:
+            sfx = ".b32.i2p"
+            assert self.ip.endswith(sfx)
+            r += b32decode(self.ip[0:-len(sfx)] + self.I2P_PAD, True)
+        r += struct.pack(">H", self.port)
+        return r
+
+    def __repr__(self):
+        return ("CAddress(nServices=%i net=%s addr=%s port=%i)"
+                % (self.nServices, self.ADDRV2_NET_NAME[self.net], self.ip, self.port))
+
+
+class CInv:
+    __slots__ = ("hash", "type")
+
+    typemap = {
+        0: "Error",
+        MSG_TX: "TX",
+        MSG_BLOCK: "Block",
+        MSG_TX | MSG_WITNESS_FLAG: "WitnessTx",
+        MSG_BLOCK | MSG_WITNESS_FLAG: "WitnessBlock",
+        MSG_FILTERED_BLOCK: "filtered Block",
+        MSG_CMPCT_BLOCK: "CompactBlock",
+        MSG_WTX: "WTX",
+    }
+
+    def __init__(self, t=0, h=
