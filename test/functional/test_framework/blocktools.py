@@ -251,4 +251,5 @@ def send_to_witness(use_p2wsh, node, utxo, pubkey, encode_p2sh, amount, sign=Tru
 class TestFrameworkBlockTools(unittest.TestCase):
     def test_create_coinbase(self):
         height = 20
-        coinbase_tx = cre
+        coinbase_tx = create_coinbase(height=height)
+        assert_equal(CScriptNum.decode(coinbase_tx.vin[0].scriptSig), height)
