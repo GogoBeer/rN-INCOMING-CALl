@@ -320,4 +320,276 @@ class CInv:
         MSG_WTX: "WTX",
     }
 
-    def __init__(self, t=0, h=
+    def __init__(self, t=0, h=0):
+        self.type = t
+        self.hash = h
+
+    def deserialize(self, f):
+        self.type = struct.unpack("<I", f.read(4))[0]
+        self.hash = deser_uint256(f)
+
+    def serialize(self):
+        r = b""
+        r += struct.pack("<I", self.type)
+        r += ser_uint256(self.hash)
+        return r
+
+    def __repr__(self):
+        return "CInv(type=%s hash=%064x)" \
+            % (self.typemap[self.type], self.hash)
+
+    def __eq__(self, other):
+        return isinstance(other, CInv) and self.hash == other.hash and self.type == other.type
+
+
+class CBlockLocator:
+    __slots__ = ("nVersion", "vHave")
+
+    def __init__(self):
+        self.vHave = []
+
+    def deserialize(self, f):
+        struct.unpack("<i", f.read(4))[0]  # Ignore version field.
+        self.vHave = deser_uint256_vector(f)
+
+    def serialize(self):
+        r = b""
+        r += struct.pack("<i", 0)  # Bitcoin Core ignores version field. Set it to 0.
+        r += ser_uint256_vector(self.vHave)
+        return r
+
+    def __repr__(self):
+        return "CBlockLocator(vHave=%s)" % (repr(self.vHave))
+
+
+class COutPoint:
+    __slots__ = ("hash", "n")
+
+    def __init__(self, hash=0, n=0):
+        self.hash = hash
+        self.n = n
+
+    def deserialize(self, f):
+        self.hash = deser_uint256(f)
+        self.n = struct.unpack("<I", f.read(4))[0]
+
+    def serialize(self):
+        r = b""
+        r += ser_uint256(self.hash)
+        r += struct.pack("<I", self.n)
+        return r
+
+    def __repr__(self):
+        return "COutPoint(hash=%064x n=%i)" % (self.hash, self.n)
+
+
+class CTxIn:
+    __slots__ = ("nSequence", "prevout", "scriptSig")
+
+    def __init__(self, outpoint=None, scriptSig=b"", nSequence=0):
+        if outpoint is None:
+            self.prevout = COutPoint()
+        else:
+            self.prevout = outpoint
+        self.scriptSig = scriptSig
+        self.nSequence = nSequence
+
+    def deserialize(self, f):
+        self.prevout = COutPoint()
+        self.prevout.deserialize(f)
+        self.scriptSig = deser_string(f)
+        self.nSequence = struct.unpack("<I", f.read(4))[0]
+
+    def serialize(self):
+        r = b""
+        r += self.prevout.serialize()
+        r += ser_string(self.scriptSig)
+        r += struct.pack("<I", self.nSequence)
+        return r
+
+    def __repr__(self):
+        return "CTxIn(prevout=%s scriptSig=%s nSequence=%i)" \
+            % (repr(self.prevout), self.scriptSig.hex(),
+               self.nSequence)
+
+
+class CTxOut:
+    __slots__ = ("nValue", "scriptPubKey")
+
+    def __init__(self, nValue=0, scriptPubKey=b""):
+        self.nValue = nValue
+        self.scriptPubKey = scriptPubKey
+
+    def deserialize(self, f):
+        self.nValue = struct.unpack("<q", f.read(8))[0]
+        self.scriptPubKey = deser_string(f)
+
+    def serialize(self):
+        r = b""
+        r += struct.pack("<q", self.nValue)
+        r += ser_string(self.scriptPubKey)
+        return r
+
+    def __repr__(self):
+        return "CTxOut(nValue=%i.%08i scriptPubKey=%s)" \
+            % (self.nValue // COIN, self.nValue % COIN,
+               self.scriptPubKey.hex())
+
+
+class CScriptWitness:
+    __slots__ = ("stack",)
+
+    def __init__(self):
+        # stack is a vector of strings
+        self.stack = []
+
+    def __repr__(self):
+        return "CScriptWitness(%s)" % \
+               (",".join([x.hex() for x in self.stack]))
+
+    def is_null(self):
+        if self.stack:
+            return False
+        return True
+
+
+class CTxInWitness:
+    __slots__ = ("scriptWitness",)
+
+    def __init__(self):
+        self.scriptWitness = CScriptWitness()
+
+    def deserialize(self, f):
+        self.scriptWitness.stack = deser_string_vector(f)
+
+    def serialize(self):
+        return ser_string_vector(self.scriptWitness.stack)
+
+    def __repr__(self):
+        return repr(self.scriptWitness)
+
+    def is_null(self):
+        return self.scriptWitness.is_null()
+
+
+class CTxWitness:
+    __slots__ = ("vtxinwit",)
+
+    def __init__(self):
+        self.vtxinwit = []
+
+    def deserialize(self, f):
+        for i in range(len(self.vtxinwit)):
+            self.vtxinwit[i].deserialize(f)
+
+    def serialize(self):
+        r = b""
+        # This is different than the usual vector serialization --
+        # we omit the length of the vector, which is required to be
+        # the same length as the transaction's vin vector.
+        for x in self.vtxinwit:
+            r += x.serialize()
+        return r
+
+    def __repr__(self):
+        return "CTxWitness(%s)" % \
+               (';'.join([repr(x) for x in self.vtxinwit]))
+
+    def is_null(self):
+        for x in self.vtxinwit:
+            if not x.is_null():
+                return False
+        return True
+
+
+class CTransaction:
+    __slots__ = ("hash", "nLockTime", "nVersion", "sha256", "vin", "vout",
+                 "wit")
+
+    def __init__(self, tx=None):
+        if tx is None:
+            self.nVersion = 1
+            self.vin = []
+            self.vout = []
+            self.wit = CTxWitness()
+            self.nLockTime = 0
+            self.sha256 = None
+            self.hash = None
+        else:
+            self.nVersion = tx.nVersion
+            self.vin = copy.deepcopy(tx.vin)
+            self.vout = copy.deepcopy(tx.vout)
+            self.nLockTime = tx.nLockTime
+            self.sha256 = tx.sha256
+            self.hash = tx.hash
+            self.wit = copy.deepcopy(tx.wit)
+
+    def deserialize(self, f):
+        self.nVersion = struct.unpack("<i", f.read(4))[0]
+        self.vin = deser_vector(f, CTxIn)
+        flags = 0
+        if len(self.vin) == 0:
+            flags = struct.unpack("<B", f.read(1))[0]
+            # Not sure why flags can't be zero, but this
+            # matches the implementation in bitcoind
+            if (flags != 0):
+                self.vin = deser_vector(f, CTxIn)
+                self.vout = deser_vector(f, CTxOut)
+        else:
+            self.vout = deser_vector(f, CTxOut)
+        if flags != 0:
+            self.wit.vtxinwit = [CTxInWitness() for _ in range(len(self.vin))]
+            self.wit.deserialize(f)
+        else:
+            self.wit = CTxWitness()
+        self.nLockTime = struct.unpack("<I", f.read(4))[0]
+        self.sha256 = None
+        self.hash = None
+
+    def serialize_without_witness(self):
+        r = b""
+        r += struct.pack("<i", self.nVersion)
+        r += ser_vector(self.vin)
+        r += ser_vector(self.vout)
+        r += struct.pack("<I", self.nLockTime)
+        return r
+
+    # Only serialize with witness when explicitly called for
+    def serialize_with_witness(self):
+        flags = 0
+        if not self.wit.is_null():
+            flags |= 1
+        r = b""
+        r += struct.pack("<i", self.nVersion)
+        if flags:
+            dummy = []
+            r += ser_vector(dummy)
+            r += struct.pack("<B", flags)
+        r += ser_vector(self.vin)
+        r += ser_vector(self.vout)
+        if flags & 1:
+            if (len(self.wit.vtxinwit) != len(self.vin)):
+                # vtxinwit must have the same length as vin
+                self.wit.vtxinwit = self.wit.vtxinwit[:len(self.vin)]
+                for _ in range(len(self.wit.vtxinwit), len(self.vin)):
+                    self.wit.vtxinwit.append(CTxInWitness())
+            r += self.wit.serialize()
+        r += struct.pack("<I", self.nLockTime)
+        return r
+
+    # Regular serialization is with witness -- must explicitly
+    # call serialize_without_witness to exclude witness data.
+    def serialize(self):
+        return self.serialize_with_witness()
+
+    def getwtxid(self):
+        return hash256(self.serialize())[::-1].hex()
+
+    # Recalculate the txid (transaction hash without witness)
+    def rehash(self):
+        self.sha256 = None
+        self.calc_sha256()
+        return self.hash
+
+    # We will only cache the serialization without witness in
+    # self.sha256 and self.hash -- those are expected to be th
