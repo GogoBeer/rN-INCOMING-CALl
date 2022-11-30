@@ -826,4 +826,210 @@ class P2PHeaderAndShortIDs:
         self.header.deserialize(f)
         self.nonce = struct.unpack("<Q", f.read(8))[0]
         self.shortids_length = deser_compact_size(f)
-        for
+        for _ in range(self.shortids_length):
+            # shortids are defined to be 6 bytes in the spec, so append
+            # two zero bytes and read it in as an 8-byte number
+            self.shortids.append(struct.unpack("<Q", f.read(6) + b'\x00\x00')[0])
+        self.prefilled_txn = deser_vector(f, PrefilledTransaction)
+        self.prefilled_txn_length = len(self.prefilled_txn)
+
+    # When using version 2 compact blocks, we must serialize with_witness.
+    def serialize(self, with_witness=False):
+        r = b""
+        r += self.header.serialize()
+        r += struct.pack("<Q", self.nonce)
+        r += ser_compact_size(self.shortids_length)
+        for x in self.shortids:
+            # We only want the first 6 bytes
+            r += struct.pack("<Q", x)[0:6]
+        if with_witness:
+            r += ser_vector(self.prefilled_txn, "serialize_with_witness")
+        else:
+            r += ser_vector(self.prefilled_txn, "serialize_without_witness")
+        return r
+
+    def __repr__(self):
+        return "P2PHeaderAndShortIDs(header=%s, nonce=%d, shortids_length=%d, shortids=%s, prefilled_txn_length=%d, prefilledtxn=%s" % (repr(self.header), self.nonce, self.shortids_length, repr(self.shortids), self.prefilled_txn_length, repr(self.prefilled_txn))
+
+
+# P2P version of the above that will use witness serialization (for compact
+# block version 2)
+class P2PHeaderAndShortWitnessIDs(P2PHeaderAndShortIDs):
+    __slots__ = ()
+    def serialize(self):
+        return super().serialize(with_witness=True)
+
+# Calculate the BIP 152-compact blocks shortid for a given transaction hash
+def calculate_shortid(k0, k1, tx_hash):
+    expected_shortid = siphash256(k0, k1, tx_hash)
+    expected_shortid &= 0x0000ffffffffffff
+    return expected_shortid
+
+
+# This version gets rid of the array lengths, and reinterprets the differential
+# encoding into indices that can be used for lookup.
+class HeaderAndShortIDs:
+    __slots__ = ("header", "nonce", "prefilled_txn", "shortids", "use_witness")
+
+    def __init__(self, p2pheaders_and_shortids = None):
+        self.header = CBlockHeader()
+        self.nonce = 0
+        self.shortids = []
+        self.prefilled_txn = []
+        self.use_witness = False
+
+        if p2pheaders_and_shortids is not None:
+            self.header = p2pheaders_and_shortids.header
+            self.nonce = p2pheaders_and_shortids.nonce
+            self.shortids = p2pheaders_and_shortids.shortids
+            last_index = -1
+            for x in p2pheaders_and_shortids.prefilled_txn:
+                self.prefilled_txn.append(PrefilledTransaction(x.index + last_index + 1, x.tx))
+                last_index = self.prefilled_txn[-1].index
+
+    def to_p2p(self):
+        if self.use_witness:
+            ret = P2PHeaderAndShortWitnessIDs()
+        else:
+            ret = P2PHeaderAndShortIDs()
+        ret.header = self.header
+        ret.nonce = self.nonce
+        ret.shortids_length = len(self.shortids)
+        ret.shortids = self.shortids
+        ret.prefilled_txn_length = len(self.prefilled_txn)
+        ret.prefilled_txn = []
+        last_index = -1
+        for x in self.prefilled_txn:
+            ret.prefilled_txn.append(PrefilledTransaction(x.index - last_index - 1, x.tx))
+            last_index = x.index
+        return ret
+
+    def get_siphash_keys(self):
+        header_nonce = self.header.serialize()
+        header_nonce += struct.pack("<Q", self.nonce)
+        hash_header_nonce_as_str = sha256(header_nonce)
+        key0 = struct.unpack("<Q", hash_header_nonce_as_str[0:8])[0]
+        key1 = struct.unpack("<Q", hash_header_nonce_as_str[8:16])[0]
+        return [ key0, key1 ]
+
+    # Version 2 compact blocks use wtxid in shortids (rather than txid)
+    def initialize_from_block(self, block, nonce=0, prefill_list=None, use_witness=False):
+        if prefill_list is None:
+            prefill_list = [0]
+        self.header = CBlockHeader(block)
+        self.nonce = nonce
+        self.prefilled_txn = [ PrefilledTransaction(i, block.vtx[i]) for i in prefill_list ]
+        self.shortids = []
+        self.use_witness = use_witness
+        [k0, k1] = self.get_siphash_keys()
+        for i in range(len(block.vtx)):
+            if i not in prefill_list:
+                tx_hash = block.vtx[i].sha256
+                if use_witness:
+                    tx_hash = block.vtx[i].calc_sha256(with_witness=True)
+                self.shortids.append(calculate_shortid(k0, k1, tx_hash))
+
+    def __repr__(self):
+        return "HeaderAndShortIDs(header=%s, nonce=%d, shortids=%s, prefilledtxn=%s" % (repr(self.header), self.nonce, repr(self.shortids), repr(self.prefilled_txn))
+
+
+class BlockTransactionsRequest:
+    __slots__ = ("blockhash", "indexes")
+
+    def __init__(self, blockhash=0, indexes = None):
+        self.blockhash = blockhash
+        self.indexes = indexes if indexes is not None else []
+
+    def deserialize(self, f):
+        self.blockhash = deser_uint256(f)
+        indexes_length = deser_compact_size(f)
+        for _ in range(indexes_length):
+            self.indexes.append(deser_compact_size(f))
+
+    def serialize(self):
+        r = b""
+        r += ser_uint256(self.blockhash)
+        r += ser_compact_size(len(self.indexes))
+        for x in self.indexes:
+            r += ser_compact_size(x)
+        return r
+
+    # helper to set the differentially encoded indexes from absolute ones
+    def from_absolute(self, absolute_indexes):
+        self.indexes = []
+        last_index = -1
+        for x in absolute_indexes:
+            self.indexes.append(x-last_index-1)
+            last_index = x
+
+    def to_absolute(self):
+        absolute_indexes = []
+        last_index = -1
+        for x in self.indexes:
+            absolute_indexes.append(x+last_index+1)
+            last_index = absolute_indexes[-1]
+        return absolute_indexes
+
+    def __repr__(self):
+        return "BlockTransactionsRequest(hash=%064x indexes=%s)" % (self.blockhash, repr(self.indexes))
+
+
+class BlockTransactions:
+    __slots__ = ("blockhash", "transactions")
+
+    def __init__(self, blockhash=0, transactions = None):
+        self.blockhash = blockhash
+        self.transactions = transactions if transactions is not None else []
+
+    def deserialize(self, f):
+        self.blockhash = deser_uint256(f)
+        self.transactions = deser_vector(f, CTransaction)
+
+    def serialize(self, with_witness=True):
+        r = b""
+        r += ser_uint256(self.blockhash)
+        if with_witness:
+            r += ser_vector(self.transactions, "serialize_with_witness")
+        else:
+            r += ser_vector(self.transactions, "serialize_without_witness")
+        return r
+
+    def __repr__(self):
+        return "BlockTransactions(hash=%064x transactions=%s)" % (self.blockhash, repr(self.transactions))
+
+
+class CPartialMerkleTree:
+    __slots__ = ("nTransactions", "vBits", "vHash")
+
+    def __init__(self):
+        self.nTransactions = 0
+        self.vHash = []
+        self.vBits = []
+
+    def deserialize(self, f):
+        self.nTransactions = struct.unpack("<i", f.read(4))[0]
+        self.vHash = deser_uint256_vector(f)
+        vBytes = deser_string(f)
+        self.vBits = []
+        for i in range(len(vBytes) * 8):
+            self.vBits.append(vBytes[i//8] & (1 << (i % 8)) != 0)
+
+    def serialize(self):
+        r = b""
+        r += struct.pack("<i", self.nTransactions)
+        r += ser_uint256_vector(self.vHash)
+        vBytesArray = bytearray([0x00] * ((len(self.vBits) + 7)//8))
+        for i in range(len(self.vBits)):
+            vBytesArray[i // 8] |= self.vBits[i] << (i % 8)
+        r += ser_string(bytes(vBytesArray))
+        return r
+
+    def __repr__(self):
+        return "CPartialMerkleTree(nTransactions=%d, vHash=%s, vBits=%s)" % (self.nTransactions, repr(self.vHash), repr(self.vBits))
+
+
+class CMerkleBlock:
+    __slots__ = ("header", "txn")
+
+    def __init__(self):
+  
