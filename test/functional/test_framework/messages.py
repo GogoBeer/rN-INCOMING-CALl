@@ -1032,4 +1032,336 @@ class CMerkleBlock:
     __slots__ = ("header", "txn")
 
     def __init__(self):
-  
+        self.header = CBlockHeader()
+        self.txn = CPartialMerkleTree()
+
+    def deserialize(self, f):
+        self.header.deserialize(f)
+        self.txn.deserialize(f)
+
+    def serialize(self):
+        r = b""
+        r += self.header.serialize()
+        r += self.txn.serialize()
+        return r
+
+    def __repr__(self):
+        return "CMerkleBlock(header=%s, txn=%s)" % (repr(self.header), repr(self.txn))
+
+
+# Objects that correspond to messages on the wire
+class msg_version:
+    __slots__ = ("addrFrom", "addrTo", "nNonce", "relay", "nServices",
+                 "nStartingHeight", "nTime", "nVersion", "strSubVer")
+    msgtype = b"version"
+
+    def __init__(self):
+        self.nVersion = 0
+        self.nServices = 0
+        self.nTime = int(time.time())
+        self.addrTo = CAddress()
+        self.addrFrom = CAddress()
+        self.nNonce = random.getrandbits(64)
+        self.strSubVer = ''
+        self.nStartingHeight = -1
+        self.relay = 0
+
+    def deserialize(self, f):
+        self.nVersion = struct.unpack("<i", f.read(4))[0]
+        self.nServices = struct.unpack("<Q", f.read(8))[0]
+        self.nTime = struct.unpack("<q", f.read(8))[0]
+        self.addrTo = CAddress()
+        self.addrTo.deserialize(f, with_time=False)
+
+        self.addrFrom = CAddress()
+        self.addrFrom.deserialize(f, with_time=False)
+        self.nNonce = struct.unpack("<Q", f.read(8))[0]
+        self.strSubVer = deser_string(f).decode('utf-8')
+
+        self.nStartingHeight = struct.unpack("<i", f.read(4))[0]
+
+        # Relay field is optional for version 70001 onwards
+        # But, unconditionally check it to match behaviour in bitcoind
+        try:
+            self.relay = struct.unpack("<b", f.read(1))[0]
+        except struct.error:
+            self.relay = 0
+
+    def serialize(self):
+        r = b""
+        r += struct.pack("<i", self.nVersion)
+        r += struct.pack("<Q", self.nServices)
+        r += struct.pack("<q", self.nTime)
+        r += self.addrTo.serialize(with_time=False)
+        r += self.addrFrom.serialize(with_time=False)
+        r += struct.pack("<Q", self.nNonce)
+        r += ser_string(self.strSubVer.encode('utf-8'))
+        r += struct.pack("<i", self.nStartingHeight)
+        r += struct.pack("<b", self.relay)
+        return r
+
+    def __repr__(self):
+        return 'msg_version(nVersion=%i nServices=%i nTime=%s addrTo=%s addrFrom=%s nNonce=0x%016X strSubVer=%s nStartingHeight=%i relay=%i)' \
+            % (self.nVersion, self.nServices, time.ctime(self.nTime),
+               repr(self.addrTo), repr(self.addrFrom), self.nNonce,
+               self.strSubVer, self.nStartingHeight, self.relay)
+
+
+class msg_verack:
+    __slots__ = ()
+    msgtype = b"verack"
+
+    def __init__(self):
+        pass
+
+    def deserialize(self, f):
+        pass
+
+    def serialize(self):
+        return b""
+
+    def __repr__(self):
+        return "msg_verack()"
+
+
+class msg_addr:
+    __slots__ = ("addrs",)
+    msgtype = b"addr"
+
+    def __init__(self):
+        self.addrs = []
+
+    def deserialize(self, f):
+        self.addrs = deser_vector(f, CAddress)
+
+    def serialize(self):
+        return ser_vector(self.addrs)
+
+    def __repr__(self):
+        return "msg_addr(addrs=%s)" % (repr(self.addrs))
+
+
+class msg_addrv2:
+    __slots__ = ("addrs",)
+    msgtype = b"addrv2"
+
+    def __init__(self):
+        self.addrs = []
+
+    def deserialize(self, f):
+        self.addrs = deser_vector(f, CAddress, "deserialize_v2")
+
+    def serialize(self):
+        return ser_vector(self.addrs, "serialize_v2")
+
+    def __repr__(self):
+        return "msg_addrv2(addrs=%s)" % (repr(self.addrs))
+
+
+class msg_sendaddrv2:
+    __slots__ = ()
+    msgtype = b"sendaddrv2"
+
+    def __init__(self):
+        pass
+
+    def deserialize(self, f):
+        pass
+
+    def serialize(self):
+        return b""
+
+    def __repr__(self):
+        return "msg_sendaddrv2()"
+
+
+class msg_inv:
+    __slots__ = ("inv",)
+    msgtype = b"inv"
+
+    def __init__(self, inv=None):
+        if inv is None:
+            self.inv = []
+        else:
+            self.inv = inv
+
+    def deserialize(self, f):
+        self.inv = deser_vector(f, CInv)
+
+    def serialize(self):
+        return ser_vector(self.inv)
+
+    def __repr__(self):
+        return "msg_inv(inv=%s)" % (repr(self.inv))
+
+
+class msg_getdata:
+    __slots__ = ("inv",)
+    msgtype = b"getdata"
+
+    def __init__(self, inv=None):
+        self.inv = inv if inv is not None else []
+
+    def deserialize(self, f):
+        self.inv = deser_vector(f, CInv)
+
+    def serialize(self):
+        return ser_vector(self.inv)
+
+    def __repr__(self):
+        return "msg_getdata(inv=%s)" % (repr(self.inv))
+
+
+class msg_getblocks:
+    __slots__ = ("locator", "hashstop")
+    msgtype = b"getblocks"
+
+    def __init__(self):
+        self.locator = CBlockLocator()
+        self.hashstop = 0
+
+    def deserialize(self, f):
+        self.locator = CBlockLocator()
+        self.locator.deserialize(f)
+        self.hashstop = deser_uint256(f)
+
+    def serialize(self):
+        r = b""
+        r += self.locator.serialize()
+        r += ser_uint256(self.hashstop)
+        return r
+
+    def __repr__(self):
+        return "msg_getblocks(locator=%s hashstop=%064x)" \
+            % (repr(self.locator), self.hashstop)
+
+
+class msg_tx:
+    __slots__ = ("tx",)
+    msgtype = b"tx"
+
+    def __init__(self, tx=CTransaction()):
+        self.tx = tx
+
+    def deserialize(self, f):
+        self.tx.deserialize(f)
+
+    def serialize(self):
+        return self.tx.serialize_with_witness()
+
+    def __repr__(self):
+        return "msg_tx(tx=%s)" % (repr(self.tx))
+
+class msg_wtxidrelay:
+    __slots__ = ()
+    msgtype = b"wtxidrelay"
+
+    def __init__(self):
+        pass
+
+    def deserialize(self, f):
+        pass
+
+    def serialize(self):
+        return b""
+
+    def __repr__(self):
+        return "msg_wtxidrelay()"
+
+
+class msg_no_witness_tx(msg_tx):
+    __slots__ = ()
+
+    def serialize(self):
+        return self.tx.serialize_without_witness()
+
+
+class msg_block:
+    __slots__ = ("block",)
+    msgtype = b"block"
+
+    def __init__(self, block=None):
+        if block is None:
+            self.block = CBlock()
+        else:
+            self.block = block
+
+    def deserialize(self, f):
+        self.block.deserialize(f)
+
+    def serialize(self):
+        return self.block.serialize()
+
+    def __repr__(self):
+        return "msg_block(block=%s)" % (repr(self.block))
+
+
+# for cases where a user needs tighter control over what is sent over the wire
+# note that the user must supply the name of the msgtype, and the data
+class msg_generic:
+    __slots__ = ("data")
+
+    def __init__(self, msgtype, data=None):
+        self.msgtype = msgtype
+        self.data = data
+
+    def serialize(self):
+        return self.data
+
+    def __repr__(self):
+        return "msg_generic()"
+
+
+class msg_no_witness_block(msg_block):
+    __slots__ = ()
+    def serialize(self):
+        return self.block.serialize(with_witness=False)
+
+
+class msg_getaddr:
+    __slots__ = ()
+    msgtype = b"getaddr"
+
+    def __init__(self):
+        pass
+
+    def deserialize(self, f):
+        pass
+
+    def serialize(self):
+        return b""
+
+    def __repr__(self):
+        return "msg_getaddr()"
+
+
+class msg_ping:
+    __slots__ = ("nonce",)
+    msgtype = b"ping"
+
+    def __init__(self, nonce=0):
+        self.nonce = nonce
+
+    def deserialize(self, f):
+        self.nonce = struct.unpack("<Q", f.read(8))[0]
+
+    def serialize(self):
+        r = b""
+        r += struct.pack("<Q", self.nonce)
+        return r
+
+    def __repr__(self):
+        return "msg_ping(nonce=%08x)" % self.nonce
+
+
+class msg_pong:
+    __slots__ = ("nonce",)
+    msgtype = b"pong"
+
+    def __init__(self, nonce=0):
+        self.nonce = nonce
+
+    def deserialize(self, f):
+        self.nonce = struct.unpack("<Q", f.read(8))[0]
+
+    def seria
