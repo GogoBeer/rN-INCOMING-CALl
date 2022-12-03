@@ -1364,4 +1364,329 @@ class msg_pong:
     def deserialize(self, f):
         self.nonce = struct.unpack("<Q", f.read(8))[0]
 
-    def seria
+    def serialize(self):
+        r = b""
+        r += struct.pack("<Q", self.nonce)
+        return r
+
+    def __repr__(self):
+        return "msg_pong(nonce=%08x)" % self.nonce
+
+
+class msg_mempool:
+    __slots__ = ()
+    msgtype = b"mempool"
+
+    def __init__(self):
+        pass
+
+    def deserialize(self, f):
+        pass
+
+    def serialize(self):
+        return b""
+
+    def __repr__(self):
+        return "msg_mempool()"
+
+
+class msg_notfound:
+    __slots__ = ("vec", )
+    msgtype = b"notfound"
+
+    def __init__(self, vec=None):
+        self.vec = vec or []
+
+    def deserialize(self, f):
+        self.vec = deser_vector(f, CInv)
+
+    def serialize(self):
+        return ser_vector(self.vec)
+
+    def __repr__(self):
+        return "msg_notfound(vec=%s)" % (repr(self.vec))
+
+
+class msg_sendheaders:
+    __slots__ = ()
+    msgtype = b"sendheaders"
+
+    def __init__(self):
+        pass
+
+    def deserialize(self, f):
+        pass
+
+    def serialize(self):
+        return b""
+
+    def __repr__(self):
+        return "msg_sendheaders()"
+
+
+# getheaders message has
+# number of entries
+# vector of hashes
+# hash_stop (hash of last desired block header, 0 to get as many as possible)
+class msg_getheaders:
+    __slots__ = ("hashstop", "locator",)
+    msgtype = b"getheaders"
+
+    def __init__(self):
+        self.locator = CBlockLocator()
+        self.hashstop = 0
+
+    def deserialize(self, f):
+        self.locator = CBlockLocator()
+        self.locator.deserialize(f)
+        self.hashstop = deser_uint256(f)
+
+    def serialize(self):
+        r = b""
+        r += self.locator.serialize()
+        r += ser_uint256(self.hashstop)
+        return r
+
+    def __repr__(self):
+        return "msg_getheaders(locator=%s, stop=%064x)" \
+            % (repr(self.locator), self.hashstop)
+
+
+# headers message has
+# <count> <vector of block headers>
+class msg_headers:
+    __slots__ = ("headers",)
+    msgtype = b"headers"
+
+    def __init__(self, headers=None):
+        self.headers = headers if headers is not None else []
+
+    def deserialize(self, f):
+        # comment in bitcoind indicates these should be deserialized as blocks
+        blocks = deser_vector(f, CBlock)
+        for x in blocks:
+            self.headers.append(CBlockHeader(x))
+
+    def serialize(self):
+        blocks = [CBlock(x) for x in self.headers]
+        return ser_vector(blocks)
+
+    def __repr__(self):
+        return "msg_headers(headers=%s)" % repr(self.headers)
+
+
+class msg_merkleblock:
+    __slots__ = ("merkleblock",)
+    msgtype = b"merkleblock"
+
+    def __init__(self, merkleblock=None):
+        if merkleblock is None:
+            self.merkleblock = CMerkleBlock()
+        else:
+            self.merkleblock = merkleblock
+
+    def deserialize(self, f):
+        self.merkleblock.deserialize(f)
+
+    def serialize(self):
+        return self.merkleblock.serialize()
+
+    def __repr__(self):
+        return "msg_merkleblock(merkleblock=%s)" % (repr(self.merkleblock))
+
+
+class msg_filterload:
+    __slots__ = ("data", "nHashFuncs", "nTweak", "nFlags")
+    msgtype = b"filterload"
+
+    def __init__(self, data=b'00', nHashFuncs=0, nTweak=0, nFlags=0):
+        self.data = data
+        self.nHashFuncs = nHashFuncs
+        self.nTweak = nTweak
+        self.nFlags = nFlags
+
+    def deserialize(self, f):
+        self.data = deser_string(f)
+        self.nHashFuncs = struct.unpack("<I", f.read(4))[0]
+        self.nTweak = struct.unpack("<I", f.read(4))[0]
+        self.nFlags = struct.unpack("<B", f.read(1))[0]
+
+    def serialize(self):
+        r = b""
+        r += ser_string(self.data)
+        r += struct.pack("<I", self.nHashFuncs)
+        r += struct.pack("<I", self.nTweak)
+        r += struct.pack("<B", self.nFlags)
+        return r
+
+    def __repr__(self):
+        return "msg_filterload(data={}, nHashFuncs={}, nTweak={}, nFlags={})".format(
+            self.data, self.nHashFuncs, self.nTweak, self.nFlags)
+
+
+class msg_filteradd:
+    __slots__ = ("data")
+    msgtype = b"filteradd"
+
+    def __init__(self, data):
+        self.data = data
+
+    def deserialize(self, f):
+        self.data = deser_string(f)
+
+    def serialize(self):
+        r = b""
+        r += ser_string(self.data)
+        return r
+
+    def __repr__(self):
+        return "msg_filteradd(data={})".format(self.data)
+
+
+class msg_filterclear:
+    __slots__ = ()
+    msgtype = b"filterclear"
+
+    def __init__(self):
+        pass
+
+    def deserialize(self, f):
+        pass
+
+    def serialize(self):
+        return b""
+
+    def __repr__(self):
+        return "msg_filterclear()"
+
+
+class msg_feefilter:
+    __slots__ = ("feerate",)
+    msgtype = b"feefilter"
+
+    def __init__(self, feerate=0):
+        self.feerate = feerate
+
+    def deserialize(self, f):
+        self.feerate = struct.unpack("<Q", f.read(8))[0]
+
+    def serialize(self):
+        r = b""
+        r += struct.pack("<Q", self.feerate)
+        return r
+
+    def __repr__(self):
+        return "msg_feefilter(feerate=%08x)" % self.feerate
+
+
+class msg_sendcmpct:
+    __slots__ = ("announce", "version")
+    msgtype = b"sendcmpct"
+
+    def __init__(self, announce=False, version=1):
+        self.announce = announce
+        self.version = version
+
+    def deserialize(self, f):
+        self.announce = struct.unpack("<?", f.read(1))[0]
+        self.version = struct.unpack("<Q", f.read(8))[0]
+
+    def serialize(self):
+        r = b""
+        r += struct.pack("<?", self.announce)
+        r += struct.pack("<Q", self.version)
+        return r
+
+    def __repr__(self):
+        return "msg_sendcmpct(announce=%s, version=%lu)" % (self.announce, self.version)
+
+
+class msg_cmpctblock:
+    __slots__ = ("header_and_shortids",)
+    msgtype = b"cmpctblock"
+
+    def __init__(self, header_and_shortids = None):
+        self.header_and_shortids = header_and_shortids
+
+    def deserialize(self, f):
+        self.header_and_shortids = P2PHeaderAndShortIDs()
+        self.header_and_shortids.deserialize(f)
+
+    def serialize(self):
+        r = b""
+        r += self.header_and_shortids.serialize()
+        return r
+
+    def __repr__(self):
+        return "msg_cmpctblock(HeaderAndShortIDs=%s)" % repr(self.header_and_shortids)
+
+
+class msg_getblocktxn:
+    __slots__ = ("block_txn_request",)
+    msgtype = b"getblocktxn"
+
+    def __init__(self):
+        self.block_txn_request = None
+
+    def deserialize(self, f):
+        self.block_txn_request = BlockTransactionsRequest()
+        self.block_txn_request.deserialize(f)
+
+    def serialize(self):
+        r = b""
+        r += self.block_txn_request.serialize()
+        return r
+
+    def __repr__(self):
+        return "msg_getblocktxn(block_txn_request=%s)" % (repr(self.block_txn_request))
+
+
+class msg_blocktxn:
+    __slots__ = ("block_transactions",)
+    msgtype = b"blocktxn"
+
+    def __init__(self):
+        self.block_transactions = BlockTransactions()
+
+    def deserialize(self, f):
+        self.block_transactions.deserialize(f)
+
+    def serialize(self):
+        r = b""
+        r += self.block_transactions.serialize()
+        return r
+
+    def __repr__(self):
+        return "msg_blocktxn(block_transactions=%s)" % (repr(self.block_transactions))
+
+
+class msg_no_witness_blocktxn(msg_blocktxn):
+    __slots__ = ()
+
+    def serialize(self):
+        return self.block_transactions.serialize(with_witness=False)
+
+
+class msg_getcfilters:
+    __slots__ = ("filter_type", "start_height", "stop_hash")
+    msgtype =  b"getcfilters"
+
+    def __init__(self, filter_type, start_height, stop_hash):
+        self.filter_type = filter_type
+        self.start_height = start_height
+        self.stop_hash = stop_hash
+
+    def deserialize(self, f):
+        self.filter_type = struct.unpack("<B", f.read(1))[0]
+        self.start_height = struct.unpack("<I", f.read(4))[0]
+        self.stop_hash = deser_uint256(f)
+
+    def serialize(self):
+        r = b""
+        r += struct.pack("<B", self.filter_type)
+        r += struct.pack("<I", self.start_height)
+        r += ser_uint256(self.stop_hash)
+        return r
+
+    def __repr__(self):
+        return "msg_getcfilters(filter_type={:#x}, 
