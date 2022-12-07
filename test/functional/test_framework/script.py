@@ -491,4 +491,239 @@ class CScript(bytes):
             else:
                 datasize = None
                 pushdata_type = None
-                if opcode < OP_
+                if opcode < OP_PUSHDATA1:
+                    pushdata_type = 'PUSHDATA(%d)' % opcode
+                    datasize = opcode
+
+                elif opcode == OP_PUSHDATA1:
+                    pushdata_type = 'PUSHDATA1'
+                    if i >= len(self):
+                        raise CScriptInvalidError('PUSHDATA1: missing data length')
+                    datasize = self[i]
+                    i += 1
+
+                elif opcode == OP_PUSHDATA2:
+                    pushdata_type = 'PUSHDATA2'
+                    if i + 1 >= len(self):
+                        raise CScriptInvalidError('PUSHDATA2: missing data length')
+                    datasize = self[i] + (self[i + 1] << 8)
+                    i += 2
+
+                elif opcode == OP_PUSHDATA4:
+                    pushdata_type = 'PUSHDATA4'
+                    if i + 3 >= len(self):
+                        raise CScriptInvalidError('PUSHDATA4: missing data length')
+                    datasize = self[i] + (self[i + 1] << 8) + (self[i + 2] << 16) + (self[i + 3] << 24)
+                    i += 4
+
+                else:
+                    assert False  # shouldn't happen
+
+                data = bytes(self[i:i + datasize])
+
+                # Check for truncation
+                if len(data) < datasize:
+                    raise CScriptTruncatedPushDataError('%s: truncated data' % pushdata_type, data)
+
+                i += datasize
+
+                yield (opcode, data, sop_idx)
+
+    def __iter__(self):
+        """'Cooked' iteration
+
+        Returns either a CScriptOP instance, an integer, or bytes, as
+        appropriate.
+
+        See raw_iter() if you need to distinguish the different possible
+        PUSHDATA encodings.
+        """
+        for (opcode, data, sop_idx) in self.raw_iter():
+            if data is not None:
+                yield data
+            else:
+                opcode = CScriptOp(opcode)
+
+                if opcode.is_small_int():
+                    yield opcode.decode_op_n()
+                else:
+                    yield CScriptOp(opcode)
+
+    def __repr__(self):
+        def _repr(o):
+            if isinstance(o, bytes):
+                return "x('%s')" % o.hex()
+            else:
+                return repr(o)
+
+        ops = []
+        i = iter(self)
+        while True:
+            op = None
+            try:
+                op = _repr(next(i))
+            except CScriptTruncatedPushDataError as err:
+                op = '%s...<ERROR: %s>' % (_repr(err.data), err)
+                break
+            except CScriptInvalidError as err:
+                op = '<ERROR: %s>' % err
+                break
+            except StopIteration:
+                break
+            finally:
+                if op is not None:
+                    ops.append(op)
+
+        return "CScript([%s])" % ', '.join(ops)
+
+    def GetSigOpCount(self, fAccurate):
+        """Get the SigOp count.
+
+        fAccurate - Accurately count CHECKMULTISIG, see BIP16 for details.
+
+        Note that this is consensus-critical.
+        """
+        n = 0
+        lastOpcode = OP_INVALIDOPCODE
+        for (opcode, data, sop_idx) in self.raw_iter():
+            if opcode in (OP_CHECKSIG, OP_CHECKSIGVERIFY):
+                n += 1
+            elif opcode in (OP_CHECKMULTISIG, OP_CHECKMULTISIGVERIFY):
+                if fAccurate and (OP_1 <= lastOpcode <= OP_16):
+                    n += opcode.decode_op_n()
+                else:
+                    n += 20
+            lastOpcode = opcode
+        return n
+
+
+SIGHASH_DEFAULT = 0 # Taproot-only default, semantics same as SIGHASH_ALL
+SIGHASH_ALL = 1
+SIGHASH_NONE = 2
+SIGHASH_SINGLE = 3
+SIGHASH_ANYONECANPAY = 0x80
+
+def FindAndDelete(script, sig):
+    """Consensus critical, see FindAndDelete() in Satoshi codebase"""
+    r = b''
+    last_sop_idx = sop_idx = 0
+    skip = True
+    for (opcode, data, sop_idx) in script.raw_iter():
+        if not skip:
+            r += script[last_sop_idx:sop_idx]
+        last_sop_idx = sop_idx
+        if script[sop_idx:sop_idx + len(sig)] == sig:
+            skip = True
+        else:
+            skip = False
+    if not skip:
+        r += script[last_sop_idx:]
+    return CScript(r)
+
+def LegacySignatureMsg(script, txTo, inIdx, hashtype):
+    """Preimage of the signature hash, if it exists.
+
+    Returns either (None, err) to indicate error (which translates to sighash 1),
+    or (msg, None).
+    """
+
+    if inIdx >= len(txTo.vin):
+        return (None, "inIdx %d out of range (%d)" % (inIdx, len(txTo.vin)))
+    txtmp = CTransaction(txTo)
+
+    for txin in txtmp.vin:
+        txin.scriptSig = b''
+    txtmp.vin[inIdx].scriptSig = FindAndDelete(script, CScript([OP_CODESEPARATOR]))
+
+    if (hashtype & 0x1f) == SIGHASH_NONE:
+        txtmp.vout = []
+
+        for i in range(len(txtmp.vin)):
+            if i != inIdx:
+                txtmp.vin[i].nSequence = 0
+
+    elif (hashtype & 0x1f) == SIGHASH_SINGLE:
+        outIdx = inIdx
+        if outIdx >= len(txtmp.vout):
+            return (None, "outIdx %d out of range (%d)" % (outIdx, len(txtmp.vout)))
+
+        tmp = txtmp.vout[outIdx]
+        txtmp.vout = []
+        for _ in range(outIdx):
+            txtmp.vout.append(CTxOut(-1))
+        txtmp.vout.append(tmp)
+
+        for i in range(len(txtmp.vin)):
+            if i != inIdx:
+                txtmp.vin[i].nSequence = 0
+
+    if hashtype & SIGHASH_ANYONECANPAY:
+        tmp = txtmp.vin[inIdx]
+        txtmp.vin = []
+        txtmp.vin.append(tmp)
+
+    s = txtmp.serialize_without_witness()
+    s += struct.pack(b"<I", hashtype)
+
+    return (s, None)
+
+def LegacySignatureHash(*args, **kwargs):
+    """Consensus-correct SignatureHash
+
+    Returns (hash, err) to precisely match the consensus-critical behavior of
+    the SIGHASH_SINGLE bug. (inIdx is *not* checked for validity)
+    """
+
+    HASH_ONE = b'\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
+    msg, err = LegacySignatureMsg(*args, **kwargs)
+    if msg is None:
+        return (HASH_ONE, err)
+    else:
+        return (hash256(msg), err)
+
+# TODO: Allow cached hashPrevouts/hashSequence/hashOutputs to be provided.
+# Performance optimization probably not necessary for python tests, however.
+# Note that this corresponds to sigversion == 1 in EvalScript, which is used
+# for version 0 witnesses.
+def SegwitV0SignatureMsg(script, txTo, inIdx, hashtype, amount):
+
+    hashPrevouts = 0
+    hashSequence = 0
+    hashOutputs = 0
+
+    if not (hashtype & SIGHASH_ANYONECANPAY):
+        serialize_prevouts = bytes()
+        for i in txTo.vin:
+            serialize_prevouts += i.prevout.serialize()
+        hashPrevouts = uint256_from_str(hash256(serialize_prevouts))
+
+    if (not (hashtype & SIGHASH_ANYONECANPAY) and (hashtype & 0x1f) != SIGHASH_SINGLE and (hashtype & 0x1f) != SIGHASH_NONE):
+        serialize_sequence = bytes()
+        for i in txTo.vin:
+            serialize_sequence += struct.pack("<I", i.nSequence)
+        hashSequence = uint256_from_str(hash256(serialize_sequence))
+
+    if ((hashtype & 0x1f) != SIGHASH_SINGLE and (hashtype & 0x1f) != SIGHASH_NONE):
+        serialize_outputs = bytes()
+        for o in txTo.vout:
+            serialize_outputs += o.serialize()
+        hashOutputs = uint256_from_str(hash256(serialize_outputs))
+    elif ((hashtype & 0x1f) == SIGHASH_SINGLE and inIdx < len(txTo.vout)):
+        serialize_outputs = txTo.vout[inIdx].serialize()
+        hashOutputs = uint256_from_str(hash256(serialize_outputs))
+
+    ss = bytes()
+    ss += struct.pack("<i", txTo.nVersion)
+    ss += ser_uint256(hashPrevouts)
+    ss += ser_uint256(hashSequence)
+    ss += txTo.vin[inIdx].prevout.serialize()
+    ss += ser_string(script)
+    ss += struct.pack("<q", amount)
+    ss += struct.pack("<I", txTo.vin[inIdx].nSequence)
+    ss += ser_uint256(hashOutputs)
+    ss += struct.pack("<i", txTo.nLockTime)
+    ss += struct.pack("<I", hashtype)
+    return ss
+
+def SegwitV0SignatureHash(*args, **kwargs):
+    
