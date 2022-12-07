@@ -228,4 +228,267 @@ OP_WITHIN = CScriptOp(0xa5)
 # crypto
 OP_RIPEMD160 = CScriptOp(0xa6)
 OP_SHA1 = CScriptOp(0xa7)
-OP_
+OP_SHA256 = CScriptOp(0xa8)
+OP_HASH160 = CScriptOp(0xa9)
+OP_HASH256 = CScriptOp(0xaa)
+OP_CODESEPARATOR = CScriptOp(0xab)
+OP_CHECKSIG = CScriptOp(0xac)
+OP_CHECKSIGVERIFY = CScriptOp(0xad)
+OP_CHECKMULTISIG = CScriptOp(0xae)
+OP_CHECKMULTISIGVERIFY = CScriptOp(0xaf)
+
+# expansion
+OP_NOP1 = CScriptOp(0xb0)
+OP_CHECKLOCKTIMEVERIFY = CScriptOp(0xb1)
+OP_CHECKSEQUENCEVERIFY = CScriptOp(0xb2)
+OP_NOP4 = CScriptOp(0xb3)
+OP_NOP5 = CScriptOp(0xb4)
+OP_NOP6 = CScriptOp(0xb5)
+OP_NOP7 = CScriptOp(0xb6)
+OP_NOP8 = CScriptOp(0xb7)
+OP_NOP9 = CScriptOp(0xb8)
+OP_NOP10 = CScriptOp(0xb9)
+
+# BIP 342 opcodes (Tapscript)
+OP_CHECKSIGADD = CScriptOp(0xba)
+
+OP_INVALIDOPCODE = CScriptOp(0xff)
+
+OPCODE_NAMES.update({
+    OP_0: 'OP_0',
+    OP_PUSHDATA1: 'OP_PUSHDATA1',
+    OP_PUSHDATA2: 'OP_PUSHDATA2',
+    OP_PUSHDATA4: 'OP_PUSHDATA4',
+    OP_1NEGATE: 'OP_1NEGATE',
+    OP_RESERVED: 'OP_RESERVED',
+    OP_1: 'OP_1',
+    OP_2: 'OP_2',
+    OP_3: 'OP_3',
+    OP_4: 'OP_4',
+    OP_5: 'OP_5',
+    OP_6: 'OP_6',
+    OP_7: 'OP_7',
+    OP_8: 'OP_8',
+    OP_9: 'OP_9',
+    OP_10: 'OP_10',
+    OP_11: 'OP_11',
+    OP_12: 'OP_12',
+    OP_13: 'OP_13',
+    OP_14: 'OP_14',
+    OP_15: 'OP_15',
+    OP_16: 'OP_16',
+    OP_NOP: 'OP_NOP',
+    OP_VER: 'OP_VER',
+    OP_IF: 'OP_IF',
+    OP_NOTIF: 'OP_NOTIF',
+    OP_VERIF: 'OP_VERIF',
+    OP_VERNOTIF: 'OP_VERNOTIF',
+    OP_ELSE: 'OP_ELSE',
+    OP_ENDIF: 'OP_ENDIF',
+    OP_VERIFY: 'OP_VERIFY',
+    OP_RETURN: 'OP_RETURN',
+    OP_TOALTSTACK: 'OP_TOALTSTACK',
+    OP_FROMALTSTACK: 'OP_FROMALTSTACK',
+    OP_2DROP: 'OP_2DROP',
+    OP_2DUP: 'OP_2DUP',
+    OP_3DUP: 'OP_3DUP',
+    OP_2OVER: 'OP_2OVER',
+    OP_2ROT: 'OP_2ROT',
+    OP_2SWAP: 'OP_2SWAP',
+    OP_IFDUP: 'OP_IFDUP',
+    OP_DEPTH: 'OP_DEPTH',
+    OP_DROP: 'OP_DROP',
+    OP_DUP: 'OP_DUP',
+    OP_NIP: 'OP_NIP',
+    OP_OVER: 'OP_OVER',
+    OP_PICK: 'OP_PICK',
+    OP_ROLL: 'OP_ROLL',
+    OP_ROT: 'OP_ROT',
+    OP_SWAP: 'OP_SWAP',
+    OP_TUCK: 'OP_TUCK',
+    OP_CAT: 'OP_CAT',
+    OP_SUBSTR: 'OP_SUBSTR',
+    OP_LEFT: 'OP_LEFT',
+    OP_RIGHT: 'OP_RIGHT',
+    OP_SIZE: 'OP_SIZE',
+    OP_INVERT: 'OP_INVERT',
+    OP_AND: 'OP_AND',
+    OP_OR: 'OP_OR',
+    OP_XOR: 'OP_XOR',
+    OP_EQUAL: 'OP_EQUAL',
+    OP_EQUALVERIFY: 'OP_EQUALVERIFY',
+    OP_RESERVED1: 'OP_RESERVED1',
+    OP_RESERVED2: 'OP_RESERVED2',
+    OP_1ADD: 'OP_1ADD',
+    OP_1SUB: 'OP_1SUB',
+    OP_2MUL: 'OP_2MUL',
+    OP_2DIV: 'OP_2DIV',
+    OP_NEGATE: 'OP_NEGATE',
+    OP_ABS: 'OP_ABS',
+    OP_NOT: 'OP_NOT',
+    OP_0NOTEQUAL: 'OP_0NOTEQUAL',
+    OP_ADD: 'OP_ADD',
+    OP_SUB: 'OP_SUB',
+    OP_MUL: 'OP_MUL',
+    OP_DIV: 'OP_DIV',
+    OP_MOD: 'OP_MOD',
+    OP_LSHIFT: 'OP_LSHIFT',
+    OP_RSHIFT: 'OP_RSHIFT',
+    OP_BOOLAND: 'OP_BOOLAND',
+    OP_BOOLOR: 'OP_BOOLOR',
+    OP_NUMEQUAL: 'OP_NUMEQUAL',
+    OP_NUMEQUALVERIFY: 'OP_NUMEQUALVERIFY',
+    OP_NUMNOTEQUAL: 'OP_NUMNOTEQUAL',
+    OP_LESSTHAN: 'OP_LESSTHAN',
+    OP_GREATERTHAN: 'OP_GREATERTHAN',
+    OP_LESSTHANOREQUAL: 'OP_LESSTHANOREQUAL',
+    OP_GREATERTHANOREQUAL: 'OP_GREATERTHANOREQUAL',
+    OP_MIN: 'OP_MIN',
+    OP_MAX: 'OP_MAX',
+    OP_WITHIN: 'OP_WITHIN',
+    OP_RIPEMD160: 'OP_RIPEMD160',
+    OP_SHA1: 'OP_SHA1',
+    OP_SHA256: 'OP_SHA256',
+    OP_HASH160: 'OP_HASH160',
+    OP_HASH256: 'OP_HASH256',
+    OP_CODESEPARATOR: 'OP_CODESEPARATOR',
+    OP_CHECKSIG: 'OP_CHECKSIG',
+    OP_CHECKSIGVERIFY: 'OP_CHECKSIGVERIFY',
+    OP_CHECKMULTISIG: 'OP_CHECKMULTISIG',
+    OP_CHECKMULTISIGVERIFY: 'OP_CHECKMULTISIGVERIFY',
+    OP_NOP1: 'OP_NOP1',
+    OP_CHECKLOCKTIMEVERIFY: 'OP_CHECKLOCKTIMEVERIFY',
+    OP_CHECKSEQUENCEVERIFY: 'OP_CHECKSEQUENCEVERIFY',
+    OP_NOP4: 'OP_NOP4',
+    OP_NOP5: 'OP_NOP5',
+    OP_NOP6: 'OP_NOP6',
+    OP_NOP7: 'OP_NOP7',
+    OP_NOP8: 'OP_NOP8',
+    OP_NOP9: 'OP_NOP9',
+    OP_NOP10: 'OP_NOP10',
+    OP_CHECKSIGADD: 'OP_CHECKSIGADD',
+    OP_INVALIDOPCODE: 'OP_INVALIDOPCODE',
+})
+
+class CScriptInvalidError(Exception):
+    """Base class for CScript exceptions"""
+    pass
+
+class CScriptTruncatedPushDataError(CScriptInvalidError):
+    """Invalid pushdata due to truncation"""
+    def __init__(self, msg, data):
+        self.data = data
+        super().__init__(msg)
+
+
+# This is used, eg, for blockchain heights in coinbase scripts (bip34)
+class CScriptNum:
+    __slots__ = ("value",)
+
+    def __init__(self, d=0):
+        self.value = d
+
+    @staticmethod
+    def encode(obj):
+        r = bytearray(0)
+        if obj.value == 0:
+            return bytes(r)
+        neg = obj.value < 0
+        absvalue = -obj.value if neg else obj.value
+        while (absvalue):
+            r.append(absvalue & 0xff)
+            absvalue >>= 8
+        if r[-1] & 0x80:
+            r.append(0x80 if neg else 0)
+        elif neg:
+            r[-1] |= 0x80
+        return bytes([len(r)]) + r
+
+    @staticmethod
+    def decode(vch):
+        result = 0
+        # We assume valid push_size and minimal encoding
+        value = vch[1:]
+        if len(value) == 0:
+            return result
+        for i, byte in enumerate(value):
+            result |= int(byte) << 8 * i
+        if value[-1] >= 0x80:
+            # Mask for all but the highest result bit
+            num_mask = (2**(len(value) * 8) - 1) >> 1
+            result &= num_mask
+            result *= -1
+        return result
+
+
+class CScript(bytes):
+    """Serialized script
+
+    A bytes subclass, so you can use this directly whenever bytes are accepted.
+    Note that this means that indexing does *not* work - you'll get an index by
+    byte rather than opcode. This format was chosen for efficiency so that the
+    general case would not require creating a lot of little CScriptOP objects.
+
+    iter(script) however does iterate by opcode.
+    """
+    __slots__ = ()
+
+    @classmethod
+    def __coerce_instance(cls, other):
+        # Coerce other into bytes
+        if isinstance(other, CScriptOp):
+            other = bytes([other])
+        elif isinstance(other, CScriptNum):
+            if (other.value == 0):
+                other = bytes([CScriptOp(OP_0)])
+            else:
+                other = CScriptNum.encode(other)
+        elif isinstance(other, int):
+            if 0 <= other <= 16:
+                other = bytes([CScriptOp.encode_op_n(other)])
+            elif other == -1:
+                other = bytes([OP_1NEGATE])
+            else:
+                other = CScriptOp.encode_op_pushdata(bn2vch(other))
+        elif isinstance(other, (bytes, bytearray)):
+            other = CScriptOp.encode_op_pushdata(other)
+        return other
+
+    def __add__(self, other):
+        # add makes no sense for a CScript()
+        raise NotImplementedError
+
+    def join(self, iterable):
+        # join makes no sense for a CScript()
+        raise NotImplementedError
+
+    def __new__(cls, value=b''):
+        if isinstance(value, bytes) or isinstance(value, bytearray):
+            return super().__new__(cls, value)
+        else:
+            def coerce_iterable(iterable):
+                for instance in iterable:
+                    yield cls.__coerce_instance(instance)
+            # Annoyingly on both python2 and python3 bytes.join() always
+            # returns a bytes instance even when subclassed.
+            return super().__new__(cls, b''.join(coerce_iterable(value)))
+
+    def raw_iter(self):
+        """Raw iteration
+
+        Yields tuples of (opcode, data, sop_idx) so that the different possible
+        PUSHDATA encodings can be accurately distinguished, as well as
+        determining the exact opcode byte indexes. (sop_idx)
+        """
+        i = 0
+        while i < len(self):
+            sop_idx = i
+            opcode = self[i]
+            i += 1
+
+            if opcode > OP_PUSHDATA4:
+                yield (opcode, None, sop_idx)
+            else:
+                datasize = None
+                pushdata_type = None
+                if opcode < OP_
