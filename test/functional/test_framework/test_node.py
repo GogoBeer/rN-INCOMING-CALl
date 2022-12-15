@@ -211,4 +211,163 @@ class TestNode():
         self.process = subprocess.Popen(self.args + extra_args, env=subp_env, stdout=stdout, stderr=stderr, cwd=cwd, **kwargs)
 
         self.running = True
-        self.log.debug("bitcoind started, 
+        self.log.debug("bitcoind started, waiting for RPC to come up")
+
+        if self.start_perf:
+            self._start_perf()
+
+    def wait_for_rpc_connection(self):
+        """Sets up an RPC connection to the bitcoind process. Returns False if unable to connect."""
+        # Poll at a rate of four times per second
+        poll_per_s = 4
+        for _ in range(poll_per_s * self.rpc_timeout):
+            if self.process.poll() is not None:
+                raise FailedToStartError(self._node_msg(
+                    'bitcoind exited with status {} during initialization'.format(self.process.returncode)))
+            try:
+                rpc = get_rpc_proxy(
+                    rpc_url(self.datadir, self.index, self.chain, self.rpchost),
+                    self.index,
+                    timeout=self.rpc_timeout // 2,  # Shorter timeout to allow for one retry in case of ETIMEDOUT
+                    coveragedir=self.coverage_dir,
+                )
+                rpc.getblockcount()
+                # If the call to getblockcount() succeeds then the RPC connection is up
+                if self.version_is_at_least(190000):
+                    # getmempoolinfo.loaded is available since commit
+                    # bb8ae2c (version 0.19.0)
+                    wait_until_helper(lambda: rpc.getmempoolinfo()['loaded'], timeout_factor=self.timeout_factor)
+                    # Wait for the node to finish reindex, block import, and
+                    # loading the mempool. Usually importing happens fast or
+                    # even "immediate" when the node is started. However, there
+                    # is no guarantee and sometimes ThreadImport might finish
+                    # later. This is going to cause intermittent test failures,
+                    # because generally the tests assume the node is fully
+                    # ready after being started.
+                    #
+                    # For example, the node will reject block messages from p2p
+                    # when it is still importing with the error "Unexpected
+                    # block message received"
+                    #
+                    # The wait is done here to make tests as robust as possible
+                    # and prevent racy tests and intermittent failures as much
+                    # as possible. Some tests might not need this, but the
+                    # overhead is trivial, and the added guarantees are worth
+                    # the minimal performance cost.
+                self.log.debug("RPC successfully started")
+                if self.use_cli:
+                    return
+                self.rpc = rpc
+                self.rpc_connected = True
+                self.url = self.rpc.rpc_url
+                return
+            except JSONRPCException as e:  # Initialization phase
+                # -28 RPC in warmup
+                # -342 Service unavailable, RPC server started but is shutting down due to error
+                if e.error['code'] != -28 and e.error['code'] != -342:
+                    raise  # unknown JSON RPC exception
+            except ConnectionResetError:
+                # This might happen when the RPC server is in warmup, but shut down before the call to getblockcount
+                # succeeds. Try again to properly raise the FailedToStartError
+                pass
+            except OSError as e:
+                if e.errno == errno.ETIMEDOUT:
+                    pass  # Treat identical to ConnectionResetError
+                elif e.errno == errno.ECONNREFUSED:
+                    pass  # Port not yet open?
+                else:
+                    raise  # unknown OS error
+            except ValueError as e:  # cookie file not found and no rpcuser or rpcpassword; bitcoind is still starting
+                if "No RPC credentials" not in str(e):
+                    raise
+            time.sleep(1.0 / poll_per_s)
+        self._raise_assertion_error("Unable to connect to bitcoind after {}s".format(self.rpc_timeout))
+
+    def wait_for_cookie_credentials(self):
+        """Ensures auth cookie credentials can be read, e.g. for testing CLI with -rpcwait before RPC connection is up."""
+        self.log.debug("Waiting for cookie credentials")
+        # Poll at a rate of four times per second.
+        poll_per_s = 4
+        for _ in range(poll_per_s * self.rpc_timeout):
+            try:
+                get_auth_cookie(self.datadir, self.chain)
+                self.log.debug("Cookie credentials successfully retrieved")
+                return
+            except ValueError:  # cookie file not found and no rpcuser or rpcpassword; bitcoind is still starting
+                pass            # so we continue polling until RPC credentials are retrieved
+            time.sleep(1.0 / poll_per_s)
+        self._raise_assertion_error("Unable to retrieve cookie credentials after {}s".format(self.rpc_timeout))
+
+    def generate(self, nblocks, maxtries=1000000, **kwargs):
+        self.log.debug("TestNode.generate() dispatches `generate` call to `generatetoaddress`")
+        return self.generatetoaddress(nblocks=nblocks, address=self.get_deterministic_priv_key().address, maxtries=maxtries, **kwargs)
+
+    def generateblock(self, *args, invalid_call, **kwargs):
+        assert not invalid_call
+        return self.__getattr__('generateblock')(*args, **kwargs)
+
+    def generatetoaddress(self, *args, invalid_call, **kwargs):
+        assert not invalid_call
+        return self.__getattr__('generatetoaddress')(*args, **kwargs)
+
+    def generatetodescriptor(self, *args, invalid_call, **kwargs):
+        assert not invalid_call
+        return self.__getattr__('generatetodescriptor')(*args, **kwargs)
+
+    def get_wallet_rpc(self, wallet_name):
+        if self.use_cli:
+            return RPCOverloadWrapper(self.cli("-rpcwallet={}".format(wallet_name)), True, self.descriptors)
+        else:
+            assert self.rpc_connected and self.rpc, self._node_msg("RPC not connected")
+            wallet_path = "wallet/{}".format(urllib.parse.quote(wallet_name))
+            return RPCOverloadWrapper(self.rpc / wallet_path, descriptors=self.descriptors)
+
+    def version_is_at_least(self, ver):
+        return self.version is None or self.version >= ver
+
+    def stop_node(self, expected_stderr='', *, wait=0, wait_until_stopped=True):
+        """Stop the node."""
+        if not self.running:
+            return
+        self.log.debug("Stopping node")
+        try:
+            # Do not use wait argument when testing older nodes, e.g. in feature_backwards_compatibility.py
+            if self.version_is_at_least(180000):
+                self.stop(wait=wait)
+            else:
+                self.stop()
+        except http.client.CannotSendRequest:
+            self.log.exception("Unable to stop node.")
+
+        # If there are any running perf processes, stop them.
+        for profile_name in tuple(self.perf_subprocesses.keys()):
+            self._stop_perf(profile_name)
+
+        # Check that stderr is as expected
+        self.stderr.seek(0)
+        stderr = self.stderr.read().decode('utf-8').strip()
+        if stderr != expected_stderr:
+            raise AssertionError("Unexpected stderr {} != {}".format(stderr, expected_stderr))
+
+        self.stdout.close()
+        self.stderr.close()
+
+        del self.p2ps[:]
+
+        if wait_until_stopped:
+            self.wait_until_stopped()
+
+    def is_node_stopped(self):
+        """Checks whether the node has stopped.
+
+        Returns True if the node has stopped. False otherwise.
+        This method is responsible for freeing resources (self.process)."""
+        if not self.running:
+            return True
+        return_code = self.process.poll()
+        if return_code is None:
+            return False
+
+        # process has stopped. Assert that it didn't return an error code.
+        assert return_code == 0, self._node_msg(
+            "Node returned n
