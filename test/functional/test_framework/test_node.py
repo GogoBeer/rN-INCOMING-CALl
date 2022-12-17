@@ -559,4 +559,171 @@ class TestNode():
                     stderr = log_stderr.read().decode('utf-8').strip()
                     if match == ErrorMatch.PARTIAL_REGEX:
                         if re.search(expected_msg, stderr, flags=re.MULTILINE) is None:
-                            self._raise_assertion_e
+                            self._raise_assertion_error(
+                                'Expected message "{}" does not partially match stderr:\n"{}"'.format(expected_msg, stderr))
+                    elif match == ErrorMatch.FULL_REGEX:
+                        if re.fullmatch(expected_msg, stderr) is None:
+                            self._raise_assertion_error(
+                                'Expected message "{}" does not fully match stderr:\n"{}"'.format(expected_msg, stderr))
+                    elif match == ErrorMatch.FULL_TEXT:
+                        if expected_msg != stderr:
+                            self._raise_assertion_error(
+                                'Expected message "{}" does not fully match stderr:\n"{}"'.format(expected_msg, stderr))
+            except subprocess.TimeoutExpired:
+                self.process.kill()
+                self.running = False
+                self.process = None
+                assert_msg = f'bitcoind should have exited within {self.rpc_timeout}s '
+                if expected_msg is None:
+                    assert_msg += "with an error"
+                else:
+                    assert_msg += "with expected error " + expected_msg
+                self._raise_assertion_error(assert_msg)
+
+    def add_p2p_connection(self, p2p_conn, *, wait_for_verack=True, **kwargs):
+        """Add an inbound p2p connection to the node.
+
+        This method adds the p2p connection to the self.p2ps list and also
+        returns the connection to the caller."""
+        if 'dstport' not in kwargs:
+            kwargs['dstport'] = p2p_port(self.index)
+        if 'dstaddr' not in kwargs:
+            kwargs['dstaddr'] = '127.0.0.1'
+
+        p2p_conn.peer_connect(**kwargs, net=self.chain, timeout_factor=self.timeout_factor)()
+        self.p2ps.append(p2p_conn)
+        p2p_conn.wait_until(lambda: p2p_conn.is_connected, check_connected=False)
+        if wait_for_verack:
+            # Wait for the node to send us the version and verack
+            p2p_conn.wait_for_verack()
+            # At this point we have sent our version message and received the version and verack, however the full node
+            # has not yet received the verack from us (in reply to their version). So, the connection is not yet fully
+            # established (fSuccessfullyConnected).
+            #
+            # This shouldn't lead to any issues when sending messages, since the verack will be in-flight before the
+            # message we send. However, it might lead to races where we are expecting to receive a message. E.g. a
+            # transaction that will be added to the mempool as soon as we return here.
+            #
+            # So syncing here is redundant when we only want to send a message, but the cost is low (a few milliseconds)
+            # in comparison to the upside of making tests less fragile and unexpected intermittent errors less likely.
+            p2p_conn.sync_with_ping()
+
+            # Consistency check that the Bitcoin Core has received our user agent string. This checks the
+            # node's newest peer. It could be racy if another Bitcoin Core node has connected since we opened
+            # our connection, but we don't expect that to happen.
+            assert_equal(self.getpeerinfo()[-1]['subver'], P2P_SUBVERSION)
+
+        return p2p_conn
+
+    def add_outbound_p2p_connection(self, p2p_conn, *, p2p_idx, connection_type="outbound-full-relay", **kwargs):
+        """Add an outbound p2p connection from node. Must be an
+        "outbound-full-relay", "block-relay-only", "addr-fetch" or "feeler" connection.
+
+        This method adds the p2p connection to the self.p2ps list and returns
+        the connection to the caller.
+        """
+
+        def addconnection_callback(address, port):
+            self.log.debug("Connecting to %s:%d %s" % (address, port, connection_type))
+            self.addconnection('%s:%d' % (address, port), connection_type)
+
+        p2p_conn.peer_accept_connection(connect_cb=addconnection_callback, connect_id=p2p_idx + 1, net=self.chain, timeout_factor=self.timeout_factor, **kwargs)()
+
+        if connection_type == "feeler":
+            # feeler connections are closed as soon as the node receives a `version` message
+            p2p_conn.wait_until(lambda: p2p_conn.message_count["version"] == 1, check_connected=False)
+            p2p_conn.wait_until(lambda: not p2p_conn.is_connected, check_connected=False)
+        else:
+            p2p_conn.wait_for_connect()
+            self.p2ps.append(p2p_conn)
+
+            p2p_conn.wait_for_verack()
+            p2p_conn.sync_with_ping()
+
+        return p2p_conn
+
+    def num_test_p2p_connections(self):
+        """Return number of test framework p2p connections to the node."""
+        return len([peer for peer in self.getpeerinfo() if peer['subver'] == P2P_SUBVERSION])
+
+    def disconnect_p2ps(self):
+        """Close all p2p connections to the node."""
+        for p in self.p2ps:
+            p.peer_disconnect()
+        del self.p2ps[:]
+
+        wait_until_helper(lambda: self.num_test_p2p_connections() == 0, timeout_factor=self.timeout_factor)
+
+
+class TestNodeCLIAttr:
+    def __init__(self, cli, command):
+        self.cli = cli
+        self.command = command
+
+    def __call__(self, *args, **kwargs):
+        return self.cli.send_cli(self.command, *args, **kwargs)
+
+    def get_request(self, *args, **kwargs):
+        return lambda: self(*args, **kwargs)
+
+
+def arg_to_cli(arg):
+    if isinstance(arg, bool):
+        return str(arg).lower()
+    elif arg is None:
+        return 'null'
+    elif isinstance(arg, dict) or isinstance(arg, list):
+        return json.dumps(arg, default=EncodeDecimal)
+    else:
+        return str(arg)
+
+
+class TestNodeCLI():
+    """Interface to bitcoin-cli for an individual node"""
+    def __init__(self, binary, datadir):
+        self.options = []
+        self.binary = binary
+        self.datadir = datadir
+        self.input = None
+        self.log = logging.getLogger('TestFramework.bitcoincli')
+
+    def __call__(self, *options, input=None):
+        # TestNodeCLI is callable with bitcoin-cli command-line options
+        cli = TestNodeCLI(self.binary, self.datadir)
+        cli.options = [str(o) for o in options]
+        cli.input = input
+        return cli
+
+    def __getattr__(self, command):
+        return TestNodeCLIAttr(self, command)
+
+    def batch(self, requests):
+        results = []
+        for request in requests:
+            try:
+                results.append(dict(result=request()))
+            except JSONRPCException as e:
+                results.append(dict(error=e))
+        return results
+
+    def send_cli(self, command=None, *args, **kwargs):
+        """Run bitcoin-cli command. Deserializes returned string as python object."""
+        pos_args = [arg_to_cli(arg) for arg in args]
+        named_args = [str(key) + "=" + arg_to_cli(value) for (key, value) in kwargs.items()]
+        assert not (pos_args and named_args), "Cannot use positional arguments and named arguments in the same bitcoin-cli call"
+        p_args = [self.binary, "-datadir=" + self.datadir] + self.options
+        if named_args:
+            p_args += ["-named"]
+        if command is not None:
+            p_args += [command]
+        p_args += pos_args + named_args
+        self.log.debug("Running bitcoin-cli {}".format(p_args[2:]))
+        process = subprocess.Popen(p_args, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
+        cli_stdout, cli_stderr = process.communicate(input=self.input)
+        returncode = process.poll()
+        if returncode:
+            match = re.match(r'error code: ([-0-9]+)\nerror message:\n(.*)', cli_stderr)
+            if match:
+                code, message = match.groups()
+                raise JSONRPCException(dict(code=int(code), message=message))
+            # Ignore cli_stdout, ra
