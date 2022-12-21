@@ -473,4 +473,150 @@ def find_output(node, txid, amount, *, blockhash=None):
 def create_confirmed_utxos(test_framework, fee, node, count, **kwargs):
     to_generate = int(0.5 * count) + 101
     while to_generate > 0:
-        test_framework.generat
+        test_framework.generate(node, min(25, to_generate), **kwargs)
+        to_generate -= 25
+    utxos = node.listunspent()
+    iterations = count - len(utxos)
+    addr1 = node.getnewaddress()
+    addr2 = node.getnewaddress()
+    if iterations <= 0:
+        return utxos
+    for _ in range(iterations):
+        t = utxos.pop()
+        inputs = []
+        inputs.append({"txid": t["txid"], "vout": t["vout"]})
+        outputs = {}
+        send_value = t['amount'] - fee
+        outputs[addr1] = satoshi_round(send_value / 2)
+        outputs[addr2] = satoshi_round(send_value / 2)
+        raw_tx = node.createrawtransaction(inputs, outputs)
+        signed_tx = node.signrawtransactionwithwallet(raw_tx)["hex"]
+        node.sendrawtransaction(signed_tx)
+
+    while (node.getmempoolinfo()['size'] > 0):
+        test_framework.generate(node, 1, **kwargs)
+
+    utxos = node.listunspent()
+    assert len(utxos) >= count
+    return utxos
+
+
+def chain_transaction(node, parent_txids, vouts, value, fee, num_outputs):
+    """Build and send a transaction that spends the given inputs (specified
+    by lists of parent_txid:vout each), with the desired total value and fee,
+    equally divided up to the desired number of outputs.
+
+    Returns a tuple with the txid and the amount sent per output.
+    """
+    send_value = satoshi_round((value - fee)/num_outputs)
+    inputs = []
+    for (txid, vout) in zip(parent_txids, vouts):
+        inputs.append({'txid' : txid, 'vout' : vout})
+    outputs = {}
+    for _ in range(num_outputs):
+        outputs[node.getnewaddress()] = send_value
+    rawtx = node.createrawtransaction(inputs, outputs, 0, True)
+    signedtx = node.signrawtransactionwithwallet(rawtx)
+    txid = node.sendrawtransaction(signedtx['hex'])
+    fulltx = node.getrawtransaction(txid, 1)
+    assert len(fulltx['vout']) == num_outputs  # make sure we didn't generate a change output
+    return (txid, send_value)
+
+
+# Create large OP_RETURN txouts that can be appended to a transaction
+# to make it large (helper for constructing large transactions).
+def gen_return_txouts():
+    # Some pre-processing to create a bunch of OP_RETURN txouts to insert into transactions we create
+    # So we have big transactions (and therefore can't fit very many into each block)
+    # create one script_pubkey
+    script_pubkey = "6a4d0200"  # OP_RETURN OP_PUSH2 512 bytes
+    for _ in range(512):
+        script_pubkey = script_pubkey + "01"
+    # concatenate 128 txouts of above script_pubkey which we'll insert before the txout for change
+    txouts = []
+    from .messages import CTxOut
+    txout = CTxOut()
+    txout.nValue = 0
+    txout.scriptPubKey = bytes.fromhex(script_pubkey)
+    for _ in range(128):
+        txouts.append(txout)
+    return txouts
+
+
+# Create a spend of each passed-in utxo, splicing in "txouts" to each raw
+# transaction to make it large.  See gen_return_txouts() above.
+def create_lots_of_big_transactions(node, txouts, utxos, num, fee):
+    addr = node.getnewaddress()
+    txids = []
+    from .messages import tx_from_hex
+    for _ in range(num):
+        t = utxos.pop()
+        inputs = [{"txid": t["txid"], "vout": t["vout"]}]
+        outputs = {}
+        change = t['amount'] - fee
+        outputs[addr] = satoshi_round(change)
+        rawtx = node.createrawtransaction(inputs, outputs)
+        tx = tx_from_hex(rawtx)
+        for txout in txouts:
+            tx.vout.append(txout)
+        newtx = tx.serialize().hex()
+        signresult = node.signrawtransactionwithwallet(newtx, None, "NONE")
+        txid = node.sendrawtransaction(signresult["hex"], 0)
+        txids.append(txid)
+    return txids
+
+
+def mine_large_block(test_framework, node, utxos=None):
+    # generate a 66k transaction,
+    # and 14 of them is close to the 1MB block limit
+    num = 14
+    txouts = gen_return_txouts()
+    utxos = utxos if utxos is not None else []
+    if len(utxos) < num:
+        utxos.clear()
+        utxos.extend(node.listunspent())
+    fee = 100 * node.getnetworkinfo()["relayfee"]
+    create_lots_of_big_transactions(node, txouts, utxos, num, fee=fee)
+    test_framework.generate(node, 1)
+
+
+def find_vout_for_address(node, txid, addr):
+    """
+    Locate the vout index of the given transaction sending to the
+    given address. Raises runtime error exception if not found.
+    """
+    tx = node.getrawtransaction(txid, True)
+    for i in range(len(tx["vout"])):
+        if addr == tx["vout"][i]["scriptPubKey"]["address"]:
+            return i
+    raise RuntimeError("Vout not found for address: txid=%s, addr=%s" % (txid, addr))
+
+def modinv(a, n):
+    """Compute the modular inverse of a modulo n using the extended Euclidean
+    Algorithm. See https://en.wikipedia.org/wiki/Extended_Euclidean_algorithm#Modular_integers.
+    """
+    # TODO: Change to pow(a, -1, n) available in Python 3.8
+    t1, t2 = 0, 1
+    r1, r2 = n, a
+    while r2 != 0:
+        q = r1 // r2
+        t1, t2 = t2, t1 - q * t2
+        r1, r2 = r2, r1 - q * r2
+    if r1 > 1:
+        return None
+    if t1 < 0:
+        t1 += n
+    return t1
+
+class TestFrameworkUtil(unittest.TestCase):
+    def test_modinv(self):
+        test_vectors = [
+            [7, 11],
+            [11, 29],
+            [90, 13],
+            [1891, 3797],
+            [6003722857, 77695236973],
+        ]
+
+        for a, n in test_vectors:
+            self.assertEqual(modinv(a, n), pow(a, n-2, n))
