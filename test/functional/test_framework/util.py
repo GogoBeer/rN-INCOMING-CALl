@@ -239,4 +239,238 @@ def wait_until_helper(predicate, *, attempts=float('inf'), timeout=float('inf'),
 
     Warning: Note that this method is not recommended to be used in tests as it is
     not aware of the context of the test framework. Using the `wait_until()` members
-    from `BitcoinTestF
+    from `BitcoinTestFramework` or `P2PInterface` class ensures the timeout is
+    properly scaled. Furthermore, `wait_until()` from `P2PInterface` class in
+    `p2p.py` has a preset lock.
+    """
+    if attempts == float('inf') and timeout == float('inf'):
+        timeout = 60
+    timeout = timeout * timeout_factor
+    attempt = 0
+    time_end = time.time() + timeout
+
+    while attempt < attempts and time.time() < time_end:
+        if lock:
+            with lock:
+                if predicate():
+                    return
+        else:
+            if predicate():
+                return
+        attempt += 1
+        time.sleep(0.05)
+
+    # Print the cause of the timeout
+    predicate_source = "''''\n" + inspect.getsource(predicate) + "'''"
+    logger.error("wait_until() failed. Predicate: {}".format(predicate_source))
+    if attempt >= attempts:
+        raise AssertionError("Predicate {} not true after {} attempts".format(predicate_source, attempts))
+    elif time.time() >= time_end:
+        raise AssertionError("Predicate {} not true after {} seconds".format(predicate_source, timeout))
+    raise RuntimeError('Unreachable')
+
+
+def sha256sum_file(filename):
+    h = hashlib.sha256()
+    with open(filename, 'rb') as f:
+        d = f.read(4096)
+        while len(d) > 0:
+            h.update(d)
+            d = f.read(4096)
+    return h.digest()
+
+# RPC/P2P connection constants and functions
+############################################
+
+# The maximum number of nodes a single test can spawn
+MAX_NODES = 12
+# Don't assign rpc or p2p ports lower than this
+PORT_MIN = int(os.getenv('TEST_RUNNER_PORT_MIN', default=11000))
+# The number of ports to "reserve" for p2p and rpc, each
+PORT_RANGE = 5000
+
+
+class PortSeed:
+    # Must be initialized with a unique integer for each process
+    n = None
+
+
+def get_rpc_proxy(url: str, node_number: int, *, timeout: int=None, coveragedir: str=None) -> coverage.AuthServiceProxyWrapper:
+    """
+    Args:
+        url: URL of the RPC server to call
+        node_number: the node number (or id) that this calls to
+
+    Kwargs:
+        timeout: HTTP timeout in seconds
+        coveragedir: Directory
+
+    Returns:
+        AuthServiceProxy. convenience object for making RPC calls.
+
+    """
+    proxy_kwargs = {}
+    if timeout is not None:
+        proxy_kwargs['timeout'] = int(timeout)
+
+    proxy = AuthServiceProxy(url, **proxy_kwargs)
+
+    coverage_logfile = coverage.get_filename(coveragedir, node_number) if coveragedir else None
+
+    return coverage.AuthServiceProxyWrapper(proxy, url, coverage_logfile)
+
+
+def p2p_port(n):
+    assert n <= MAX_NODES
+    return PORT_MIN + n + (MAX_NODES * PortSeed.n) % (PORT_RANGE - 1 - MAX_NODES)
+
+
+def rpc_port(n):
+    return PORT_MIN + PORT_RANGE + n + (MAX_NODES * PortSeed.n) % (PORT_RANGE - 1 - MAX_NODES)
+
+
+def rpc_url(datadir, i, chain, rpchost):
+    rpc_u, rpc_p = get_auth_cookie(datadir, chain)
+    host = '127.0.0.1'
+    port = rpc_port(i)
+    if rpchost:
+        parts = rpchost.split(':')
+        if len(parts) == 2:
+            host, port = parts
+        else:
+            host = rpchost
+    return "http://%s:%s@%s:%d" % (rpc_u, rpc_p, host, int(port))
+
+
+# Node functions
+################
+
+
+def initialize_datadir(dirname, n, chain, disable_autoconnect=True):
+    datadir = get_datadir_path(dirname, n)
+    if not os.path.isdir(datadir):
+        os.makedirs(datadir)
+    write_config(os.path.join(datadir, "bitcoin.conf"), n=n, chain=chain, disable_autoconnect=disable_autoconnect)
+    os.makedirs(os.path.join(datadir, 'stderr'), exist_ok=True)
+    os.makedirs(os.path.join(datadir, 'stdout'), exist_ok=True)
+    return datadir
+
+
+def write_config(config_path, *, n, chain, extra_config="", disable_autoconnect=True):
+    # Translate chain subdirectory name to config name
+    if chain == 'testnet3':
+        chain_name_conf_arg = 'testnet'
+        chain_name_conf_section = 'test'
+    else:
+        chain_name_conf_arg = chain
+        chain_name_conf_section = chain
+    with open(config_path, 'w', encoding='utf8') as f:
+        if chain_name_conf_arg:
+            f.write("{}=1\n".format(chain_name_conf_arg))
+        if chain_name_conf_section:
+            f.write("[{}]\n".format(chain_name_conf_section))
+        f.write("port=" + str(p2p_port(n)) + "\n")
+        f.write("rpcport=" + str(rpc_port(n)) + "\n")
+        f.write("fallbackfee=0.0002\n")
+        f.write("server=1\n")
+        f.write("keypool=1\n")
+        f.write("discover=0\n")
+        f.write("dnsseed=0\n")
+        f.write("fixedseeds=0\n")
+        f.write("listenonion=0\n")
+        # Increase peertimeout to avoid disconnects while using mocktime.
+        # peertimeout is measured in mock time, so setting it large enough to
+        # cover any duration in mock time is sufficient. It can be overridden
+        # in tests.
+        f.write("peertimeout=999999999\n")
+        f.write("printtoconsole=0\n")
+        f.write("upnp=0\n")
+        f.write("natpmp=0\n")
+        f.write("shrinkdebugfile=0\n")
+        # To improve SQLite wallet performance so that the tests don't timeout, use -unsafesqlitesync
+        f.write("unsafesqlitesync=1\n")
+        if disable_autoconnect:
+            f.write("connect=0\n")
+        f.write(extra_config)
+
+
+def get_datadir_path(dirname, n):
+    return os.path.join(dirname, "node" + str(n))
+
+
+def append_config(datadir, options):
+    with open(os.path.join(datadir, "bitcoin.conf"), 'a', encoding='utf8') as f:
+        for option in options:
+            f.write(option + "\n")
+
+
+def get_auth_cookie(datadir, chain):
+    user = None
+    password = None
+    if os.path.isfile(os.path.join(datadir, "bitcoin.conf")):
+        with open(os.path.join(datadir, "bitcoin.conf"), 'r', encoding='utf8') as f:
+            for line in f:
+                if line.startswith("rpcuser="):
+                    assert user is None  # Ensure that there is only one rpcuser line
+                    user = line.split("=")[1].strip("\n")
+                if line.startswith("rpcpassword="):
+                    assert password is None  # Ensure that there is only one rpcpassword line
+                    password = line.split("=")[1].strip("\n")
+    try:
+        with open(os.path.join(datadir, chain, ".cookie"), 'r', encoding="ascii") as f:
+            userpass = f.read()
+            split_userpass = userpass.split(':')
+            user = split_userpass[0]
+            password = split_userpass[1]
+    except OSError:
+        pass
+    if user is None or password is None:
+        raise ValueError("No RPC credentials")
+    return user, password
+
+
+# If a cookie file exists in the given datadir, delete it.
+def delete_cookie_file(datadir, chain):
+    if os.path.isfile(os.path.join(datadir, chain, ".cookie")):
+        logger.debug("Deleting leftover cookie file")
+        os.remove(os.path.join(datadir, chain, ".cookie"))
+
+
+def softfork_active(node, key):
+    """Return whether a softfork is active."""
+    return node.getblockchaininfo()['softforks'][key]['active']
+
+
+def set_node_times(nodes, t):
+    for node in nodes:
+        node.setmocktime(t)
+
+
+def check_node_connections(*, node, num_in, num_out):
+    info = node.getnetworkinfo()
+    assert_equal(info["connections_in"], num_in)
+    assert_equal(info["connections_out"], num_out)
+
+
+# Transaction/Block functions
+#############################
+
+
+def find_output(node, txid, amount, *, blockhash=None):
+    """
+    Return index to output of txid with value amount
+    Raises exception if there is none.
+    """
+    txdata = node.getrawtransaction(txid, 1, blockhash)
+    for i in range(len(txdata["vout"])):
+        if txdata["vout"][i]["value"] == amount:
+            return i
+    raise RuntimeError("find_output txid %s : %s not found" % (txid, str(amount)))
+
+
+# Helper to create at least "count" utxos
+# Pass in a fee that is sufficient for relay and mining new transactions.
+def create_confirmed_utxos(test_framework, fee, node, count, **kwargs):
+    to_generate = int(0.5 * count) + 101
+    while to_generate > 0:
+        test_framework.generat
