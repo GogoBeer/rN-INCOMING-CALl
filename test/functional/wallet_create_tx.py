@@ -71,3 +71,12 @@ class CreateTxWalletTest(BitcoinTestFramework):
             lambda: self.nodes[0].sendmany(dummy="", amounts=outputs),
         )
         assert_raises_rpc_error(
+            -4,
+            "Fee exceeds maximum configured by user (e.g. -maxtxfee, maxfeerate)",
+            lambda: self.nodes[0].fundrawtransaction(hexstring=raw_tx),
+        )
+        self.nodes[0].settxfee(0)
+
+
+if __name__ == '__main__':
+    CreateTxWalletTest().main()
