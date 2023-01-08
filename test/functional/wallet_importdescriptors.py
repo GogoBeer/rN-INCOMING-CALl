@@ -519,4 +519,147 @@ class ImportDescriptorsTest(BitcoinTestFramework):
         }])
         assert_equal(res[0]['success'], True)
         assert_equal(res[0]['warnings'][0], 'Not all private keys provided. Some wallet functionality may return unexpected errors')
-        assert_equal(res[1]['success']
+        assert_equal(res[1]['success'], True)
+        assert_equal(res[1]['warnings'][0], 'Not all private keys provided. Some wallet functionality may return unexpected errors')
+
+        self.nodes[1].createwallet(wallet_name='wmulti_priv2', blank=True, descriptors=True)
+        wmulti_priv2 = self.nodes[1].get_wallet_rpc('wmulti_priv2')
+        res = wmulti_priv2.importdescriptors([
+        {
+            "desc": descsum_create("wsh(multi(2,[7b2d0242/84h/0h/0h]" + acc_xpub1 + "/*," + xprv2 + "/84h/0h/0h/*,[e81a0532/84h/0h/0h]" + acc_xpub3 + "/*))"),
+            "active": True,
+            "range": 1000,
+            "next_index": 0,
+            "timestamp": "now"
+        },
+        {
+            "desc": descsum_create("wsh(multi(2,[7b2d0242/84h/1h/0h]" + chg_xpub1 + "/*," + xprv2 + "/84h/1h/0h/*,[e81a0532/84h/1h/0h]" + chg_xpub3 + "/*))"),
+            "active": True,
+            "internal" : True,
+            "range": 1000,
+            "next_index": 0,
+            "timestamp": "now"
+        }])
+        assert_equal(res[0]['success'], True)
+        assert_equal(res[0]['warnings'][0], 'Not all private keys provided. Some wallet functionality may return unexpected errors')
+        assert_equal(res[1]['success'], True)
+        assert_equal(res[1]['warnings'][0], 'Not all private keys provided. Some wallet functionality may return unexpected errors')
+
+        rawtx = self.nodes[1].createrawtransaction([{'txid': txid, 'vout': vout}], {w0.getnewaddress(): 9.999})
+        tx_signed_1 = wmulti_priv1.signrawtransactionwithwallet(rawtx)
+        assert_equal(tx_signed_1['complete'], False)
+        tx_signed_2 = wmulti_priv2.signrawtransactionwithwallet(tx_signed_1['hex'])
+        assert_equal(tx_signed_2['complete'], True)
+        self.nodes[1].sendrawtransaction(tx_signed_2['hex'])
+
+        self.log.info("We can create and use a huge multisig under P2WSH")
+        self.nodes[1].createwallet(wallet_name='wmulti_priv_big', blank=True, descriptors=True)
+        wmulti_priv_big = self.nodes[1].get_wallet_rpc('wmulti_priv_big')
+        xkey = "tprv8ZgxMBicQKsPeZSeYx7VXDDTs3XrTcmZQpRLbAeSQFCQGgKwR4gKpcxHaKdoTNHniv4EPDJNdzA3KxRrrBHcAgth8fU5X4oCndkkxk39iAt/*"
+        xkey_int = "tprv8ZgxMBicQKsPeZSeYx7VXDDTs3XrTcmZQpRLbAeSQFCQGgKwR4gKpcxHaKdoTNHniv4EPDJNdzA3KxRrrBHcAgth8fU5X4oCndkkxk39iAt/1/*"
+        res = wmulti_priv_big.importdescriptors([
+        {
+            "desc": descsum_create(f"wsh(sortedmulti(20,{(xkey + ',') * 19}{xkey}))"),
+            "active": True,
+            "range": 1000,
+            "next_index": 0,
+            "timestamp": "now"
+        },
+        {
+            "desc": descsum_create(f"wsh(sortedmulti(20,{(xkey_int + ',') * 19}{xkey_int}))"),
+            "active": True,
+            "internal": True,
+            "range": 1000,
+            "next_index": 0,
+            "timestamp": "now"
+        }])
+        assert_equal(res[0]['success'], True)
+        assert_equal(res[1]['success'], True)
+
+        addr = wmulti_priv_big.getnewaddress()
+        w0.sendtoaddress(addr, 10)
+        self.generate(self.nodes[0], 1)
+        # It is standard and would relay.
+        txid = wmulti_priv_big.sendtoaddress(w0.getnewaddress(), 9.999)
+        decoded = wmulti_priv_big.gettransaction(txid=txid, verbose=True)['decoded']
+        # 20 sigs + dummy + witness script
+        assert_equal(len(decoded['vin'][0]['txinwitness']), 22)
+
+
+        self.log.info("Under P2SH, multisig are standard with up to 15 "
+                      "compressed keys")
+        self.nodes[1].createwallet(wallet_name='multi_priv_big_legacy',
+                                   blank=True, descriptors=True)
+        multi_priv_big = self.nodes[1].get_wallet_rpc('multi_priv_big_legacy')
+        res = multi_priv_big.importdescriptors([
+        {
+            "desc": descsum_create(f"sh(multi(15,{(xkey + ',') * 14}{xkey}))"),
+            "active": True,
+            "range": 1000,
+            "next_index": 0,
+            "timestamp": "now"
+        },
+        {
+            "desc": descsum_create(f"sh(multi(15,{(xkey_int + ',') * 14}{xkey_int}))"),
+            "active": True,
+            "internal": True,
+            "range": 1000,
+            "next_index": 0,
+            "timestamp": "now"
+        }])
+        assert_equal(res[0]['success'], True)
+        assert_equal(res[1]['success'], True)
+
+        addr = multi_priv_big.getnewaddress("", "legacy")
+        w0.sendtoaddress(addr, 10)
+        self.generate(self.nodes[0], 6)
+        # It is standard and would relay.
+        txid = multi_priv_big.sendtoaddress(w0.getnewaddress(), 10, "", "", True)
+        decoded = multi_priv_big.gettransaction(txid=txid, verbose=True)['decoded']
+
+        self.log.info("Amending multisig with new private keys")
+        self.nodes[1].createwallet(wallet_name="wmulti_priv3", descriptors=True)
+        wmulti_priv3 = self.nodes[1].get_wallet_rpc("wmulti_priv3")
+        res = wmulti_priv3.importdescriptors([
+            {
+                "desc": descsum_create("wsh(multi(2," + xprv1 + "/84h/0h/0h/*,[59b09cd6/84h/0h/0h]" + acc_xpub2 + "/*,[e81a0532/84h/0h/0h]" + acc_xpub3 + "/*))"),
+                "active": True,
+                "range": 1000,
+                "next_index": 0,
+                "timestamp": "now"
+            }])
+        assert_equal(res[0]['success'], True)
+        res = wmulti_priv3.importdescriptors([
+            {
+                "desc": descsum_create("wsh(multi(2," + xprv1 + "/84h/0h/0h/*,[59b09cd6/84h/0h/0h]" + acc_xprv2 + "/*,[e81a0532/84h/0h/0h]" + acc_xpub3 + "/*))"),
+                "active": True,
+                "range": 1000,
+                "next_index": 0,
+                "timestamp": "now"
+            }])
+        assert_equal(res[0]['success'], True)
+
+        rawtx = self.nodes[1].createrawtransaction([{'txid': txid2, 'vout': vout2}], {w0.getnewaddress(): 9.999})
+        tx = wmulti_priv3.signrawtransactionwithwallet(rawtx)
+        assert_equal(tx['complete'], True)
+        self.nodes[1].sendrawtransaction(tx['hex'])
+
+        self.log.info("Combo descriptors cannot be active")
+        self.test_importdesc({"desc": descsum_create("combo(tpubDCJtdt5dgJpdhW4MtaVYDhG4T4tF6jcLR1PxL43q9pq1mxvXgMS9Mzw1HnXG15vxUGQJMMSqCQHMTy3F1eW5VkgVroWzchsPD5BUojrcWs8/*)"),
+                              "active": True,
+                              "range": 1,
+                              "timestamp": "now"},
+                              success=False,
+                              error_code=-4,
+                              error_message="Combo descriptors cannot be set to active")
+
+        self.log.info("Descriptors with no type cannot be active")
+        self.test_importdesc({"desc": descsum_create("pk(tpubDCJtdt5dgJpdhW4MtaVYDhG4T4tF6jcLR1PxL43q9pq1mxvXgMS9Mzw1HnXG15vxUGQJMMSqCQHMTy3F1eW5VkgVroWzchsPD5BUojrcWs8/*)"),
+                              "active": True,
+                              "range": 1,
+                              "timestamp": "now"},
+                              success=True,
+                              warnings=["Unknown output type, cannot set descriptor to active."])
+
+if __name__ == '__main__':
+    ImportDescriptorsTest().main()
