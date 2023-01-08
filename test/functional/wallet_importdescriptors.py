@@ -112,4 +112,149 @@ class ImportDescriptorsTest(BitcoinTestFramework):
                              error_code=-8,
                              error_message="Internal addresses should not have a label")
 
-        self.log.info("Internal addresses should be detected as s
+        self.log.info("Internal addresses should be detected as such")
+        key = get_generate_key()
+        addr = key_to_p2pkh(key.pubkey)
+        self.test_importdesc({"desc": descsum_create("pkh(" + key.pubkey + ")"),
+                              "timestamp": "now",
+                              "internal": True},
+                             success=True)
+        info = w1.getaddressinfo(addr)
+        assert_equal(info["ismine"], True)
+        assert_equal(info["ischange"], True)
+
+        # # Test importing of a P2SH-P2WPKH descriptor
+        key = get_generate_key()
+        self.log.info("Should not import a p2sh-p2wpkh descriptor without checksum")
+        self.test_importdesc({"desc": "sh(wpkh(" + key.pubkey + "))",
+                              "timestamp": "now"
+                              },
+                             success=False,
+                             error_code=-5,
+                             error_message="Missing checksum")
+
+        self.log.info("Should not import a p2sh-p2wpkh descriptor that has range specified")
+        self.test_importdesc({"desc": descsum_create("sh(wpkh(" + key.pubkey + "))"),
+                               "timestamp": "now",
+                               "range": 1,
+                              },
+                              success=False,
+                              error_code=-8,
+                              error_message="Range should not be specified for an un-ranged descriptor")
+
+        self.log.info("Should not import a p2sh-p2wpkh descriptor and have it set to active")
+        self.test_importdesc({"desc": descsum_create("sh(wpkh(" + key.pubkey + "))"),
+                               "timestamp": "now",
+                               "active": True,
+                              },
+                              success=False,
+                              error_code=-8,
+                              error_message="Active descriptors must be ranged")
+
+        self.log.info("Should import a (non-active) p2sh-p2wpkh descriptor")
+        self.test_importdesc({"desc": descsum_create("sh(wpkh(" + key.pubkey + "))"),
+                               "timestamp": "now",
+                               "active": False,
+                              },
+                              success=True)
+        assert_equal(w1.getwalletinfo()['keypoolsize'], 0)
+
+        test_address(w1,
+                     key.p2sh_p2wpkh_addr,
+                     ismine=True,
+                     solvable=True)
+
+        # Check persistence of data and that loading works correctly
+        w1.unloadwallet()
+        self.nodes[1].loadwallet('w1')
+        test_address(w1,
+                     key.p2sh_p2wpkh_addr,
+                     ismine=True,
+                     solvable=True)
+
+        # # Test importing of a multisig descriptor
+        key1 = get_generate_key()
+        key2 = get_generate_key()
+        self.log.info("Should import a 1-of-2 bare multisig from descriptor")
+        self.test_importdesc({"desc": descsum_create("multi(1," + key1.pubkey + "," + key2.pubkey + ")"),
+                              "timestamp": "now"},
+                             success=True)
+        self.log.info("Should not treat individual keys from the imported bare multisig as watchonly")
+        test_address(w1,
+                     key1.p2pkh_addr,
+                     ismine=False)
+
+        # # Test ranged descriptors
+        xpriv = "tprv8ZgxMBicQKsPeuVhWwi6wuMQGfPKi9Li5GtX35jVNknACgqe3CY4g5xgkfDDJcmtF7o1QnxWDRYw4H5P26PXq7sbcUkEqeR4fg3Kxp2tigg"
+        xpub = "tpubD6NzVbkrYhZ4YNXVQbNhMK1WqguFsUXceaVJKbmno2aZ3B6QfbMeraaYvnBSGpV3vxLyTTK9DYT1yoEck4XUScMzXoQ2U2oSmE2JyMedq3H"
+        addresses = ["2N7yv4p8G8yEaPddJxY41kPihnWvs39qCMf", "2MsHxyb2JS3pAySeNUsJ7mNnurtpeenDzLA"] # hdkeypath=m/0'/0'/0' and 1'
+        addresses += ["bcrt1qrd3n235cj2czsfmsuvqqpr3lu6lg0ju7scl8gn", "bcrt1qfqeppuvj0ww98r6qghmdkj70tv8qpchehegrg8"] # wpkh subscripts corresponding to the above addresses
+        desc = "sh(wpkh(" + xpub + "/0/0/*" + "))"
+
+        self.log.info("Ranged descriptors cannot have labels")
+        self.test_importdesc({"desc":descsum_create(desc),
+                              "timestamp": "now",
+                              "range": [0, 100],
+                              "label": "test"},
+                              success=False,
+                              error_code=-8,
+                              error_message='Ranged descriptors should not have a label')
+
+        self.log.info("Private keys required for private keys enabled wallet")
+        self.test_importdesc({"desc":descsum_create(desc),
+                              "timestamp": "now",
+                              "range": [0, 100]},
+                              success=False,
+                              error_code=-4,
+                              error_message='Cannot import descriptor without private keys to a wallet with private keys enabled',
+                              wallet=wpriv)
+
+        self.log.info("Ranged descriptor import should warn without a specified range")
+        self.test_importdesc({"desc": descsum_create(desc),
+                               "timestamp": "now"},
+                              success=True,
+                              warnings=['Range not given, using default keypool range'])
+        assert_equal(w1.getwalletinfo()['keypoolsize'], 0)
+
+        # # Test importing of a ranged descriptor with xpriv
+        self.log.info("Should not import a ranged descriptor that includes xpriv into a watch-only wallet")
+        desc = "sh(wpkh(" + xpriv + "/0'/0'/*'" + "))"
+        self.test_importdesc({"desc": descsum_create(desc),
+                              "timestamp": "now",
+                              "range": 1},
+                             success=False,
+                             error_code=-4,
+                             error_message='Cannot import private keys to a wallet with private keys disabled')
+
+        self.log.info("Should not import a descriptor with hardened derivations when private keys are disabled")
+        self.test_importdesc({"desc": descsum_create("wpkh(" + xpub + "/1h/*)"),
+                              "timestamp": "now",
+                              "range": 1},
+                             success=False,
+                             error_code=-4,
+                             error_message='Cannot expand descriptor. Probably because of hardened derivations without private keys provided')
+
+        for address in addresses:
+            test_address(w1,
+                         address,
+                         ismine=False,
+                         solvable=False)
+
+        self.test_importdesc({"desc": descsum_create(desc), "timestamp": "now", "range": -1},
+                              success=False, error_code=-8, error_message='End of range is too high')
+
+        self.test_importdesc({"desc": descsum_create(desc), "timestamp": "now", "range": [-1, 10]},
+                              success=False, error_code=-8, error_message='Range should be greater or equal than 0')
+
+        self.test_importdesc({"desc": descsum_create(desc), "timestamp": "now", "range": [(2 << 31 + 1) - 1000000, (2 << 31 + 1)]},
+                              success=False, error_code=-8, error_message='End of range is too high')
+
+        self.test_importdesc({"desc": descsum_create(desc), "timestamp": "now", "range": [2, 1]},
+                              success=False, error_code=-8, error_message='Range specified as [begin,end] must not have begin after end')
+
+        self.test_importdesc({"desc": descsum_create(desc), "timestamp": "now", "range": [0, 1000001]},
+                              success=False, error_code=-8, error_message='Range is too large')
+
+        self.log.info("Verify we can only extend descriptor's range")
+        range_request = {"desc": descsum_create(desc), "timestamp": "now", "range": [5, 10], 'active': True}
+        self.test_importdesc(range_request, wallet=wpriv
