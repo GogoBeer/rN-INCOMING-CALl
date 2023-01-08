@@ -395,3 +395,128 @@ class ImportDescriptorsTest(BitcoinTestFramework):
         self.test_importdesc({"desc": descsum_create(desc),
                                "timestamp": "now"},
                               success=True,
+                              wallet=wpriv)
+
+        self.log.info('Test can import same descriptor with private key twice')
+        self.test_importdesc({"desc": descsum_create(desc), "timestamp": "now"}, success=True, wallet=wpriv)
+
+        test_address(wpriv,
+                     address,
+                     solvable=True,
+                     ismine=True)
+        txid = w0.sendtoaddress(address, 49.99995540)
+        self.generatetoaddress(self.nodes[0], 6, w0.getnewaddress())
+        tx = wpriv.createrawtransaction([{"txid": txid, "vout": 0}], {w0.getnewaddress(): 49.999})
+        signed_tx = wpriv.signrawtransactionwithwallet(tx)
+        w1.sendrawtransaction(signed_tx['hex'])
+
+        # Make sure that we can use import and use multisig as addresses
+        self.log.info('Test that multisigs can be imported, signed for, and getnewaddress\'d')
+        self.nodes[1].createwallet(wallet_name="wmulti_priv", disable_private_keys=False, blank=True, descriptors=True)
+        wmulti_priv = self.nodes[1].get_wallet_rpc("wmulti_priv")
+        assert_equal(wmulti_priv.getwalletinfo()['keypoolsize'], 0)
+
+        xprv1 = 'tprv8ZgxMBicQKsPevADjDCWsa6DfhkVXicu8NQUzfibwX2MexVwW4tCec5mXdCW8kJwkzBRRmAay1KZya4WsehVvjTGVW6JLqiqd8DdZ4xSg52'
+        acc_xpub1 = 'tpubDCJtdt5dgJpdhW4MtaVYDhG4T4tF6jcLR1PxL43q9pq1mxvXgMS9Mzw1HnXG15vxUGQJMMSqCQHMTy3F1eW5VkgVroWzchsPD5BUojrcWs8'  # /84'/0'/0'
+        chg_xpub1 = 'tpubDCXqdwWZcszwqYJSnZp8eARkxGJfHAk23KDxbztV4BbschfaTfYLTcSkSJ3TN64dRqwa1rnFUScsYormKkGqNbbPwkorQimVevXjxzUV9Gf'  # /84'/1'/0'
+        xprv2 = 'tprv8ZgxMBicQKsPdSNWUhDiwTScDr6JfkZuLshTRwzvZGnMSnGikV6jxpmdDkC3YRc4T3GD6Nvg9uv6hQg73RVv1EiTXDZwxVbsLugVHU8B1aq'
+        acc_xprv2 = 'tprv8gVCsmRAxVSxyUpsL13Y7ZEWBFPWbgS5E2MmFVNGuANrknvmmn2vWnmHvU8AwEFYzR2ji6EeZLSCLVacsYkvor3Pcb5JY5FGcevqTwYvdYx'
+        acc_xpub2 = 'tpubDDBF2BTR6s8drwrfDei8WxtckGuSm1cyoKxYY1QaKSBFbHBYQArWhHPA6eJrzZej6nfHGLSURYSLHr7GuYch8aY5n61tGqgn8b4cXrMuoPH'
+        chg_xpub2 = 'tpubDCYfZY2ceyHzYzMMVPt9MNeiqtQ2T7Uyp9QSFwYXh8Vi9iJFYXcuphJaGXfF3jUQJi5Y3GMNXvM11gaL4txzZgNGK22BFAwMXynnzv4z2Jh'
+        xprv3 = 'tprv8ZgxMBicQKsPeonDt8Ka2mrQmHa61hQ5FQCsvWBTpSNzBFgM58cV2EuXNAHF14VawVpznnme3SuTbA62sGriwWyKifJmXntfNeK7zeqMCj1'
+        acc_xpub3 = 'tpubDCsWoW1kuQB9kG5MXewHqkbjPtqPueRnXju7uM2NK7y3JYb2ajAZ9EiuZXNNuE4661RAfriBWhL8UsnAPpk8zrKKnZw1Ug7X4oHgMdZiU4E'
+        chg_xpub3 = 'tpubDC6UGqnsQStngYuGD4MKsMy7eD1Yg9NTJfPdvjdG2JE5oZ7EsSL3WHg4Gsw2pR5K39ZwJ46M1wZayhedVdQtMGaUhq5S23PH6fnENK3V1sb'
+
+        self.test_importdesc({"desc":"wsh(multi(2," + xprv1 + "/84h/0h/0h/*," + xprv2 + "/84h/0h/0h/*," + xprv3 + "/84h/0h/0h/*))#m2sr93jn",
+                            "active": True,
+                            "range": 1000,
+                            "next_index": 0,
+                            "timestamp": "now"},
+                            success=True,
+                            wallet=wmulti_priv)
+        self.test_importdesc({"desc":"wsh(multi(2," + xprv1 + "/84h/1h/0h/*," + xprv2 + "/84h/1h/0h/*," + xprv3 + "/84h/1h/0h/*))#q3sztvx5",
+                            "active": True,
+                            "internal" : True,
+                            "range": 1000,
+                            "next_index": 0,
+                            "timestamp": "now"},
+                            success=True,
+                            wallet=wmulti_priv)
+
+        assert_equal(wmulti_priv.getwalletinfo()['keypoolsize'], 1001) # Range end (1000) is inclusive, so 1001 addresses generated
+        addr = wmulti_priv.getnewaddress('', 'bech32')
+        assert_equal(addr, 'bcrt1qdt0qy5p7dzhxzmegnn4ulzhard33s2809arjqgjndx87rv5vd0fq2czhy8') # Derived at m/84'/0'/0'/0
+        change_addr = wmulti_priv.getrawchangeaddress('bech32')
+        assert_equal(change_addr, 'bcrt1qt9uhe3a9hnq7vajl7a094z4s3crm9ttf8zw3f5v9gr2nyd7e3lnsy44n8e')
+        assert_equal(wmulti_priv.getwalletinfo()['keypoolsize'], 1000)
+        txid = w0.sendtoaddress(addr, 10)
+        self.generate(self.nodes[0], 6)
+        send_txid = wmulti_priv.sendtoaddress(w0.getnewaddress(), 8)
+        decoded = wmulti_priv.gettransaction(txid=send_txid, verbose=True)['decoded']
+        assert_equal(len(decoded['vin'][0]['txinwitness']), 4)
+        self.generate(self.nodes[0], 6)
+
+        self.nodes[1].createwallet(wallet_name="wmulti_pub", disable_private_keys=True, blank=True, descriptors=True)
+        wmulti_pub = self.nodes[1].get_wallet_rpc("wmulti_pub")
+        assert_equal(wmulti_pub.getwalletinfo()['keypoolsize'], 0)
+
+        self.test_importdesc({"desc":"wsh(multi(2,[7b2d0242/84h/0h/0h]" + acc_xpub1 + "/*,[59b09cd6/84h/0h/0h]" + acc_xpub2 + "/*,[e81a0532/84h/0h/0h]" + acc_xpub3 +"/*))#tsry0s5e",
+                            "active": True,
+                            "range": 1000,
+                            "next_index": 0,
+                            "timestamp": "now"},
+                            success=True,
+                            wallet=wmulti_pub)
+        self.test_importdesc({"desc":"wsh(multi(2,[7b2d0242/84h/1h/0h]" + chg_xpub1 + "/*,[59b09cd6/84h/1h/0h]" + chg_xpub2 + "/*,[e81a0532/84h/1h/0h]" + chg_xpub3 + "/*))#c08a2rzv",
+                            "active": True,
+                            "internal" : True,
+                            "range": 1000,
+                            "next_index": 0,
+                            "timestamp": "now"},
+                            success=True,
+                            wallet=wmulti_pub)
+
+        assert_equal(wmulti_pub.getwalletinfo()['keypoolsize'], 1000) # The first one was already consumed by previous import and is detected as used
+        addr = wmulti_pub.getnewaddress('', 'bech32')
+        assert_equal(addr, 'bcrt1qp8s25ckjl7gr6x2q3dx3tn2pytwp05upkjztk6ey857tt50r5aeqn6mvr9') # Derived at m/84'/0'/0'/1
+        change_addr = wmulti_pub.getrawchangeaddress('bech32')
+        assert_equal(change_addr, 'bcrt1qt9uhe3a9hnq7vajl7a094z4s3crm9ttf8zw3f5v9gr2nyd7e3lnsy44n8e')
+        assert_equal(wmulti_pub.getwalletinfo()['keypoolsize'], 999)
+
+        # generate some utxos for next tests
+        txid = w0.sendtoaddress(addr, 10)
+        vout = find_vout_for_address(self.nodes[0], txid, addr)
+
+        addr2 = wmulti_pub.getnewaddress('', 'bech32')
+        txid2 = w0.sendtoaddress(addr2, 10)
+        vout2 = find_vout_for_address(self.nodes[0], txid2, addr2)
+
+        self.generate(self.nodes[0], 6)
+        assert_equal(wmulti_pub.getbalance(), wmulti_priv.getbalance())
+
+        # Make sure that descriptor wallets containing multiple xpubs in a single descriptor load correctly
+        wmulti_pub.unloadwallet()
+        self.nodes[1].loadwallet('wmulti_pub')
+
+        self.log.info("Multisig with distributed keys")
+        self.nodes[1].createwallet(wallet_name="wmulti_priv1", descriptors=True)
+        wmulti_priv1 = self.nodes[1].get_wallet_rpc("wmulti_priv1")
+        res = wmulti_priv1.importdescriptors([
+        {
+            "desc": descsum_create("wsh(multi(2," + xprv1 + "/84h/0h/0h/*,[59b09cd6/84h/0h/0h]" + acc_xpub2 + "/*,[e81a0532/84h/0h/0h]" + acc_xpub3 + "/*))"),
+            "active": True,
+            "range": 1000,
+            "next_index": 0,
+            "timestamp": "now"
+        },
+        {
+            "desc": descsum_create("wsh(multi(2," + xprv1 + "/84h/1h/0h/*,[59b09cd6/84h/1h/0h]" + chg_xpub2 + "/*,[e81a0532/84h/1h/0h]" + chg_xpub3 + "/*))"),
+            "active": True,
+            "internal" : True,
+            "range": 1000,
+            "next_index": 0,
+            "timestamp": "now"
+        }])
+        assert_equal(res[0]['success'], True)
+        assert_equal(res[0]['warnings'][0], 'Not all private keys provided. Some wallet functionality may return unexpected errors')
+        assert_equal(res[1]['success']
