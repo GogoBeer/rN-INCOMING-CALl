@@ -191,4 +191,155 @@ class ImportMultiTest(BitcoinTestFramework):
         # Address + Private key + !watchonly
         self.log.info("Should import an address with private key")
         key = get_key(self.nodes[0])
-        self.test_importmulti({"scriptPu
+        self.test_importmulti({"scriptPubKey": {"address": key.p2pkh_addr},
+                               "timestamp": "now",
+                               "keys": [key.privkey]},
+                              success=True)
+        test_address(self.nodes[1],
+                     key.p2pkh_addr,
+                     iswatchonly=False,
+                     ismine=True,
+                     timestamp=timestamp)
+
+        self.log.info("Should not import an address with private key if is already imported")
+        self.test_importmulti({"scriptPubKey": {"address": key.p2pkh_addr},
+                               "timestamp": "now",
+                               "keys": [key.privkey]},
+                              success=False,
+                              error_code=-4,
+                              error_message='The wallet already contains the private key for this address or script ("' + key.p2pkh_script + '")')
+
+        # Address + Private key + watchonly
+        self.log.info("Should import an address with private key and with watchonly")
+        key = get_key(self.nodes[0])
+        self.test_importmulti({"scriptPubKey": {"address": key.p2pkh_addr},
+                               "timestamp": "now",
+                               "keys": [key.privkey],
+                               "watchonly": True},
+                              success=True,
+                              warnings=["All private keys are provided, outputs will be considered spendable. If this is intentional, do not specify the watchonly flag."])
+        test_address(self.nodes[1],
+                     key.p2pkh_addr,
+                     iswatchonly=False,
+                     ismine=True,
+                     timestamp=timestamp)
+
+        # ScriptPubKey + Private key + internal
+        self.log.info("Should import a scriptPubKey with internal and with private key")
+        key = get_key(self.nodes[0])
+        self.test_importmulti({"scriptPubKey": key.p2pkh_script,
+                               "timestamp": "now",
+                               "keys": [key.privkey],
+                               "internal": True},
+                              success=True)
+        test_address(self.nodes[1],
+                     key.p2pkh_addr,
+                     iswatchonly=False,
+                     ismine=True,
+                     timestamp=timestamp)
+
+        # Nonstandard scriptPubKey + Private key + !internal
+        self.log.info("Should not import a nonstandard scriptPubKey without internal and with private key")
+        key = get_key(self.nodes[0])
+        self.test_importmulti({"scriptPubKey": nonstandardScriptPubKey,
+                               "timestamp": "now",
+                               "keys": [key.privkey]},
+                              success=False,
+                              error_code=-8,
+                              error_message='Internal must be set to true for nonstandard scriptPubKey imports.')
+        test_address(self.nodes[1],
+                     key.p2pkh_addr,
+                     iswatchonly=False,
+                     ismine=False,
+                     timestamp=None)
+
+        # P2SH address
+        multisig = get_multisig(self.nodes[0])
+        self.generate(self.nodes[1], COINBASE_MATURITY, sync_fun=self.no_op)
+        self.nodes[1].sendtoaddress(multisig.p2sh_addr, 10.00)
+        self.generate(self.nodes[1], 1, sync_fun=self.no_op)
+        timestamp = self.nodes[1].getblock(self.nodes[1].getbestblockhash())['mediantime']
+
+        self.log.info("Should import a p2sh")
+        self.test_importmulti({"scriptPubKey": {"address": multisig.p2sh_addr},
+                               "timestamp": "now"},
+                              success=True)
+        test_address(self.nodes[1],
+                     multisig.p2sh_addr,
+                     isscript=True,
+                     iswatchonly=True,
+                     timestamp=timestamp)
+        p2shunspent = self.nodes[1].listunspent(0, 999999, [multisig.p2sh_addr])[0]
+        assert_equal(p2shunspent['spendable'], False)
+        assert_equal(p2shunspent['solvable'], False)
+
+        # P2SH + Redeem script
+        multisig = get_multisig(self.nodes[0])
+        self.generate(self.nodes[1], COINBASE_MATURITY, sync_fun=self.no_op)
+        self.nodes[1].sendtoaddress(multisig.p2sh_addr, 10.00)
+        self.generate(self.nodes[1], 1, sync_fun=self.no_op)
+        timestamp = self.nodes[1].getblock(self.nodes[1].getbestblockhash())['mediantime']
+
+        self.log.info("Should import a p2sh with respective redeem script")
+        self.test_importmulti({"scriptPubKey": {"address": multisig.p2sh_addr},
+                               "timestamp": "now",
+                               "redeemscript": multisig.redeem_script},
+                              success=True,
+                              warnings=["Some private keys are missing, outputs will be considered watchonly. If this is intentional, specify the watchonly flag."])
+        test_address(self.nodes[1],
+                     multisig.p2sh_addr, timestamp=timestamp, iswatchonly=True, ismine=False, solvable=True)
+
+        p2shunspent = self.nodes[1].listunspent(0, 999999, [multisig.p2sh_addr])[0]
+        assert_equal(p2shunspent['spendable'], False)
+        assert_equal(p2shunspent['solvable'], True)
+
+        # P2SH + Redeem script + Private Keys + !Watchonly
+        multisig = get_multisig(self.nodes[0])
+        self.generate(self.nodes[1], COINBASE_MATURITY, sync_fun=self.no_op)
+        self.nodes[1].sendtoaddress(multisig.p2sh_addr, 10.00)
+        self.generate(self.nodes[1], 1, sync_fun=self.no_op)
+        timestamp = self.nodes[1].getblock(self.nodes[1].getbestblockhash())['mediantime']
+
+        self.log.info("Should import a p2sh with respective redeem script and private keys")
+        self.test_importmulti({"scriptPubKey": {"address": multisig.p2sh_addr},
+                               "timestamp": "now",
+                               "redeemscript": multisig.redeem_script,
+                               "keys": multisig.privkeys[0:2]},
+                              success=True,
+                              warnings=["Some private keys are missing, outputs will be considered watchonly. If this is intentional, specify the watchonly flag."])
+        test_address(self.nodes[1],
+                     multisig.p2sh_addr,
+                     timestamp=timestamp,
+                     ismine=False,
+                     iswatchonly=True,
+                     solvable=True)
+
+        p2shunspent = self.nodes[1].listunspent(0, 999999, [multisig.p2sh_addr])[0]
+        assert_equal(p2shunspent['spendable'], False)
+        assert_equal(p2shunspent['solvable'], True)
+
+        # P2SH + Redeem script + Private Keys + Watchonly
+        multisig = get_multisig(self.nodes[0])
+        self.generate(self.nodes[1], COINBASE_MATURITY, sync_fun=self.no_op)
+        self.nodes[1].sendtoaddress(multisig.p2sh_addr, 10.00)
+        self.generate(self.nodes[1], 1, sync_fun=self.no_op)
+        timestamp = self.nodes[1].getblock(self.nodes[1].getbestblockhash())['mediantime']
+
+        self.log.info("Should import a p2sh with respective redeem script and private keys")
+        self.test_importmulti({"scriptPubKey": {"address": multisig.p2sh_addr},
+                               "timestamp": "now",
+                               "redeemscript": multisig.redeem_script,
+                               "keys": multisig.privkeys[0:2],
+                               "watchonly": True},
+                              success=True)
+        test_address(self.nodes[1],
+                     multisig.p2sh_addr,
+                     iswatchonly=True,
+                     ismine=False,
+                     solvable=True,
+                     timestamp=timestamp)
+
+        # Address + Public key + !Internal + Wrong pubkey
+        self.log.info("Should not import an address with the wrong public key as non-solvable")
+        key = get_key(self.nodes[0])
+        wrong_key = get
