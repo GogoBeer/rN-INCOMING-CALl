@@ -342,4 +342,142 @@ class ImportMultiTest(BitcoinTestFramework):
         # Address + Public key + !Internal + Wrong pubkey
         self.log.info("Should not import an address with the wrong public key as non-solvable")
         key = get_key(self.nodes[0])
-        wrong_key = get
+        wrong_key = get_key(self.nodes[0]).pubkey
+        self.test_importmulti({"scriptPubKey": {"address": key.p2pkh_addr},
+                               "timestamp": "now",
+                               "pubkeys": [wrong_key]},
+                              success=True,
+                              warnings=["Importing as non-solvable: some required keys are missing. If this is intentional, don't provide any keys, pubkeys, witnessscript, or redeemscript.", "Some private keys are missing, outputs will be considered watchonly. If this is intentional, specify the watchonly flag."])
+        test_address(self.nodes[1],
+                     key.p2pkh_addr,
+                     iswatchonly=True,
+                     ismine=False,
+                     solvable=False,
+                     timestamp=timestamp)
+
+        # ScriptPubKey + Public key + internal + Wrong pubkey
+        self.log.info("Should import a scriptPubKey with internal and with a wrong public key as non-solvable")
+        key = get_key(self.nodes[0])
+        wrong_key = get_key(self.nodes[0]).pubkey
+        self.test_importmulti({"scriptPubKey": key.p2pkh_script,
+                               "timestamp": "now",
+                               "pubkeys": [wrong_key],
+                               "internal": True},
+                              success=True,
+                              warnings=["Importing as non-solvable: some required keys are missing. If this is intentional, don't provide any keys, pubkeys, witnessscript, or redeemscript.", "Some private keys are missing, outputs will be considered watchonly. If this is intentional, specify the watchonly flag."])
+        test_address(self.nodes[1],
+                     key.p2pkh_addr,
+                     iswatchonly=True,
+                     ismine=False,
+                     solvable=False,
+                     timestamp=timestamp)
+
+        # Address + Private key + !watchonly + Wrong private key
+        self.log.info("Should import an address with a wrong private key as non-solvable")
+        key = get_key(self.nodes[0])
+        wrong_privkey = get_key(self.nodes[0]).privkey
+        self.test_importmulti({"scriptPubKey": {"address": key.p2pkh_addr},
+                               "timestamp": "now",
+                               "keys": [wrong_privkey]},
+                               success=True,
+                               warnings=["Importing as non-solvable: some required keys are missing. If this is intentional, don't provide any keys, pubkeys, witnessscript, or redeemscript.", "Some private keys are missing, outputs will be considered watchonly. If this is intentional, specify the watchonly flag."])
+        test_address(self.nodes[1],
+                     key.p2pkh_addr,
+                     iswatchonly=True,
+                     ismine=False,
+                     solvable=False,
+                     timestamp=timestamp)
+
+        # ScriptPubKey + Private key + internal + Wrong private key
+        self.log.info("Should import a scriptPubKey with internal and with a wrong private key as non-solvable")
+        key = get_key(self.nodes[0])
+        wrong_privkey = get_key(self.nodes[0]).privkey
+        self.test_importmulti({"scriptPubKey": key.p2pkh_script,
+                               "timestamp": "now",
+                               "keys": [wrong_privkey],
+                               "internal": True},
+                              success=True,
+                              warnings=["Importing as non-solvable: some required keys are missing. If this is intentional, don't provide any keys, pubkeys, witnessscript, or redeemscript.", "Some private keys are missing, outputs will be considered watchonly. If this is intentional, specify the watchonly flag."])
+        test_address(self.nodes[1],
+                     key.p2pkh_addr,
+                     iswatchonly=True,
+                     ismine=False,
+                     solvable=False,
+                     timestamp=timestamp)
+
+        # Importing existing watch only address with new timestamp should replace saved timestamp.
+        assert_greater_than(timestamp, watchonly_timestamp)
+        self.log.info("Should replace previously saved watch only timestamp.")
+        self.test_importmulti({"scriptPubKey": {"address": watchonly_address},
+                               "timestamp": "now"},
+                              success=True)
+        test_address(self.nodes[1],
+                     watchonly_address,
+                     iswatchonly=True,
+                     ismine=False,
+                     timestamp=timestamp)
+        watchonly_timestamp = timestamp
+
+        # restart nodes to check for proper serialization/deserialization of watch only address
+        self.stop_nodes()
+        self.start_nodes()
+        test_address(self.nodes[1],
+                     watchonly_address,
+                     iswatchonly=True,
+                     ismine=False,
+                     timestamp=watchonly_timestamp)
+
+        # Bad or missing timestamps
+        self.log.info("Should throw on invalid or missing timestamp values")
+        assert_raises_rpc_error(-3, 'Missing required timestamp field for key',
+                                self.nodes[1].importmulti, [{"scriptPubKey": key.p2pkh_script}])
+        assert_raises_rpc_error(-3, 'Expected number or "now" timestamp value for key. got type string',
+                                self.nodes[1].importmulti, [{
+                                    "scriptPubKey": key.p2pkh_script,
+                                    "timestamp": ""
+                                }])
+
+        # Import P2WPKH address as watch only
+        self.log.info("Should import a P2WPKH address as watch only")
+        key = get_key(self.nodes[0])
+        self.test_importmulti({"scriptPubKey": {"address": key.p2wpkh_addr},
+                               "timestamp": "now"},
+                              success=True)
+        test_address(self.nodes[1],
+                     key.p2wpkh_addr,
+                     iswatchonly=True,
+                     solvable=False)
+
+        # Import P2WPKH address with public key but no private key
+        self.log.info("Should import a P2WPKH address and public key as solvable but not spendable")
+        key = get_key(self.nodes[0])
+        self.test_importmulti({"scriptPubKey": {"address": key.p2wpkh_addr},
+                               "timestamp": "now",
+                               "pubkeys": [key.pubkey]},
+                              success=True,
+                              warnings=["Some private keys are missing, outputs will be considered watchonly. If this is intentional, specify the watchonly flag."])
+        test_address(self.nodes[1],
+                     key.p2wpkh_addr,
+                     ismine=False,
+                     solvable=True)
+
+        # Import P2WPKH address with key and check it is spendable
+        self.log.info("Should import a P2WPKH address with key")
+        key = get_key(self.nodes[0])
+        self.test_importmulti({"scriptPubKey": {"address": key.p2wpkh_addr},
+                               "timestamp": "now",
+                               "keys": [key.privkey]},
+                              success=True)
+        test_address(self.nodes[1],
+                     key.p2wpkh_addr,
+                     iswatchonly=False,
+                     ismine=True)
+
+        # P2WSH multisig address without scripts or keys
+        multisig = get_multisig(self.nodes[0])
+        self.log.info("Should import a p2wsh multisig as watch only without respective redeem script and private keys")
+        self.test_importmulti({"scriptPubKey": {"address": multisig.p2wsh_addr},
+                               "timestamp": "now"},
+                              success=True)
+        test_address(self.nodes[1],
+                     multisig.p2s
