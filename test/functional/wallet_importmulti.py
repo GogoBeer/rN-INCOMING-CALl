@@ -778,4 +778,102 @@ class ImportMultiTest(BitcoinTestFramework):
                 "timestamp": "now",
             },
             {
-                'desc':
+                'desc': descsum_create('wpkh(' + pub2 + ')'),
+                'keypool': True,
+                "timestamp": "now",
+            }]
+        )
+        assert result[0]['success']
+        assert result[1]['success']
+        assert_equal(wrpc.getwalletinfo()["keypoolsize"], 2)
+        newaddr1 = wrpc.getnewaddress(address_type="bech32")
+        assert_equal(addr1, newaddr1)
+        newaddr2 = wrpc.getnewaddress(address_type="bech32")
+        assert_equal(addr2, newaddr2)
+
+        # Import some public keys to the internal keypool of a no privkey wallet
+        self.log.info("Adding pubkey to internal keypool of disableprivkey wallet")
+        addr1 = self.nodes[0].getnewaddress(address_type="bech32")
+        addr2 = self.nodes[0].getnewaddress(address_type="bech32")
+        pub1 = self.nodes[0].getaddressinfo(addr1)['pubkey']
+        pub2 = self.nodes[0].getaddressinfo(addr2)['pubkey']
+        result = wrpc.importmulti(
+            [{
+                'desc': descsum_create('wpkh(' + pub1 + ')'),
+                'keypool': True,
+                'internal': True,
+                "timestamp": "now",
+            },
+            {
+                'desc': descsum_create('wpkh(' + pub2 + ')'),
+                'keypool': True,
+                'internal': True,
+                "timestamp": "now",
+            }]
+        )
+        assert result[0]['success']
+        assert result[1]['success']
+        assert_equal(wrpc.getwalletinfo()["keypoolsize_hd_internal"], 2)
+        newaddr1 = wrpc.getrawchangeaddress(address_type="bech32")
+        assert_equal(addr1, newaddr1)
+        newaddr2 = wrpc.getrawchangeaddress(address_type="bech32")
+        assert_equal(addr2, newaddr2)
+
+        # Import a multisig and make sure the keys don't go into the keypool
+        self.log.info('Imported scripts with pubkeys should not have their pubkeys go into the keypool')
+        addr1 = self.nodes[0].getnewaddress(address_type="bech32")
+        addr2 = self.nodes[0].getnewaddress(address_type="bech32")
+        pub1 = self.nodes[0].getaddressinfo(addr1)['pubkey']
+        pub2 = self.nodes[0].getaddressinfo(addr2)['pubkey']
+        result = wrpc.importmulti(
+            [{
+                'desc': descsum_create('wsh(multi(2,' + pub1 + ',' + pub2 + '))'),
+                'keypool': True,
+                "timestamp": "now",
+            }]
+        )
+        assert result[0]['success']
+        assert_equal(wrpc.getwalletinfo()["keypoolsize"], 0)
+
+        # Cannot import those pubkeys to keypool of wallet with privkeys
+        self.log.info("Pubkeys cannot be added to the keypool of a wallet with private keys")
+        wrpc = self.nodes[1].get_wallet_rpc(self.default_wallet_name)
+        assert wrpc.getwalletinfo()['private_keys_enabled']
+        result = wrpc.importmulti(
+            [{
+                'desc': descsum_create('wpkh(' + pub1 + ')'),
+                'keypool': True,
+                "timestamp": "now",
+            }]
+        )
+        assert_equal(result[0]['error']['code'], -8)
+        assert_equal(result[0]['error']['message'], "Keys can only be imported to the keypool when private keys are disabled")
+
+        # Make sure ranged imports import keys in order
+        self.log.info('Key ranges should be imported in order')
+        wrpc = self.nodes[1].get_wallet_rpc("noprivkeys")
+        assert_equal(wrpc.getwalletinfo()["keypoolsize"], 0)
+        assert_equal(wrpc.getwalletinfo()["private_keys_enabled"], False)
+        xpub = "tpubDAXcJ7s7ZwicqjprRaEWdPoHKrCS215qxGYxpusRLLmJuT69ZSicuGdSfyvyKpvUNYBW1s2U3NSrT6vrCYB9e6nZUEvrqnwXPF8ArTCRXMY"
+        addresses = [
+            'bcrt1qtmp74ayg7p24uslctssvjm06q5phz4yrxucgnv', # m/0'/0'/0
+            'bcrt1q8vprchan07gzagd5e6v9wd7azyucksq2xc76k8', # m/0'/0'/1
+            'bcrt1qtuqdtha7zmqgcrr26n2rqxztv5y8rafjp9lulu', # m/0'/0'/2
+            'bcrt1qau64272ymawq26t90md6an0ps99qkrse58m640', # m/0'/0'/3
+            'bcrt1qsg97266hrh6cpmutqen8s4s962aryy77jp0fg0', # m/0'/0'/4
+        ]
+        result = wrpc.importmulti(
+            [{
+                'desc': descsum_create('wpkh([80002067/0h/0h]' + xpub + '/*)'),
+                'keypool': True,
+                'timestamp': 'now',
+                'range' : [0, 4],
+            }]
+        )
+        for i in range(0, 5):
+            addr = wrpc.getnewaddress('', 'bech32')
+            assert_equal(addr, addresses[i])
+
+
+if __name__ == '__main__':
+    ImportMultiTest().main()
