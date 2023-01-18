@@ -616,4 +616,166 @@ class ImportMultiTest(BitcoinTestFramework):
         wif_priv = "cTe1f5rdT8A8DFgVWTjyPwACsDPJM9ff4QngFxUixCSvvbg1x6sh"
         address = "2MuhcG52uHPknxDgmGPsV18jSHFBnnRgjPg"
         desc = "sh(wpkh(" + wif_priv + "))"
-        self.log.info("Should
+        self.log.info("Should import a descriptor with a WIF private key as spendable")
+        self.test_importmulti({"desc": descsum_create(desc),
+                               "timestamp": "now"},
+                              success=True)
+        test_address(self.nodes[1],
+                     address,
+                     solvable=True,
+                     ismine=True)
+
+        # dump the private key to ensure it matches what was imported
+        privkey = self.nodes[1].dumpprivkey(address)
+        assert_equal(privkey, wif_priv)
+
+        # Test importing of a P2PKH address via descriptor
+        key = get_key(self.nodes[0])
+        p2pkh_label = "P2PKH descriptor import"
+        self.log.info("Should import a p2pkh address from descriptor")
+        self.test_importmulti({"desc": descsum_create("pkh(" + key.pubkey + ")"),
+                               "timestamp": "now",
+                               "label": p2pkh_label},
+                              True,
+                              warnings=["Some private keys are missing, outputs will be considered watchonly. If this is intentional, specify the watchonly flag."])
+        test_address(self.nodes[1],
+                     key.p2pkh_addr,
+                     solvable=True,
+                     ismine=False,
+                     labels=[p2pkh_label])
+
+        # Test import fails if both desc and scriptPubKey are provided
+        key = get_key(self.nodes[0])
+        self.log.info("Import should fail if both scriptPubKey and desc are provided")
+        self.test_importmulti({"desc": descsum_create("pkh(" + key.pubkey + ")"),
+                               "scriptPubKey": {"address": key.p2pkh_addr},
+                               "timestamp": "now"},
+                              success=False,
+                              error_code=-8,
+                              error_message='Both a descriptor and a scriptPubKey should not be provided.')
+
+        # Test import fails if neither desc nor scriptPubKey are present
+        key = get_key(self.nodes[0])
+        self.log.info("Import should fail if neither a descriptor nor a scriptPubKey are provided")
+        self.test_importmulti({"timestamp": "now"},
+                              success=False,
+                              error_code=-8,
+                              error_message='Either a descriptor or scriptPubKey must be provided.')
+
+        # Test importing of a multisig via descriptor
+        key1 = get_key(self.nodes[0])
+        key2 = get_key(self.nodes[0])
+        self.log.info("Should import a 1-of-2 bare multisig from descriptor")
+        self.test_importmulti({"desc": descsum_create("multi(1," + key1.pubkey + "," + key2.pubkey + ")"),
+                               "timestamp": "now"},
+                              success=True,
+                              warnings=["Some private keys are missing, outputs will be considered watchonly. If this is intentional, specify the watchonly flag."])
+        self.log.info("Should not treat individual keys from the imported bare multisig as watchonly")
+        test_address(self.nodes[1],
+                     key1.p2pkh_addr,
+                     ismine=False,
+                     iswatchonly=False)
+
+        # Import pubkeys with key origin info
+        self.log.info("Addresses should have hd keypath and master key id after import with key origin")
+        pub_addr = self.nodes[1].getnewaddress()
+        pub_addr = self.nodes[1].getnewaddress(address_type="bech32")
+        info = self.nodes[1].getaddressinfo(pub_addr)
+        pub = info['pubkey']
+        pub_keypath = info['hdkeypath']
+        pub_fpr = info['hdmasterfingerprint']
+        result = self.nodes[0].importmulti(
+            [{
+                'desc' : descsum_create("wpkh([" + pub_fpr + pub_keypath[1:] +"]" + pub + ")"),
+                "timestamp": "now",
+            }]
+        )
+        assert result[0]['success']
+        pub_import_info = self.nodes[0].getaddressinfo(pub_addr)
+        assert_equal(pub_import_info['hdmasterfingerprint'], pub_fpr)
+        assert_equal(pub_import_info['pubkey'], pub)
+        assert_equal(pub_import_info['hdkeypath'], pub_keypath)
+
+        # Import privkeys with key origin info
+        priv_addr = self.nodes[1].getnewaddress(address_type="bech32")
+        info = self.nodes[1].getaddressinfo(priv_addr)
+        priv = self.nodes[1].dumpprivkey(priv_addr)
+        priv_keypath = info['hdkeypath']
+        priv_fpr = info['hdmasterfingerprint']
+        result = self.nodes[0].importmulti(
+            [{
+                'desc' : descsum_create("wpkh([" + priv_fpr + priv_keypath[1:] + "]" + priv + ")"),
+                "timestamp": "now",
+            }]
+        )
+        assert result[0]['success']
+        priv_import_info = self.nodes[0].getaddressinfo(priv_addr)
+        assert_equal(priv_import_info['hdmasterfingerprint'], priv_fpr)
+        assert_equal(priv_import_info['hdkeypath'], priv_keypath)
+
+        # Make sure the key origin info are still there after a restart
+        self.stop_nodes()
+        self.start_nodes()
+        import_info = self.nodes[0].getaddressinfo(pub_addr)
+        assert_equal(import_info['hdmasterfingerprint'], pub_fpr)
+        assert_equal(import_info['hdkeypath'], pub_keypath)
+        import_info = self.nodes[0].getaddressinfo(priv_addr)
+        assert_equal(import_info['hdmasterfingerprint'], priv_fpr)
+        assert_equal(import_info['hdkeypath'], priv_keypath)
+
+        # Check legacy import does not import key origin info
+        self.log.info("Legacy imports don't have key origin info")
+        pub_addr = self.nodes[1].getnewaddress()
+        info = self.nodes[1].getaddressinfo(pub_addr)
+        pub = info['pubkey']
+        result = self.nodes[0].importmulti(
+            [{
+                'scriptPubKey': {'address': pub_addr},
+                'pubkeys': [pub],
+                "timestamp": "now",
+            }]
+        )
+        assert result[0]['success']
+        pub_import_info = self.nodes[0].getaddressinfo(pub_addr)
+        assert_equal(pub_import_info['pubkey'], pub)
+        assert 'hdmasterfingerprint' not in pub_import_info
+        assert 'hdkeypath' not in pub_import_info
+
+        # Bech32m addresses and descriptors cannot be imported
+        self.log.info("Bech32m addresses and descriptors cannot be imported")
+        self.test_importmulti(
+            {
+                "scriptPubKey": {"address": "bcrt1p0xlxvlhemja6c4dqv22uapctqupfhlxm9h8z3k2e72q4k9hcz7vqc8gma6"},
+                "timestamp": "now",
+            },
+            success=False,
+            error_code=-5,
+            error_message="Bech32m addresses cannot be imported into legacy wallets",
+        )
+        self.test_importmulti(
+            {
+                "desc": descsum_create("tr({})".format(pub)),
+                "timestamp": "now",
+            },
+            success=False,
+            error_code=-5,
+            error_message="Bech32m descriptors cannot be imported into legacy wallets",
+        )
+
+        # Import some public keys to the keypool of a no privkey wallet
+        self.log.info("Adding pubkey to keypool of disableprivkey wallet")
+        self.nodes[1].createwallet(wallet_name="noprivkeys", disable_private_keys=True)
+        wrpc = self.nodes[1].get_wallet_rpc("noprivkeys")
+
+        addr1 = self.nodes[0].getnewaddress(address_type="bech32")
+        addr2 = self.nodes[0].getnewaddress(address_type="bech32")
+        pub1 = self.nodes[0].getaddressinfo(addr1)['pubkey']
+        pub2 = self.nodes[0].getaddressinfo(addr2)['pubkey']
+        result = wrpc.importmulti(
+            [{
+                'desc': descsum_create('wpkh(' + pub1 + ')'),
+                'keypool': True,
+                "timestamp": "now",
+            },
+            {
+                'desc':
