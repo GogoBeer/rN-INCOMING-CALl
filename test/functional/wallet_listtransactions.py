@@ -244,4 +244,46 @@ class ListTransactionsTest(BitcoinTestFramework):
         addr3 = self.nodes[0].getnewaddress("pizza3", 'bech32')
 
         self.log.info("Send to externally generated addresses")
-        # send to an address beyond th
+        # send to an address beyond the next to be generated to test the keypool gap
+        self.nodes[1].sendtoaddress(addr3, "0.001")
+        self.generate(self.nodes[1], 1)
+
+        # send to an address that is already marked as used due to the keypool gap mechanics
+        self.nodes[1].sendtoaddress(addr2, "0.001")
+        self.generate(self.nodes[1], 1)
+
+        # send to self transaction
+        self.nodes[0].sendtoaddress(addr1, "0.001")
+        self.generate(self.nodes[0], 1)
+
+        self.log.info("Verify listtransactions is the same regardless of where the address was generated")
+        transactions0 = self.nodes[0].listtransactions()
+        transactions2 = self.nodes[2].listtransactions()
+
+        # normalize results: remove fields that normally could differ and sort
+        def normalize_list(txs):
+            for tx in txs:
+                tx.pop('label', None)
+                tx.pop('time', None)
+                tx.pop('timereceived', None)
+            txs.sort(key=lambda x: x['txid'])
+
+        normalize_list(transactions0)
+        normalize_list(transactions2)
+        assert_equal(transactions0, transactions2)
+
+        self.log.info("Verify labels are persistent on the node that generated the addresses")
+        assert_equal(['pizza1'], self.nodes[0].getaddressinfo(addr1)['labels'])
+        assert_equal(['pizza2'], self.nodes[0].getaddressinfo(addr2)['labels'])
+        assert_equal(['pizza3'], self.nodes[0].getaddressinfo(addr3)['labels'])
+
+    def run_invalid_parameters_test(self):
+        self.log.info("Test listtransactions RPC parameter validity")
+        assert_raises_rpc_error(-8, 'Label argument must be a valid label name or "*".', self.nodes[0].listtransactions, label="")
+        self.nodes[0].listtransactions(label="*")
+        assert_raises_rpc_error(-8, "Negative count", self.nodes[0].listtransactions, count=-1)
+        assert_raises_rpc_error(-8, "Negative from", self.nodes[0].listtransactions, skip=-1)
+
+
+if __name__ == '__main__':
+    ListTransactionsTest().main()
