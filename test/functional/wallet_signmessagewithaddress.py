@@ -26,4 +26,20 @@ class SignMessagesWithAddressTest(BitcoinTestFramework):
         signature = self.nodes[0].signmessage(address, message)
         assert self.nodes[0].verifymessage(address, signature, message)
 
-        self.log.info('test verifying with another address s
+        self.log.info('test verifying with another address should not work')
+        other_address = self.nodes[0].getnewaddress()
+        other_signature = self.nodes[0].signmessage(other_address, message)
+        assert not self.nodes[0].verifymessage(other_address, signature, message)
+        assert not self.nodes[0].verifymessage(address, other_signature, message)
+
+        self.log.info('test parameter validity and error codes')
+        # signmessage has two required parameters
+        for num_params in [0, 1, 3, 4, 5]:
+            param_list = ["dummy"]*num_params
+            assert_raises_rpc_error(-1, "signmessage", self.nodes[0].signmessage, *param_list)
+        # invalid key or address provided
+        assert_raises_rpc_error(-5, "Invalid address", self.nodes[0].signmessage, "invalid_addr", message)
+
+
+if __name__ == '__main__':
+    SignMessagesWithAddressTest().main()
