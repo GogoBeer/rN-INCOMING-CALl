@@ -81,4 +81,166 @@ KEYS = [
         ]
     },
     {
-        "xprv": "tprv8ZgxMBicQKsPdEhLRxxwzTv2t18j7ruoff
+        "xprv": "tprv8ZgxMBicQKsPdEhLRxxwzTv2t18j7ruoffPeqAwVA2qXJ2P66RaMZLUWQ85SjoA7xPxdSgCB9UZ72m65qbnaLPtFTfHVP3MEmkpZk1Bv8RT",
+        "xpub": "tpubD6NzVbkrYhZ4Whj8KcdYPsa9T2efHC6iExzS7gynaJdv8WdripPwjq6NaH5gQJGrLmvUwHY1smhiakUosXNDTEa6qfKUQdLKV6DJBre6XvQ",
+        "pubs": [
+            "d0c19def28bb1b39451c1a814737615983967780d223b79969ba692182c6006b",
+            "cb1d1b1dc62fec1894d4c3d9a1b6738e5ff9c273a64f74e9ab363095f45e9c47",
+            "245be588f41acfaeb9481aa132717db56ee1e23eb289729fe2b8bde8f9a00830",
+            "5bc4ad6d6187fa82728c85a073b428483295288f8aef5722e47305b5872f7169",
+        ]
+    },
+    {
+        "xprv": "tprv8ZgxMBicQKsPcxbqxzcMAwQpiCD8x6qaZEJTxdKxw4w9GuMzDACTD9yhEsHGfqQcfYX4LivosLDDngTykYEp9JnTdcqY7cHqU8PpeFFKyV3",
+        "xpub": "tpubD6NzVbkrYhZ4WRddreGwaM4wHDj57S2V8XuFF9NGMLjY7PckqZ23PebZR1wGA4w84uX2vZphdZVsnREjij1ibYjEBTaTVQCEZCLs4xUDapx",
+        "pubs": [
+            "065cc1b92bd99e5a3e626e8296a366b2d132688eb43aea19bc14fd8f43bf07fb",
+            "5b95633a7dda34578b6985e6bfd85d83ec38b7ded892a9b74a3d899c85890562",
+            "dc86d434b9a34495c8e845b969d51f80d19a8df03b400353ffe8036a0c22eb60",
+            "06c8ffde238745b29ae8a97ae533e1f3edf214bba6ec58b5e7b9451d1d61ec19",
+        ]
+    },
+    {
+        "xprv": "tprv8ZgxMBicQKsPe6zLoU8MTTXgsdJVNBErrYGpoGwHf5VGvwUzdNc7NHeCSzkJkniCxBhZWujXjmD4HZmBBrnr3URgJjM6GxRgMmEhLdqNTWG",
+        "xpub": "tpubD6NzVbkrYhZ4Xa28h7nwrsBoSepRXWRmRqsc5nyb5MHfmRjmFmRhYnG4d9dC7uxixN5AfsEv1Lz3mCAuWvERyvPgKozHUVjfo8EG6foJGy7",
+        "pubs": [
+            "d826a0a53abb6ffc60df25b9c152870578faef4b2eb5a09bdd672bbe32cdd79b",
+            "939365e0359ff6bc6f6404ee220714c5d4a0d1e36838b9e2081ede217674e2ba",
+            "4e8767edcf7d3d90258cfbbea01b784f4d2de813c4277b51279cf808bac410a2",
+            "d42a2c280940bfc6ede971ae72cde2e1df96c6da7dab06a132900c6751ade208",
+        ]
+    },
+    {
+        "xprv": "tprv8ZgxMBicQKsPeB5o5oCsN2dVxM2mtJiYERQEBRc4JNwC1DFGYaEdNkmh8jJYVPU76YhkFoRoWTdh1p3yQGykG8TfDW34dKgrgSx28gswUyL",
+        "xpub": "tpubD6NzVbkrYhZ4Xe7aySsTmSHcXNYi3duSoj11TweMiejaqhW3Ay4DZFPZJses4sfpk4b9VHRhn8v4cKTMjugMM3hqXcqSSmRdiW8QvASXjfY",
+        "pubs": [
+            "e360564b2e0e8d06681b6336a29d0750210e8f34afd9afb5e6fd5fe6dba26c81",
+            "76b4900f00a1dcce463b6d8e02b768518fce4f9ecd6679a13ad78ea1e4815ad3",
+            "5575556e263c8ed52e99ab02147cc05a738869afe0039911b5a60a780f4e43d2",
+            "593b00e2c8d4bd6dda0fd9e238888acf427bb4e128887fd5a40e0e9da78cbc01",
+        ]
+    },
+    {
+        "xprv": "tprv8ZgxMBicQKsPfEH6jHemkGDjZRnAaKFJVGH8pQU638E6SdbX9hxit1tK2sfFPfL6KS7v8FfUKxstbfEpzSymbdfBM9Y5UkrxErF9fJaKLK3",
+        "xpub": "tpubD6NzVbkrYhZ4YhJtcwKN9fsr8TJ6jeSD4Zsv6vWPTQ2VH7rHn6nK4WWBCzKK7FkdVVwm3iztCU1UmStY4hX6gRbBmp9UzK9C59dQEzeXS12",
+        "pubs": [
+            "7631cacec3343052d87ef4d0065f61dde82d7d2db0c1cc02ef61ef3c982ea763",
+            "c05e44a9e735d1b1bef62e2c0d886e6fb4923b2649b67828290f5cacc51c71b7",
+            "b33198b20701afe933226c92fd0e3d51d3f266f1113d864dbd026ae3166ef7f2",
+            "f99643ac3f4072ee4a949301e86963a9ca0ad57f2ef29f6b84fda037d7cac85b",
+        ]
+    },
+    {
+        "xprv": "tprv8ZgxMBicQKsPdNWU38dT6aGxtqJR4oYS5kPpLVBcuKiiu7gqTYqMMqhUG6DP7pPahzPQu36sWSmeLCP1C4AwqcR5FX2RyRoZfd4B8pAnSdX",
+        "xpub": "tpubD6NzVbkrYhZ4WqYFvnJ3Vyw5TrpME8jLf3zbd1DvKbX7jbwc5wewYLKLSFRzZWV6hZj7XhsXAy7fhE5jB25DiWyNM3ztXbsXHRVCrp5BiPY",
+        "pubs": [
+            "2258b1c3160be0864a541854eec9164a572f094f7562628281a8073bb89173a7",
+            "83df59d0a5c951cdd62b7ab225a62079f48d2a333a86e66c35420d101446e92e",
+            "2a654bf234d819055312f9ca03fad5836f9163b09cdd24d29678f694842b874a",
+            "aa0334ab910047387c912a21ec0dab806a47ffa38365060dbc5d47c18c6e66e7",
+        ]
+    },
+    {
+        "xprv": "tprv8mGPkMVz5mZuJDnC2NjjAv7E9Zqa5LCgX4zawbZu5nzTtLb5kGhPwycX4H1gtW1f5ZdTKTNtQJ61hk71F2TdcQ93EFDTpUcPBr98QRji615",
+        "xpub": "tpubDHxRtmYEE9FaBgoyv2QKaKmLibMWEfPb6NbNE7cCW4nripqrNfWz8UEPEPbHCrakwLvwFfsqoaf4pjX4gWStp4nECRf1QwBKPkLqnY8pHbj",
+        "pubs": [
+            "00a9da96087a72258f83b338ef7f0ea8cbbe05da5f18f091eb397d1ecbf7c3d3",
+            "b2749b74d51a78f5fe3ebb3a7c0ff266a468cade143dfa265c57e325177edf00",
+            "6b8747a6bbe4440d7386658476da51f6e49a220508a7ec77fe7bccc3e7baa916",
+            "4674bf4d9ebbe01bf0aceaca2472f63198655ecf2df810f8d69b38421972318e",
+        ]
+    }
+]
+
+CHANGE_XPRV = "tprv8ZgxMBicQKsPcyDrWwiecVnTtFmfRwbfFqEfR4ZGWvq5aTTwLBWmAm5zrbMcYtb9gQNFfhRfqhhrBG37U3nhmXxEgeEPBJGHAPrHCrAd1WX"
+CHANGE_XPUB = "tpubD6NzVbkrYhZ4WSFeQbPF1uSaTHHbbGnZq8qShabZwCdUQwihxaLMMFhs2kidGF2qrRKiQVqw8VoyuTHj1bZqmMXMeciaU1gBjWA1sim2zUB"
+
+# Point with no known discrete log.
+H_POINT = "50929b74c1a04954b78b4b6035e97a5e078a5a0f28ec96d547bfee9ace803ac0"
+
+
+def key(hex_key):
+    """Construct an x-only pubkey from its hex representation."""
+    return bytes.fromhex(hex_key)
+
+def pk(hex_key):
+    """Construct a script expression for taproot_construct for pk(hex_key)."""
+    return (None, CScript([bytes.fromhex(hex_key), OP_CHECKSIG]))
+
+def compute_taproot_address(pubkey, scripts):
+    """Compute the address for a taproot output with given inner key and scripts."""
+    tap = taproot_construct(pubkey, scripts)
+    assert tap.scriptPubKey[0] == OP_1
+    assert tap.scriptPubKey[1] == 0x20
+    return encode_segwit_address("bcrt", 1, tap.scriptPubKey[2:])
+
+class WalletTaprootTest(BitcoinTestFramework):
+    """Test generation and spending of P2TR address outputs."""
+
+    def set_test_params(self):
+        self.num_nodes = 3
+        self.setup_clean_chain = True
+        self.extra_args = [['-keypool=100'], ['-keypool=100'], ["-vbparams=taproot:1:1"]]
+        self.supports_cli = False
+
+    def skip_test_if_missing_module(self):
+        self.skip_if_no_wallet()
+        self.skip_if_no_sqlite()
+
+    def setup_network(self):
+        self.setup_nodes()
+
+    def init_wallet(self, *, node):
+        pass
+
+    @staticmethod
+    def rand_keys(n):
+        ret = []
+        idxes = set()
+        for _ in range(n):
+            while True:
+                i = random.randrange(len(KEYS))
+                if not i in idxes:
+                    break
+            idxes.add(i)
+            ret.append(KEYS[i])
+        return ret
+
+    @staticmethod
+    def make_desc(pattern, privmap, keys, pub_only = False):
+        pat = pattern.replace("$H", H_POINT)
+        for i in range(len(privmap)):
+            if privmap[i] and not pub_only:
+                pat = pat.replace("$%i" % (i + 1), keys[i]['xprv'])
+            else:
+                pat = pat.replace("$%i" % (i + 1), keys[i]['xpub'])
+        return descsum_create(pat)
+
+    @staticmethod
+    def make_addr(treefn, keys, i):
+        args = []
+        for j in range(len(keys)):
+            args.append(keys[j]['pubs'][i])
+        return compute_taproot_address(*treefn(*args))
+
+    def do_test_addr(self, comment, pattern, privmap, treefn, keys):
+        self.log.info("Testing %s address derivation" % comment)
+        desc = self.make_desc(pattern, privmap, keys, False)
+        desc_pub = self.make_desc(pattern, privmap, keys, True)
+        assert_equal(self.nodes[0].getdescriptorinfo(desc)['descriptor'], desc_pub)
+        result = self.addr_gen.importdescriptors([{"desc": desc_pub, "active": True, "timestamp": "now"}])
+        assert(result[0]['success'])
+        for i in range(4):
+            addr_g = self.addr_gen.getnewaddress(address_type='bech32m')
+            if treefn is not None:
+                addr_r = self.make_addr(treefn, keys, i)
+                assert_equal(addr_g, addr_r)
+            desc_a = self.addr_gen.getaddressinfo(addr_g)['desc']
+            if desc.startswith("tr("):
+                assert desc_a.startswith("tr(")
+            rederive = self.nodes[1].deriveaddresses(desc_a)
+            assert_equal(len(rederive), 1)
+            assert_equal(rederive[0], addr_g)
+
+        # tr descriptors can be imported regardless of Taproot status
+        result = self.privs_tr_enabled.importdescriptors([{"desc": de
