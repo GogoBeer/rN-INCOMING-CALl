@@ -368,3 +368,60 @@ class WalletTaprootTest(BitcoinTestFramework):
         )
         self.do_test(
             "tr(XPRV,{H,{H,XPUB}})",
+            "tr($1/*,{pk($H),{pk($H),pk($2/*)}})",
+            [True, False],
+            lambda k1, k2: (key(k1), [pk(H_POINT), [pk(H_POINT), pk(k2)]]),
+            2
+        )
+        self.do_test(
+            "wsh(multi(1,XPRV,XPUB))",
+            "wsh(multi(1,$1/*,$2/*))",
+            [True, False],
+            None,
+            2
+        )
+        self.do_test(
+            "tr(XPRV,{XPUB,XPUB})",
+            "tr($1/*,{pk($2/*),pk($2/*)})",
+            [True, False],
+            lambda k1, k2: (key(k1), [pk(k2), pk(k2)]),
+            2
+        )
+        self.do_test(
+            "tr(XPRV,{{XPUB,H},{H,XPUB}})",
+            "tr($1/*,{{pk($2/*),pk($H)},{pk($H),pk($2/*)}})",
+            [True, False],
+            lambda k1, k2: (key(k1), [[pk(k2), pk(H_POINT)], [pk(H_POINT), pk(k2)]]),
+            2
+        )
+        self.do_test(
+            "tr(XPUB,{{H,{H,XPUB}},{H,{H,{H,XPRV}}}})",
+            "tr($1/*,{{pk($H),{pk($H),pk($2/*)}},{pk($H),{pk($H),{pk($H),pk($3/*)}}}})",
+            [False, False, True],
+            lambda k1, k2, k3: (key(k1), [[pk(H_POINT), [pk(H_POINT), pk(k2)]], [pk(H_POINT), [pk(H_POINT), [pk(H_POINT), pk(k3)]]]]),
+            3
+        )
+        self.do_test(
+            "tr(XPRV,{XPUB,{{XPUB,{H,H}},{{H,H},XPUB}}})",
+            "tr($1/*,{pk($2/*),{{pk($2/*),{pk($H),pk($H)}},{{pk($H),pk($H)},pk($2/*)}}})",
+            [True, False],
+            lambda k1, k2: (key(k1), [pk(k2), [[pk(k2), [pk(H_POINT), pk(H_POINT)]], [[pk(H_POINT), pk(H_POINT)], pk(k2)]]]),
+            2
+        )
+
+        self.log.info("Sending everything back...")
+
+        txid = self.rpc_online.sendtoaddress(address=self.boring.getnewaddress(), amount=self.rpc_online.getbalance(), subtractfeefromamount=True)
+        self.generatetoaddress(self.nodes[0], 1, self.boring.getnewaddress(), sync_fun=self.no_op)
+        assert(self.rpc_online.gettransaction(txid)["confirmations"] > 0)
+
+        psbt = self.psbt_online.walletcreatefundedpsbt([], [{self.boring.getnewaddress(): self.psbt_online.getbalance()}], None, {"subtractFeeFromOutputs": [0]})['psbt']
+        res = self.psbt_offline.walletprocesspsbt(psbt)
+        assert(res['complete'])
+        rawtx = self.nodes[0].finalizepsbt(res['psbt'])['hex']
+        txid = self.nodes[0].sendrawtransaction(rawtx)
+        self.generatetoaddress(self.nodes[0], 1, self.boring.getnewaddress(), sync_fun=self.no_op)
+        assert(self.psbt_online.gettransaction(txid)['confirmations'] > 0)
+
+if __name__ == '__main__':
+    WalletTaprootTest().main()
