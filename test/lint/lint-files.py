@@ -164,4 +164,40 @@ def check_shebang_file_permissions() -> int:
     failed_tests = 0
     for filename in filenames:
         file_meta = FileMeta(filename)
-        if file_meta.permissions != ALLOWED_PER
+        if file_meta.permissions != ALLOWED_PERMISSION_EXECUTABLES:
+            # These file types are typically expected to be sourced and not executed directly
+            if file_meta.full_extension in ["bash", "init", "openrc", "sh.in"]:
+                continue
+
+            # *.py files which don't contain an `if __name__ == '__main__'` are not expected to be executed directly
+            if file_meta.extension == "py":
+                with open(filename, "r", encoding="utf8") as f:
+                    file_data = f.read()
+                if not re.search("""if __name__ == ['"]__main__['"]:""", file_data):
+                    continue
+
+            print(
+                f"""File "{filename}" contains a shebang line, but has the file permission {file_meta.permissions} instead of the expected executable permission {ALLOWED_PERMISSION_EXECUTABLES}. Do "chmod {ALLOWED_PERMISSION_EXECUTABLES} {filename}" (or remove the shebang line)."""
+            )
+            failed_tests += 1
+    return failed_tests
+
+
+def main() -> NoReturn:
+    failed_tests = 0
+    failed_tests += check_all_filenames()
+    failed_tests += check_source_filenames()
+    failed_tests += check_all_file_permissions()
+    failed_tests += check_shebang_file_permissions()
+
+    if failed_tests:
+        print(
+            f"ERROR: There were {failed_tests} failed tests in the lint-files.py lint test. Please resolve the above errors."
+        )
+        sys.exit(1)
+    else:
+        sys.exit(0)
+
+
+if __name__ == "__main__":
+    main()
