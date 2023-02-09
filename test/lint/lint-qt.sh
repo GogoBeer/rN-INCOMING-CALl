@@ -12,4 +12,9 @@ EXIT_CODE=0
 
 OUTPUT=$(git grep -E '(SIGNAL|, ?SLOT)\(' -- src/qt)
 if [[ ${OUTPUT} != "" ]]; then
-    echo "Use Qt5 connect style
+    echo "Use Qt5 connect style in:"
+    echo "$OUTPUT"
+    EXIT_CODE=1
+fi
+
+exit ${EXIT_CODE}
